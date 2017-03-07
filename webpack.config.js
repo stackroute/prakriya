@@ -5,6 +5,9 @@ const buildPath = path.resolve(__dirname, 'build');
 
 const config = {
 	entry: [
+		'webpack/hot/dev-server',
+		'webpack/hot/only-dev-server',
+		path.join(__dirname, '/src/Route.jsx')
 	],
 	devServer: {
 		contentBase: './',
