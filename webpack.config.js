@@ -1,24 +1,16 @@
 const webpack = require('webpack');
 const path = require('path');
-const buildPath = path.resolve(__dirname, 'build');
+const buildPath = path.resolve(__dirname, 'client', 'assets');
 // const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 
 const config = {
 	entry: [
-		'webpack/hot/dev-server',
-		'webpack/hot/only-dev-server',
 		path.join(__dirname, '/client/Route.jsx')
 	],
-	devServer: {
-		contentBase: './',
-		hot: true,
-		inline: true,
-		port: 3000,
-		host: 'localhost'
-	}, 
 	output: {
 		path: buildPath,
-		filename: 'bundle.js'
+		filename: 'bundle.js',
+		publicPath: '/assets/'
 	},
 	plugins: [
 		new webpack.HotModuleReplacementPlugin(),
