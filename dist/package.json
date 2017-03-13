@@ -5,18 +5,25 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "gulp build && node ./bin/www",
     "start": "node ./bin/www"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.17.1",
+    "connect-flash": "^0.1.1",
     "express": "^4.15.2",
+    "express-session": "^1.15.1",
     "material-ui": "^0.17.0",
+    "mongoose": "^4.8.6",
     "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-router": "^3.0.2",
-    "react-tap-event-plugin": "^2.0.1"
+    "react-tap-event-plugin": "^2.0.1",
+    "superagent": "^3.5.0"
   },
   "devDependencies": {
     "babel-core": "^6.23.1",
