@@ -1,9 +1,18 @@
 import React from 'react';
+import cookie from 'react-cookie'; 
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import Request from 'superagent';
 import {Link} from 'react-router';
+
+// if (typeof localStorage === "undefined" || localStorage === null) {
+//   var LocalStorage = require('node-localstorage').LocalStorage;
+//   localStorage = new LocalStorage('./scratch');
+// }
+
+
+
 
 export default class Login extends React.Component {
 
@@ -30,20 +39,36 @@ export default class Login extends React.Component {
 	login() {
 		let th = this
 		Request
-			.post('/login')
+			.post('/login/token')
 			.send({username: this.state.username, password: this.state.password})
 			.end(function(err, res){
 		    // Do something 
-		    if(res.text == "true") {
+		    console.log(res)
+		    if(res.body.token != ''){
+		    	localStorage.setItem('token', res.body.token);
+				// console.log(localStorage.getItem('token'));
+		    	// cookie.save('token', res.body.token, { path: '/' });
+      			// dispatch({ type: AUTH_USER });
+
 		    	// th.props.showDashboard();
-		    	window.loginStatus = true
 		    	th.context.router.push('/admin')
+		    	window.loginStatus = true
 		    }
 		    else {
 		    	th.setState({
 		    		errMsg: "*Invalid username or password"
 		    	})
 		    }
+		    // if(res.text == "true") {
+		    // 	// th.props.showDashboard();
+		    // 	window.loginStatus = true
+		    // 	th.context.router.push('/admin')
+		    // }
+		    // else {
+		    // 	th.setState({
+		    // 		errMsg: "*Invalid username or password"
+		    // 	})
+		    // }
 		  });
 	}
 
