@@ -10,6 +10,7 @@ import Welcome from './views/Welcome.jsx';
 import Login from './components/login/index.jsx';
 import SignUp from './components/signup/index.jsx';
 import Admin from './components/admin/index.jsx';
+import AddUser from './components/admin/AddUser.jsx';
 
 injectTapEventPlugin();
 
@@ -24,6 +25,7 @@ ReactDOM.render(
 				<Route path="/login" component={Login} />
 				<Route path="/signup" component={SignUp} />
 				<Route path="/admin" component={Admin} />
+				<Route path="/adduser" component={AddUser} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

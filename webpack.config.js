@@ -27,6 +27,11 @@ const config = {
 				test: /\.jsx$/,
 				loaders: ['react-hot', 'babel-loader'],
 				exclude: [/node_modules/]
+			},
+			{
+			  test: /\.css$/,
+			  loader: 'style!css?modules',
+			  include: /flexboxgrid/,
 			}
 		]
 	}

@@ -1,8 +1,7 @@
 import React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import Request from 'superagent';
-import cookie from 'react-cookie'; 
-
+import AddUser from './AddUser.jsx';
 
 export default class Admin extends React.Component {
 

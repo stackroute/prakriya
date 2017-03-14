@@ -1,6 +1,9 @@
 const router = require('express').Router();
+<<<<<<< HEAD
 var mongoose = require('mongoose');
 
+=======
+>>>>>>> c47a9442bae0b812d615332a27f466e551e8ad6e
 const userModel = require('../../models/users.js');
 const passport = require('passport');
 var jwt = require("jwt-simple");  

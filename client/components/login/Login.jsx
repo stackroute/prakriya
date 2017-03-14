@@ -43,6 +43,7 @@ export default class Login extends React.Component {
 			.send({username: this.state.username, password: this.state.password})
 			.end(function(err, res){
 		    // Do something 
+
 		    console.log(res)
 		    if(res.body.token != ''){
 		    	localStorage.setItem('token', res.body.token);
@@ -51,6 +52,7 @@ export default class Login extends React.Component {
       			// dispatch({ type: AUTH_USER });
 
 		    	// th.props.showDashboard();
+
 		    	th.context.router.push('/admin')
 		    	window.loginStatus = true
 		    }
@@ -78,7 +80,6 @@ export default class Login extends React.Component {
 				<TextField hintText="Username" onChange={this.onChangeUsername} /> <br />
 				<TextField hintText="Password" type="password" onChange={this.onChangePassword} /> <br />
 				<RaisedButton label="Login" primary={true} onClick={this.login} />
-				<Link to='/signup'><FlatButton label="Sign Up" primary={true} /></Link><br />
 				<span style={{color:'red'}}>{this.state.errMsg}</span>
 			</div>
 		)
