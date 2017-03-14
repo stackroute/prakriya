@@ -6,14 +6,6 @@ import FlatButton from 'material-ui/FlatButton';
 import Request from 'superagent';
 import {Link} from 'react-router';
 
-// if (typeof localStorage === "undefined" || localStorage === null) {
-//   var LocalStorage = require('node-localstorage').LocalStorage;
-//   localStorage = new LocalStorage('./scratch');
-// }
-
-
-
-
 export default class Login extends React.Component {
 
 	constructor(props) {
@@ -43,34 +35,15 @@ export default class Login extends React.Component {
 			.send({username: this.state.username, password: this.state.password})
 			.end(function(err, res){
 		    // Do something 
-
-		    console.log(res)
 		    if(res.body.token != ''){
 		    	localStorage.setItem('token', res.body.token);
-				// console.log(localStorage.getItem('token'));
-		    	// cookie.save('token', res.body.token, { path: '/' });
-      			// dispatch({ type: AUTH_USER });
-
-		    	// th.props.showDashboard();
-
-		    	th.context.router.push('/admin')
-		    	window.loginStatus = true
+		    	th.context.router.push('/dashboard')
 		    }
 		    else {
 		    	th.setState({
 		    		errMsg: "*Invalid username or password"
 		    	})
 		    }
-		    // if(res.text == "true") {
-		    // 	// th.props.showDashboard();
-		    // 	window.loginStatus = true
-		    // 	th.context.router.push('/admin')
-		    // }
-		    // else {
-		    // 	th.setState({
-		    // 		errMsg: "*Invalid username or password"
-		    // 	})
-		    // }
 		  });
 	}
 

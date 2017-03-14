@@ -1,9 +1,7 @@
 import React from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
 import Request from 'superagent';
-import AddUser from './AddUser.jsx';
 
-export default class Admin extends React.Component {
+export default class Dashboard extends React.Component {
 
 	constructor(props) {
 		super(props)
@@ -22,8 +20,7 @@ export default class Admin extends React.Component {
 	render() {
 		return(
 			<div>
-				<h1>Welcome to Admin Page</h1>
-				<RaisedButton label="Login" primary={true} onClick={this.authenticate} />
+				<h1>This is the dashboard</h1>
 			</div>
 		)
 	}

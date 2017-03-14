@@ -42,8 +42,7 @@ export default class Header extends React.Component {
 			marginTop: -8
 		}
 		let rightMenu, header
-		if(window.loginStatus) {
-
+		if(localStorage.getItem('token')) {
 			rightMenu = 
 				<IconMenu
 			    iconButtonElement={

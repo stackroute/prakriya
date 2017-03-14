@@ -79,7 +79,7 @@ export default class AddUser extends React.Component {
 		    let userObj
 		    if(res.text)
 		    	userObj = JSON.parse(res.text)
-		    th.context.router.push('/admin')
+		    th.context.router.push('/dashboard')
 		  });
 	}
 

@@ -58,8 +58,6 @@ router.post("/token", function(req, res) {
     } else {
         res.sendStatus(401);
     }   
-   
-    
 });
 
 router.get("/user", auth.authenticate(), function(req, res) {  

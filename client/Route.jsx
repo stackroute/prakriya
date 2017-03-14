@@ -9,23 +9,37 @@ import App from './views/App.jsx';
 import Welcome from './views/Welcome.jsx';
 import Login from './components/login/index.jsx';
 import SignUp from './components/signup/index.jsx';
-import Admin from './components/admin/index.jsx';
-import AddUser from './components/admin/AddUser.jsx';
+import Dashboard from './components/dashboard/index.jsx';
+import AddUser from './components/actions/index.jsx';
 
 injectTapEventPlugin();
 
 const muiTheme = getMuiTheme(baseTheme);
-window.loginStatus = false;
+
+function requireAuth (nextState, replace, callback) {
+  const token = localStorage.getItem('token')
+  if (!token) 
+  	replace('/')
+  return callback()
+}
+
+function alreadyLoggedIn (nextState, replace, callback) {
+  const token = localStorage.getItem('token')
+  // console.log(nextState.location.pathname)
+  if(token)
+  	replace('/dashboard')
+  return callback()
+}
 
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={muiTheme}>
 		<Router history={hashHistory}>
 			<Route path="/" component={App} >
 				<IndexRoute component={Welcome} />
-				<Route path="/login" component={Login} />
-				<Route path="/signup" component={SignUp} />
-				<Route path="/admin" component={Admin} />
-				<Route path="/adduser" component={AddUser} />
+				<Route path="/login" component={Login} onEnter={alreadyLoggedIn} />
+				<Route path="/signup" component={SignUp} onEnter={alreadyLoggedIn} />
+				<Route path="/dashboard" component={Dashboard} onEnter={requireAuth} />
+				<Route path="/adduser" component={AddUser} onEnter={requireAuth} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,
