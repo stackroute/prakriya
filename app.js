@@ -10,6 +10,7 @@ var flash = require('connect-flash');
 var LocalStrategy = require('passport-local').Strategy;
 
 var loginRoutes = require('./server/login');
+var adminRoutes = require('./server/admin');
 const userModel = require('./models/users.js');
 
 
@@ -72,10 +73,10 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-  db.users.findById(id, function (err, user) {
+  userModel.findOne({'_id': id}, function(err, user) {
     if (err) { return done(err); }
     done(null, user);
-  });
+  })
 });
 
 
@@ -97,6 +98,7 @@ app.use(passport.session());
 app.use(flash());
 
 app.use('/login', loginRoutes);
+app.use('/admin', adminRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

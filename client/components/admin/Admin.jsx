@@ -1,4 +1,5 @@
 import React from 'react';
+import AddUser from './AddUser.jsx';
 
 export default class Admin extends React.Component {
 

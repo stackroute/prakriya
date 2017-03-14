@@ -1,9 +1,15 @@
 const router = require('express').Router();
-const users = require('../../models/users.js');
+const userModel = require('../../models/users.js');
 const passport = require('passport');
 
 router.post('/', 
-  passport.authenticate('local', {failureFlash : 'Invalid login attempt..!', successFlash: 'Welcome to Prakriya'}),
+  passport.authenticate(
+  	'local', 
+  	{
+  		failureFlash : 'Invalid login attempt..!', 
+  		successFlash: 'Welcome to Prakriya'
+  	}
+  ),
   function(req, res) {
     res.send(true);
   }

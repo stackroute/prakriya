@@ -35,7 +35,6 @@ export default class Login extends React.Component {
 			.end(function(err, res){
 		    // Do something 
 		    if(res.text == "true") {
-		    	// th.props.showDashboard();
 		    	window.loginStatus = true
 		    	th.context.router.push('/admin')
 		    }
@@ -53,7 +52,6 @@ export default class Login extends React.Component {
 				<TextField hintText="Username" onChange={this.onChangeUsername} /> <br />
 				<TextField hintText="Password" type="password" onChange={this.onChangePassword} /> <br />
 				<RaisedButton label="Login" primary={true} onClick={this.login} />
-				<Link to='/signup'><FlatButton label="Sign Up" primary={true} /></Link><br />
 				<span style={{color:'red'}}>{this.state.errMsg}</span>
 			</div>
 		)

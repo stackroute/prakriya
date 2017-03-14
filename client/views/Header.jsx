@@ -4,6 +4,7 @@ import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
 import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
+import Drawer from 'material-ui/Drawer';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import {Link} from 'react-router';
@@ -13,18 +14,36 @@ export default class Header extends React.Component {
 	constructor(props) {
 		super(props) 
 		this.state = {
-			loginStatus: false
+			loginStatus: false,
+			openDrawer: false
 		}
 		this.openLoginPage = this.openLoginPage.bind(this);
+		this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
+		this.handleDrawerClose = this.handleDrawerClose.bind(this);
 	}
 
 	openLoginPage() {
 		this.context.router.push('/login')
 	}
 
+	handleDrawerToggle() {
+		this.setState({
+			openDrawer: !this.state.openDrawer
+		})
+	}
+	handleDrawerClose() {
+		this.setState({
+			openDrawer: false
+		})
+	}
 	render() {
-		let rightMenu
+		const style = {
+			marginLeft: -8,
+			marginTop: -8
+		}
+		let rightMenu, header
 		if(window.loginStatus) {
+
 			rightMenu = 
 				<IconMenu
 			    iconButtonElement={
@@ -33,24 +52,46 @@ export default class Header extends React.Component {
 			    targetOrigin={{horizontal: 'right', vertical: 'top'}}
 			    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
 			  >
-			    <MenuItem primaryText="LOG OUT" onClick={console.log('logout clicked')} />
+			    <MenuItem primaryText="LOG OUT" />
 			  </IconMenu>
+
+			header = 
+				<div>
+					<Drawer
+			      docked={false}
+			      width={250}
+			      open={this.state.openDrawer}
+			      onRequestChange={(openDrawer) => this.setState({openDrawer})}>
+			      <Link to='/adduser'>
+				      <MenuItem onTouchTap={this.handleDrawerClose}>
+					      <FlatButton label='add user' hoverColor= '#e8f1fb' labelStyle={{textAlign: 'left'}}
+					      style = {{fontSize: '50px', marginTop: '4px'}}/>
+				      </MenuItem>
+			      </Link>
+		      </Drawer>
+					<AppBar
+						style={style}
+		        title="Prakriya"
+		        onLeftIconButtonTouchTap={this.handleDrawerToggle}
+		        iconElementRight={rightMenu}
+		      />
+	      </div>
+
 		}
 		else {
 			rightMenu = <FlatButton label="Login" onClick={this.openLoginPage} />
-		}
-		const style = {
-			marginLeft: -8,
-			marginTop: -8
-		}
-		return(
-			<div>
+
+			header = 
 				<AppBar
 					style={style}
 	        title="Prakriya"
-	        showMenuIconButton={false} 
+	        showMenuIconButton={false}
 	        iconElementRight={rightMenu}
 	      />
+		}
+		return(
+			<div>
+				{header}
 	    </div>  
 		)
 	}
