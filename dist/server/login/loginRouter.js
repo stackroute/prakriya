@@ -1,9 +1,6 @@
 const router = require('express').Router();
-<<<<<<< HEAD
 var mongoose = require('mongoose');
 
-=======
->>>>>>> c47a9442bae0b812d615332a27f466e551e8ad6e
 const userModel = require('../../models/users.js');
 const passport = require('passport');
 var jwt = require("jwt-simple");  
@@ -11,48 +8,19 @@ var cfg = require("../config.js");
 var auth = require('../auth/auth.js')();
 
 
-router.post('/', 
-  passport.authenticate(
-  	'local', 
-  	{
-  		failureFlash : 'Invalid login attempt..!', 
-  		successFlash: 'Welcome to Prakriya'
-  	}
-  ),
-  function(req, res) {
-    res.send(true);
-  }
-)
-
-// function(username, password, done) {
-//     userModel.findOne({ 'username' :  username }, 
-//       function(err, user) {
-//         // In case of any error, return using the done method
-//         if (err)
-//           return done(err);
-//         // Username does not exist, log error & redirect back
-//         if (!user){
-//           console.log('User Not Found with username ',username);
-//           return done(null, false, 
-//                 req.flash('message', 'User Not found.'));                 
-//         }
-//         // // User exists but wrong password, log the error 
-//         // if (!isValidPassword(user, password)){
-//         //   console.log('Invalid Password');
-//         //   return done(null, false, 
-//         //       req.flash('message', 'Invalid Password'));
-//         // }
-//         // User and password both match, return user from 
-//         // done method which will be treated like success
-//         return done(null, user);
-//       }
-//     );
+// router.post('/', 
+//   passport.authenticate(
+//   	'local', 
+//   	{
+//   		failureFlash : 'Invalid login attempt..!', 
+//   		successFlash: 'Welcome to Prakriya'
+//   	}
+//   ),
+//   function(req, res) {
+//     res.send(true);
 //   }
+// )
 
-// function getUserPromise(name){
-//    var promise = userModel.findOne({'username':name}).exec();
-//    return promise;
-// }
 
 
 //encoding tokens here!!!!!
@@ -95,7 +63,7 @@ router.post("/token", function(req, res) {
 });
 
 router.get("/user", auth.authenticate(), function(req, res) {  
-    // res.json(users[req.user.id]);
+    
     console.log("req from admin!!!")
     console.log(req);
     res.send("authenticated!!!!!")

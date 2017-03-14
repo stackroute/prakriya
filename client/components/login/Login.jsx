@@ -1,5 +1,5 @@
 import React from 'react';
-import cookie from 'react-cookie'; 
+
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';

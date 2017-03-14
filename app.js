@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var expressSession = require('express-session');
 var flash = require('connect-flash');
-var LocalStrategy = require('passport-local').Strategy;
+
 var jwt = require("jwt-simple");  
 var cfg = require("./server/config.js"); 
 var auth = require("./server/auth/auth.js")();
