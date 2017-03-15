@@ -56,7 +56,16 @@ export default class Login extends React.Component {
 		}
 		const bodyStyle = {
 			textAlign: 'center',
-			fontFamily: 'sans-serif'
+			margin: 'auto',
+			marginTop: '20px',
+			width: '350px',
+			padding: '10px 0px 20px 0px',
+			fontFamily: 'sans-serif',
+			backgroundColor: '#eee',
+			boxShadow: '1px 1px 10px 1px #444',
+			borderRadius: '10px'
+		}
+		const inputStyle = {
 		}
 		return(
 			<div>
@@ -67,8 +76,10 @@ export default class Login extends React.Component {
 	        iconElementRight={<FlatButton label="Login" onClick={this.openLoginPage} />}
 		    />
 		    <div style={bodyStyle}>
-					<TextField hintText="Username" onChange={this.onChangeUsername} /> <br />
-					<TextField hintText="Password" type="password" onChange={this.onChangePassword} /> <br />
+		    	<h2>Log In to Continue</h2>
+					<TextField style={inputStyle} hintText="Username" onChange={this.onChangeUsername} /> <br />
+					<TextField style={inputStyle} hintText="Password" type="password" onChange={this.onChangePassword} /> 
+					<br /><br />
 					<RaisedButton label="Login" primary={true} onClick={this.login} />
 				</div>
 				<Footer />
