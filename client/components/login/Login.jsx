@@ -5,6 +5,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import Request from 'superagent';
 import {Link} from 'react-router';
+import AppBar from 'material-ui/AppBar';
+import Footer from '../../views/Footer.jsx';
 
 export default class Login extends React.Component {
 
@@ -31,13 +33,13 @@ export default class Login extends React.Component {
 	login() {
 		let th = this
 		Request
-			.post('/login/token')
+			.post('/login')
 			.send({username: this.state.username, password: this.state.password})
 			.end(function(err, res){
 		    // Do something 
 		    if(res.body.token != ''){
 		    	localStorage.setItem('token', res.body.token);
-		    	th.context.router.push('/dashboard')
+		    	th.context.router.push('/app')
 		    }
 		    else {
 		    	th.setState({
@@ -48,12 +50,28 @@ export default class Login extends React.Component {
 	}
 
 	render() {
+		const appBarStyle = {
+			marginLeft: '-8px',
+			marginTop: '-8px'
+		}
+		const bodyStyle = {
+			textAlign: 'center',
+			fontFamily: 'sans-serif'
+		}
 		return(
 			<div>
-				<TextField hintText="Username" onChange={this.onChangeUsername} /> <br />
-				<TextField hintText="Password" type="password" onChange={this.onChangePassword} /> <br />
-				<RaisedButton label="Login" primary={true} onClick={this.login} />
-				<span style={{color:'red'}}>{this.state.errMsg}</span>
+				<AppBar
+					style={appBarStyle}
+	        title="Prakriya"
+	        showMenuIconButton={false}
+	        iconElementRight={<FlatButton label="Login" onClick={this.openLoginPage} />}
+		    />
+		    <div style={bodyStyle}>
+					<TextField hintText="Username" onChange={this.onChangeUsername} /> <br />
+					<TextField hintText="Password" type="password" onChange={this.onChangePassword} /> <br />
+					<RaisedButton label="Login" primary={true} onClick={this.login} />
+				</div>
+				<Footer />
 			</div>
 		)
 	}

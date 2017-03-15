@@ -10,12 +10,14 @@ export default class Dashboard extends React.Component {
 
 	authenticate() {
 		Request
-			.get('/admin/user')
+			.get('/dashboard/getuser')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 				alert(res.text)
 			});
 	}
+
+	
 
 	render() {
 		return(

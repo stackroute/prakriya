@@ -5,10 +5,15 @@ import Footer from './Footer.jsx';
 export default class App extends React.Component {
 
 	render() {
+		const bodyStyle = {
+			fontFamily: 'sans-serif'
+		}
 		return (
 			<div>
 				<Header />
-				{this.props.children}
+				<div style={bodyStyle}>
+					{this.props.children}
+				</div>
 				<Footer />
 			</div>
 		)

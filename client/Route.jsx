@@ -27,19 +27,18 @@ function alreadyLoggedIn (nextState, replace, callback) {
   const token = localStorage.getItem('token')
   // console.log(nextState.location.pathname)
   if(token)
-  	replace('/dashboard')
+  	replace('/app')
   return callback()
 }
 
 ReactDOM.render(
 	<MuiThemeProvider muiTheme={muiTheme}>
 		<Router history={hashHistory}>
-			<Route path="/" component={App} >
-				<IndexRoute component={Welcome} />
-				<Route path="/login" component={Login} onEnter={alreadyLoggedIn} />
-				<Route path="/signup" component={SignUp} onEnter={alreadyLoggedIn} />
-				<Route path="/dashboard" component={Dashboard} onEnter={requireAuth} />
-				<Route path="/adduser" component={AddUser} onEnter={requireAuth} />
+			<Route path="/" component={Welcome} onEnter={alreadyLoggedIn} />
+			<Route path="/login" component={Login} onEnter={alreadyLoggedIn} />
+			<Route path="/app" component={App} onEnter={requireAuth} >
+				<IndexRoute component={Dashboard} />
+				<Route path="/adduser" component={AddUser} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

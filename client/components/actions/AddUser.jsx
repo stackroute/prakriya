@@ -72,14 +72,14 @@ export default class AddUser extends React.Component {
 		user.role = this.state.role
 		user.actions = this.state.actions
 		Request
-			.post('/admin/adduser')
+			.post('/dashboard/adduser')
 			.send(user)
 			.end(function(err, res){
 		    // Do something
 		    let userObj
 		    if(res.text)
 		    	userObj = JSON.parse(res.text)
-		    th.context.router.push('/dashboard')
+		    th.context.router.push('/app')
 		  });
 	}
 

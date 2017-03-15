@@ -8,9 +8,9 @@ var flash = require('connect-flash');
 
 var jwt = require("jwt-simple");  
 var cfg = require("./server/config.js"); 
-var auth = require("./server/auth/auth.js")();
+var auth = require("./server/auth")();
 var loginRoutes = require('./server/login');
-var adminRoutes = require('./server/admin');
+var dashboardRoutes = require('./server/dashboard');
 const userModel = require('./models/users.js');
 
 
@@ -52,7 +52,7 @@ app.use(auth.initialize())
 app.use(flash());
 
 app.use('/login', loginRoutes);
-app.use('/admin', adminRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
