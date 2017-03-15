@@ -5,7 +5,7 @@ const userModel = require('../../models/users.js');
 const passport = require('passport');
 var jwt = require("jwt-simple");  
 var cfg = require("../config.js"); 
-var auth = require('../auth/auth.js')();
+var auth = require('../auth')();
 
 
 // router.post('/', 
@@ -24,7 +24,7 @@ var auth = require('../auth/auth.js')();
 
 
 //encoding tokens here!!!!!
-router.post("/token", function(req, res) {  
+router.post("/", function(req, res) {  
     if (req.body.username && req.body.password) {
         var uname = req.body.username;
         var password = req.body.password;
@@ -58,15 +58,6 @@ router.post("/token", function(req, res) {
     } else {
         res.sendStatus(401);
     }   
-   
-    
-});
-
-router.get("/user", auth.authenticate(), function(req, res) {  
-    
-    console.log("req from admin!!!")
-    console.log(req);
-    res.send("authenticated!!!!!")
 });
 
 module.exports = router;
