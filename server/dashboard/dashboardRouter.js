@@ -4,7 +4,7 @@ const passport = require('passport');
 var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
 
-router.get("/getuser", auth.authenticate(), function(req, res) {  
+router.get("/user", auth.authenticate(), function(req, res) {  
     // res.json(users[req.user.id]);
     console.log("req from user!!!")
     console.log('User object sent ', req.user);

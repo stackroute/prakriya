@@ -39,21 +39,21 @@ router.post("/", function(req, res) {
           console.log(user);
           // user = doc;
           if (user) {
-            var payload = {
-                id: user._id,
-                user: user.username
-            };
-            console.log(payload);
-            var token = jwt.encode(payload, cfg.jwtSecret);
-    // expiresIn: 10080 // in seconds});
-            console.log(token);
-            res.json({
-                // user: user,
-                token: "JWT " + token
-            });
-        } else {
-            res.sendStatus(401);
-        }
+              var payload = {
+                  id: user._id,
+                  user: user.username
+              };
+              console.log(payload);
+              var token = jwt.encode(payload, cfg.jwtSecret);
+      // expiresIn: 10080 // in seconds});
+              console.log(token);
+              res.json({
+                  // user: user,
+                  token: "JWT " + token
+              });
+          } else {
+              res.sendStatus(401);
+          }
         });
     } else {
         res.sendStatus(401);

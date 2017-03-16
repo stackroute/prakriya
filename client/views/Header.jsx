@@ -34,7 +34,7 @@ export default class Header extends React.Component {
 	getActions() {
 		let th = this
 		Request
-			.get('/dashboard/getuser')
+			.get('/dashboard/user')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 				let actions = res.body.actions;

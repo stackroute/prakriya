@@ -37,14 +37,19 @@ export default class Login extends React.Component {
 			.send({username: this.state.username, password: this.state.password})
 			.end(function(err, res){
 		    // Do something 
-		    if(res.body.token != ''){
-		    	localStorage.setItem('token', res.body.token);
-		    	th.context.router.push('/app')
-		    }
-		    else {
+		    if(res.status == 401) {
 		    	th.setState({
 		    		errMsg: "*Invalid username or password"
 		    	})
+		    }
+		    else if(err) {
+		    	th.setState({
+		    		errMsg: "*Internal Server Error"
+		    	})
+		    }
+		    else {
+		    	localStorage.setItem('token', res.body.token);
+		    	th.context.router.push('/app')
 		    }
 		  });
 	}
@@ -55,36 +60,45 @@ export default class Login extends React.Component {
 			marginTop: '-8px'
 		}
 		const bodyStyle = {
-			textAlign: 'center',
-			margin: 'auto',
-			marginTop: '20px',
-			width: '350px',
-			padding: '10px 0px 20px 0px',
-			fontFamily: 'sans-serif',
-			backgroundColor: '#eee',
-			boxShadow: '1px 1px 10px 1px #444',
-			borderRadius: '10px'
-		}
-		const inputStyle = {
+			textAlign: 'center'
+			// margin: 'auto',
+			// marginTop: '20px',
+			// width: '350px',
+			// padding: '10px 0px 20px 0px',
+			// fontFamily: 'sans-serif',
+			// backgroundColor: '#eee',
+			// boxShadow: '1px 1px 10px 1px #444',
+			// borderRadius: '10px'
 		}
 		return(
 			<div>
-				<AppBar
-					style={appBarStyle}
-	        title="Prakriya"
-	        showMenuIconButton={false}
-	        iconElementRight={<FlatButton label="Login" onClick={this.openLoginPage} />}
-		    />
 		    <div style={bodyStyle}>
-		    	<h2>Log In to Continue</h2>
-					<TextField style={inputStyle} hintText="Username" onChange={this.onChangeUsername} /> <br />
-					<TextField style={inputStyle} hintText="Password" type="password" onChange={this.onChangePassword} /> 
+					<TextField hintText="Username" onChange={this.onChangeUsername} /> <br />
+					<TextField hintText="Password" type="password" onChange={this.onChangePassword} /> 
 					<br /><br />
-					<RaisedButton label="Login" primary={true} onClick={this.login} />
+					<RaisedButton label="Login" primary={true} onClick={this.login} /><br />
+					<span style={{color: 'red'}}>{this.state.errMsg}</span>
 				</div>
-				<Footer />
 			</div>
 		)
+		// return(
+		// 	<div>
+		// 		<AppBar
+		// 			style={appBarStyle}
+	 //        title="Prakriya"
+	 //        showMenuIconButton={false}
+	 //        iconElementRight={<FlatButton label="Login" onClick={this.openLoginPage} />}
+		//     />
+		//     <div style={bodyStyle}>
+		//     	<h2>Log In to Continue</h2>
+		// 			<TextField style={inputStyle} hintText="Username" onChange={this.onChangeUsername} /> <br />
+		// 			<TextField style={inputStyle} hintText="Password" type="password" onChange={this.onChangePassword} /> 
+		// 			<br /><br />
+		// 			<RaisedButton label="Login" primary={true} onClick={this.login} />
+		// 		</div>
+		// 		<Footer />
+		// 	</div>
+		// )
 	}
 }
 
