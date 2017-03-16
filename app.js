@@ -11,6 +11,7 @@ var cfg = require("./server/config.js");
 var auth = require("./server/auth")();
 var loginRoutes = require('./server/login');
 var dashboardRoutes = require('./server/dashboard');
+var adminRoutes = require('./server/admin');
 const userModel = require('./models/users.js');
 
 
@@ -53,6 +54,7 @@ app.use(flash());
 
 app.use('/login', loginRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/admin', adminRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

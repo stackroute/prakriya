@@ -44,7 +44,17 @@ const tableData = [
 export default class AccountSuspension extends React.Component {
 	componentDidMount() {
 		Request
-			.send
+			.get('/admin/users')
+			.set({'Authorization': localStorage.getItem('token')})
+			// .send(user)
+			.end(function(err, res){
+		    // Do something
+		    
+		    if(res.status==200)
+		    	alert("api hit!!!!!!!");
+		    	
+		    // th.context.router.push('/app')
+		  });
 	}
 	render() {
 		return (
