@@ -12,6 +12,7 @@ router.get("/getuser", auth.authenticate(), function(req, res) {
     userObj.actions = req.user.actions.filter(function(action) {
         return action != "Login";
     });
+
     userObj.role = req.user.role;
     userObj.username = req.user.username;
     console.log('Converted User object ', userObj)
