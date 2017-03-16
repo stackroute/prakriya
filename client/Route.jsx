@@ -39,6 +39,7 @@ ReactDOM.render(
 			<Route path="/app" component={App} onEnter={requireAuth} >
 				<IndexRoute component={Dashboard} />
 				<Route path="/adduser" component={AddUser} />
+				<Route path="/rolemanagement" component={RoleManagement} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,
