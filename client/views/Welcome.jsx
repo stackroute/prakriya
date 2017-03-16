@@ -38,7 +38,8 @@ export default class Welcome extends React.Component {
 					<h1>Welcome To Prakriya</h1>
 					<img src='../assets/images/home.png' />
 					<p style={briefStyle}>
-						It is a Wave Automation tool
+						A Process management tool that uses a system of integrated applications to manage the business and automates functions related to administration and Operations.
+						Supporting, generating and disseminating timely and accurate information on business operations at StackRoute.
 					</p>
 				</div>
 				<Footer />

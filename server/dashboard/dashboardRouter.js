@@ -9,6 +9,7 @@ router.get("/getuser", auth.authenticate(), function(req, res) {
     console.log("req from user!!!")
     console.log('User object sent ', req.user);
     let userObj = {};
+    
     userObj.actions = req.user.actions;
     userObj.role = req.user.role;
     userObj.username = req.user.username;

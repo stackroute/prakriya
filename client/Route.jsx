@@ -10,7 +10,7 @@ import Welcome from './views/Welcome.jsx';
 import Login from './components/login/index.jsx';
 import SignUp from './components/signup/index.jsx';
 import Dashboard from './components/dashboard/index.jsx';
-import AddUser from './components/actions/index.jsx';
+import {AddUser, RoleManagement} from './components/actions/index.jsx';
 
 injectTapEventPlugin();
 
