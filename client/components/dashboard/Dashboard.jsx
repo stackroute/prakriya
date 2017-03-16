@@ -13,7 +13,7 @@ export default class Dashboard extends React.Component {
 			.get('/dashboard/getuser')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
-				alert(res.text)
+				console.log(res);
 			});
 	}
 
@@ -22,7 +22,7 @@ export default class Dashboard extends React.Component {
 	render() {
 		return(
 			<div>
-				<h1>This is the dashboard</h1>
+				<h1>This is the dashboard</h1>				
 			</div>
 		)
 	}
