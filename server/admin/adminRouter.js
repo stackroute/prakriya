@@ -7,21 +7,22 @@ const adminMongoController = require('./adminMongoController');
 router.get("/users", auth.authenticate(), function(req, res) {
 
     console.log("API HIT!!!");  
-    res.send(200);
-    // res.json(users[req.user.id]);
-    // console.log("req from user!!!")
-    // console.log('User object sent ', req.user);
-    // let userObj = {};
-    // userObj.actions = req.user.actions.filter(function(action) {
-    //     return action != "Login";
-    // });
+    try{
+        adminMongoController.getUsers(function(users) {
 
-    // userObj.role = req.user.role;
-    // userObj.username = req.user.username;
-    // console.log('Converted User object ', userObj)
-    // res.send(userObj);
+                res.status(201).json(users);
+            }, function(err) {
+                res.status(500).json({ error: 'Cannot get all users from db...!' });
+            });
+    }
+    catch(err){
+       res.status(500).json({
+                    error: 'Internal error occurred, please report...!'
+                }); 
+    }
 });
 
 
 
 module.exports = router;
+

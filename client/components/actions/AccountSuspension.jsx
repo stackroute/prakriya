@@ -5,7 +5,7 @@ import Request from 'superagent';
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn}
   from 'material-ui/Table';
 
-
+// let allUsers = [];
 
 const tableData = [
   {
@@ -45,13 +45,15 @@ export default class AccountSuspension extends React.Component {
 	componentDidMount() {
 		Request
 			.get('/admin/users')
-			.set({'Authorization': localStorage.getItem('token')})
-			// .send(user)
+			.set({'Authorization': localStorage.getItem('token')})			
 			.end(function(err, res){
-		    // Do something
-		    
-		    if(res.status==200)
-		    	alert("api hit!!!!!!!");
+		    if(err)
+		    	console.log(err);
+		    else
+		    	allUsers = res.body;
+		    	console.log("Users");
+		    	console.log(allUsers);
+			    
 		    	
 		    // th.context.router.push('/app')
 		  });
@@ -77,9 +79,10 @@ export default class AccountSuspension extends React.Component {
 		              </TableHeaderColumn>
 		            </TableRow>
 		            <TableRow>
-		              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
-		              <TableHeaderColumn tooltip="The Name">Name</TableHeaderColumn>
-		              <TableHeaderColumn tooltip="The Status">Status</TableHeaderColumn>
+		              <TableHeaderColumn tooltip="Username">Username</TableHeaderColumn>
+		              <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
+		              <TableHeaderColumn tooltip="Role">Role</TableHeaderColumn>
+		              <TableHeaderColumn tooltip="Email">Email</TableHeaderColumn>
 		            </TableRow>
 		          </TableHeader>
 		          <TableBody
@@ -88,11 +91,12 @@ export default class AccountSuspension extends React.Component {
 		            showRowHover={true}
 		            stripedRows={true}
 		          >
-		            {tableData.map( (row, index) => (
-		              <TableRow key={index} selected={row.selected}>
-		                <TableRowColumn>{index}</TableRowColumn>
-		                <TableRowColumn>{row.name}</TableRowColumn>
-		                <TableRowColumn>{row.status}</TableRowColumn>
+		            {allUsers.map( (user, index) => (
+		              <TableRow key={index} selected={user.selected}>
+		                <TableRowColumn>{user.username}</TableRowColumn>
+		                <TableRowColumn>{user.name}</TableRowColumn>
+		                <TableRowColumn>{user.role}</TableRowColumn>
+		                <TableRowColumn>{user.email}</TableRowColumn>		                
 		              </TableRow>
 		              ))}
 		          </TableBody>
