@@ -60,7 +60,9 @@ export default class AddRole extends React.Component {
 	}
 	render() {
 		let th = this
-		console.log(actions)
+		actions.map(function (action, index) {
+			console.log(action)
+		})
 		const dialogActions = [
       <FlatButton
         label="Cancel"
@@ -88,11 +90,11 @@ export default class AddRole extends React.Component {
         >
           <TextField hintText="Enter the role" onChange={this.onChangeRole} /><br />
           {
-          	actions.map(function(action, key) {
+          	actions.map(function(action, index) {
           		<Checkbox
 								label={action}
 								value={action}
-								key={key}
+								key={index}
 								onCheck={th.onChangeActions}
 							/>
           	})

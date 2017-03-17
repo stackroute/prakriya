@@ -1,9 +1,10 @@
 const userModel = require('../../models/users.js');
+const roleModel = require('../../models/roles.js');
 
-
-
-module.exports = {
-	// getUsers: getUsers
+let getAllRoles = function() {
+	
 }
 
-
+module.exports = {
+	getAllRoles: getAllRoles,
+}

@@ -4,14 +4,11 @@ import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import Footer from './Footer.jsx';
 import Login from '../components/login/index.jsx';
+import {Card, CardMedia} from 'material-ui/Card';
 
 const briefStyle = {
 	marginTop: '50px',
 	fontSize: '14px'
-}
-const appBarStyle = {
-	marginLeft: '-8px',
-	marginTop: '-8px'
 }
 const bodyStyle = {
 	textAlign: 'center',
@@ -61,7 +58,6 @@ export default class Welcome extends React.Component {
 		return(
 			<div>
 				<AppBar
-					style={appBarStyle}
 	        title="Prakriya"
 	        showMenuIconButton={false}
 	        iconElementRight={<FlatButton label="Login" onClick={this.handleOpen} />}
@@ -76,7 +72,11 @@ export default class Welcome extends React.Component {
 	        <Login />
 	        </Dialog>
 					<h1>Welcome To Prakriya</h1>
-					<img src='../assets/images/home.png' alt='Home' />
+					<Card style={{maxWidth: '650px', margin: 'auto'}} >
+						<CardMedia style={{maxWidth: '600px', margin: 'auto'}} >
+							<img src='../assets/images/home.png' alt='Home' />
+						</CardMedia>
+					</Card>
 					<p style={briefStyle}>
 						It is a Wave Automation Tool<br/>
 						Supporting, generating and disseminating timely and accurate information on business operations at StackRoute.
