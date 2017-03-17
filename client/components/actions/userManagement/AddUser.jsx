@@ -6,6 +6,9 @@ import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
 import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import Dialog from 'material-ui/Dialog';
 import Request from 'superagent';
 
 const items = [
@@ -15,17 +18,26 @@ const items = [
   <MenuItem key={4} value={"sponsor"} primaryText="Sponsor" />
 ];
 
+const addButtonStyle = {
+	position:'fixed',
+  top: '13%',
+  right:'5%'
+}
+
 export default class AddUser extends React.Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
+			open: false,
 			name: '',
 			email: '',
 			password: '',
 			cpassword: '',
 			role: ''
 		}
+		this.handleOpen = this.handleOpen.bind(this);
+	  this.handleClose = this.handleClose.bind(this);
 		this.onChangeName = this.onChangeName.bind(this)
 		this.onChangeEmail = this.onChangeEmail.bind(this)
 		this.onChangePassword = this.onChangePassword.bind(this)
@@ -33,7 +45,13 @@ export default class AddUser extends React.Component {
 		this.onChangeRole = this.onChangeRole.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
 	}
+	handleOpen() {
+    this.setState({open: true});
+  };
 
+  handleClose() {
+    this.setState({open: false});
+  };
 	onChangeName(e) {
 		this.setState({name: e.target.value})
 	}
@@ -75,47 +93,59 @@ export default class AddUser extends React.Component {
 			width: '300px'
 		}
 		return(
-			<Card style={style} >
-				<CardTitle style={{textAlign: 'center'}} title="Add User" />
-				<CardText>
-		    	<TextField 
-		    		hintText="Display name" 
-		    		floatingLabelText="Name"
-		    		onChange={this.onChangeName} 
-		    	/><br/>
-		    	<TextField 
-		    		hintText="This will be unique"
-		    		floatingLabelText="Email" 
-		    		onChange={this.onChangeEmail} 
-		    	/><br/>
-		    	<TextField 
-		    		floatingLabelText="Password" 
-		    		hintText="Secure your account" 
-		    		type="password" 
-		    		onChange={this.onChangePassword} 
-		    	/><br/>
-		    	<TextField 
-		    		floatingLabelText="Confirm Password" 
-		    		hintText="Confirm password" 
-		    		type="password" 
-		    		onChange={this.onChangeConfirmPassword} 
-		    	/><br/>
-		    	<SelectField
-		        onChange={this.onChangeRole}
-		        floatingLabelText="Select Role"
-		        value={this.state.role}
-		      >
-		        {items}
-		      </SelectField>
-		    </CardText>
-		    <CardActions style={{textAlign: 'center'}} >
-	    		<RaisedButton 
-	    			label="Add User" 
-	    			primary={true}
-	    			onClick={this.handleSubmit}
-	    		/>
-	    	</CardActions>
-			</Card>
+			<div>
+				<FloatingActionButton style={addButtonStyle} onTouchTap={this.handleOpen} >
+		      <ContentAdd />
+		    </FloatingActionButton>
+		    <Dialog
+          title="Add a new Role"
+          modal={false}
+          open={this.state.open}
+          onRequestClose={this.handleClose}
+        >
+        	<Card style={style} >
+						<CardTitle style={{textAlign: 'center'}} title="Add User" />
+						<CardText>
+				    	<TextField 
+				    		hintText="Display name" 
+				    		floatingLabelText="Name"
+				    		onChange={this.onChangeName} 
+				    	/><br/>
+				    	<TextField 
+				    		hintText="This will be unique"
+				    		floatingLabelText="Email" 
+				    		onChange={this.onChangeEmail} 
+				    	/><br/>
+				    	<TextField 
+				    		floatingLabelText="Password" 
+				    		hintText="Secure your account" 
+				    		type="password" 
+				    		onChange={this.onChangePassword} 
+				    	/><br/>
+				    	<TextField 
+				    		floatingLabelText="Confirm Password" 
+				    		hintText="Confirm password" 
+				    		type="password" 
+				    		onChange={this.onChangeConfirmPassword} 
+				    	/><br/>
+				    	<SelectField
+				        onChange={this.onChangeRole}
+				        floatingLabelText="Select Role"
+				        value={this.state.role}
+				      >
+				        {items}
+				      </SelectField>
+				    </CardText>
+				    <CardActions style={{textAlign: 'center'}} >
+			    		<RaisedButton 
+			    			label="Add User" 
+			    			primary={true}
+			    			onClick={this.handleSubmit}
+			    		/>
+			    	</CardActions>
+					</Card>
+        </Dialog>
+			</div>
 		)
 	}
 }
