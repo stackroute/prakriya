@@ -32,6 +32,7 @@ export default class AddRole extends React.Component {
 	  this.handleClose = this.handleClose.bind(this);
 	  this.onChangeRole = this.onChangeRole.bind(this);
 	  this.onChangeActions = this.onChangeActions.bind(this);
+	  this.handleSubmit = this.handleSubmit.bind(this);
 	}
 	handleOpen() {
     this.setState({open: true});
@@ -58,6 +59,13 @@ export default class AddRole extends React.Component {
 			this.setState({actions: actionList})
 		}
 	}
+	handleSubmit() {
+		let roleObj = {}
+		roleObj.role = this.state.role
+		roleObj.permissions = this.state.actions
+		console.log(roleObj)
+		this.props.addRole(roleObj)
+	}
 	render() {
 		let th = this
 		const dialogActions = [
@@ -67,10 +75,11 @@ export default class AddRole extends React.Component {
         onTouchTap={this.handleClose}
       />,
       <FlatButton
-        label="Submit"
+        label="Add"
         primary={true}
         keyboardFocused={true}
         onTouchTap={this.handleClose}
+        onClick={this.handleSubmit}
       />,
     ];
 		return (
@@ -85,15 +94,22 @@ export default class AddRole extends React.Component {
           open={this.state.open}
           onRequestClose={this.handleClose}
         >
-          <TextField hintText="Enter the role" onChange={this.onChangeRole} /><br />
+          <TextField 
+          	floatingLabelText="Role"
+          	hintText="Name a new role" 
+          	onChange={this.onChangeRole} 
+          />
+          should have following selected permissions<br/>
           {
           	actionsList.map(function(action, index) {
-          		<Checkbox
-								label={action}
-								value={action}
-								key={index}
-								onCheck={th.onChangeActions}
-							/>
+          		return(
+	          		<Checkbox
+									label={action}
+									value={action}
+									key={index}
+									onCheck={th.onChangeActions}
+								/>
+							)
           	})
 					}
         </Dialog>

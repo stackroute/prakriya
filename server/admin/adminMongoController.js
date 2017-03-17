@@ -1,9 +1,9 @@
-const userModel = require('../../models/users.js');
-const roleModel = require('../../models/roles.js');
+const UserModel = require('../../models/users.js');
+const RoleModel = require('../../models/roles.js');
 
 
 let getUsers = function(successCB, errorCB) {
-	userModel.find({},function(err, result) {
+	UserModel.find({},function(err, result) {
 		if (err) {
 			errorCB(err);
 		}
@@ -11,18 +11,47 @@ let getUsers = function(successCB, errorCB) {
 	});
 }
 
+let addUser = function(newUser) {
+	let promise = new Promise(function(resolve, reject) {
+
+		let saveUser = new UserModel(newUser);
+
+		saveUser.save(function(err, savedUser) {
+			if(err)
+				reject(err)
+			if (!savedUser) {
+        reject({
+          error: 'Null user object created in mongo..!'
+        });
+      }
+      console.log("successfully saved new user ", savedUser);
+      resolve(savedUser);
+		})
+
+	})
+	return promise;
+}
 
 let getRoles = function(successCB, errorCB) {
-	roleModel.find({},function(err, result) {
-		if (err) {
+	RoleModel.find({},function(err, result) {
+		if (err) 
 				errorCB(err);
-		}
 		successCB(result);
 	});
 }
 
+let addRole = function (roleObj, successCB, errorCB) {
+	let saveRole = new RoleModel(roleObj)
+	saveRole.save(roleObj, function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result);
+	})
+}
 
 module.exports = {
 	getUsers: getUsers,
-	getRoles: getRoles
+	getRoles: getRoles,
+	addUser: addUser,
+	addRole: addRole
 }
