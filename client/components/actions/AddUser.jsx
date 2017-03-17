@@ -5,6 +5,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
+import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card';
 import Request from 'superagent';
 
 const items = [
@@ -23,15 +24,13 @@ export default class AddUser extends React.Component {
 			email: '',
 			password: '',
 			cpassword: '',
-			role: '',
-			actions: []
+			role: ''
 		}
 		this.onChangeName = this.onChangeName.bind(this)
 		this.onChangeEmail = this.onChangeEmail.bind(this)
 		this.onChangePassword = this.onChangePassword.bind(this)
 		this.onChangeConfirmPassword = this.onChangeConfirmPassword.bind(this)
 		this.onChangeRole = this.onChangeRole.bind(this)
-		this.onChangeActions = this.onChangeActions.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
 	}
 
@@ -50,19 +49,6 @@ export default class AddUser extends React.Component {
 	onChangeRole(event, key, value) {
 		this.setState({role: value})
 	}
-	onChangeActions(event, isChecked) {
-		let actionList = this.state.actions
-		if(isChecked) {
-			actionList.push(event.target.value)
-			this.setState({actions: actionList})
-		}
-		else {
-			actionList = this.state.actions.filter(function(item) {
-				return item != event.target.value;
-			})
-			this.setState({actions: actionList})
-		}
-	}
 	handleSubmit() {
 		let th = this
 		let user = {}
@@ -70,7 +56,6 @@ export default class AddUser extends React.Component {
 		user.email = this.state.email
 		user.password = this.state.password
 		user.role = this.state.role
-		user.actions = this.state.actions
 		Request
 			.post('/dashboard/adduser')
 			.send(user)
@@ -84,100 +69,53 @@ export default class AddUser extends React.Component {
 	}
 
 	render() {
-		const labelStyle = {
-			fontFamily: 'sans-serif'
+		const style = {
+			fontFamily: 'sans-serif',
+			margin: 'auto',
+			width: '300px'
 		}
 		return(
-			<div>
-				<Grid>
-					<Row middle="md" center="md">
-						<Col md={12} xs={12}>
-							<h1>Add User</h1>
-						</Col>
-					</Row>
-	        <Row middle="md" >
-	          <Col xs={12} md={2} mdOffset={3} >
-	          	<div style={labelStyle} >Name</div>
-	          </Col>
-	          <Col xs={12} md={6}>
-	          	<TextField hintText="Enter your name" onChange={this.onChangeName} />
-	          </Col>
-	        </Row>
-	        <Row middle="md" >
-	          <Col xs={12} md={2} mdOffset={3} >
-	          	<div style={labelStyle} >Email</div>
-	          </Col>
-	          <Col xs={12} md={6}>
-	          	<TextField hintText="Enter your email" onChange={this.onChangeEmail} />
-	          </Col>
-	        </Row>
-	        <Row middle="md" >
-	          <Col xs={12} md={2} mdOffset={3} >
-	          	<div style={labelStyle} >Password</div>
-	          </Col>
-	          <Col xs={12} md={6}>
-	          	<TextField hintText="Enter password" type="password" onChange={this.onChangePassword} />
-	          </Col>
-	        </Row>
-	        <Row middle="md" >
-	          <Col xs={12} md={2} mdOffset={3} >
-	          	<div style={labelStyle} >Confirm Password</div>
-	          </Col>
-	          <Col xs={12} md={6}>
-	          	<TextField hintText="Re enter password" type="password" onChange={this.onChangeConfirmPassword} />
-	          </Col>
-	        </Row>
-	        <Row middle="md" >
-	          <Col xs={12} md={2} mdOffset={3} >
-	          	<div style={labelStyle} >Select Role</div>
-	          </Col>
-	          <Col xs={12} md={6}>
-	          	<SelectField
-			          onChange={this.onChangeRole}
-			          floatingLabelText="Select Role"
-			          value={this.state.role}
-			        >
-			          {items}
-			        </SelectField>
-	          </Col>
-	        </Row>
-	        <Row middle="md" >
-	          <Col xs={12} md={2} mdOffset={3} >
-	          	<div style={labelStyle} >Select Actions</div>
-	          </Col>
-	          <Col xs={12} md={2}>
-	          	<Checkbox
-								label="Candidate review"
-								value="Candidate review"
-								onCheck={this.onChangeActions}
-							/>
-	          </Col>
-	          <Col xs={12} md={2}>
-	          	<Checkbox
-								label="Add assignment"
-								value="Add assignment"
-								onCheck={this.onChangeActions}
-							/>
-	          </Col>
-	          <Col xs={12} md={2}>
-	          	<Checkbox
-								label="Provide Feedback"
-								value="Provide Feedback"
-								onCheck={this.onChangeActions}
-							/>
-	          </Col>
-	        </Row>
-	        <Row middle="md" center="md" style={{marginTop: '40px'}} >
-	        	<Col xs={12} md={12}>
-	        		<RaisedButton 
-	        			label="Add User" 
-	        			primary={true}
-	        			onClick={this.handleSubmit}
-	        		/>
-	        	</Col>
-	        </Row>
-	      </Grid>
-			</div>
+			<Card style={style} >
+				<CardTitle style={{textAlign: 'center'}} title="Add User" />
+				<CardText>
+		    	<TextField 
+		    		hintText="Display name" 
+		    		floatingLabelText="Name"
+		    		onChange={this.onChangeName} 
+		    	/><br/>
+		    	<TextField 
+		    		hintText="This will be unique"
+		    		floatingLabelText="Email" 
+		    		onChange={this.onChangeEmail} 
+		    	/><br/>
+		    	<TextField 
+		    		floatingLabelText="Password" 
+		    		hintText="Secure your account" 
+		    		type="password" 
+		    		onChange={this.onChangePassword} 
+		    	/><br/>
+		    	<TextField 
+		    		floatingLabelText="Confirm Password" 
+		    		hintText="Confirm password" 
+		    		type="password" 
+		    		onChange={this.onChangeConfirmPassword} 
+		    	/><br/>
+		    	<SelectField
+		        onChange={this.onChangeRole}
+		        floatingLabelText="Select Role"
+		        value={this.state.role}
+		      >
+		        {items}
+		      </SelectField>
+		    </CardText>
+		    <CardActions style={{textAlign: 'center'}} >
+	    		<RaisedButton 
+	    			label="Add User" 
+	    			primary={true}
+	    			onClick={this.handleSubmit}
+	    		/>
+	    	</CardActions>
+			</Card>
 		)
 	}
 }

@@ -68,10 +68,6 @@ export default class Header extends React.Component {
 	}
 	render() {
 		let th = this;
-		const style = {
-			marginLeft: '-8px',
-			marginTop: '-8px'
-		}
 		return(
 			<div>
 				<Drawer
@@ -91,7 +87,6 @@ export default class Header extends React.Component {
 		      }
 	      </Drawer>
 				<AppBar
-					style={style}
 	        title="Prakriya"
 	        onLeftIconButtonTouchTap={this.handleDrawerToggle}
 	        iconElementRight={

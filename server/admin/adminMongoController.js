@@ -1,4 +1,6 @@
 const userModel = require('../../models/users.js');
+const roleModel = require('../../models/roles.js');
+
 
 function getUsers(successCB, errorCB) {
 		
@@ -14,8 +16,13 @@ function getUsers(successCB, errorCB) {
 }
 
 
-module.exports = {
-	getUsers: getUsers
+let getAllRoles = function() {
+	
+
 }
 
 
+module.exports = {
+	getUsers: getUsers,
+	getAllRoles: getAllRoles
+}

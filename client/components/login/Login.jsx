@@ -23,11 +23,17 @@ export default class Login extends React.Component {
 	}
 
 	onChangeUsername(e) {
-		this.setState({username: e.target.value})
+		this.setState({
+			errMsg: "",
+			username: e.target.value
+		})
 	}
 
 	onChangePassword(e) {
-		this.setState({password: e.target.value})
+		this.setState({
+			errMsg: "",
+			password: e.target.value
+		})
 	}
 
 	login() {
@@ -77,7 +83,7 @@ export default class Login extends React.Component {
 					<TextField hintText="Password" type="password" onChange={this.onChangePassword} /> 
 					<br /><br />
 					<RaisedButton label="Login" primary={true} onClick={this.login} /><br />
-					<span style={{color: 'red'}}>{this.state.errMsg}</span>
+					<div style={{color: 'red'}}>{this.state.errMsg}</div>
 				</div>
 			</div>
 		)

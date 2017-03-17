@@ -4,6 +4,7 @@ const users = require('../../models/users.js');
 var auth = require('../auth')();
 const adminMongoController = require('./adminMongoController');
 
+// Get all the users
 router.get("/users", auth.authenticate(), function(req, res) {
 
     console.log("API HIT!!!");  
@@ -22,7 +23,10 @@ router.get("/users", auth.authenticate(), function(req, res) {
     }
 });
 
-
+// Get all the roles
+router.get('/roles', auth.authenticate(), function (req, res) {
+    adminMongoController.getAllRoles()
+})
 
 module.exports = router;
 
