@@ -2,27 +2,27 @@ const userModel = require('../../models/users.js');
 const roleModel = require('../../models/roles.js');
 
 
-function getUsers(successCB, errorCB) {
-		
-		userModel.find({},function(err, result) {
-				if (err) {
-						errorCB(err);
-				}
-				successCB(result);
-
-				
-		});
-		
+let getUsers = function(successCB, errorCB) {
+	userModel.find({},function(err, result) {
+		if (err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
 }
 
 
-let getAllRoles = function() {
-	
-
+let getRoles = function(successCB, errorCB) {
+	roleModel.find({},function(err, result) {
+		if (err) {
+				errorCB(err);
+		}
+		successCB(result);
+	});
 }
 
 
 module.exports = {
 	getUsers: getUsers,
-	getAllRoles: getAllRoles
+	getRoles: getRoles
 }
