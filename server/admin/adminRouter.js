@@ -47,8 +47,24 @@ router.get('/roles', auth.authenticate(), function (req, res) {
       error: 'Internal error occurred, please report...!'
     }); 
   }
-
 })
+
+//Add a new role
+router.post('/addrole', auth.authenticate(), function(req, res) {
+    try {
+      adminMongoController.addRole(req.body, function (role) {
+        res.status(200).json(role)
+      }, function (err) {
+        res.status(500).json({ error: 'Cannot add role in db...!' });
+      })
+    }
+    catch(err) {
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      }); 
+    }
+  }
+)
 
 module.exports = router;
 
