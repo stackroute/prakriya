@@ -10,7 +10,7 @@ import Welcome from './views/Welcome.jsx';
 import Login from './components/login/index.jsx';
 import SignUp from './components/signup/index.jsx';
 import Dashboard from './components/dashboard/index.jsx';
-import {RoleManagement, Users} from './components/actions/index.jsx';
+import {Roles, Users} from './components/actions/index.jsx';
 
 injectTapEventPlugin();
 
@@ -38,8 +38,7 @@ ReactDOM.render(
 			<Route path="/login" component={Login} onEnter={alreadyLoggedIn} />
 			<Route path="/app" component={App} onEnter={requireAuth} >
 				<IndexRoute component={Dashboard} />
-				
-				<Route path="/rolemanagement" component={RoleManagement} />
+				<Route path="/roles" component={Roles} />
 				<Route path="/users" component={Users} />
 			</Route>
 		</Router>

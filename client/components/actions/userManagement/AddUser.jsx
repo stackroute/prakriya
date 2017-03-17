@@ -57,7 +57,8 @@ export default class AddUser extends React.Component {
 		user.password = this.state.password
 		user.role = this.state.role
 		Request
-			.post('/dashboard/adduser')
+			.post('/admin/adduser')
+			.set({'Authorization': localStorage.getItem('token')})
 			.send(user)
 			.end(function(err, res){
 		    // Do something

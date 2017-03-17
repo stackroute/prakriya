@@ -1,3 +1,3 @@
-import RoleManagement from './RoleManagement.jsx';
+import Roles from './Roles.jsx';
 
-export default RoleManagement
+export default Roles

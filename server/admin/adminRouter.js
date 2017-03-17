@@ -22,6 +22,17 @@ router.get("/users", auth.authenticate(), function(req, res) {
   }
 });
 
+//Add a new user
+router.post('/adduser', auth.authenticate(), function(req, res) {
+    let user = req.body
+    user.username = user.email.split('@')[0]
+    adminMongoController.addUser(user)
+      .then(function(savedUser) {
+        res.send(user)
+      })
+  }
+)
+
 // Get all the roles
 router.get('/roles', auth.authenticate(), function (req, res) {
   try{

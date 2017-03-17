@@ -14,7 +14,7 @@ const roles = [
 export default class RoleTable extends React.Component {
 	constructor(props) {
 		super(props)
-		this.setState = {
+		this.state = {
 			roles: []
 		}
 	}
@@ -27,11 +27,9 @@ export default class RoleTable extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log(th)
 		    	th.setState({
 		    		roles: res.body
 		    	})
-		    	console.log('Roles in state ',th.state.roles)
 		    }
 			})
 	}
@@ -47,7 +45,7 @@ export default class RoleTable extends React.Component {
 			    </TableHeader>
 			    <TableBody displayRowCheckbox={false} >
 			    	{
-			    		roles.map((obj, index) => (
+			    		this.state.roles.map((obj, index) => (
 			    			<TableRow key={index}>
 					        <TableRowColumn>{obj.role}</TableRowColumn>
 					        <TableRowColumn>Edit Delete</TableRowColumn>
