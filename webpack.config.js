@@ -21,6 +21,7 @@ const config = {
       	net: "empty",
       	tls: "empty"
     },
+    
 	module: {
 		loaders: [
 			{
