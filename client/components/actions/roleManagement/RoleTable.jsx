@@ -14,13 +14,25 @@ const roles = [
 export default class RoleTable extends React.Component {
 	constructor(props) {
 		super(props)
+		this.setState = {
+			roles: []
+		}
 	}
 	componentDidMount() {
+		let th = this
 		Request
 			.get('/admin/roles')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
-				
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log(th)
+		    	th.setState({
+		    		roles: res.body
+		    	})
+		    	console.log('Roles in state ',th.state.roles)
+		    }
 			})
 	}
 	render() {
@@ -35,9 +47,9 @@ export default class RoleTable extends React.Component {
 			    </TableHeader>
 			    <TableBody displayRowCheckbox={false} >
 			    	{
-			    		roles.map((role, index) => (
+			    		roles.map((obj, index) => (
 			    			<TableRow key={index}>
-					        <TableRowColumn>{role}</TableRowColumn>
+					        <TableRowColumn>{obj.role}</TableRowColumn>
 					        <TableRowColumn>Edit Delete</TableRowColumn>
 					      </TableRow>
 			    		))

@@ -90,7 +90,7 @@ export default class AddUser extends React.Component {
 		const style = {
 			fontFamily: 'sans-serif',
 			margin: 'auto',
-			width: '300px'
+			width: '500px'
 		}
 		return(
 			<div>

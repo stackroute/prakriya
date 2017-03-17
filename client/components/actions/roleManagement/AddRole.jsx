@@ -12,7 +12,7 @@ const addButtonStyle = {
   right:'5%'
 }
 
-const actions = [
+const actionsList = [
 	"User Management",
 	"Role Management",
 	"Candidate Review",
@@ -60,9 +60,6 @@ export default class AddRole extends React.Component {
 	}
 	render() {
 		let th = this
-		actions.map(function (action, index) {
-			console.log(action)
-		})
 		const dialogActions = [
       <FlatButton
         label="Cancel"
@@ -90,7 +87,7 @@ export default class AddRole extends React.Component {
         >
           <TextField hintText="Enter the role" onChange={this.onChangeRole} /><br />
           {
-          	actions.map(function(action, index) {
+          	actionsList.map(function(action, index) {
           		<Checkbox
 								label={action}
 								value={action}
