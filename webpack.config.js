@@ -21,7 +21,7 @@ const config = {
       	net: "empty",
       	tls: "empty"
     },
-    
+  devtool: 'cheap-module-eval-source-map',
 	module: {
 		loaders: [
 			{

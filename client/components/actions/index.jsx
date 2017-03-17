@@ -1,9 +1,7 @@
-import AddUser from './AddUser.jsx';
 import RoleManagement from './roleManagement/index.jsx';
-import AccountSuspension from './AccountSuspension.jsx';
+import Users from './userManagement/index.jsx';
 
-module.exports = {
-	AddUser: AddUser,
+module.exports = {	
 	RoleManagement: RoleManagement,
-	AccountSuspension: AccountSuspension
+	Users: Users
 } 
