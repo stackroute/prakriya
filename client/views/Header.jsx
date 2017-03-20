@@ -24,6 +24,7 @@ export default class Header extends React.Component {
 		this.getActions = this.getActions.bind(this);
 		this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
 		this.handleDrawerClose = this.handleDrawerClose.bind(this);
+		this.openDashboard = this.openDashboard.bind(this);
 	}
 
 	componentDidMount() {
@@ -44,10 +45,6 @@ export default class Header extends React.Component {
 				th.setState({
 					actions: actions,
 					routes: routes
-					// actionMenu: 
-					// 	<Link to={routes[0]}>
-			  //     	<MenuItem primaryText={actions[0]} onTouchTap={th.handleDrawerClose} />
-		   //    	</Link>
 				})
 				console.log(th.state.actions)
 			});
@@ -65,6 +62,9 @@ export default class Header extends React.Component {
 		this.setState({
 			openDrawer: false
 		})
+	}
+	openDashboard() {
+		this.context.router.push('/app')
 	}
 	render() {
 		let th = this;
@@ -88,6 +88,7 @@ export default class Header extends React.Component {
 	      </Drawer>
 				<AppBar
 	        title="Prakriya"
+	        onTitleTouchTap={this.openDashboard}
 	        onLeftIconButtonTouchTap={this.handleDrawerToggle}
 	        iconElementRight={
 	        	<IconMenu
