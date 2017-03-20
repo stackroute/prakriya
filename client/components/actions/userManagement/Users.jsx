@@ -3,6 +3,7 @@ import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import AddUser from './AddUser.jsx';
 import UserList from './UserList.jsx';
 
@@ -11,8 +12,11 @@ const styles = {
 		textAlign: 'center'
 	},	
 	card: {
-		margin: '10px 10px',
+		padding: '20px 10px',
 		height: 'auto'
+	},
+	addUser: {
+		padding: '20px 10px'
 	}
 }
 
@@ -55,27 +59,26 @@ export default class Users extends React.Component {
 	render() {
 		return (
 			<div >
-				<AddUser />
+				
 				<h1 style={styles.heading}>User Management</h1>
 				<Grid>
 					<Row>
-					<Col  md={4}>
-						<Paper style={style} zDepth={1}>
-							<FlatButton label="ADD" />
-						</Paper>
-					</Col>
-					{
-						this.state.users.map(function (user, index) {
-							return(
-								<Col md={4} key={index}>
-									 
-										<UserList style={styles.card} currUser={user} />
+					
+						{
+							this.state.users.map(function (user, index) {
+								return(
+									<Col style={styles.card} md={3} key={index}>
+										 
+											<UserList  currUser={user} />
+										
+									</Col>
 									
-								</Col>
-								
-							)
-						})
-					}
+								)
+							})
+						}
+						<Col style={styles.addUser} md={3}>
+							<AddUser />
+						</Col>
 					</Row>
 				</Grid>
 			</div>

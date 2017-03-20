@@ -5,7 +5,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
-import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Dialog from 'material-ui/Dialog';
@@ -18,10 +18,10 @@ const items = [
   <MenuItem key={4} value={"sponsor"} primaryText="Sponsor" />
 ];
 
-const addButtonStyle = {
-	position:'fixed',
-  top: '13%',
-  right:'5%'
+const styles = {	
+	add: {
+		cursor: 'pointer'
+	}
 }
 
 export default class AddUser extends React.Component {
@@ -95,11 +95,16 @@ export default class AddUser extends React.Component {
 		}
 		return(
 			<div>
-				<FloatingActionButton style={addButtonStyle} onTouchTap={this.handleOpen} >
-		      <ContentAdd />
-		    </FloatingActionButton>
+				
+					<Card style={styles.add} onClick={this.handleOpen} >
+						<CardMedia overlay={<CardTitle title="Add new user" />}>
+						  <img src="../../../assets/images/add_user.png" />
+				    </CardMedia>						    
+					</Card>
+				
+				
 		    <Dialog
-          title="Add a new Role"
+          title="Add new User"
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
