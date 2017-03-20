@@ -45,9 +45,11 @@ export default class RoleItem extends React.Component {
 		this.state = {
 			permissions: [],
 			showDeleteDialog: false,
-			showAddMoreDialog: false
+			showAddMoreDialog: false,
+			showSave: false,
 		}
 		this.handlePermissionDelete = this.handlePermissionDelete.bind(this);
+		this.saveDeletedPerms = this.saveDeletedPerms.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 		this.handleDeleteRole = this.handleDeleteRole.bind(this);
@@ -60,8 +62,21 @@ export default class RoleItem extends React.Component {
 			permissions: this.props.roleperm.permissions
 		})
 	} 
-	handlePermissionDelete(data) {
-		console.log(data)
+	handlePermissionDelete(perm) {
+		let permissions = this.state.permissions.filter(function(permission) {
+			return perm != permission
+		})
+		this.setState({
+			permissions: permissions,
+			showSave: true
+		})
+	}
+	saveDeletedPerms() {
+		let roleObj = {
+			role: this.props.roleperm.role,
+			permissions: this.state.permissions
+		}
+		this.props.savePermissions(roleObj)
 	}
 	openDeleteDialog() {
 		this.setState({
@@ -167,8 +182,11 @@ export default class RoleItem extends React.Component {
 							    targetOrigin={{horizontal: 'right', vertical: 'top'}}
 							    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
 							  >
-							    <MenuItem primaryText="Edit" />
-							    <MenuItem primaryText="Delete" onClick={this.openDeleteDialog} />
+							    <MenuItem primaryText="Delete Role" onClick={this.openDeleteDialog} />
+							    {
+							    	this.state.showSave &&
+							    	<MenuItem primaryText="Save Changes" onClick={this.saveDeletedPerms} />
+							    }
 							  </IconMenu>
 							</Col>
 						</Row>

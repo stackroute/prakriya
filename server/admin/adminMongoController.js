@@ -49,14 +49,23 @@ let addRole = function (roleObj, successCB, errorCB) {
 	})
 }
 
+let updateRole = function (roleObj, successCB, errorCB) {
+	console.log('Role obj in Mongo', roleObj)
+	console.log(roleObj.role)
+	RoleModel.update({"role": roleObj.role}, roleObj, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
 let deleteRole = function (roleObj, successCB, errorCB) {
-	console.log('roleobj in mongo request', roleObj)
 	RoleModel
 		.find(roleObj)
-		.remove(function (err, removed) {
+		.remove(function (err, status) {
 			if(err)
 				errorCB(err);
-			successCB(removed);
+			successCB(status);
 		})
 }
 
@@ -73,5 +82,6 @@ module.exports = {
 	getRoles: getRoles,
 	addUser: addUser,
 	addRole: addRole,
+	updateRole: updateRole,
 	deleteRole: deleteRole
 }

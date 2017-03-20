@@ -16,10 +16,27 @@ export default class RoleManagement extends React.Component {
 			roles: [],
 			permissions: []
 		}
+		this.getRoles = this.getRoles.bind(this);
 		this.addRole = this.addRole.bind(this);
 		this.deleteRole = this.deleteRole.bind(this);
+		this.savePermissions = this.savePermissions.bind(this);
 	}
 	componentDidMount() {
+		this.getRoles();
+		// Request
+		// 	.get('/admin/permissions')
+		// 	.set({'Authorization': localStorage.getItem('token')})
+		// 	.end(function(err, res) {
+		// 		if(err)
+		//     	console.log(err);
+		//     else {
+		//     	th.setState({
+		//     		permissions: res.body
+		//     	})
+		//     }
+		// 	})
+	}
+	getRoles() {
 		let th = this
 		Request
 			.get('/admin/roles')
@@ -33,19 +50,6 @@ export default class RoleManagement extends React.Component {
 		    	})
 		    }
 			})
-
-		// Request
-		// 	.get('/admin/permissions')
-		// 	.set({'Authorization': localStorage.getItem('token')})
-		// 	.end(function(err, res) {
-		// 		if(err)
-		//     	console.log(err);
-		//     else {
-		//     	th.setState({
-		//     		permissions: res.body
-		//     	})
-		//     }
-		// 	})
 	}
 	addRole(role) {
 		let th = this
@@ -88,6 +92,23 @@ export default class RoleManagement extends React.Component {
 		    }
 		  })
 	}
+	savePermissions(roleObj) {
+		console.log('Update role with ', roleObj)
+		let th = this;
+		Request
+			.post('/admin/updaterole')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(roleObj)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Updated role and Server responded', res.body)
+		    	th.getRoles();
+		    }
+			}) 
+	}
+
 	render() {
 		let th = this;
 		return (
@@ -97,7 +118,13 @@ export default class RoleManagement extends React.Component {
 				{
 					this.state.roles.map(function (role, index) {
 						return(
-							<RoleItem roleperm={role} permissions={th.state.permissions} key={index} deleteRole={th.deleteRole} />
+							<RoleItem 
+								roleperm={role} 
+								permissions={th.state.permissions} 
+								key={index} 
+								deleteRole={th.deleteRole}
+								savePermissions={th.savePermissions}
+						 	/>
 						)
 					})
 				}

@@ -75,11 +75,28 @@ router.post('/addrole', auth.authenticate(), function(req, res) {
   }
 )
 
+//Update role
+router.post('/updaterole', auth.authenticate(), function(req, res) {
+    try {
+      adminMongoController.updateRole(req.body, function (status) {
+        res.status(200).json(status)
+      }, function (err) {
+        res.status(500).json({ error: 'Cannot update role in db...!' });
+      })
+    }
+    catch(err) {
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      }); 
+    }
+  }
+)
+
 //Delete a role
 router.delete('/deleterole', auth.authenticate(), function(req, res) {
     try {
-      adminMongoController.deleteRole(req.body, function (removed) {
-        res.status(200).json(removed)
+      adminMongoController.deleteRole(req.body, function (status) {
+        res.status(200).json(status)
       }, function (err) {
         res.status(500).json({ error: 'Cannot delete role in db...!' });
       })
