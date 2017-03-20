@@ -6,7 +6,8 @@ export default class App extends React.Component {
 
 	render() {
 		const bodyStyle = {
-			fontFamily: 'sans-serif'
+			fontFamily: 'sans-serif',
+			marginBottom: '40px'
 		}
 		return (
 			<div>

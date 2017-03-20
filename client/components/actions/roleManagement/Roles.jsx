@@ -13,9 +13,11 @@ export default class RoleManagement extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			roles: []
+			roles: [],
+			permissions: []
 		}
 		this.addRole = this.addRole.bind(this);
+		this.deleteRole = this.deleteRole.bind(this);
 	}
 	componentDidMount() {
 		let th = this
@@ -31,6 +33,19 @@ export default class RoleManagement extends React.Component {
 		    	})
 		    }
 			})
+
+		// Request
+		// 	.get('/admin/permissions')
+		// 	.set({'Authorization': localStorage.getItem('token')})
+		// 	.end(function(err, res) {
+		// 		if(err)
+		//     	console.log(err);
+		//     else {
+		//     	th.setState({
+		//     		permissions: res.body
+		//     	})
+		//     }
+		// 	})
 	}
 	addRole(role) {
 		let th = this
@@ -51,7 +66,30 @@ export default class RoleManagement extends React.Component {
 		    }
 			})
 	} 
+	deleteRole(role) {
+		console.log('Role from request',role)
+		let th = this
+		let roleObj = {
+      "role": role
+    }
+		Request
+			.delete('/admin/deleterole')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(roleObj)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	let roles = th.state.roles.filter(function(roleObj) {
+		    		return role != roleObj.role;
+		    	})
+		    	th.setState({roles: roles})
+		    	console.log('Roles in state',th.state.roles)
+		    }
+		  })
+	}
 	render() {
+		let th = this;
 		return (
 			<div >
 				<AddRole addRole={this.addRole}/>
@@ -59,7 +97,7 @@ export default class RoleManagement extends React.Component {
 				{
 					this.state.roles.map(function (role, index) {
 						return(
-							<RoleItem roleperm={role} key={index} />
+							<RoleItem roleperm={role} permissions={th.state.permissions} key={index} deleteRole={th.deleteRole} />
 						)
 					})
 				}

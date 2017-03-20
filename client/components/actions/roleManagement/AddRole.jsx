@@ -9,7 +9,8 @@ import Checkbox from 'material-ui/Checkbox';
 const addButtonStyle = {
 	position:'fixed',
   top: '13%',
-  right:'5%'
+  right:'5%',
+  zIndex: 2
 }
 
 const actionsList = [
