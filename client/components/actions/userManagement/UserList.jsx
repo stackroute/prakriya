@@ -1,40 +1,34 @@
 import React from 'react';
 import Request from 'superagent';
 import { Grid, Row, Col } from 'react-flexbox-grid/lib/index';
-// import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn}
-//   from 'material-ui/Table';
- import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card';
-
+import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
-// import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-// import IconMenu from 'material-ui/IconMenu';
-// import MenuItem from 'material-ui/MenuItem';
-import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
- // import React from 'react';
-// import MobileTearSheet from '../../../MobileTearSheet';
+import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors'; 
 import Avatar from 'material-ui/Avatar';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Divider from 'material-ui/Divider';
-// import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/navigation/cancel';
 
 
 
 // let allUsers = [];
-const iconButtonElement = (
-	<div style={{alignItems: 'center'}}>
-		<IconButton tooltip="edit" tooltipPosition="bottom-left">
-	    <EditIcon color={grey400} />
-	  </IconButton>
-	  <IconButton tooltip="delete" tooltipPosition="bottom-left">
-			<DeleteIcon color={grey400} />
-	  </IconButton>
-	</div>
+// const iconButtonElement = (
+// 	<div>
+		
+// 				<IconButton tooltip="edit" tooltipPosition="bottom-left">
+// 			    <EditIcon color={grey400} />
+// 			  </IconButton>
+// 			  <IconButton tooltip="delete" tooltipPosition="bottom-left">
+// 					<DeleteIcon color={grey400} />
+// 			  </IconButton>
+			
+		
+// 	</div>
   
   
-);
+// );
 
 // const actionButtons = (
 //   <Grid>
@@ -78,22 +72,42 @@ export default class UserList extends React.Component {
 	}
 	render() {
 		return (
-			<div style={{display: 'flex', alignItems: 'center'}}>
-				<Card style={{width:'70%', margin:'auto' }}>
-					<CardText>
-						<List>
-				      <Subheader>Available Users</Subheader>
-				      {this.state.users.map( (user, index) => (
-					      	<ListItem
-					      	key={index}		
-					      	disableKeyboardFocus={true}			      	
-					        primaryText={user.name}
-					        leftAvatar={<Avatar src="../../../assets/images/avt-default.jpg" />}
-					        rightIcon={iconButtonElement}					        
-					      	/>		              
-		          ))}				      
-				    </List>						
-					</CardText>
+			<div>
+				<Card style={{width:'80%', margin:'auto' }}>
+					<Grid>
+						<Row middle="md">
+							<Subheader>Available Users</Subheader>
+						</Row>
+						
+							
+								<List>
+						      
+						      {this.state.users.map( (user, index) => (
+						      	<Row between="md" key={index}>
+						      		<Col md={6}>
+								      	<ListItem 
+								      	key={index}								      				      	
+								        primaryText={user.name}
+								        leftAvatar={<Avatar src="../../../assets/images/avt-default.jpg" />}								        				        
+								      	/>
+								      </Col>	
+								      <Col md={2} mdOffset={4}>	
+								      	<IconButton tooltip="delete" tooltipPosition="bottom-left">
+													<DeleteIcon color={grey400} />
+											  </IconButton>	
+							      	</Col>
+							      </Row>			              
+				          ))}				      
+						    </List>
+							
+							
+						
+							
+														
+							
+						
+					</Grid>
+					
 				</Card>	
 				
 			</div>
