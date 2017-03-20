@@ -4,6 +4,10 @@ const users = require('../../models/users.js');
 var auth = require('../auth')();
 const adminMongoController = require('./adminMongoController');
 
+/****************************************
+*******          Users           ******** 
+****************************************/
+
 // Get all the users
 router.get("/users", auth.authenticate(), function(req, res) {
 
@@ -32,6 +36,11 @@ router.post('/adduser', auth.authenticate(), function(req, res) {
       })
   }
 )
+
+
+/****************************************
+*******          Roles           ******** 
+****************************************/
 
 // Get all the roles
 router.get('/roles', auth.authenticate(), function (req, res) {
@@ -65,6 +74,43 @@ router.post('/addrole', auth.authenticate(), function(req, res) {
     }
   }
 )
+
+//Delete a role
+router.delete('/deleterole', auth.authenticate(), function(req, res) {
+    try {
+      adminMongoController.deleteRole(req.body, function (removed) {
+        res.status(200).json(removed)
+      }, function (err) {
+        res.status(500).json({ error: 'Cannot delete role in db...!' });
+      })
+    }
+    catch(err) {
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      }); 
+    }
+  }
+)
+
+/****************************************
+*******       Permissions        ******** 
+****************************************/
+
+// Get all the permissions
+router.get('/permissions', auth.authenticate(), function (req, res) {
+  try{
+    adminMongoController.getPermissions(function(permissions) {
+      res.status(201).json(permissions);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all permissions from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
 
 module.exports = router;
 

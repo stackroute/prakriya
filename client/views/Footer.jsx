@@ -4,6 +4,7 @@ export default class Footer extends React.Component {
 
 	render() {
 		const containerStyle = {
+			zIndex: 2,
 			fontFamily: 'sans-serif',
 			backgroundColor: 'rgb(0, 188, 212)',
 			color: '#fff',
