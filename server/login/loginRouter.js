@@ -31,7 +31,7 @@ router.post("/", function(req, res) {
 
         let user = {}; 
 
-        var query = userModel.findOne({'username': uname});
+        var query = userModel.findOne({'username': uname, 'password': password});
 
         var promise = query.exec();
 

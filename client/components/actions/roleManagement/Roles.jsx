@@ -1,10 +1,12 @@
 import React from 'react';
 import Request from 'superagent';
 import AddRole from './AddRole.jsx';
-import RoleTable from './RoleTable.jsx';
+import RoleItem from './RoleItem.jsx';
 
-const style = {
-	textAlign: 'center'
+const styles = {
+	heading: {
+		textAlign: 'center'
+	}
 }
 
 export default class RoleManagement extends React.Component {
@@ -51,10 +53,16 @@ export default class RoleManagement extends React.Component {
 	} 
 	render() {
 		return (
-			<div style={style} >
+			<div >
 				<AddRole addRole={this.addRole}/>
-				<h1>Role Management</h1>
-				<RoleTable roles={this.state.roles}/>
+				<h1 style={styles.heading}>Role Management</h1>
+				{
+					this.state.roles.map(function (role, index) {
+						return(
+							<RoleItem roleperm={role} key={index} />
+						)
+					})
+				}
 			</div>
 		);
 	}
