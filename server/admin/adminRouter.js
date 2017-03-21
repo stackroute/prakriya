@@ -54,6 +54,23 @@ router.delete('/deleteuser', auth.authenticate(), function(req, res) {
   }
 )  
 
+router.post('/updateuser', auth.authenticate(), function(req, res) {
+    try {
+      adminMongoController.updateUser(req.body, function (status) {
+        res.status(200).json(status)
+      }, function (err) {
+        res.status(500).json({ error: 'Cannot update user in db...!' });
+      })
+    }
+    catch(err) {
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      }); 
+    }
+  }
+)
+
+
 
 /****************************************
 *******          Roles           ******** 

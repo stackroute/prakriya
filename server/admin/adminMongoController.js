@@ -42,6 +42,16 @@ let deleteUser = function (userObj, successCB, errorCB) {
 		})
 }
 
+let updateUser = function (userObj, successCB, errorCB) {
+	console.log('User obj from server', userObj)
+	console.log(userObj.username)
+	UserModel.update({"username": userObj.username}, userObj, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
 let getRoles = function(successCB, errorCB) {
 	RoleModel.find({},function(err, result) {
 		if (err) 
@@ -97,5 +107,6 @@ module.exports = {
 	addRole: addRole,
 	updateRole: updateRole,
 	deleteRole: deleteRole,
-	deleteUser: deleteUser
+	deleteUser: deleteUser,
+	updateUser: updateUser
 }

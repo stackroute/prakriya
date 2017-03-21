@@ -56,6 +56,7 @@ export default class AddUser extends React.Component {
 		this.onChangeRole = this.onChangeRole.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleUpdate = this.handleUpdate.bind(this)
+		this.resetFields = this.resetFields.bind(this)
 	}
 	componentDidMount() {
 		if(this.props.openDialog) {
@@ -65,7 +66,6 @@ export default class AddUser extends React.Component {
 				username: this.props.user.username,
 				email: this.props.user.email,
 				password: this.props.user.password,
-				cpassword: this.props.user.password,
 				role: this.props.user.role
 			})
 		}
@@ -114,6 +114,17 @@ export default class AddUser extends React.Component {
 	onChangeRole(event, key, value) {
 		this.setState({role: value})
 	}
+
+	resetFields() {
+		this.setState({name: '',
+			username: '',
+			email: '',
+			password: '',
+			cpassword: '',
+			role: ''
+		});
+	}
+
 	handleSubmit() {
 		let th = this
 		let user = {}
@@ -122,6 +133,7 @@ export default class AddUser extends React.Component {
 		user.email = this.state.email
 		user.password = this.state.password
 		user.role = this.state.role
+		this.resetFields();
 		this.props.addUser(user);
 	}
 
@@ -133,7 +145,9 @@ export default class AddUser extends React.Component {
 		user.email = this.state.email
 		user.password = this.state.password
 		user.role = this.state.role
+		this.resetFields();
 		this.props.handleUpdate(user);
+
 	}
 
 
@@ -186,23 +200,28 @@ export default class AddUser extends React.Component {
 						    	<TextField 
 						    		hintText="Should not be your name" 
 						    		floatingLabelText="Username"
+						    		value={this.state.username}
 						    		onChange={this.onChangeUsername} 
+						    		disabled={this.props.openDialog}
 						    	/><br/>
 						    	<TextField 
 						    		hintText="This will be unique"
 						    		floatingLabelText="Email" 
+						    		value={this.state.email}
 						    		onChange={this.onChangeEmail} 
 						    	/><br/>
 						    	<TextField 
 						    		floatingLabelText="Password" 
 						    		hintText="Secure your account" 
 						    		type="password" 
+						    		value={this.state.password}
 						    		onChange={this.onChangePassword} 
 						    	/><br/>
 						    	<TextField 
 						    		floatingLabelText="Confirm Password" 
 						    		hintText="Confirm password" 
 						    		type="password" 
+						    		value={this.state.cpassword}
 						    		onChange={this.onChangeConfirmPassword} 
 						    	/><br/>
 						    	<SelectField

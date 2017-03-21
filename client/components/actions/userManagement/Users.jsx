@@ -42,6 +42,10 @@ export default class Users extends React.Component {
 	}
 
 	componentDidMount() {
+		this.getUsers();
+	}
+
+	getUsers() {
 		let th = this;
 		Request
 			.get('/admin/users')
@@ -68,11 +72,7 @@ export default class Users extends React.Component {
 		    if(err)
 		    	console.log(err);
 		    else {
-		    	let newUsers = th.state.users;
-		    	newUsers.push(res.body)
-		    	th.setState({
-		    		users: newUsers
-		    	})
+		    	th.getUsers();
 		    }
 		  });
 	} 
@@ -80,21 +80,17 @@ export default class Users extends React.Component {
 	updateUser(user) {
 		let th = this
 		console.log(user)
-		// Request
-		// 	.post('/admin/adduser')
-		// 	.set({'Authorization': localStorage.getItem('token')})
-		// 	.send(user)
-		// 	.end(function(err, res){
-		//     if(err)
-		//     	console.log(err);
-		//     else {
-		//     	let newUsers = th.state.users;
-		//     	newUsers.push(res.body)
-		//     	th.setState({
-		//     		users: newUsers
-		//     	})
-		//     }
-		//   });
+		Request
+			.post('/admin/updateuser')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(user)
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+		    	th.getUsers();
+		    }
+		  });
 	} 
 
 	deleteUser(user) {
@@ -108,12 +104,7 @@ export default class Users extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	let users = th.state.users.filter(function(userObj) {
-		    		return user.username != userObj.username;
-		    	})
-		    	th.setState({users: users})
-		    	console.log('Users in state',th.state.users)
-		    	// console.log(res.body);
+		    	th.getUsers();
 		    }
 		  })
 	} 
@@ -130,6 +121,7 @@ export default class Users extends React.Component {
 						{
 							this.state.users.map(function (user, index) {
 								return(
+									user.role != "admin" &&
 									<Col style={styles.card} md={3} key={index}>
 										 
 											<UserList  currUser={user} deleteUser={th.deleteUser} updateUser={th.updateUser} />
