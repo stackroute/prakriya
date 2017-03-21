@@ -17,20 +17,21 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import AutoComplete from 'material-ui/AutoComplete';
 import Snackbar from 'material-ui/Snackbar';
+import {cyan500, white} from 'material-ui/styles/colors';
 
 const styles = {
 	avatar: {
 		margin: '3px 10px'
 	},
 	card: {
-		background: '#f5f5f5',
+		// background: '#f5f5f5',
 	},
 	paper: {
 		margin: '5px',
 		padding: '5px',
 		width: 'auto',
 		height: '120px',
-		borderRadius: '10px'
+		borderRadius: '2px'
 	},
 	wrapper: {
     display: 'flex',
@@ -38,6 +39,7 @@ const styles = {
   },
 	chip: {
     margin: '4px',
+    background: '#eee'
   },
   chipAdd: {
   	margin: '4px',
@@ -45,10 +47,14 @@ const styles = {
   },
   deleteIcon: {
   	float: 'right',
-  	cursor: 'pointer'
+  	cursor: 'pointer',
+  	color: '#999'
   },
   cardActions: {
-  	textAlign: 'center'
+  	textAlign: 'right'
+  },
+  cardText: {
+  	paddingTop: 0
   }
 }
 
@@ -58,6 +64,7 @@ export default class RoleItem extends React.Component {
 		this.state = {
 			permissions: [],
 			searchPerm: '',
+			lastModified: '',
 			showDeleteDialog: false,
 			showAddMoreDialog: false,
 			disableSave: true,
@@ -75,7 +82,15 @@ export default class RoleItem extends React.Component {
 		this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
 	}
 	componentDidMount() {
+		let date = new Date(this.props.roleperm.lastModified);
+		date = date.toString();
+		let formatDate = 
+			"Last modified: " + 
+			date.substr(8,2) + " " + 
+			date.substr(4,3) + " " + 
+			date.substr(11,4);
 		this.setState({
+			lastModified: formatDate,
 			permissions: this.props.roleperm.permissions
 		})
 	} 
@@ -172,7 +187,7 @@ export default class RoleItem extends React.Component {
 				<Card style={styles.card} >
 					<CardHeader
 			      title={role}
-			      subtitle="Last modified: 20th Mar 2017"
+			      subtitle={this.state.lastModified}
 			      avatar={
 			      	<Avatar>
 			      		{this.props.roleperm.role.charAt(0).toUpperCase()}
@@ -181,9 +196,9 @@ export default class RoleItem extends React.Component {
 			    >
 			    	<DeleteIcon style={styles.deleteIcon} onClick={this.openDeleteDialog} />
 			    </CardHeader>
-			    <CardText>
+			    <CardText style={styles.cardText} >
 						<AutoComplete
-				      floatingLabelText="Type to add more permissions..."
+				      floatingLabelText="Add more permissions..."
 				      filter={AutoComplete.fuzzyFilter}
 				      searchText={this.state.searchPerm}
 		          onUpdateInput={this.handleUpdateInputPerm}
@@ -191,7 +206,7 @@ export default class RoleItem extends React.Component {
 				      dataSource={this.props.permissions}
 				      maxSearchResults={5}
 				    />
-			    	<Paper style={styles.paper} zDepth={3} >
+			    	<Paper style={styles.paper} zDepth={1} >
 							<div style={styles.wrapper}>
 								{
 									this.state.permissions.map(function (permission, index) {
@@ -210,7 +225,7 @@ export default class RoleItem extends React.Component {
 						</Paper>
 			    </CardText>
 			    <CardActions style={styles.cardActions}>
-			    	<RaisedButton 
+			    	<FlatButton 
 			    		label="Apply" 
 			    		primary={true} 
 			    		disabled={this.state.disableSave} 
