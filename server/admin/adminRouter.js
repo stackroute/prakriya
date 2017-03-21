@@ -29,13 +29,30 @@ router.get("/users", auth.authenticate(), function(req, res) {
 //Add a new user
 router.post('/adduser', auth.authenticate(), function(req, res) {
     let user = req.body
-    user.username = user.email.split('@')[0]
+    // user.username = user.email.split('@')[0]
     adminMongoController.addUser(user)
       .then(function(savedUser) {
         res.send(user)
       })
   }
 )
+
+router.delete('/deleteuser', auth.authenticate(), function(req, res) {
+  console.log(req.body)
+    try {
+      adminMongoController.deleteUser(req.body, function (status) {
+        res.status(200).json(status)
+      }, function (err) {
+        res.status(500).json({ error: 'Cannot delete user in db...!' });
+      })
+    }
+    catch(err) {
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      }); 
+    }
+  }
+)  
 
 
 /****************************************

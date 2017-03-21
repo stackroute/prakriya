@@ -57,6 +57,17 @@ export default class AddUser extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this)
 	}
 	componentDidMount() {
+		if(this.props.openDialog) {
+			this.setState({
+				open: true,
+				name: this.props.user.name,
+				username: this.props.user.username,
+				email: this.props.user.email,
+				password: this.props.user.password,
+				cpassword: this.props.user.password,
+				role: this.props.user.role
+			})
+		}
 		let th = this
 		Request
 			.get('/admin/roles')
@@ -65,8 +76,14 @@ export default class AddUser extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+		    	console.log(res.body);
+		    	let roles = []
+		    	res.body.map(function (role, index) {
+						roles.push(role.role);			
+					})
+					// console.log(roles)
 		    	th.setState({
-		    		roles: res.body
+		    		roles: roles
 		    	})
 		    }
 			})
@@ -104,24 +121,43 @@ export default class AddUser extends React.Component {
 		user.email = this.state.email
 		user.password = this.state.password
 		user.role = this.state.role
-		Request
-			.post('/admin/adduser')
-			.set({'Authorization': localStorage.getItem('token')})
-			.send(user)
-			.end(function(err, res){
-		    // Do something
-		    let userObj
-		    if(res.text)
-		    	userObj = JSON.parse(res.text)
-		    th.context.router.push('/app')
-		  });
+		this.props.addUser(user);
 	}
+
+	handleUpdate() {
+		let th = this
+		let user = {}
+		user.name = this.state.name
+		user.username = this.state.username
+		user.email = this.state.email
+		user.password = this.state.password
+		user.role = this.state.role
+		this.props.handleUpdate(user);
+	}
+
 
 	render() {
 		const style = {
 			fontFamily: 'sans-serif',
 			margin: 'auto',
 			width: '500px'
+		}
+		let submitButton
+		if(this.props.openDialog) {
+			submitButton = <RaisedButton 
+						    	 		label="Update User" 
+						    	   	primary={true}
+						    			onClick={this.handleUpdate}
+						    			onTouchTap={this.handleClose}
+						    	 	/>
+		}
+		else {
+			submitButton = <RaisedButton 
+						    	 		label="Add User" 
+						    	   	primary={true}
+						    			onClick={this.handleSubmit}
+						    			onTouchTap={this.handleClose}
+						    	 	/>
 		}
 		return(
 			<div>
@@ -143,6 +179,7 @@ export default class AddUser extends React.Component {
       						<TextField 
 						    		hintText="Display name" 
 						    		floatingLabelText="Name"
+						    		value={this.state.name}
 						    		onChange={this.onChangeName} 
 						    	/><br/>
 						    	<TextField 
@@ -172,21 +209,20 @@ export default class AddUser extends React.Component {
 						        floatingLabelText="Select Role"
 						        value={this.state.role}
 						      >
-						        {this.state.roles}
+						        {
+						        	this.state.roles.map(function(val, key) {
+						        		return <MenuItem key={key} value={val} primaryText={val} />
+						        	})
+						        }
 						      </SelectField>
       					
       			
 				    			<div>
-				    				<RaisedButton 
-						    	 		label="Add User" 
-						    	   	primary={true}
-						    			onClick={this.handleSubmit}
-						    	 	/>&nbsp;	
-					    		
+				    				{submitButton}
+				    				&nbsp;	
 					    			<RaisedButton 
 						    	 		label="Cancel" 
 						    	   	primary={true}
-						    			onClick={this.handleSubmit}
 						    			onTouchTap={this.handleClose}
 						    	 	/>	
 				    			</div>

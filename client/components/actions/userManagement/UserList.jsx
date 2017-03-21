@@ -6,14 +6,31 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 // import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 // import DeleteIcon from 'material-ui/svg-icons/navigation/cancel';
 import FlatButton from 'material-ui/FlatButton';
-
+import AddUser from './AddUser.jsx';
 
 export default class UserList extends React.Component {
 	constructor(props) {
 		super(props)
-		// this.state = {
-		// 	users: []
-		// }
+		this.state = {
+			openDialog: false
+		}
+		this.handleRemoveUser = this.handleRemoveUser.bind(this);
+		this.handleEditUser = this.handleEditUser.bind(this);
+		this.handleUpdateUser = this.handleUpdateUser.bind(this);
+	}
+
+	handleRemoveUser() {
+		
+		this.props.deleteUser(this.props.currUser);
+	}
+	handleEditUser() {
+		this.setState({
+			openDialog: true
+		})
+	}
+	handleUpdateUser(updatedUser) {
+		
+		this.props.updateUser(updatedUser);
 	}
 	
 	render() {
@@ -28,10 +45,13 @@ export default class UserList extends React.Component {
 				    </CardMedia>
 				    <CardTitle subtitle={this.props.currUser.username} />							
 						<CardActions>
-						  <FlatButton label="Edit" />
-						  <FlatButton label="Remove" />
+						  <FlatButton label="Edit" onClick={this.handleEditUser} />
+						  <FlatButton label="Remove" onClick={this.handleRemoveUser} />
 						</CardActions>
-
+						{
+							this.state.openDialog &&
+							<AddUser user={this.props.currUser} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateUser} />
+						}
 				  </Card>
 			  
 			</div>

@@ -32,6 +32,16 @@ let addUser = function(newUser) {
 	return promise;
 }
 
+let deleteUser = function (userObj, successCB, errorCB) {
+	UserModel
+		.find(userObj)
+		.remove(function (err, status) {
+			if(err)
+				errorCB(err);
+			successCB(status);
+		})
+}
+
 let getRoles = function(successCB, errorCB) {
 	RoleModel.find({},function(err, result) {
 		if (err) 
@@ -86,5 +96,6 @@ module.exports = {
 	addUser: addUser,
 	addRole: addRole,
 	updateRole: updateRole,
-	deleteRole: deleteRole
+	deleteRole: deleteRole,
+	deleteUser: deleteUser
 }

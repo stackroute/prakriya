@@ -36,7 +36,11 @@ export default class Users extends React.Component {
 		this.state = {
 			users: []
 		}
+		this.addUser = this.addUser.bind(this);
+		this.deleteUser = this.deleteUser.bind(this);
+		this.updateUser = this.updateUser.bind(this);
 	}
+
 	componentDidMount() {
 		let th = this;
 		Request
@@ -56,7 +60,69 @@ export default class Users extends React.Component {
 		    // th.context.router.push('/app')
 		  });
 	}
+
+	addUser(user) {
+		let th = this
+		Request
+			.post('/admin/adduser')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(user)
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+		    	let newUsers = th.state.users;
+		    	newUsers.push(res.body)
+		    	th.setState({
+		    		users: newUsers
+		    	})
+		    }
+		  });
+	} 
+
+	updateUser(user) {
+		let th = this
+		console.log(user)
+		// Request
+		// 	.post('/admin/adduser')
+		// 	.set({'Authorization': localStorage.getItem('token')})
+		// 	.send(user)
+		// 	.end(function(err, res){
+		//     if(err)
+		//     	console.log(err);
+		//     else {
+		//     	let newUsers = th.state.users;
+		//     	newUsers.push(res.body)
+		//     	th.setState({
+		//     		users: newUsers
+		//     	})
+		//     }
+		//   });
+	} 
+
+	deleteUser(user) {
+		console.log('Role from request',user)
+		let th = this
+		Request
+			.delete('/admin/deleteuser')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({username: user.username})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	let users = th.state.users.filter(function(userObj) {
+		    		return user.username != userObj.username;
+		    	})
+		    	th.setState({users: users})
+		    	console.log('Users in state',th.state.users)
+		    	// console.log(res.body);
+		    }
+		  })
+	} 
+
 	render() {
+		let th = this;
 		return (
 			<div >
 				
@@ -69,7 +135,7 @@ export default class Users extends React.Component {
 								return(
 									<Col style={styles.card} md={3} key={index}>
 										 
-											<UserList  currUser={user} />
+											<UserList  currUser={user} deleteUser={th.updateUser} updateUser={th.updateUser} />
 										
 									</Col>
 									
@@ -77,7 +143,7 @@ export default class Users extends React.Component {
 							})
 						}
 						<Col style={styles.addUser} md={3}>
-							<AddUser />
+							<AddUser addUser={this.addUser}/>
 						</Col>
 					</Row>
 				</Grid>
