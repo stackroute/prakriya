@@ -80,6 +80,7 @@ let getPermissions = function(successCB, errorCB) {
 module.exports = {
 	getUsers: getUsers,
 	getRoles: getRoles,
+	getPermissions: getPermissions,
 	addUser: addUser,
 	addRole: addRole,
 	updateRole: updateRole,

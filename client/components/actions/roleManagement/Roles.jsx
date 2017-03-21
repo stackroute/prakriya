@@ -2,10 +2,14 @@ import React from 'react';
 import Request from 'superagent';
 import AddRole from './AddRole.jsx';
 import RoleItem from './RoleItem.jsx';
+import {Grid, Row, Col} from 'react-flexbox-grid';
 
 const styles = {
 	heading: {
 		textAlign: 'center'
+	},
+	col: {
+		marginBottom: '15px'
 	}
 }
 
@@ -23,18 +27,7 @@ export default class RoleManagement extends React.Component {
 	}
 	componentDidMount() {
 		this.getRoles();
-		// Request
-		// 	.get('/admin/permissions')
-		// 	.set({'Authorization': localStorage.getItem('token')})
-		// 	.end(function(err, res) {
-		// 		if(err)
-		//     	console.log(err);
-		//     else {
-		//     	th.setState({
-		//     		permissions: res.body
-		//     	})
-		//     }
-		// 	})
+		this.getPermissions();
 	}
 	getRoles() {
 		let th = this
@@ -48,6 +41,22 @@ export default class RoleManagement extends React.Component {
 		    	th.setState({
 		    		roles: res.body
 		    	})
+		    }
+			})
+	}
+	getPermissions() {
+		let th = this
+		Request
+			.get('/admin/permissions')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	th.setState({
+		    		permissions: res.body[0].permissions
+		    	})
+		    	console.log('Got all permissions', th.state.permissions)
 		    }
 			})
 	}
@@ -115,19 +124,24 @@ export default class RoleManagement extends React.Component {
 			<div >
 				<AddRole addRole={this.addRole}/>
 				<h1 style={styles.heading}>Role Management</h1>
-				{
-					this.state.roles.map(function (role, index) {
-						return(
-							<RoleItem 
-								roleperm={role} 
-								permissions={th.state.permissions} 
-								key={index} 
-								deleteRole={th.deleteRole}
-								savePermissions={th.savePermissions}
-						 	/>
-						)
-					})
-				}
+				<Grid>
+					<Row>
+						{
+							this.state.roles.map(function (role, index) {
+								return(
+									<Col style={styles.col} md={6} key={index}>
+										<RoleItem 
+											roleperm={role} 
+											permissions={th.state.permissions} 
+											deleteRole={th.deleteRole}
+											savePermissions={th.savePermissions}
+									 	/>
+								 	</Col>
+								)
+							})
+						}
+					</Row>
+				</Grid>
 			</div>
 		);
 	}

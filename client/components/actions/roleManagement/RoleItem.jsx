@@ -1,6 +1,6 @@
 import React from 'react';
 import Request from 'superagent';
-import {Card, CardText, CardHeader} from 'material-ui/Card';
+import {Card, CardText, CardHeader, CardActions} from 'material-ui/Card';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
 import Paper from 'material-ui/Paper';
@@ -9,22 +9,28 @@ import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import SvgIcon from 'material-ui/svg-icons/content/add';
+import AddIcon from 'material-ui/svg-icons/content/add';
+import SaveIcon from 'material-ui/svg-icons/content/save';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import AutoComplete from 'material-ui/AutoComplete';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
 	avatar: {
 		margin: '3px 10px'
 	},
 	card: {
-		background: '#eeeeee'
+		background: '#f5f5f5',
 	},
 	paper: {
 		margin: '5px',
 		padding: '5px',
 		width: 'auto',
-		height: '120px'
+		height: '120px',
+		borderRadius: '10px'
 	},
 	wrapper: {
     display: 'flex',
@@ -36,6 +42,13 @@ const styles = {
   chipAdd: {
   	margin: '4px',
   	marginBottom: '0px'
+  },
+  deleteIcon: {
+  	float: 'right',
+  	cursor: 'pointer'
+  },
+  cardActions: {
+  	textAlign: 'center'
   }
 }
 
@@ -44,18 +57,22 @@ export default class RoleItem extends React.Component {
 		super(props)
 		this.state = {
 			permissions: [],
+			searchPerm: '',
 			showDeleteDialog: false,
 			showAddMoreDialog: false,
-			showSave: false,
+			disableSave: true,
+			openSnackBar: false,
+			snackBarMsg: ''
 		}
 		this.handlePermissionDelete = this.handlePermissionDelete.bind(this);
-		this.saveDeletedPerms = this.saveDeletedPerms.bind(this);
+		this.handleUpdateInputPerm = this.handleUpdateInputPerm.bind(this);
+		this.handleAddNewPerm = this.handleAddNewPerm.bind(this);
+		this.savePerms = this.savePerms.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 		this.handleDeleteRole = this.handleDeleteRole.bind(this);
-		this.openAddMoreDialog = this.openAddMoreDialog.bind(this);
-		this.closeAddMoreDialog = this.closeAddMoreDialog.bind(this);
 		this.handleAddMore = this.handleAddMore.bind(this);
+		this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
 	}
 	componentDidMount() {
 		this.setState({
@@ -68,14 +85,33 @@ export default class RoleItem extends React.Component {
 		})
 		this.setState({
 			permissions: permissions,
-			showSave: true
+			disableSave: false
 		})
 	}
-	saveDeletedPerms() {
+	handleUpdateInputPerm(searchPerm) {
+		this.setState({
+			searchPerm: searchPerm
+		})
+	}
+	handleAddNewPerm() {
+		let perms = this.state.permissions
+		perms.push(this.state.searchPerm)
+		this.setState({
+			permissions: perms,
+			searchPerm: '',
+			disableSave: false
+		})
+	}
+	savePerms() {
 		let roleObj = {
 			role: this.props.roleperm.role,
 			permissions: this.state.permissions
 		}
+		this.setState({
+			disableSave: true,
+			snackBarMsg: "Changes applied to the role",
+			openSnackBar: true
+		})
 		this.props.savePermissions(roleObj)
 	}
 	openDeleteDialog() {
@@ -88,22 +124,18 @@ export default class RoleItem extends React.Component {
 			showDeleteDialog: false
 		})
 	}
-	openAddMoreDialog() {
-
-		this.setState({
-			showAddMoreDialog: true
-		})
-	}
-	closeAddMoreDialog() {
-		this.setState({
-			showAddMoreDialog: false
-		})
-	}
 	handleDeleteRole() {
+		this.setState({
+			snackBarMsg: "Role deleted",
+			openSnackBar: true
+		})
 		this.props.deleteRole(this.props.roleperm.role)
 	}
 	handleAddMore() {
 
+	}
+	handleSnackBarClose() {
+		this.setState({openSnackBar: false})
 	}
 
 	render() {
@@ -138,60 +170,61 @@ export default class RoleItem extends React.Component {
 		return (
 			<div>
 				<Card style={styles.card} >
-					<Grid>
-						<Row middle="md">
-							<Col md={2}>
-								<CardText>
-									<Avatar style={styles.avatar}>{this.props.roleperm.role.charAt(0).toUpperCase()}</Avatar>
-									{role}
-								</CardText>
-							</Col>
-							<Col md={5} mdOffset={1}>
-								<Paper style={styles.paper} zDepth={1} >
-									<div style={styles.wrapper}>
-										{
-											this.state.permissions.map(function (permission, index) {
-												return(
-													<Chip
-														onRequestDelete={() => th.handlePermissionDelete(permission)}
-									          style={styles.chip}
-									          key={index}
-									        >
-									          {permission}
-									        </Chip>
-								        )
-											})
-										}
-									</div>
-								</Paper>
-							</Col>
-							<Col md={1}>
-								<Chip
-									onTouchTap={this.openAddMoreDialog}
-				          style={styles.chip}
-				        >
-				        	<Avatar icon={<SvgIcon />} />
-				        	Add More
-				        </Chip>
-							</Col>
-							<Col md={1} mdOffset={2}>
-								<IconMenu
-							    iconButtonElement={
-							      <IconButton><MoreVertIcon /></IconButton>
-							    }
-							    targetOrigin={{horizontal: 'right', vertical: 'top'}}
-							    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-							  >
-							    <MenuItem primaryText="Delete Role" onClick={this.openDeleteDialog} />
-							    {
-							    	this.state.showSave &&
-							    	<MenuItem primaryText="Save Changes" onClick={this.saveDeletedPerms} />
-							    }
-							  </IconMenu>
-							</Col>
-						</Row>
-					</Grid>
+					<CardHeader
+			      title={role}
+			      subtitle="Last modified: 20th Mar 2017"
+			      avatar={
+			      	<Avatar>
+			      		{this.props.roleperm.role.charAt(0).toUpperCase()}
+			      	</Avatar>
+			     	}
+			    >
+			    	<DeleteIcon style={styles.deleteIcon} onClick={this.openDeleteDialog} />
+			    </CardHeader>
+			    <CardText>
+						<AutoComplete
+				      floatingLabelText="Type to add more permissions..."
+				      filter={AutoComplete.fuzzyFilter}
+				      searchText={this.state.searchPerm}
+		          onUpdateInput={this.handleUpdateInputPerm}
+		          onNewRequest={this.handleAddNewPerm}
+				      dataSource={this.props.permissions}
+				      maxSearchResults={5}
+				    />
+			    	<Paper style={styles.paper} zDepth={3} >
+							<div style={styles.wrapper}>
+								{
+									this.state.permissions.map(function (permission, index) {
+										return(
+											<Chip
+												onRequestDelete={() => th.handlePermissionDelete(permission)}
+							          style={styles.chip}
+							          key={index}
+							        >
+							          {permission}
+							        </Chip>
+						        )
+									})
+								}
+							</div>
+						</Paper>
+			    </CardText>
+			    <CardActions style={styles.cardActions}>
+			    	<RaisedButton 
+			    		label="Apply" 
+			    		primary={true} 
+			    		disabled={this.state.disableSave} 
+			    		icon={<SaveIcon />}
+			    		onClick={this.savePerms}
+			    	/>
+			    </CardActions>
 			  </Card>
+			  <Snackbar
+          open={this.state.openSnackBar}
+          message={this.state.snackBarMsg}
+          autoHideDuration={4000}
+          onRequestClose={this.handleSnackBarClose}
+        />
 			  <Dialog
           actions={deleteDialogActions}
           modal={false}
@@ -199,15 +232,6 @@ export default class RoleItem extends React.Component {
           onRequestClose={this.closeDeleteDialog}
         >
         	Are you sure you want to delete this role?
-        </Dialog>
-        <Dialog
-        	title="Add some more permissions"
-          actions={addMoreActions}
-          modal={false}
-          open={this.state.showAddMoreDialog}
-          onRequestClose={this.closeAddMoreDialog}
-        >
-
         </Dialog>
 			</div>
 		);
