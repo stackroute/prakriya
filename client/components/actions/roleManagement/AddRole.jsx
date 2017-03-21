@@ -65,9 +65,11 @@ export default class AddRole extends React.Component {
 	}
 	handleSubmit() {
 		let roleObj = {}
-		roleObj.role = this.state.role
+		roleObj.role = this.state.role.toLowerCase()
 		roleObj.permissions = this.state.actions
-		console.log(roleObj)
+		this.setState({
+			actions: []
+		})
 		this.props.addRole(roleObj)
 	}
 	render() {

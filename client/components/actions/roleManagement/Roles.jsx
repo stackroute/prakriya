@@ -80,7 +80,6 @@ export default class RoleManagement extends React.Component {
 			})
 	} 
 	deleteRole(role) {
-		console.log('Role from request',role)
 		let th = this
 		let roleObj = {
       "role": role
@@ -97,12 +96,10 @@ export default class RoleManagement extends React.Component {
 		    		return role != roleObj.role;
 		    	})
 		    	th.setState({roles: roles})
-		    	console.log('Roles in state',th.state.roles)
 		    }
 		  })
 	}
 	savePermissions(roleObj) {
-		console.log('Update role with ', roleObj)
 		let th = this;
 		Request
 			.post('/admin/updaterole')
