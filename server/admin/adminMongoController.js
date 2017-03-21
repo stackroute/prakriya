@@ -41,6 +41,7 @@ let getRoles = function(successCB, errorCB) {
 }
 
 let addRole = function (roleObj, successCB, errorCB) {
+	// roleObj.lastModified = new Date();
 	let saveRole = new RoleModel(roleObj)
 	saveRole.save(roleObj, function (err, result) {
 		if(err)
@@ -52,6 +53,7 @@ let addRole = function (roleObj, successCB, errorCB) {
 let updateRole = function (roleObj, successCB, errorCB) {
 	console.log('Role obj in Mongo', roleObj)
 	console.log(roleObj.role)
+	roleObj.lastModified= new Date();
 	RoleModel.update({"role": roleObj.role}, roleObj, function(err, status) {
 		if(err)
 			errorCB(err);

@@ -5,12 +5,15 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
+import {Grid, Row, Col} from 'react-flexbox-grid';
 
-const addButtonStyle = {
-	position:'fixed',
-  top: '13%',
-  right:'5%',
-  zIndex: 2
+const styles = {
+	addButtonStyle: {
+		position:'fixed',
+	  top: '13%',
+	  right:'5%',
+	  zIndex: 2
+	}
 }
 
 const actionsList = [
@@ -85,7 +88,7 @@ export default class AddRole extends React.Component {
     ];
 		return (
 			<div>
-				<FloatingActionButton style={addButtonStyle} onTouchTap={this.handleOpen} >
+				<FloatingActionButton mini={true} style={styles.addButtonStyle} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
 		    <Dialog
@@ -94,6 +97,7 @@ export default class AddRole extends React.Component {
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
         >
           <TextField 
           	floatingLabelText="Role"
@@ -102,13 +106,13 @@ export default class AddRole extends React.Component {
           />
           should have following selected permissions<br/>
           {
-          	actionsList.map(function(action, index) {
+          	this.props.permissions.map(function(action, index) {
           		return(
 	          		<Checkbox
 									label={action}
 									value={action}
-									key={index}
 									onCheck={th.onChangeActions}
+									key={index}
 								/>
 							)
           	})

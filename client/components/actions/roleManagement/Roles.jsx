@@ -122,7 +122,7 @@ export default class RoleManagement extends React.Component {
 		let th = this;
 		return (
 			<div >
-				<AddRole addRole={this.addRole}/>
+				<AddRole permissions={this.state.permissions} addRole={this.addRole}/>
 				<h1 style={styles.heading}>Role Management</h1>
 				<Grid>
 					<Row>
