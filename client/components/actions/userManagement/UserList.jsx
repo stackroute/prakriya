@@ -8,6 +8,12 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import FlatButton from 'material-ui/FlatButton';
 import AddUser from './AddUser.jsx';
 
+const styles = {
+	cardActions: {
+		textAlign: 'right'
+	}
+}
+
 export default class UserList extends React.Component {
 	constructor(props) {
 		super(props)
@@ -40,11 +46,11 @@ export default class UserList extends React.Component {
 				
 					<Card>
 
-						<CardMedia overlay={<CardTitle title={this.props.currUser.name} subtitle={this.props.currUser.email} />}>
+						<CardMedia overlay={<CardTitle title={this.props.currUser.username} subtitle={this.props.currUser.role.toUpperCase()} />}>
 				      <img src="../../../assets/images/avt-default.jpg" />
 				    </CardMedia>
-				    <CardTitle subtitle={this.props.currUser.username} />							
-						<CardActions>
+				    <CardTitle title={this.props.currUser.name} subtitle={this.props.currUser.email} />							
+						<CardActions style={styles.cardActions}>
 							<IconButton tooltip="Edit User" onClick={this.handleEditUser}>
 					      <EditIcon color={lightBlack} />
 					    </IconButton>
