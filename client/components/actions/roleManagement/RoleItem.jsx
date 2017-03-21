@@ -41,9 +41,8 @@ const styles = {
     margin: '4px',
     background: '#eee'
   },
-  chipAdd: {
-  	margin: '4px',
-  	marginBottom: '0px'
+  chipName: {
+  	// fontSize: '12px'
   },
   deleteIcon: {
   	float: 'right',
@@ -216,7 +215,7 @@ export default class RoleItem extends React.Component {
 							          style={styles.chip}
 							          key={index}
 							        >
-							          {permission}
+							          <span style={styles.chipName}>{permission}</span>
 							        </Chip>
 						        )
 									})

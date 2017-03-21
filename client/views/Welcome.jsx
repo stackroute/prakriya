@@ -7,8 +7,8 @@ import Login from '../components/login/index.jsx';
 import {Card, CardMedia} from 'material-ui/Card';
 
 const briefStyle = {
-	marginTop: '50px',
-	fontSize: '14px'
+	marginTop: '70px',
+	fontSize: '16px'
 }
 const bodyStyle = {
 	textAlign: 'center',
@@ -78,8 +78,7 @@ export default class Welcome extends React.Component {
 						</CardMedia>
 					</Card>
 					<p style={briefStyle}>
-						It is a Wave Automation Tool<br/>
-						Supporting, generating and disseminating timely and accurate information on business operations at StackRoute.
+						<em>It is a Wave Automation Tool</em>
 					</p>
 				</div>
 				<Footer />

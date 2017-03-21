@@ -36,7 +36,7 @@ router.post("/", function(req, res) {
         var promise = query.exec();
 
         promise.then(function(user){
-          console.log(user);
+          console.log('User object in the loginRouter',user);
           // user = doc;
           if (user) {
               var payload = {
