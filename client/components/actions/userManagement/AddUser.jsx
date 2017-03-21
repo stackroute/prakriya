@@ -18,11 +18,18 @@ const items = [
   <MenuItem key={4} value={"sponsor"} primaryText="Sponsor" />
 ];
 
-const styles = {	
-	add: {
-		cursor: 'pointer'
-	}
+
+
+const addButtonStyle = {
+	position:'fixed',
+  top: '13%',
+  right:'5%',
+  zIndex: 2
 }
+
+const dialogStyle = {
+  textAlign: 'center'
+};
 
 export default class AddUser extends React.Component {
 
@@ -31,19 +38,38 @@ export default class AddUser extends React.Component {
 		this.state = {
 			open: false,
 			name: '',
+			username: '',
 			email: '',
 			password: '',
 			cpassword: '',
-			role: ''
+			role: '',
+			roles: []
 		}
+	
 		this.handleOpen = this.handleOpen.bind(this);
 	  this.handleClose = this.handleClose.bind(this);
 		this.onChangeName = this.onChangeName.bind(this)
+		this.onChangeUsername = this.onChangeUsername.bind(this)
 		this.onChangeEmail = this.onChangeEmail.bind(this)
 		this.onChangePassword = this.onChangePassword.bind(this)
 		this.onChangeConfirmPassword = this.onChangeConfirmPassword.bind(this)
 		this.onChangeRole = this.onChangeRole.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
+	}
+	componentDidMount() {
+		let th = this
+		Request
+			.get('/admin/roles')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	th.setState({
+		    		roles: res.body
+		    	})
+		    }
+			})
 	}
 	handleOpen() {
     this.setState({open: true});
@@ -54,6 +80,9 @@ export default class AddUser extends React.Component {
   };
 	onChangeName(e) {
 		this.setState({name: e.target.value})
+	}
+	onChangeUsername(e) {
+		this.setState({username: e.target.value})
 	}
 	onChangeEmail(e) {
 		this.setState({email: e.target.value})
@@ -71,6 +100,7 @@ export default class AddUser extends React.Component {
 		let th = this
 		let user = {}
 		user.name = this.state.name
+		user.username = this.state.username
 		user.email = this.state.email
 		user.password = this.state.password
 		user.role = this.state.role
@@ -96,60 +126,72 @@ export default class AddUser extends React.Component {
 		return(
 			<div>
 				
-					<Card style={styles.add} onClick={this.handleOpen} >
-						<CardMedia overlay={<CardTitle title="Add new user" />}>
-						  <img src="../../../assets/images/add_user.png" />
-				    </CardMedia>						    
-					</Card>
+					<FloatingActionButton style={addButtonStyle} mini={true} onTouchTap={this.handleOpen} >
+			      <ContentAdd />
+			    </FloatingActionButton>
 				
 				
-		    <Dialog
+		    <Dialog style={dialogStyle}
           title="Add new User"
           modal={false}
           open={this.state.open}
+          
+          autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
         >
-        	<Card style={style} >
-						<CardTitle style={{textAlign: 'center'}} title="Add User" />
-						<CardText>
-				    	<TextField 
-				    		hintText="Display name" 
-				    		floatingLabelText="Name"
-				    		onChange={this.onChangeName} 
-				    	/><br/>
-				    	<TextField 
-				    		hintText="This will be unique"
-				    		floatingLabelText="Email" 
-				    		onChange={this.onChangeEmail} 
-				    	/><br/>
-				    	<TextField 
-				    		floatingLabelText="Password" 
-				    		hintText="Secure your account" 
-				    		type="password" 
-				    		onChange={this.onChangePassword} 
-				    	/><br/>
-				    	<TextField 
-				    		floatingLabelText="Confirm Password" 
-				    		hintText="Confirm password" 
-				    		type="password" 
-				    		onChange={this.onChangeConfirmPassword} 
-				    	/><br/>
-				    	<SelectField
-				        onChange={this.onChangeRole}
-				        floatingLabelText="Select Role"
-				        value={this.state.role}
-				      >
-				        {items}
-				      </SelectField>
-				    </CardText>
-				    <CardActions style={{textAlign: 'center'}} >
-			    		<RaisedButton 
-			    			label="Add User" 
-			    			primary={true}
-			    			onClick={this.handleSubmit}
-			    		/>
-			    	</CardActions>
-					</Card>
+      			
+      						<TextField 
+						    		hintText="Display name" 
+						    		floatingLabelText="Name"
+						    		onChange={this.onChangeName} 
+						    	/><br/>
+						    	<TextField 
+						    		hintText="Should not be your name" 
+						    		floatingLabelText="Username"
+						    		onChange={this.onChangeUsername} 
+						    	/><br/>
+						    	<TextField 
+						    		hintText="This will be unique"
+						    		floatingLabelText="Email" 
+						    		onChange={this.onChangeEmail} 
+						    	/><br/>
+						    	<TextField 
+						    		floatingLabelText="Password" 
+						    		hintText="Secure your account" 
+						    		type="password" 
+						    		onChange={this.onChangePassword} 
+						    	/><br/>
+						    	<TextField 
+						    		floatingLabelText="Confirm Password" 
+						    		hintText="Confirm password" 
+						    		type="password" 
+						    		onChange={this.onChangeConfirmPassword} 
+						    	/><br/>
+						    	<SelectField
+						        onChange={this.onChangeRole}
+						        floatingLabelText="Select Role"
+						        value={this.state.role}
+						      >
+						        {this.state.roles}
+						      </SelectField>
+      					
+      			
+				    			<div>
+				    				<RaisedButton 
+						    	 		label="Add User" 
+						    	   	primary={true}
+						    			onClick={this.handleSubmit}
+						    	 	/>&nbsp;	
+					    		
+					    			<RaisedButton 
+						    	 		label="Cancel" 
+						    	   	primary={true}
+						    			onClick={this.handleSubmit}
+						    			onTouchTap={this.handleClose}
+						    	 	/>	
+				    			</div>
+				    			
+				    		
         </Dialog>
 			</div>
 		)
