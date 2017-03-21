@@ -55,9 +55,6 @@ export default class Users extends React.Component {
 		    	}) 
 		    	console.log("Users");
 		    	console.log(th.state.users);
-			    
-		    	
-		    // th.context.router.push('/app')
 		  });
 	}
 
@@ -135,7 +132,7 @@ export default class Users extends React.Component {
 								return(
 									<Col style={styles.card} md={3} key={index}>
 										 
-											<UserList  currUser={user} deleteUser={th.updateUser} updateUser={th.updateUser} />
+											<UserList  currUser={user} deleteUser={th.deleteUser} updateUser={th.updateUser} />
 										
 									</Col>
 									

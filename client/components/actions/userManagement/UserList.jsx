@@ -20,16 +20,16 @@ export default class UserList extends React.Component {
 	}
 
 	handleRemoveUser() {
-		
 		this.props.deleteUser(this.props.currUser);
 	}
+
 	handleEditUser() {
 		this.setState({
 			openDialog: true
 		})
 	}
+
 	handleUpdateUser(updatedUser) {
-		
 		this.props.updateUser(updatedUser);
 	}
 	

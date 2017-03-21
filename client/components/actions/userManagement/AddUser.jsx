@@ -55,6 +55,7 @@ export default class AddUser extends React.Component {
 		this.onChangeConfirmPassword = this.onChangeConfirmPassword.bind(this)
 		this.onChangeRole = this.onChangeRole.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
+		this.handleUpdate = this.handleUpdate.bind(this)
 	}
 	componentDidMount() {
 		if(this.props.openDialog) {
