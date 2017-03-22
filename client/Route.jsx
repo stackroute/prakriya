@@ -10,7 +10,9 @@ import Welcome from './views/Welcome.jsx';
 import Login from './components/login/index.jsx';
 import SignUp from './components/signup/index.jsx';
 import Dashboard from './components/dashboard/index.jsx';
-import {Roles, Users} from './components/actions/index.jsx';
+import Roles from './components/roleManagement/index.jsx';
+import Users from './components/userManagement/index.jsx';
+import Candidates from './components/candidateManagement/index.jsx';
 
 injectTapEventPlugin();
 
@@ -25,7 +27,6 @@ function requireAuth (nextState, replace, callback) {
 
 function alreadyLoggedIn (nextState, replace, callback) {
   const token = localStorage.getItem('token')
-  // console.log(nextState.location.pathname)
   if(token)
   	replace('/app')
   return callback()
@@ -40,6 +41,7 @@ ReactDOM.render(
 				<IndexRoute component={Dashboard} />
 				<Route path="/roles" component={Roles} />
 				<Route path="/users" component={Users} />
+				<Route path="/candidates" component={Candidates} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,
