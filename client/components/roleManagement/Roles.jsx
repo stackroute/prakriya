@@ -126,6 +126,7 @@ export default class RoleManagement extends React.Component {
 						{
 							this.state.roles.map(function (role, index) {
 								return(
+									role.role != "admin" &&
 									<Col style={styles.col} md={6} key={index}>
 										<RoleItem 
 											roleperm={role} 
