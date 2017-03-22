@@ -13,8 +13,10 @@ let getUsers = function(successCB, errorCB) {
 
 let addUser = function(newUser) {
 	let promise = new Promise(function(resolve, reject) {
+		let userObj = newUser
+		userObj.actions = "login"
 
-		let saveUser = new UserModel(newUser);
+		let saveUser = new UserModel(userObj);
 
 		saveUser.save(function(err, savedUser) {
 			if(err)
@@ -46,6 +48,16 @@ let updateUser = function (userObj, successCB, errorCB) {
 	console.log('User obj from server', userObj)
 	console.log(userObj.username)
 	UserModel.update({"username": userObj.username}, userObj, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
+let lockUser = function (userObj, successCB, errorCB) {
+	console.log('User obj from server', userObj)
+	console.log(userObj.username)
+	UserModel.update({"username": userObj.username}, {$pull:{"actions": "login"}}, function(err, status) {
 		if(err)
 			errorCB(err);
 		successCB(status);
@@ -108,5 +120,6 @@ module.exports = {
 	updateRole: updateRole,
 	deleteRole: deleteRole,
 	deleteUser: deleteUser,
-	updateUser: updateUser
+	updateUser: updateUser,
+	lockUser: lockUser
 }

@@ -157,6 +157,13 @@ export default class AddUser extends React.Component {
 			margin: 'auto',
 			width: '500px'
 		}
+		let dialogTitle
+		if(this.props.openDialog) {
+			dialogTitle = "Edit user"
+		}
+		else {
+			dialogTitle = "Add new user"
+		}
 		let submitButton
 		if(this.props.openDialog) {
 			submitButton = <RaisedButton 
@@ -183,14 +190,13 @@ export default class AddUser extends React.Component {
 				
 				
 		    <Dialog style={dialogStyle}
-          title="Add new User"
+          title={dialogTitle}
           modal={false}
           open={this.state.open}
-          
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
         >
-      			
+      		
       						<TextField 
 						    		hintText="Display name" 
 						    		floatingLabelText="Name"
@@ -234,12 +240,12 @@ export default class AddUser extends React.Component {
 						        		return <MenuItem key={key} value={val} primaryText={val} />
 						        	})
 						        }
-						      </SelectField>
+						      </SelectField><br/><br/><br/>
       					
       			
 				    			<div>
 				    				{submitButton}
-				    				&nbsp;	
+				    				&emsp;	
 					    			<RaisedButton 
 						    	 		label="Cancel" 
 						    	   	primary={true}

@@ -39,6 +39,8 @@ export default class Users extends React.Component {
 		this.addUser = this.addUser.bind(this);
 		this.deleteUser = this.deleteUser.bind(this);
 		this.updateUser = this.updateUser.bind(this);
+		this.lockUser = this.lockUser.bind(this);
+
 	}
 
 	componentDidMount() {
@@ -94,7 +96,6 @@ export default class Users extends React.Component {
 	} 
 
 	deleteUser(user) {
-		console.log('Role from request',user)
 		let th = this
 		Request
 			.delete('/admin/deleteuser')
@@ -107,6 +108,21 @@ export default class Users extends React.Component {
 		    	th.getUsers();
 		    }
 		  })
+	} 
+
+	lockUser(user) {
+		let th = this
+		Request
+			.post('/admin/lockuser')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(user)
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+		    	th.getUsers();
+		    }
+		  });
 	} 
 
 	render() {
@@ -124,7 +140,7 @@ export default class Users extends React.Component {
 									user.role != "admin" &&
 									<Col style={styles.card} md={3} key={index}>
 										 
-											<UserList  currUser={user} deleteUser={th.deleteUser} updateUser={th.updateUser} />
+											<UserList  currUser={user} lockUser={th.lockUser} deleteUser={th.deleteUser} updateUser={th.updateUser} />
 										
 									</Col>
 									

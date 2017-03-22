@@ -70,6 +70,22 @@ router.post('/updateuser', auth.authenticate(), function(req, res) {
   }
 )
 
+router.post('/lockuser', auth.authenticate(), function(req, res) {
+    try {
+      adminMongoController.lockUser(req.body, function (status) {
+        res.status(200).json(status)
+      }, function (err) {
+        res.status(500).json({ error: 'Cannot lock user account in db...!' });
+      })
+    }
+    catch(err) {
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      }); 
+    }
+  }
+)
+
 
 
 /****************************************
