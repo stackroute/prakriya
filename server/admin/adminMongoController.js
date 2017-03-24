@@ -73,7 +73,6 @@ let getRoles = function(successCB, errorCB) {
 }
 
 let addRole = function (roleObj, successCB, errorCB) {
-	// roleObj.lastModified = new Date();
 	let saveRole = new RoleModel(roleObj)
 	saveRole.save(roleObj, function (err, result) {
 		if(err)
