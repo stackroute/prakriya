@@ -1,0 +1,31 @@
+# create a docker-compose.yml file
+version: "2"
+services:
+  web:
+    build: .
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - 3000:3000
+    links:
+      - mongo
+      - redis
+    depends_on:
+      - mongo
+      - redis  
+  mongo:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+     - $HOME/mongo/data:/data  
+    expose:
+      - 27017
+    ports: 
+      - "27017:27017"
+  redis:
+    image: redis:latest
+    links:
+      -  mongo
+    ports:
+      - 6379:6379    

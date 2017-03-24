@@ -15,9 +15,8 @@ var adminRoutes = require('./server/admin');
 const userModel = require('./models/users.js');
 
 
-
 //Connection with database
-mongoose.connect('mongodb://localhost:27017/prakriya',function (error){
+mongoose.connect('mongodb://mongo:27017/prakriya',function (error){
 	if(error){
 	   console.log(error);
 	}
