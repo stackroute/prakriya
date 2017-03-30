@@ -26,7 +26,7 @@ module.exports = function() {
   
   let app = service.createApp();
   
-  app = service.setupWebpack(app);
+  // app = service.setupWebpack(app);
   
   app = service.setupStaticRoutes(app);
   

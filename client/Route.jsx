@@ -13,6 +13,7 @@ import Dashboard from './components/dashboard/index.jsx';
 import Roles from './components/roleManagement/index.jsx';
 import Users from './components/userManagement/index.jsx';
 import Candidates from './components/candidateManagement/index.jsx';
+import BulkUpload from './components/bulkupload/index.jsx';
 
 injectTapEventPlugin();
 
@@ -42,6 +43,7 @@ ReactDOM.render(
 				<Route path="/roles" component={Roles} />
 				<Route path="/users" component={Users} />
 				<Route path="/candidates" component={Candidates} />
+				<Route path="/bulkupload" component={BulkUpload} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

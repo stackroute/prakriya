@@ -33,4 +33,36 @@ router.get("/user", auth.authenticate(), function(req, res) {
   }
 });
 
+// Get all the cadets
+router.get('/cadets', auth.authenticate(), function (req, res) {
+  try{
+    dashboardMongoController.getCadets(function(cadets) {
+      res.status(201).json(cadets);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all cadets from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
+// Get all the files
+router.get('/files', auth.authenticate(), function (req, res) {
+  try{
+    dashboardMongoController.getFiles(function(files) {
+      res.status(201).json(files);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all files from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
 module.exports = router;

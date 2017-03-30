@@ -40,7 +40,7 @@ export default class Header extends React.Component {
 			.end(function(err, res){
 				let actions = res.body.actions;
 				let routes = actions.map(function(item) {
-					return item.replace(" ", "").toLowerCase()
+					return item.replace(/\s/g,'').toLowerCase()
 				});
 				th.setState({
 					actions: actions,

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./bin/www",
-    "serve": "gulp build && node ./bin/www"
+    "serve": "gulp build && node ./bin/www",
+    "upload": "node ./server/bulkUpload.service"
   },
   "author": "",
   "license": "ISC",
@@ -22,6 +23,7 @@
     "flexboxgrid": "^6.3.1",
     "formidable": "^1.1.1",
     "fs": "0.0.1-security",
+    "humanize": "0.0.9",
     "jwt-simple": "^0.5.1",
     "log4js": "^1.1.1",
     "material-ui": "^0.17.0",
@@ -36,6 +38,7 @@
     "react-flexbox-grid": "^0.10.2",
     "react-router": "^3.0.2",
     "react-tap-event-plugin": "^2.0.1",
+    "redis": "^2.7.1",
     "style-loader": "^0.13.2",
     "superagent": "^3.5.0"
   },

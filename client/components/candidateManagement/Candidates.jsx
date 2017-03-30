@@ -1,35 +1,60 @@
 import React from 'react';
-import BulkUpload from './BulkUpload.jsx';
 import Request from 'superagent';
+import {Grid, Row, Col} from 'react-flexbox-grid';
+import CandidateInfo from './CandidateInfo.jsx';
 
-export default class RoleManagement extends React.Component {
+const styles = {
+	heading: {
+		textAlign: 'center'
+	}
+}
+export default class Candidates extends React.Component {
 	constructor(props) {
 		super(props)
-		this.handleUpload = this.handleUpload.bind(this);
-		this.hanbleDrag = this.handleDrag.bind(this);
+		this.state = {
+			candidates: []
+		}
+		
+		this.getCandidates = this.getCandidates.bind(this);
 	}
-	handleUpload(file) {
+	componentDidMount() {
+		this.getCandidates();
+	}
+	
+	getCandidates() {
 		let th = this;
 		Request
-			.post('/upload/cadets')
+			.get('/dashboard/cadets')
 			.set({'Authorization': localStorage.getItem('token')})
-			.attach('file', file)
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Response came from the server', res.text)
+		    	console.log('Response came from the server', res.body)
+		    	th.setState({
+		    		candidates: res.body
+		    	})
 		    }
 		  })
-	}
-	handleDrag() {
-		console.log('Hello');
 	}
 
 	render() {
 		return(
-			<div onDrag={this.handleDrag}>
-				<BulkUpload uploadCadets={this.handleUpload}/>
+			<div>
+				<h1 style={styles.heading}>Candidate Management</h1>
+				<Grid>
+					<Row>
+						{
+							this.state.candidates.map(function(candidate, key) {
+								return (
+									<Col md={3} key={key}>
+										<CandidateInfo candidate={candidate} />
+									</Col>
+								)
+							})
+						}
+					</Row>
+				</Grid>
 			</div>
 		)
 	}
