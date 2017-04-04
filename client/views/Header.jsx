@@ -10,6 +10,12 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import {Link} from 'react-router';
 import Request from 'superagent';
 
+const styles = {
+  title: {
+    cursor: 'pointer',
+  },
+}
+
 export default class Header extends React.Component {
 
 	constructor(props) {
@@ -87,7 +93,7 @@ export default class Header extends React.Component {
 		      }
 	      </Drawer>
 				<AppBar
-	        title="Prakriya"
+	        title={<span style={styles.title}>Prakriya</span>}
 	        onTitleTouchTap={this.openDashboard}
 	        onLeftIconButtonTouchTap={this.handleDrawerToggle}
 	        iconElementRight={

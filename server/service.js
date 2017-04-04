@@ -45,11 +45,12 @@ function setupRestRoutes(app) {
 function setupMiddlewares(app) {
   //  For logging each requests
   // app.use(morgan('dev'));
-
   const bodyParser = require('body-parser');
   const expressSession = require('express-session');
   const compression = require('compression');
+  const favicon = require('serve-favicon');
 
+  app.use(favicon(path.join(__dirname, '../', 'client', 'favicon.ico')));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(expressSession({secret: 'prakriya'}));

@@ -11,27 +11,13 @@ let getUsers = function(successCB, errorCB) {
 	});
 }
 
-let addUser = function(newUser) {
-	let promise = new Promise(function(resolve, reject) {
-		let userObj = newUser
-		userObj.actions = "login"
-
-		let saveUser = new UserModel(userObj);
-
-		saveUser.save(function(err, savedUser) {
-			if(err)
-				reject(err)
-			if (!savedUser) {
-        reject({
-          error: 'Null user object created in mongo..!'
-        });
-      }
-      console.log("successfully saved new user ", savedUser);
-      resolve(savedUser);
-		})
-
+let addUser = function(userObj, successCB, errorCB) {
+	let saveUser = new UserModel(userObj)
+	saveUser.save(userObj, function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result);
 	})
-	return promise;
 }
 
 let deleteUser = function (userObj, successCB, errorCB) {

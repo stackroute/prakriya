@@ -22,13 +22,15 @@ export default class FileDrop extends React.Component {
 		super(props);
 		this.state = {
 			showSelFile: false,
-			selectedFile: {},
-			data_uri: null
+			selectedFile: {}
 		}
 		this.uploadCadets = this.uploadCadets.bind(this);
 		this.handleDrop = this.handleDrop.bind(this);
 	}
 	uploadCadets() {
+		this.setState({
+			showSelFile: false
+		})
 		this.props.uploadCadets(this.state.selectedFile)
 	}
 	handleDrop(acceptedFiles, rejectedFiles) {

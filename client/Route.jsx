@@ -14,6 +14,9 @@ import Roles from './components/roleManagement/index.jsx';
 import Users from './components/userManagement/index.jsx';
 import Candidates from './components/candidateManagement/index.jsx';
 import BulkUpload from './components/bulkupload/index.jsx';
+import CourseManagement from './components/courseManagement/index.jsx';
+import AssessmentTracker from './components/assessmentTracker/index.jsx';
+import ProgramFlow from './components/programFlow/index.jsx';
 
 injectTapEventPlugin();
 
@@ -44,6 +47,9 @@ ReactDOM.render(
 				<Route path="/users" component={Users} />
 				<Route path="/candidates" component={Candidates} />
 				<Route path="/bulkupload" component={BulkUpload} />
+				<Route path="/coursemanagement" component={CourseManagement} />
+				<Route path="/assessmenttracker" component={AssessmentTracker} />
+				<Route path="/programflow" component={ProgramFlow} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

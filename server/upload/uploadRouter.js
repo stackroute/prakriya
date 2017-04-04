@@ -16,6 +16,7 @@ router.post('/cadets', auth.authenticate(), function(req, res) {
 				fileObj.fileName = files.file.name;
 				fileObj.submittedOn = Date.now();
 				fileObj.status = 'processing';
+				fileObj.addedBy = req.user.name;
 				console.log('FileObj created', fileObj)
 	      uploadMongoController.addFile(fileObj, function (file) {
 	      	client.rpush('fileImport', file.fileId);

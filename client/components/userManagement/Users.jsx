@@ -133,17 +133,14 @@ export default class Users extends React.Component {
 				<h1 style={styles.heading}>User Management</h1>
 				<Grid>
 					<Row>
-					
 						{
 							this.state.users.map(function (user, index) {
 								return(
-									user.role != "admin" &&
+									user.role != 'admin' &&
+									user.role != 'candidate' &&
 									<Col style={styles.card} md={3} key={index}>
-										 
-											<UserList  currUser={user} lockUser={th.lockUser} deleteUser={th.deleteUser} updateUser={th.updateUser} />
-										
+										<UserList  currUser={user} lockUser={th.lockUser} deleteUser={th.deleteUser} updateUser={th.updateUser} />
 									</Col>
-									
 								)
 							})
 						}

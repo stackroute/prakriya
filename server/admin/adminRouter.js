@@ -28,64 +28,66 @@ router.get("/users", auth.authenticate(), function(req, res) {
 
 //Add a new user
 router.post('/adduser', auth.authenticate(), function(req, res) {
-    let user = req.body
-    // user.username = user.email.split('@')[0]
-    adminMongoController.addUser(user)
-      .then(function(savedUser) {
-        res.send(user)
-      })
+  let user = req.body
+  try{
+    adminMongoController.addUser(user, function(user) {
+      res.status(200).json(user)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot add user in db...!' });
+    })
   }
-)
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
 
 router.delete('/deleteuser', auth.authenticate(), function(req, res) {
   console.log(req.body)
-    try {
-      adminMongoController.deleteUser(req.body, function (status) {
-        res.status(200).json(status)
-      }, function (err) {
-        res.status(500).json({ error: 'Cannot delete user in db...!' });
-      })
-    }
-    catch(err) {
-      res.status(500).json({
-        error: 'Internal error occurred, please report...!'
-      }); 
-    }
+  try {
+    adminMongoController.deleteUser(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot delete user in db...!' });
+    })
   }
-)  
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})  
 
 router.post('/updateuser', auth.authenticate(), function(req, res) {
-    try {
-      adminMongoController.updateUser(req.body, function (status) {
-        res.status(200).json(status)
-      }, function (err) {
-        res.status(500).json({ error: 'Cannot update user in db...!' });
-      })
-    }
-    catch(err) {
-      res.status(500).json({
-        error: 'Internal error occurred, please report...!'
-      }); 
-    }
+  try {
+    adminMongoController.updateUser(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update user in db...!' });
+    })
   }
-)
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
 
 router.post('/lockuser', auth.authenticate(), function(req, res) {
-    try {
-      adminMongoController.lockUser(req.body, function (status) {
-        res.status(200).json(status)
-      }, function (err) {
-        res.status(500).json({ error: 'Cannot lock user account in db...!' });
-      })
-    }
-    catch(err) {
-      res.status(500).json({
-        error: 'Internal error occurred, please report...!'
-      }); 
-    }
+  try {
+    adminMongoController.lockUser(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot lock user account in db...!' });
+    })
   }
-)
-
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
 
 
 /****************************************

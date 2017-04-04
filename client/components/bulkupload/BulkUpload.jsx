@@ -2,12 +2,12 @@ import React from 'react';
 import Request from 'superagent';
 import FileList from './FileList.jsx';
 import FileDrop from './FileDrop.jsx';
+import {Grid, Row, Col} from 'react-flexbox-grid';
 
 export default class BulkUpload extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			showList: false,
 			files: []
 		}
 		this.getFiles = this.getFiles.bind(this);
@@ -35,8 +35,7 @@ export default class BulkUpload extends React.Component {
 						  return 0;
 		    		})
 		    		th.setState({
-			    		files: files,
-			    		showList: true
+			    		files: files
 		    		})
 		    	}
 		    }
@@ -53,6 +52,7 @@ export default class BulkUpload extends React.Component {
 		    	console.log(err);
 		    else {
 		    	console.log('File uploaded:', res.body.fileName)
+		    	th.getFiles();
 		    }
 			})
 	}
@@ -63,7 +63,7 @@ export default class BulkUpload extends React.Component {
 			<div>
 		    <FileDrop uploadCadets={this.handleUpload}/>
 		    {
-		    	this.state.showList &&
+		    	this.state.files.length > 0 &&
 		    	<FileList files={this.state.files}/>
 		    }
 			</div>

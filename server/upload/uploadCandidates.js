@@ -6,6 +6,7 @@ const uploadMongoController = require('./uploadMongoController');
 let registerCandidates = function () {
 	client.brpop('fileImport', 0, function(err, fileId) {
 		let importedCadets = [], failedCadets = [];
+		let total = 0;
 		try {
 			uploadMongoController.getFileById(fileId, function (fileObj) {
 
@@ -23,10 +24,11 @@ let registerCandidates = function () {
 			  					cadetObj[head] = line_col[key];
 			  			}
 			  		})
-			  		cadetObj['username'] = cadetObj.EmailID.split('@')[0];
-			  		cadetObj['password'] = 'digital@123';
-			  		cadetObj['role'] = 'candidate';
+			  		// cadetObj['username'] = cadetObj.EmailID.split('@')[0];
+			  		// cadetObj['password'] = 'digital@123';
+			  		// cadetObj['role'] = 'candidate';
 			  		cadetColln.push(cadetObj);
+			  		total++;
 			  	}
 			  })
 
@@ -42,12 +44,12 @@ let registerCandidates = function () {
 				  },
 				  function(err){
 				  	logger.debug('Final function');
-				    fileObj.completedOn = Date.now();
-					  fileObj.totalCadets = lines.length-2;
+					  fileObj.totalCadets = total;
 					  fileObj.importedCadets = importedCadets.length;
 					  fileObj.failedCadets = failedCadets.length;
-					  if(fileObj.totalCadets ==  fileObj.importedCadets+fileObj.failedCadets)
+					  if(fileObj.totalCadets ==  fileObj.importedCadets+fileObj.failedCadets) {
 					  	uploadMongoController.updateFileStatus(fileObj);
+					  }
 				  }
 				);
 			}, function (err) {

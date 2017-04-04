@@ -7,6 +7,7 @@ var files = new Schema({
     fileName: String,
     submittedOn: {type: Date, default: Date.now() },
     completedOn: Date,
+    addedBy: String,
     totalCadets: Number,
     importedCadets: Number,
     failedCadets: Number,

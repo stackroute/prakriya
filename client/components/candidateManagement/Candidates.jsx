@@ -1,7 +1,8 @@
 import React from 'react';
 import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
-import CandidateInfo from './CandidateInfo.jsx';
+import CandidateCard from './CandidateCard.jsx';
+import CandidateHome from './CandidateHome.jsx';
 
 const styles = {
 	heading: {
@@ -12,15 +13,17 @@ export default class Candidates extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			candidates: []
+			candidates: [],
+			showCandidate: false,
+			displayCandidate: {}
 		}
-		
 		this.getCandidates = this.getCandidates.bind(this);
+		this.candidateView = this.candidateView.bind(this);
+		this.handleBack = this.handleBack.bind(this);
 	}
 	componentDidMount() {
 		this.getCandidates();
 	}
-	
 	getCandidates() {
 		let th = this;
 		Request
@@ -37,24 +40,45 @@ export default class Candidates extends React.Component {
 		    }
 		  })
 	}
+	candidateView(candidate) {
+		this.setState({
+			showCandidate: true,
+			displayCandidate: candidate
+		})
+	}
+	handleBack() {
+		this.setState({
+			showCandidate: false
+		})
+	}
 
 	render() {
+		let th = this;
 		return(
 			<div>
-				<h1 style={styles.heading}>Candidate Management</h1>
-				<Grid>
-					<Row>
-						{
-							this.state.candidates.map(function(candidate, key) {
-								return (
-									<Col md={3} key={key}>
-										<CandidateInfo candidate={candidate} />
-									</Col>
-								)
-							})
-						}
-					</Row>
-				</Grid>
+			{
+				!this.state.showCandidate ? 
+				<div>
+					<h1 style={styles.heading}>Candidate Management</h1>
+					<Grid>
+						<Row>
+							{
+								this.state.candidates.map(function(candidate, key) {
+									return (
+										<Col md={3} key={key}>
+											<CandidateCard candidate={candidate} handleCardClick={th.candidateView}/>
+										</Col>
+									)
+								})
+							}
+						</Row>
+					</Grid>
+				</div>
+				:
+				<div>
+					<CandidateHome candidate={this.state.displayCandidate} handleBack={this.handleBack}/>
+				</div>
+			}
 			</div>
 		)
 	}
