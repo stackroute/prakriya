@@ -2,7 +2,7 @@ const router = require('express').Router();
 const auth = require('../auth')();
 const formidable = require('formidable');
 const fs = require('fs');
-const client = require('redis').createClient();
+const client = require('redis').createClient(6379,'redis');
 const uploadMongoController = require('./uploadMongoController');
 
 router.post('/cadets', auth.authenticate(), function(req, res) {
