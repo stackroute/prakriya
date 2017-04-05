@@ -2,7 +2,7 @@ import React from 'react';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
-import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import Dialog from 'material-ui/Dialog';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import {lightBlack} from 'material-ui/styles/colors'; 
 
@@ -12,6 +12,9 @@ const styles = {
 	},
 	cardClick: {
 		cursor: 'pointer'
+	},
+	cardTitle: {
+		paddingBottom: 0
 	}
 }
 
@@ -19,21 +22,45 @@ export default class CandidateCard extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.handleEdit = this.handleEdit.bind(this);
+		this.state = {
+			showDeleteDialog: false
+		}
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleCardClick = this.handleCardClick.bind(this);
+		this.openDeleteDialog = this.openDeleteDialog.bind(this);
+		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 	}
 	handleCardClick() {
 		this.props.handleCardClick(this.props.candidate);
 	}
-	handleEdit() {
-
+	openDeleteDialog() {
+		this.setState({
+			showDeleteDialog: true
+		})
+	}
+	closeDeleteDialog() {
+		this.setState({
+			showDeleteDialog: false
+		})
 	}
 	handleDelete() {
-
+		this.props.handleDelete(this.props.candidate);
 	}
 
 	render() {
+		const deleteDialogActions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onTouchTap={this.closeDeleteDialog}
+      />,
+      <FlatButton
+        label="Delete"
+        primary={true}
+        onTouchTap={this.closeDeleteDialog}
+        onClick={this.handleDelete}
+      />,
+    ];
 		return(
 			<div>
 				<Card>
@@ -52,16 +79,22 @@ export default class CandidateCard extends React.Component {
 			    <CardTitle 
 			    	title={this.props.candidate.EmployeeID}
 			    	subtitle={this.props.candidate.CareerBand}
+			    	style={styles.cardTitle}
 			    />
 			    <CardActions style={styles.actions}>
-			      <IconButton tooltip="Edit Candidate" onTouchTap={this.handleEdit}>
-				      <EditIcon color={lightBlack} />
-				    </IconButton>
-				    <IconButton tooltip="Delete Candidate" onTouchTap={this.handleDelete}>
+				    <IconButton tooltip="Delete Candidate" onTouchTap={this.openDeleteDialog}>
 				      <DeleteIcon color={lightBlack} />
 				    </IconButton>
 			    </CardActions>
 			  </Card>
+			  <Dialog
+          actions={deleteDialogActions}
+          modal={false}
+          open={this.state.showDeleteDialog}
+          onRequestClose={this.closeDeleteDialog}
+        >
+        	Are you sure you want to delete this candidate?
+        </Dialog>
 			</div>
 		)
 	}

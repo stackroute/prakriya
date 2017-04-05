@@ -49,6 +49,39 @@ router.get('/cadets', auth.authenticate(), function (req, res) {
   }
 })
 
+// Update a cadet
+router.post('/updatecadet', auth.authenticate(), function(req, res) {
+  try {
+    dashboardMongoController.updateCadet(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update candidate in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
+// Delete a cadet
+router.delete('/deletecadet', auth.authenticate(), function(req, res) {
+  console.log('reached to server');
+  try {
+    dashboardMongoController.deleteCadet(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot delete candidate in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
 // Get all the files
 router.get('/files', auth.authenticate(), function (req, res) {
   try{

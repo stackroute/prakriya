@@ -1,4 +1,5 @@
 import React from 'react';
+import AddCourse from './AddCourse.jsx';
 
 export default class Courses extends React.Component {
 	constructor(props) {
@@ -8,6 +9,7 @@ export default class Courses extends React.Component {
 	render() {
 		return(
 			<div>
+				<AddCourse />
 			</div>
 		)
 	}

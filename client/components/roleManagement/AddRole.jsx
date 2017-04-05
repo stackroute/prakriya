@@ -16,14 +16,6 @@ const styles = {
 	}
 }
 
-const actionsList = [
-	"User Management",
-	"Role Management",
-	"Candidate Review",
-	"Assessment Tracker",
-	"Candidate Management"
-]
-
 export default class AddRole extends React.Component {
 	constructor(props) {
 		super(props)

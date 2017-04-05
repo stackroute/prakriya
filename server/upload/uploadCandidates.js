@@ -1,4 +1,5 @@
-const client = require('redis').createClient(6379,'redis');
+const client = require('redis').createClient();
+// const client = require('redis').createClient(6379,'redis');
 const logger = require('log4js').getLogger();
 const async = require('async');
 const uploadMongoController = require('./uploadMongoController');
