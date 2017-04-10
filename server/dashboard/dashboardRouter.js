@@ -1,6 +1,4 @@
 const router = require('express').Router();
-const users = require('../../models/users.js');
-// const passport = require('passport');
 var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
 
@@ -32,6 +30,56 @@ router.get("/user", auth.authenticate(), function(req, res) {
     }); 
   }
 });
+
+// Get all projects
+router.get('/projects', auth.authenticate(), function (req, res) {
+  try{
+    dashboardMongoController.getProjects(function(projects) {
+      res.status(201).json(projects);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all projects from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
+//Add project
+router.post('/addproject', auth.authenticate(), function (req, res) {
+  try {
+    let projectObj = req.body;
+    projectObj.addedBy = req.user.name;
+    dashboardMongoController.addProject(projectObj, function(project) {
+      res.status(201).json(project);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot add the project...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+// Get cadet profile
+router.get('/cadet', auth.authenticate(), function (req, res) {
+  try {
+    dashboardMongoController.getCadet(req.user.email, function(cadet) {
+      res.status(201).json(cadet);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get the cadet from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
 
 // Get all the cadets
 router.get('/cadets', auth.authenticate(), function (req, res) {

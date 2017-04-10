@@ -37,7 +37,6 @@ export default class FileList extends React.Component {
 	}
 	formatDate(date) {
 		if(date) {
-			let newdate = new Date(date)
 			return Moment(date).fromNow();
 			// return Humanize.naturalDay(newdate,'H:i:s dS M, Y')
 		}

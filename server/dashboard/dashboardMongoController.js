@@ -1,4 +1,5 @@
 const RoleModel = require('../../models/roles.js');
+const ProjectModel = require('../../models/projects.js');
 const CandidateModel = require('../../models/candidates.js');
 const FileModel = require('../../models/files.js');
 const adminMongoController = require('../admin/adminMongoController.js');
@@ -8,6 +9,33 @@ let getPermissions =  function(role, successCB, errorCB) {
 		if (err) {
 			errorCB(err);
 		}
+		successCB(result);
+	});
+}
+
+let getProjects = function(successCB, errorCB) {
+	ProjectModel.find({},function(err, result) {
+		if (err) 
+				errorCB(err);
+		successCB(result);
+	});
+}
+
+let addProject = function (projectObj, successCB, errorCB) {
+	console.log('Project obj', projectObj);
+	let saveProject = new ProjectModel(projectObj);
+	saveProject.save(function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result);
+	})
+}
+
+let getCadet = function(email, successCB, errorCB) {
+	console.log();
+	CandidateModel.findOne({'EmailID': email},function(err, result) {
+		if (err) 
+				errorCB(err);
 		successCB(result);
 	});
 }
@@ -60,7 +88,10 @@ let getFiles = function(successCB, errorCB) {
 
 module.exports = {
 	getPermissions: getPermissions,
+	getCadet: getCadet,
 	getCadets: getCadets,
+	getProjects: getProjects,
+	addProject: addProject,
 	getFiles: getFiles,
 	updateCadet: updateCadet,
 	deleteCadet: deleteCadet

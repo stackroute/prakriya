@@ -89,7 +89,6 @@ export default class CandidateCard extends React.Component {
 			  </Card>
 			  <Dialog
           actions={deleteDialogActions}
-          modal={false}
           open={this.state.showDeleteDialog}
           onRequestClose={this.closeDeleteDialog}
         >

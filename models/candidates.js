@@ -5,6 +5,7 @@ var candidates = new Schema({
 		EmployeeID: {type: Number, unique: true},
 		EmployeeName: String,
 		EmailID: String,
+		ProfilePic: String,
 		DigiThonQualified: String,
 		Selected: String,
 		Remarks: String,
@@ -26,7 +27,10 @@ var candidates = new Schema({
 		ProjectSupervisor: String,
 		College: String,
 		CGPA: String,
-		Date: String
+		Date: String,
+		ProjectName: String,
+		ProjectDescription: String,
+		AssetID: String
 });
 
 module.exports = mongoose.model('Candidates', candidates);

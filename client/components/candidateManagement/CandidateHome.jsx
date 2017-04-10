@@ -1,12 +1,10 @@
 import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import Paper from 'material-ui/Paper';
 import {Card, CardMedia} from 'material-ui/Card';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import Dialog from 'material-ui/Dialog';
-import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import {grey50} from 'material-ui/styles/colors'; 
 import CandidateEdit from './CandidateEdit.jsx';

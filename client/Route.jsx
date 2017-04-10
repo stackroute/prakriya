@@ -17,6 +17,8 @@ import BulkUpload from './components/bulkupload/index.jsx';
 import CourseManagement from './components/courseManagement/index.jsx';
 import AssessmentTracker from './components/assessmentTracker/index.jsx';
 import ProgramFlow from './components/programFlow/index.jsx';
+import MyProfile from './components/myProfile/index.jsx';
+import Projects from './components/projectManagement/index.jsx';
 
 injectTapEventPlugin();
 
@@ -50,6 +52,8 @@ ReactDOM.render(
 				<Route path="/coursemanagement" component={CourseManagement} />
 				<Route path="/assessmenttracker" component={AssessmentTracker} />
 				<Route path="/programflow" component={ProgramFlow} />
+				<Route path="/myprofile" component={MyProfile} />
+				<Route path="/projects" component={Projects} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,
