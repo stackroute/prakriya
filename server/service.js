@@ -80,10 +80,10 @@ function setupWebpack(app) {
 }
 
 function setupMongooseConnections() {
-  mongoose.connect('mongodb://mongo:27017/prakriya');
+  mongoose.connect('mongodb://localhost:27017/prakriya');
 
   mongoose.connection.on('connected', function() {
-    logger.debug('Mongoose is now connected to ', 'mongodb://mongo:27017/prakriya');
+    logger.debug('Mongoose is now connected to ', 'mongodb://localhost:27017/prakriya');
   });
 
   mongoose.connection.on('error', function(err) {

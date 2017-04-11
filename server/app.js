@@ -1,5 +1,7 @@
 const path = require('path');
 const logger = require('log4js').getLogger();
+const RBAC = require('rbac').default;
+const secure = require('rbac/controllers/express');
 
 const loginRoutes = require('./login');
 const dashboardRoutes = require('./dashboard');
@@ -8,6 +10,13 @@ const uploadRoutes = require('./upload');
 const service = require('./service');
 
 function setupWebAppRESTRoutes(app) {
+  // const rbac = new RBAC({
+  //   roles: ['admin', 'administrator']  
+  // }, (err, rbac) => {
+  //   if (err) throw err;
+  //   // setup express routes 
+  //   app.use('/admin', secure.hasRole(rbac, 'admin'), adminRoutes);
+  // });
   app.use('/login', loginRoutes);
   app.use('/dashboard', dashboardRoutes);
   app.use('/admin', adminRoutes);

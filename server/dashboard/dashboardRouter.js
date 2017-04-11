@@ -146,4 +146,20 @@ router.get('/files', auth.authenticate(), function (req, res) {
   }
 })
 
+// Save the feedback
+router.post('/savefeedback', auth.authenticate(), function(req, res) {
+  try {
+    dashboardMongoController.saveFeedback(req.body, function (feedback) {
+      res.status(200).json(feedback)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot save feedback in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
 module.exports = router;

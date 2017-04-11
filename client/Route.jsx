@@ -19,6 +19,7 @@ import AssessmentTracker from './components/assessmentTracker/index.jsx';
 import ProgramFlow from './components/programFlow/index.jsx';
 import MyProfile from './components/myProfile/index.jsx';
 import Projects from './components/projectManagement/index.jsx';
+import Feedback from './components/feedback/index.jsx';
 
 injectTapEventPlugin();
 
@@ -54,6 +55,7 @@ ReactDOM.render(
 				<Route path="/programflow" component={ProgramFlow} />
 				<Route path="/myprofile" component={MyProfile} />
 				<Route path="/projects" component={Projects} />
+				<Route path="/feedback" component={Feedback} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,
