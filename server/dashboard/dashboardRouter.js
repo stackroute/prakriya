@@ -1,8 +1,10 @@
 const router = require('express').Router();
 var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
+var auth = require('../auth')();
+var CONFIG = require('../../config');
 
-router.get("/user", auth.authenticate(), function(req, res) {  
+router.get("/user", function(req, res) {  
   // res.json(users[req.user.id]);
   console.log("req from user!!!")
   console.log('User object sent ', req.user);
@@ -32,7 +34,7 @@ router.get("/user", auth.authenticate(), function(req, res) {
 });
 
 // Get all projects
-router.get('/projects', auth.authenticate(), function (req, res) {
+router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try{
     dashboardMongoController.getProjects(function(projects) {
       res.status(201).json(projects);
@@ -48,7 +50,7 @@ router.get('/projects', auth.authenticate(), function (req, res) {
 })
 
 //Add project
-router.post('/addproject', auth.authenticate(), function (req, res) {
+router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
     let projectObj = req.body;
     projectObj.addedBy = req.user.name;
@@ -66,7 +68,7 @@ router.post('/addproject', auth.authenticate(), function (req, res) {
 })
 
 // Get cadet profile
-router.get('/cadet', auth.authenticate(), function (req, res) {
+router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try {
     dashboardMongoController.getCadet(req.user.email, function(cadet) {
       res.status(201).json(cadet);
@@ -82,7 +84,7 @@ router.get('/cadet', auth.authenticate(), function (req, res) {
 })
 
 // Get all the cadets
-router.get('/cadets', auth.authenticate(), function (req, res) {
+router.get('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try{
     dashboardMongoController.getCadets(function(cadets) {
       res.status(201).json(cadets);
@@ -98,7 +100,7 @@ router.get('/cadets', auth.authenticate(), function (req, res) {
 })
 
 // Update a cadet
-router.post('/updatecadet', auth.authenticate(), function(req, res) {
+router.post('/updatecadet', auth.canAccess(CONFIG.ADMCAN), function(req, res) {
   try {
     dashboardMongoController.updateCadet(req.body, function (status) {
       res.status(200).json(status)
@@ -114,7 +116,7 @@ router.post('/updatecadet', auth.authenticate(), function(req, res) {
 })
 
 // Delete a cadet
-router.delete('/deletecadet', auth.authenticate(), function(req, res) {
+router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   console.log('reached to server');
   try {
     dashboardMongoController.deleteCadet(req.body, function (status) {
@@ -131,7 +133,7 @@ router.delete('/deletecadet', auth.authenticate(), function(req, res) {
 })
 
 // Get all the files
-router.get('/files', auth.authenticate(), function (req, res) {
+router.get('/files', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try{
     dashboardMongoController.getFiles(function(files) {
       res.status(201).json(files);
@@ -147,7 +149,7 @@ router.get('/files', auth.authenticate(), function (req, res) {
 })
 
 // Save the feedback
-router.post('/savefeedback', auth.authenticate(), function(req, res) {
+router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try {
     dashboardMongoController.saveFeedback(req.body, function (feedback) {
       res.status(200).json(feedback)

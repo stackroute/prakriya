@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 const userModel = require('../../models/users.js');
 const passport = require('passport');
 var jwt = require("jwt-simple");  
-var cfg = require("../config.js"); 
+var cfg = require("../../config"); 
 var auth = require('../auth')();
 
 

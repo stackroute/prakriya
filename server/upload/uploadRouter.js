@@ -1,12 +1,13 @@
 const router = require('express').Router();
-const auth = require('../auth')();
 const formidable = require('formidable');
 const fs = require('fs');
 const client = require('redis').createClient();
 // const client = require('redis').createClient(6379,'redis');
 const uploadMongoController = require('./uploadMongoController');
+var auth = require('../auth')();
+var CONFIG = require('../../config');
 
-router.post('/cadets', auth.authenticate(), function(req, res) {
+router.post('/cadets', auth.canAccess(CONFIG.UPLOAD), function(req, res) {
 	var form = new formidable.IncomingForm();
 	form.parse(req, function(err, fields, files) {
 		fs.readFile(files.file.path, 'utf8', (err, data) => {

@@ -1,15 +1,15 @@
 const router = require('express').Router();
 const users = require('../../models/users.js');
-// const passport = require('passport');
-var auth = require('../auth')();
 const adminMongoController = require('./adminMongoController');
+var auth = require('../auth')();
+var CONFIG = require('../../config');
 
 /****************************************
 *******          Users           ******** 
 ****************************************/
 
 // Get all the users
-router.get("/users", auth.authenticate(), function(req, res) {
+router.get("/users", auth.canAccess(CONFIG.ADMIN), function(req, res) {
 
   console.log("API HIT!!!");  
   try{
@@ -27,7 +27,7 @@ router.get("/users", auth.authenticate(), function(req, res) {
 });
 
 //Add a new user
-router.post('/adduser', auth.authenticate(), function(req, res) {
+router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   let user = req.body
   try{
     adminMongoController.addUser(user, function(user) {
@@ -43,7 +43,7 @@ router.post('/adduser', auth.authenticate(), function(req, res) {
   }
 })
 
-router.delete('/deleteuser', auth.authenticate(), function(req, res) {
+router.delete('/deleteuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   console.log(req.body)
   try {
     adminMongoController.deleteUser(req.body, function (status) {
@@ -59,7 +59,7 @@ router.delete('/deleteuser', auth.authenticate(), function(req, res) {
   }
 })  
 
-router.post('/updateuser', auth.authenticate(), function(req, res) {
+router.post('/updateuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   try {
     adminMongoController.updateUser(req.body, function (status) {
       res.status(200).json(status)
@@ -74,7 +74,7 @@ router.post('/updateuser', auth.authenticate(), function(req, res) {
   }
 })
 
-router.post('/lockuser', auth.authenticate(), function(req, res) {
+router.post('/lockuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   try {
     adminMongoController.lockUser(req.body, function (status) {
       res.status(200).json(status)
@@ -95,7 +95,7 @@ router.post('/lockuser', auth.authenticate(), function(req, res) {
 ****************************************/
 
 // Get all the roles
-router.get('/roles', auth.authenticate(), function (req, res) {
+router.get('/roles', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   try{
     adminMongoController.getRoles(function(roles) {
       res.status(201).json(roles);
@@ -111,7 +111,7 @@ router.get('/roles', auth.authenticate(), function (req, res) {
 })
 
 //Add a new role
-router.post('/addrole', auth.authenticate(), function(req, res) {
+router.post('/addrole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
     try {
       adminMongoController.addRole(req.body, function (role) {
         res.status(200).json(role)
@@ -128,7 +128,7 @@ router.post('/addrole', auth.authenticate(), function(req, res) {
 )
 
 //Update role
-router.post('/updaterole', auth.authenticate(), function(req, res) {
+router.post('/updaterole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
     try {
       adminMongoController.updateRole(req.body, function (status) {
         res.status(200).json(status)
@@ -145,7 +145,7 @@ router.post('/updaterole', auth.authenticate(), function(req, res) {
 )
 
 //Delete a role
-router.delete('/deleterole', auth.authenticate(), function(req, res) {
+router.delete('/deleterole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
     try {
       adminMongoController.deleteRole(req.body, function (status) {
         res.status(200).json(status)
@@ -166,7 +166,7 @@ router.delete('/deleterole', auth.authenticate(), function(req, res) {
 ****************************************/
 
 // Get all the permissions
-router.get('/permissions', auth.authenticate(), function (req, res) {
+router.get('/permissions', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   try{
     adminMongoController.getPermissions(function(permissions) {
       res.status(201).json(permissions);

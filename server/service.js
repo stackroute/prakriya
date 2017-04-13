@@ -5,9 +5,7 @@ const mongoose = require('mongoose');
 const flash = require('connect-flash');
 const auth = require("./auth")();
 
-// const config = require('../config/');
 // const logger = require('../applogger');
-const cfg = require("./config.js");
 const logger = require('log4js').getLogger();
 
 function createApp() {
