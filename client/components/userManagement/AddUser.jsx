@@ -59,6 +59,10 @@ export default class AddUser extends React.Component {
 		this.resetFields = this.resetFields.bind(this)
 	}
 	componentDidMount() {
+		console.log('Roles in props', this.props.roles);
+		this.setState({
+			roles: this.props.roles
+		})
 		if(this.props.openDialog) {
 			this.setState({
 				open: true,
@@ -69,25 +73,6 @@ export default class AddUser extends React.Component {
 				role: this.props.user.role
 			})
 		}
-		let th = this
-		Request
-			.get('/admin/roles')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	console.log(res.body);
-		    	let roles = []
-		    	res.body.map(function (role, index) {
-						roles.push(role.role);			
-					})
-					// console.log(roles)
-		    	th.setState({
-		    		roles: roles
-		    	})
-		    }
-			})
 	}
 	handleOpen() {
     this.setState({open: true});

@@ -61,7 +61,8 @@ export default class RoleItem extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			permissions: [],
+			controls: [],
+			controlsList: [],
 			searchPerm: '',
 			lastModified: '',
 			showDeleteDialog: false,
@@ -70,17 +71,17 @@ export default class RoleItem extends React.Component {
 			openSnackBar: false,
 			snackBarMsg: ''
 		}
-		this.handlePermissionDelete = this.handlePermissionDelete.bind(this);
+		this.handleControlDelete = this.handleControlDelete.bind(this);
 		this.handleUpdateInputPerm = this.handleUpdateInputPerm.bind(this);
 		this.handleAddNewPerm = this.handleAddNewPerm.bind(this);
 		this.savePerms = this.savePerms.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 		this.handleDeleteRole = this.handleDeleteRole.bind(this);
-		this.handleAddMore = this.handleAddMore.bind(this);
 		this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
 	}
 	componentDidMount() {
+		let th = this;
 		let date = new Date(this.props.roleperm.lastModified);
 		date = date.toString();
 		let formatDate = 
@@ -88,17 +89,25 @@ export default class RoleItem extends React.Component {
 			date.substr(8,2) + " " + 
 			date.substr(4,3) + " " + 
 			date.substr(11,4);
+		let controls = [];
+		let controlsList = [];
+		this.props.controls.map(function (control, key) {
+			controlsList.push(control.name);
+			if(th.props.roleperm.controls.indexOf(control.code) >= 0)
+				controls.push(control.name);
+		})
 		this.setState({
 			lastModified: formatDate,
-			permissions: this.props.roleperm.permissions
+			controls: controls,
+			controlsList: controlsList
 		})
 	} 
-	handlePermissionDelete(perm) {
-		let permissions = this.state.permissions.filter(function(permission) {
-			return perm != permission
+	handleControlDelete(perm) {
+		let controls = this.state.controls.filter(function(control) {
+			return perm != control
 		})
 		this.setState({
-			permissions: permissions,
+			controls: controls,
 			disableSave: false
 		})
 	}
@@ -108,18 +117,24 @@ export default class RoleItem extends React.Component {
 		})
 	}
 	handleAddNewPerm() {
-		let perms = this.state.permissions
+		let perms = this.state.controls
 		perms.push(this.state.searchPerm)
 		this.setState({
-			permissions: perms,
+			controls: perms,
 			searchPerm: '',
 			disableSave: false
 		})
 	}
 	savePerms() {
+		let th = this;
+		let controlsCode = [];
+		this.props.controls.map(function (control, key) {
+			if(th.state.controls.indexOf(control.name) >= 0)
+				controlsCode.push(control.code);
+		})
 		let roleObj = {
-			role: this.props.roleperm.role,
-			permissions: this.state.permissions
+			name: this.props.roleperm.name,
+			controls: controlsCode
 		}
 		this.setState({
 			disableSave: true,
@@ -143,10 +158,7 @@ export default class RoleItem extends React.Component {
 			snackBarMsg: "Role deleted",
 			openSnackBar: true
 		})
-		this.props.deleteRole(this.props.roleperm.role)
-	}
-	handleAddMore() {
-
+		this.props.deleteRole(this.props.roleperm.name)
 	}
 	handleSnackBarClose() {
 		this.setState({openSnackBar: false})
@@ -154,7 +166,7 @@ export default class RoleItem extends React.Component {
 
 	render() {
 		let th = this;
-		let role = this.props.roleperm.role.charAt(0).toUpperCase() + this.props.roleperm.role.slice(1)
+		let role = this.props.roleperm.name.charAt(0).toUpperCase() + this.props.roleperm.name.slice(1)
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
@@ -168,19 +180,6 @@ export default class RoleItem extends React.Component {
         onClick={this.handleDeleteRole}
       />,
     ];
-    const addMoreActions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.closeAddMoreDialog}
-      />,
-      <FlatButton
-        label="Save"
-        primary={true}
-        onTouchTap={this.closeAddMoreDialog}
-        onClick={this.handleAddMore}
-      />,
-    ];
 		return (
 			<div>
 				<Card style={styles.card} >
@@ -189,7 +188,7 @@ export default class RoleItem extends React.Component {
 			      subtitle={this.state.lastModified}
 			      avatar={
 			      	<Avatar>
-			      		{this.props.roleperm.role.charAt(0).toUpperCase()}
+			      		{this.props.roleperm.name.charAt(0).toUpperCase()}
 			      	</Avatar>
 			     	}
 			    >
@@ -202,20 +201,20 @@ export default class RoleItem extends React.Component {
 				      searchText={this.state.searchPerm}
 		          onUpdateInput={this.handleUpdateInputPerm}
 		          onNewRequest={this.handleAddNewPerm}
-				      dataSource={this.props.permissions}
+				      dataSource={this.state.controlsList}
 				      maxSearchResults={5}
 				    />
 			    	<Paper style={styles.paper} zDepth={1} >
 							<div style={styles.wrapper}>
 								{
-									this.state.permissions.map(function (permission, index) {
+									this.state.controls.map(function (control, index) {
 										return(
 											<Chip
-												onRequestDelete={() => th.handlePermissionDelete(permission)}
+												onRequestDelete={() => th.handleControlDelete(control)}
 							          style={styles.chip}
 							          key={index}
 							        >
-							          <span style={styles.chipName}>{permission}</span>
+							          <span style={styles.chipName}>{control}</span>
 							        </Chip>
 						        )
 									})

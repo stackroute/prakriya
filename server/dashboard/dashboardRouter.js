@@ -1,6 +1,7 @@
 const router = require('express').Router();
 var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
+const adminMongoController = require('../admin/adminMongoController.js');
 var auth = require('../auth')();
 var CONFIG = require('../../config');
 
@@ -14,16 +15,25 @@ router.get("/user", function(req, res) {
       // userObj.actions = req.user.actions.filter(function(action) {
       //   return action != "Login";
       // });
-      console.log('Permissions from role', users);
-      userObj.name = req.user.name;
-      userObj.role = req.user.role;
-      userObj.username = req.user.username;
-      userObj.email = req.user.email;
-      userObj.actions = users.permissions;
-      console.log('Converted User object ', userObj)
-      res.status(201).json(userObj);
+      adminMongoController.getAccessControls(function(controls) {
+        let accesscontrols = [];
+        controls.map(function (control, key) {
+          if(users.controls.indexOf(control.code) >= 0)
+            accesscontrols.push(control.name)
+        })
+        console.log('Permissions from role', users);
+        userObj.name = req.user.name;
+        userObj.role = req.user.role;
+        userObj.username = req.user.username;
+        userObj.email = req.user.email;
+        userObj.actions = accesscontrols;
+        console.log('Converted User object ', userObj)
+        res.status(201).json(userObj);
+      }, function(err) {
+        res.status(500).json({ error: 'Cannot get all controls from db...!' });
+      })
     }, function(err) {
-      res.status(500).json({ error: 'Cannot get all permissions from db...!' });
+      res.status(500).json({ error: 'Cannot get controls of role from db...!' });
     });
   }
   catch(err){

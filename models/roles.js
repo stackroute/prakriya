@@ -2,9 +2,9 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var roles = new Schema({
-    role: {type: String, unique: true},
+    name: {type: String, unique: true},
     lastModified: {type: Date, default: Date.now() },
-    permissions: [String]
+    controls: [String]
 });
 
 module.exports = mongoose.model('Roles', roles);

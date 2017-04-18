@@ -56,9 +56,15 @@ export default class AddRole extends React.Component {
 		}
 	}
 	handleSubmit() {
-		let roleObj = {}
-		roleObj.role = this.state.role.toLowerCase()
-		roleObj.permissions = this.state.actions
+		let th = this;
+		let roleObj = {};
+		let controlsCode = [];
+		this.props.controls.map(function (control, key) {
+			if(th.state.actions.indexOf(control.name) >= 0)
+				controlsCode.push(control.code)
+		})
+		roleObj.name = this.state.role.toLowerCase()
+		roleObj.controls = controlsCode
 		this.setState({
 			actions: []
 		})
@@ -98,13 +104,13 @@ export default class AddRole extends React.Component {
           	hintText="Name a new role" 
           	onChange={this.onChangeRole} 
           />
-          should have following selected permissions<br/>
+          should have following selected controls<br/>
           {
-          	this.props.permissions.map(function(action, index) {
+          	this.props.controls.map(function(control, index) {
           		return(
 	          		<Checkbox
-									label={action}
-									value={action}
+									label={control.name}
+									value={control.name}
 									onCheck={th.onChangeActions}
 									key={index}
 								/>

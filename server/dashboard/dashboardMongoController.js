@@ -6,7 +6,7 @@ const FeedbackModel = require('../../models/feedback.js');
 const adminMongoController = require('../admin/adminMongoController.js');
 
 let getPermissions =  function(role, successCB, errorCB) {
-	RoleModel.findOne({"role": role},function(err, result) {
+	RoleModel.findOne({"name": role},function(err, result) {
 		if (err) {
 			errorCB(err);
 		}

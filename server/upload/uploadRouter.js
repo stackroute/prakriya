@@ -7,7 +7,7 @@ const uploadMongoController = require('./uploadMongoController');
 var auth = require('../auth')();
 var CONFIG = require('../../config');
 
-router.post('/cadets', auth.canAccess(CONFIG.UPLOAD), function(req, res) {
+router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
 	var form = new formidable.IncomingForm();
 	form.parse(req, function(err, fields, files) {
 		fs.readFile(files.file.path, 'utf8', (err, data) => {

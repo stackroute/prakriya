@@ -162,16 +162,16 @@ router.delete('/deleterole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
 )
 
 /****************************************
-*******       Permissions        ******** 
+********       Controls        ********** 
 ****************************************/
 
-// Get all the permissions
-router.get('/permissions', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+// Get all the access controls
+router.get('/accesscontrols', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   try{
-    adminMongoController.getPermissions(function(permissions) {
-      res.status(201).json(permissions);
+    adminMongoController.getAccessControls(function(controls) {
+      res.status(201).json(controls);
     }, function(err) {
-      res.status(500).json({ error: 'Cannot get all permissions from db...!' });
+      res.status(500).json({ error: 'Cannot get all access controls from db...!' });
     });
   }
   catch(err) {

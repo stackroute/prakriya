@@ -18,16 +18,17 @@ export default class RoleManagement extends React.Component {
 		super(props)
 		this.state = {
 			roles: [],
-			permissions: []
+			controls: []
 		}
 		this.getRoles = this.getRoles.bind(this);
+		this.getAccessControls = this.getAccessControls.bind(this);
 		this.addRole = this.addRole.bind(this);
 		this.deleteRole = this.deleteRole.bind(this);
 		this.savePermissions = this.savePermissions.bind(this);
 	}
 	componentDidMount() {
 		this.getRoles();
-		this.getPermissions();
+		this.getAccessControls();
 	}
 	getRoles() {
 		let th = this
@@ -44,19 +45,19 @@ export default class RoleManagement extends React.Component {
 		    }
 			})
 	}
-	getPermissions() {
+	getAccessControls() {
 		let th = this
 		Request
-			.get('/admin/permissions')
+			.get('/admin/accesscontrols')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
 		    	th.setState({
-		    		permissions: res.body[0].permissions
+		    		controls: res.body
 		    	})
-		    	console.log('Got all permissions', th.state.permissions)
+		    	console.log('Got all controls', th.state.controls)
 		    }
 			})
 	}
@@ -82,7 +83,7 @@ export default class RoleManagement extends React.Component {
 	deleteRole(role) {
 		let th = this
 		let roleObj = {
-      "role": role
+      "name": role
     }
 		Request
 			.delete('/admin/deleterole')
@@ -93,7 +94,7 @@ export default class RoleManagement extends React.Component {
 		    	console.log(err);
 		    else {
 		    	let roles = th.state.roles.filter(function(roleObj) {
-		    		return role != roleObj.role;
+		    		return role != roleObj.name;
 		    	})
 		    	th.setState({roles: roles})
 		    }
@@ -119,18 +120,19 @@ export default class RoleManagement extends React.Component {
 		let th = this;
 		return (
 			<div >
-				<AddRole permissions={this.state.permissions} addRole={this.addRole}/>
+				<AddRole controls={this.state.controls} addRole={this.addRole}/>
 				<h1 style={styles.heading}>Role Management</h1>
 				<Grid>
 					<Row>
 						{
+							this.state.controls.length > 0 &&
 							this.state.roles.map(function (role, index) {
 								return(
-									role.role != "admin" &&
+									role.name != "admin" &&
 									<Col style={styles.col} md={6} key={index}>
 										<RoleItem 
 											roleperm={role} 
-											permissions={th.state.permissions} 
+											controls={th.state.controls} 
 											deleteRole={th.deleteRole}
 											savePermissions={th.savePermissions}
 									 	/>

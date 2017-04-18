@@ -34,7 +34,8 @@ export default class Users extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			users: []
+			users: [],
+			roles: []
 		}
 		this.addUser = this.addUser.bind(this);
 		this.deleteUser = this.deleteUser.bind(this);
@@ -44,9 +45,29 @@ export default class Users extends React.Component {
 	}
 
 	componentDidMount() {
+		this.getRoles();
 		this.getUsers();
 	}
 
+	getRoles() {
+		let th = this
+		Request
+			.get('/admin/roles')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	let roles = []
+		    	res.body.map(function (role, index) {
+						roles.push(role.name);			
+					})
+		    	th.setState({
+		    		roles: roles
+		    	})
+		    }
+			})
+	}
 	getUsers() {
 		let th = this;
 		Request
@@ -145,7 +166,10 @@ export default class Users extends React.Component {
 							})
 						}
 						<Col style={styles.addUser} md={3}>
-							<AddUser addUser={this.addUser}/>
+							{
+								this.state.roles.length > 0 &&
+								<AddUser roles={this.state.roles} addUser={this.addUser}/>
+							}
 						</Col>
 					</Row>
 				</Grid>
