@@ -6,7 +6,8 @@ import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 
 const styles = {
 	heading: {
-		textAlign: 'center'
+		textAlign: 'center',
+		marginTop: '70px'
 	},
 	card: {
 		margin: 'auto'

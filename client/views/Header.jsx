@@ -14,6 +14,17 @@ const styles = {
   title: {
     cursor: 'pointer',
   },
+  containerStyle: {
+			zIndex: 2,
+			fontFamily: 'sans-serif',
+			backgroundColor: 'rgb(0, 188, 212)',
+			color: '#fff',
+			position: 'fixed',
+			left: 0,
+			top: 0,
+	    height: '40px',
+	    width: '100%',
+		}
 }
 
 export default class Header extends React.Component {
@@ -75,7 +86,7 @@ export default class Header extends React.Component {
 	render() {
 		let th = this;
 		return(
-			<div>
+			<div style={styles.containerStyle}>
 				<Drawer
 		      docked={false}
 		      width={250}

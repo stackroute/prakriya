@@ -4,7 +4,8 @@ import ProfileView from './ProfileView.jsx';
 
 const styles = {
 	heading: {
-		textAlign: 'center'
+		textAlign: 'center',
+		marginTop: '70px'
 	}
 }
 

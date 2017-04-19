@@ -7,7 +7,8 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 
 const styles = {
 	heading: {
-		textAlign: 'center'
+		textAlign: 'center',
+		marginTop: '70px'
 	},
 	name: {
 		color: '#fff',

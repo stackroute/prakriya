@@ -8,7 +8,8 @@ import CandidateHome from './CandidateHome.jsx';
 
 const styles = {
 	heading: {
-		textAlign: 'center'
+		textAlign: 'center',
+		marginTop: '70px'
 	}
 }
 

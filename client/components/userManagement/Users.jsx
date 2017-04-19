@@ -9,7 +9,8 @@ import UserList from './UserList.jsx';
 
 const styles = {
 	heading: {
-		textAlign: 'center'
+		textAlign: 'center',
+		marginTop: '70px'
 	},	
 	card: {
 		padding: '20px 10px',

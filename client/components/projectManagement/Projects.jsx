@@ -6,7 +6,8 @@ import ProjectCard from './ProjectCard.jsx';
 
 const styles = {
 	heading: {
-		textAlign: 'center'
+		textAlign: 'center',
+		marginTop: '70px'
 	},
 	col: {
 		marginBottom: 20

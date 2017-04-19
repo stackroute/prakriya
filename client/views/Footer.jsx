@@ -9,16 +9,14 @@ export default class Footer extends React.Component {
 			backgroundColor: 'rgb(0, 188, 212)',
 			color: '#fff',
 			textAlign: 'center',
-			position: 'fixed',
-			left: 0,
-			bottom: 0,
-	    height: "40px",
-	    width: "100%",
+			height: '50px',
+	    width: '100%',
+	    marginBottom: 0
 		}
 		const textStyle = {
-			fontSize: "14px",
-			marginTop: "12px",
-			marginBottom: "10px"
+			marginTop:'12px',
+			marginBottom: '0px',
+			paddingTop: '14px'
 		}
 		return(
 			<div>

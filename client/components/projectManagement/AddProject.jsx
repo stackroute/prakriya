@@ -8,8 +8,8 @@ import FlatButton from 'material-ui/FlatButton';
 const styles = {
 	addButtonStyle: {
 		position:'fixed',
-	  top: '13%',
-	  right:'3%',
+	  bottom: '50px',
+	  right: '15px',
 	  zIndex: 2
 	},
 	dialogStyle: {

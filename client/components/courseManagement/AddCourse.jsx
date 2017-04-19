@@ -9,8 +9,8 @@ import TextField from 'material-ui/TextField';
 const styles = {
 	addButtonStyle: {
 		position:'fixed',
-	  top: '13%',
-	  right:'3%',
+	  bottom: '50px',
+	  right: '15px',
 	  zIndex: 2
 	},
 	dialogStyle: {

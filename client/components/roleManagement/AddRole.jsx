@@ -10,8 +10,8 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 const styles = {
 	addButtonStyle: {
 		position:'fixed',
-	  top: '13%',
-	  right:'3%',
+	  bottom: '50px',
+	  right: '15px',
 	  zIndex: 2
 	}
 }

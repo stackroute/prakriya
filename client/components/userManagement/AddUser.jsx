@@ -21,10 +21,10 @@ const items = [
 
 
 const addButtonStyle = {
-	position:'fixed',
-  top: '13%',
-  right:'5%',
-  zIndex: 2
+		position:'fixed',
+	  bottom: '50px',
+	  right: '15px',
+	  zIndex: 2
 }
 
 const dialogStyle = {
