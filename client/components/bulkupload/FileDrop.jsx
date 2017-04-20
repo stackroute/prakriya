@@ -13,6 +13,8 @@ const styles = {
 		background: '#eee',
 		height: '100px',
 		borderStyle: 'dashed',
+		paddingTop: '40px',
+		boxSizing: 'border-box'
 	}
 }
 
@@ -60,7 +62,7 @@ export default class FileDrop extends React.Component {
 					    />
 					    {
 					    	this.state.showSelFile &&
-					    	<span>	
+					    	<span>
 					    		{this.state.selectedFile.name}
 					    	</span>
 					    }

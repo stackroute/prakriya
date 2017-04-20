@@ -6,17 +6,19 @@ import Footer from './Footer.jsx';
 import Login from '../components/login/index.jsx';
 import {Card, CardMedia} from 'material-ui/Card';
 
-const briefStyle = {
-	marginTop: '70px',
-	fontSize: '16px'
-}
-const bodyStyle = {
-	textAlign: 'center',
-	fontFamily: 'sans-serif'
-}
-const customContentStyle = {
-  width: '400px',
-  maxWidth: 'none',
+const styles = {
+	brief: {
+		marginTop: '70px',
+		fontSize: '16px'
+	},
+	body: {
+		textAlign: 'center',
+		fontFamily: 'sans-serif'
+	},
+	customContent: {
+	  width: '400px',
+	  maxWidth: 'none'
+	}
 };
 
 export default class Welcome extends React.Component {
@@ -62,10 +64,11 @@ export default class Welcome extends React.Component {
 	        showMenuIconButton={false}
 	        iconElementRight={<FlatButton label="Login" onClick={this.handleOpen} />}
 		    />
-		    <div style={bodyStyle}>
+		    <div style={styles.body}>
 		    	<Dialog
-	          title="Log In to Continue"
-	          contentStyle={customContentStyle}
+	          title="Login To Continue"
+						titleStyle={{textAlign: 'center'}}
+	          contentStyle={styles.customContent}
 	          open={this.state.open}
           	onRequestClose={this.handleClose}
 	        >
@@ -77,7 +80,7 @@ export default class Welcome extends React.Component {
 							<img src='../assets/images/home.png' alt='Home' />
 						</CardMedia>
 					</Card>
-					<p style={briefStyle}>
+					<p style={styles.brief}>
 						<em>It is a Wave Automation Tool</em>
 					</p>
 				</div>

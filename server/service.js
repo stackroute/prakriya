@@ -48,6 +48,12 @@ function setupMiddlewares(app) {
   const compression = require('compression');
   const favicon = require('serve-favicon');
 
+  const webpack = require('webpack');
+  const webpackDevMiddleware = require('webpack-dev-middleware');
+  const webpackHotMiddleware = require('webpack-hot-middleware');
+  const webpackConfig = require('../webpack.config.js');
+  const webpackCompiler = webpack(webpackConfig);
+
   app.use(favicon(path.join(__dirname, '../', 'client', 'favicon.ico')));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
@@ -55,6 +61,19 @@ function setupMiddlewares(app) {
   app.use(auth.initialize());
   app.use(flash());
   app.use(compression());
+
+  app.use(webpackHotMiddleware(webpackCompiler));
+  app.use(webpackDevMiddleware(webpackCompiler, {
+      noInfo: true,
+      publicPath: webpackConfig.output.publicPath,
+      stats: {
+          colors: true
+      },
+      watchOptions: {
+          aggregateTimeout: 300,
+          poll: 1000
+      }
+  }));
 
   return app;
 }

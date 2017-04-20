@@ -4,8 +4,7 @@ import ProfileView from './ProfileView.jsx';
 
 const styles = {
 	heading: {
-		textAlign: 'center',
-		marginTop: '70px'
+		textAlign: 'center'
 	}
 }
 
@@ -54,7 +53,7 @@ export default class MyProfile extends React.Component {
 		    	})
 		    	console.log(th.state.cadet);
 		    }
-		  })	
+		  })
 	}
 	updateProfile(cadet) {
 		let th = this;
@@ -76,10 +75,10 @@ export default class MyProfile extends React.Component {
 			<div>
 				{
 					this.state.cadet != null &&
-					<ProfileView 
+					<ProfileView
 						cadet={this.state.cadet}
-						projects={this.state.projects} 
-						handleUpdate={this.updateProfile} 
+						projects={this.state.projects}
+						handleUpdate={this.updateProfile}
 					/>
 				}
 			</div>

@@ -6,8 +6,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 
 const styles = {
 	heading: {
-		textAlign: 'center',
-		marginTop: '70px'
+		textAlign: 'center'
 	},
 	card: {
 		margin: 'auto'
@@ -33,7 +32,7 @@ export default class Dashboard extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 				if(err)
-					console.log(err) 
+					console.log(err)
 				else {
 					th.setState({
 						user: res.body
@@ -52,7 +51,7 @@ export default class Dashboard extends React.Component {
 						<Col md={6} mdOffset={3} >
 							<Card style={styles.card} >
 						    <CardHeader
-						      title={this.state.user.name}			      
+						      title={this.state.user.name}
 						      subtitle={this.state.user.username}
 						      avatar="../assets/images/avt-default.jpg"
 						    />
@@ -61,10 +60,10 @@ export default class Dashboard extends React.Component {
 						    >
 						      <img src="../assets/images/avt-default.jpg" />
 						    </CardMedia>
-						  </Card>	
+						  </Card>
 					  </Col>
 				  </Row>
-			  </Grid>			
+			  </Grid>
 			</div>
 		)
 	}

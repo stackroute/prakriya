@@ -6,8 +6,7 @@ import ProjectCard from './ProjectCard.jsx';
 
 const styles = {
 	heading: {
-		textAlign: 'center',
-		marginTop: '70px'
+		textAlign: 'center'
 	},
 	col: {
 		marginBottom: 20
@@ -83,5 +82,5 @@ export default class Projects extends React.Component {
 				</Grid>
 			</div>
 		)
-	}	
+	}
 }

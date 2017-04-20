@@ -6,8 +6,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 
 const styles = {
 	heading: {
-		textAlign: 'center',
-		marginTop: '70px'
+		textAlign: 'center'
 	},
 	col: {
 		marginBottom: '15px'
@@ -80,7 +79,7 @@ export default class RoleManagement extends React.Component {
 		    	})
 		    }
 			})
-	} 
+	}
 	deleteRole(role) {
 		let th = this
 		let roleObj = {
@@ -114,7 +113,7 @@ export default class RoleManagement extends React.Component {
 		    	console.log('Updated role and Server responded', res.body)
 		    	th.getRoles();
 		    }
-			}) 
+			})
 	}
 
 	render() {
@@ -131,9 +130,9 @@ export default class RoleManagement extends React.Component {
 								return(
 									role.name != "admin" &&
 									<Col style={styles.col} md={6} key={index}>
-										<RoleItem 
-											roleperm={role} 
-											controls={th.state.controls} 
+										<RoleItem
+											roleperm={role}
+											controls={th.state.controls}
 											deleteRole={th.deleteRole}
 											savePermissions={th.savePermissions}
 									 	/>

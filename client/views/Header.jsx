@@ -14,7 +14,7 @@ const styles = {
   title: {
     cursor: 'pointer',
   },
-  containerStyle: {
+  header: {
 			zIndex: 2,
 			fontFamily: 'sans-serif',
 			backgroundColor: 'rgb(0, 188, 212)',
@@ -25,12 +25,12 @@ const styles = {
 	    height: '40px',
 	    width: '100%',
 		}
-}
+};
 
 export default class Header extends React.Component {
 
 	constructor(props) {
-		super(props) 
+		super(props)
 		this.state = {
 			openDrawer: false,
 			actionMenu: '',
@@ -86,14 +86,14 @@ export default class Header extends React.Component {
 	render() {
 		let th = this;
 		return(
-			<div style={styles.containerStyle}>
+			<div style={styles.header}>
 				<Drawer
 		      docked={false}
 		      width={250}
 		      open={this.state.openDrawer}
 		      onRequestChange={(openDrawer) => this.setState({openDrawer})}>
 		      {
-		      	localStorage.getItem('token') && 
+		      	localStorage.getItem('token') &&
 		      	this.state.actions.map(function(action, key) {
 		      		return (
 		      			<Link to={th.state.routes[key]} key={key} style={{textDecoration: 'none'}} >
@@ -118,7 +118,7 @@ export default class Header extends React.Component {
 					    <MenuItem primaryText="LOG OUT" onClick={this.logout} />
 					  </IconMenu>}
 	      />
-      </div> 
+      </div>
 		)
 	}
 }

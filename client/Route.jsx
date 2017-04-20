@@ -29,7 +29,7 @@ var user;
 
 let requireAuth = function(nextState, replace, callback) {
   const token = localStorage.getItem('token')
-  if (!token) 
+  if (!token)
   	replace('/')
   return callback()
 }
@@ -44,7 +44,7 @@ let alreadyLoggedIn = function(nextState, replace, callback) {
   	// 	.set({'Authorization': token})
 			// .end(function(err, res){
 			// 	if(err)
-			// 		console.log(err) 
+			// 		console.log(err)
 			// 	else {
 			// 		user = res.body
 			// 		replace('/app')

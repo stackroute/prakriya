@@ -9,9 +9,8 @@ import UserList from './UserList.jsx';
 
 const styles = {
 	heading: {
-		textAlign: 'center',
-		marginTop: '70px'
-	},	
+		textAlign: 'center'
+	},
 	card: {
 		padding: '20px 10px',
 		height: 'auto'
@@ -61,7 +60,7 @@ export default class Users extends React.Component {
 		    else {
 		    	let roles = []
 		    	res.body.map(function (role, index) {
-						roles.push(role.name);			
+						roles.push(role.name);
 					})
 		    	th.setState({
 		    		roles: roles
@@ -73,14 +72,14 @@ export default class Users extends React.Component {
 		let th = this;
 		Request
 			.get('/admin/users')
-			.set({'Authorization': localStorage.getItem('token')})			
+			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 		    if(err)
 		    	console.log(err);
 		    else
 		    	th.setState({
 		    		users: res.body
-		    	}) 
+		    	})
 		    	console.log("Users");
 		    	console.log(th.state.users);
 		  });
@@ -99,7 +98,7 @@ export default class Users extends React.Component {
 		    	th.getUsers();
 		    }
 		  });
-	} 
+	}
 
 	updateUser(user) {
 		let th = this
@@ -115,7 +114,7 @@ export default class Users extends React.Component {
 		    	th.getUsers();
 		    }
 		  });
-	} 
+	}
 
 	deleteUser(user) {
 		let th = this
@@ -130,7 +129,7 @@ export default class Users extends React.Component {
 		    	th.getUsers();
 		    }
 		  })
-	} 
+	}
 
 	lockUser(user) {
 		let th = this
@@ -145,13 +144,13 @@ export default class Users extends React.Component {
 		    	th.getUsers();
 		    }
 		  });
-	} 
+	}
 
 	render() {
 		let th = this;
 		return (
 			<div >
-				
+
 				<h1 style={styles.heading}>User Management</h1>
 				<Grid>
 					<Row>

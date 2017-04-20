@@ -7,8 +7,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 
 const styles = {
 	heading: {
-		textAlign: 'center',
-		marginTop: '70px'
+		textAlign: 'center'
 	},
 	name: {
 		color: '#fff',
@@ -119,7 +118,7 @@ export default class Feedback extends React.Component {
 		    	})
 		    	console.log(th.state.cadet);
 		    }
-		  })	
+		  })
 	}
 	saveFeedback(feedbackObj) {
 		Request
@@ -132,7 +131,7 @@ export default class Feedback extends React.Component {
 		    else {
 		    	console.log('Feedback saved successfully', res.body);
 		    }
-		  })	
+		  })
 	}
 
 	handleChange(val, type, key) {
@@ -199,10 +198,10 @@ export default class Feedback extends React.Component {
 														{index+1}. {option}
 													</Col>
 													<Col md={2}>
-														<StarRating 
+														<StarRating
 															color1={'#ddd'}
-															half={false} 
-															size={30} 
+															half={false}
+															size={30}
 															value={th.state[item.type][index+1]}
 															onChange={(newVal) => th.handleChange(newVal, item.type, index+1)}
 														/>
@@ -211,7 +210,7 @@ export default class Feedback extends React.Component {
 											)
 										})
 									}
-									
+
 								</div>
 							)
 						})
@@ -256,4 +255,4 @@ export default class Feedback extends React.Component {
 			</div>
 		)
 	}
-}		
+}

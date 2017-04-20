@@ -5,7 +5,9 @@ const buildPath = path.resolve(__dirname, 'client', 'assets');
 
 const config = {
 	entry: [
-		path.join(__dirname, '/client/Route.jsx')
+			'webpack/hot/dev-server',
+			'webpack-hot-middleware/client?http://localhost:8080/',
+			path.join(__dirname, '/client/Route.jsx')
 	],
 	output: {
 		path: buildPath,

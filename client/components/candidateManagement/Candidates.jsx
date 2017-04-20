@@ -8,8 +8,7 @@ import CandidateHome from './CandidateHome.jsx';
 
 const styles = {
 	heading: {
-		textAlign: 'center',
-		marginTop: '70px'
+		textAlign: 'center'
 	}
 }
 
@@ -110,7 +109,7 @@ export default class Candidates extends React.Component {
 
 	render() {
 		let th = this;
-		// let filter = Filter: 
+		// let filter = Filter:
 		// 			<SelectField
 	 //          floatingLabelText="Select Wave"
 	 //          value={this.state.wave}
@@ -121,7 +120,7 @@ export default class Candidates extends React.Component {
 		return(
 			<div>
 			{
-				!this.state.showCandidate ? 
+				!this.state.showCandidate ?
 				<div>
 					<h1 style={styles.heading}>Candidate Management</h1>
 					<Grid>
@@ -130,8 +129,8 @@ export default class Candidates extends React.Component {
 								this.state.candidates.map(function(candidate, key) {
 									return (
 										<Col md={3} key={key}>
-											<CandidateCard 
-												candidate={candidate} 
+											<CandidateCard
+												candidate={candidate}
 												handleCardClick={th.candidateView}
 												handleDelete={th.deleteCandidate}
 											/>
@@ -144,8 +143,8 @@ export default class Candidates extends React.Component {
 				</div>
 				:
 				<div>
-					<CandidateHome 
-						candidate={this.state.displayCandidate} 
+					<CandidateHome
+						candidate={this.state.displayCandidate}
 						handleBack={this.handleBack}
 						handleDelete={this.deleteCandidate}
 						handleUpdate={this.updateCandidate}
