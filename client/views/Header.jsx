@@ -5,6 +5,10 @@ import IconMenu from 'material-ui/IconMenu';
 import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
 import Drawer from 'material-ui/Drawer';
+import Card from 'material-ui/Card';
+import CardMedia from 'material-ui/Card';
+import CardTitle from 'material-ui/Card';
+import Avatar from 'material-ui/Avatar';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import {Link} from 'react-router';
@@ -55,13 +59,18 @@ export default class Header extends React.Component {
 			.get('/dashboard/user')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
+
 				let actions = res.body.actions;
 				let routes = actions.map(function(item) {
 					return item.replace(/\s/g,'').toLowerCase()
 				});
 				th.setState({
 					actions: actions,
-					routes: routes
+					routes: routes,
+          user: {
+            name: res.body.name,
+            username: res.body.username
+          }
 				})
 				console.log(th.state.actions)
 			});
@@ -92,6 +101,13 @@ export default class Header extends React.Component {
 		      width={250}
 		      open={this.state.openDrawer}
 		      onRequestChange={(openDrawer) => this.setState({openDrawer})}>
+
+          <Card>
+             <CardMedia>
+                 <img src="./assets/images/avt-default.jpg" style={{width: '100%'}}/>
+             </CardMedia>
+          </Card>
+
 		      {
 		      	localStorage.getItem('token') &&
 		      	this.state.actions.map(function(action, key) {

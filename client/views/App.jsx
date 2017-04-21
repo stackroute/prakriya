@@ -16,7 +16,7 @@ const styles = {
 
 export default class App extends React.Component {
 
-	render() {
+  render() {
 		return (
 			<div style={styles.container}>
 				<Header />

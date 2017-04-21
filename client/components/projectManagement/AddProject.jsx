@@ -6,13 +6,13 @@ import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 
 const styles = {
-	addButtonStyle: {
+	addButton: {
 		position:'fixed',
-	  bottom: '50px',
+	  bottom: '60px',
 	  right: '15px',
 	  zIndex: 2
 	},
-	dialogStyle: {
+	dialog: {
 	  textAlign: 'center'
 	}
 }
@@ -80,10 +80,10 @@ export default class AddProject extends React.Component {
     ];
 		return(
 			<div>
-				<FloatingActionButton mini={true} style={styles.addButtonStyle} onTouchTap={this.handleOpen}>
+				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen}>
 		      <ContentAdd />
 		    </FloatingActionButton>
-		    <Dialog 
+		    <Dialog
 		    	style={styles.dialog}
           title="Add a new Project"
           actions={projectDialogActions}

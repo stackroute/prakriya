@@ -8,20 +8,20 @@ import Checkbox from 'material-ui/Checkbox';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 
 const styles = {
-	addButtonStyle: {
+	addButton: {
 		position:'fixed',
-	  bottom: '50px',
+	  bottom: '60px',
 	  right: '15px',
 	  zIndex: 2
 	}
-}
+};
 
 export default class AddRole extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 	    open: false,
-	    role:'', 
+	    role:'',
 	    actions: []
 	  }
 	  this.handleOpen = this.handleOpen.bind(this);
@@ -88,7 +88,7 @@ export default class AddRole extends React.Component {
     ];
 		return (
 			<div>
-				<FloatingActionButton mini={true} style={styles.addButtonStyle} onTouchTap={this.handleOpen} >
+				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
 		    <Dialog
@@ -99,10 +99,10 @@ export default class AddRole extends React.Component {
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
-          <TextField 
+          <TextField
           	floatingLabelText="Role"
-          	hintText="Name a new role" 
-          	onChange={this.onChangeRole} 
+          	hintText="Name a new role"
+          	onChange={this.onChangeRole}
           />
           should have following selected controls<br/>
           {

@@ -18,17 +18,16 @@ const items = [
   <MenuItem key={4} value={"sponsor"} primaryText="Sponsor" />
 ];
 
-
-
-const addButtonStyle = {
-		position:'fixed',
-	  bottom: '50px',
-	  right: '15px',
-	  zIndex: 2
-}
-
-const dialogStyle = {
-  textAlign: 'center'
+const styles = {
+    addButton: {
+      position:'fixed',
+      bottom: '60px',
+      right: '15px',
+      zIndex: 2
+    },
+    dialog: {
+      textAlign: 'center'
+    }
 };
 
 export default class AddUser extends React.Component {
@@ -45,7 +44,7 @@ export default class AddUser extends React.Component {
 			role: '',
 			roles: []
 		}
-	
+
 		this.handleOpen = this.handleOpen.bind(this);
 	  this.handleClose = this.handleClose.bind(this);
 		this.onChangeName = this.onChangeName.bind(this)
@@ -151,16 +150,16 @@ export default class AddUser extends React.Component {
 		}
 		let submitButton
 		if(this.props.openDialog) {
-			submitButton = <RaisedButton 
-						    	 		label="Update User" 
+			submitButton = <RaisedButton
+						    	 		label="Update User"
 						    	   	primary={true}
 						    			onClick={this.handleUpdate}
 						    			onTouchTap={this.handleClose}
 						    	 	/>
 		}
 		else {
-			submitButton = <RaisedButton 
-						    	 		label="Add User" 
+			submitButton = <RaisedButton
+						    	 		label="Add User"
 						    	   	primary={true}
 						    			onClick={this.handleSubmit}
 						    			onTouchTap={this.handleClose}
@@ -168,52 +167,52 @@ export default class AddUser extends React.Component {
 		}
 		return(
 			<div>
-				
-					<FloatingActionButton style={addButtonStyle} mini={true} onTouchTap={this.handleOpen} >
+
+					<FloatingActionButton style={styles.addButton} mini={true} onTouchTap={this.handleOpen} >
 			      <ContentAdd />
 			    </FloatingActionButton>
-				
-				
-		    <Dialog style={dialogStyle}
+
+
+		    <Dialog style={styles.dialog}
           title={dialogTitle}
           modal={false}
           open={this.state.open}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
         >
-      		
-      						<TextField 
-						    		hintText="Display name" 
+
+      						<TextField
+						    		hintText="Display name"
 						    		floatingLabelText="Name"
 						    		value={this.state.name}
-						    		onChange={this.onChangeName} 
+						    		onChange={this.onChangeName}
 						    	/><br/>
-						    	<TextField 
-						    		hintText="Should not be your name" 
+						    	<TextField
+						    		hintText="Should not be your name"
 						    		floatingLabelText="Username"
 						    		value={this.state.username}
-						    		onChange={this.onChangeUsername} 
+						    		onChange={this.onChangeUsername}
 						    		disabled={this.props.openDialog}
 						    	/><br/>
-						    	<TextField 
+						    	<TextField
 						    		hintText="This will be unique"
-						    		floatingLabelText="Email" 
+						    		floatingLabelText="Email"
 						    		value={this.state.email}
-						    		onChange={this.onChangeEmail} 
+						    		onChange={this.onChangeEmail}
 						    	/><br/>
-						    	<TextField 
-						    		floatingLabelText="Password" 
-						    		hintText="Secure your account" 
-						    		type="password" 
+						    	<TextField
+						    		floatingLabelText="Password"
+						    		hintText="Secure your account"
+						    		type="password"
 						    		value={this.state.password}
-						    		onChange={this.onChangePassword} 
+						    		onChange={this.onChangePassword}
 						    	/><br/>
-						    	<TextField 
-						    		floatingLabelText="Confirm Password" 
-						    		hintText="Confirm password" 
-						    		type="password" 
+						    	<TextField
+						    		floatingLabelText="Confirm Password"
+						    		hintText="Confirm password"
+						    		type="password"
 						    		value={this.state.cpassword}
-						    		onChange={this.onChangeConfirmPassword} 
+						    		onChange={this.onChangeConfirmPassword}
 						    	/><br/>
 						    	<SelectField
 						        onChange={this.onChangeRole}
@@ -226,19 +225,19 @@ export default class AddUser extends React.Component {
 						        	})
 						        }
 						      </SelectField><br/><br/><br/>
-      					
-      			
+
+
 				    			<div>
 				    				{submitButton}
-				    				&emsp;	
-					    			<RaisedButton 
-						    	 		label="Cancel" 
+				    				&emsp;
+					    			<RaisedButton
+						    	 		label="Cancel"
 						    	   	primary={true}
 						    			onTouchTap={this.handleClose}
-						    	 	/>	
+						    	 	/>
 				    			</div>
-				    			
-				    		
+
+
         </Dialog>
 			</div>
 		)
