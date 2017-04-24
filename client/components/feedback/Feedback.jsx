@@ -267,9 +267,9 @@ export default class Feedback extends React.Component {
 					<Row>
 						<Col md={8} mdOffset={2} style={styles.submit}>
 							<RaisedButton label="Submit" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled} disabled={this.state.invalidData}/>
-							<Snackbar bodyStyle={{ backgroundColor: 'teal', color: 'coral' }}
+							<Snackbar
 								open={this.state.open}
-          							message="Feedback submitted"
+          			message="Feedback submitted"
 								autoHideDuration={2000}
         			/>
 						</Col>

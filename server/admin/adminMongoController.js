@@ -1,6 +1,6 @@
 const UserModel = require('../../models/users.js');
-const RoleModel = require('../../models/roles.js'); 
-const AccessControlModel = require('../../models/accesscontrols.js');
+const RoleModel = require('../../models/roles.js');
+const PermissionModel = require('../../models/permissions.js');
 
 let getUsers = function(successCB, errorCB) {
 	UserModel.find({},function(err, result) {
@@ -51,8 +51,8 @@ let lockUser = function (userObj, successCB, errorCB) {
 }
 
 let getRoles = function(successCB, errorCB) {
-	RoleModel.find({},function(err, result) {
-		if (err) 
+	RoleModel.find({name: {$ne: 'admin'}},function(err, result) {
+		if (err)
 				errorCB(err);
 		successCB(result);
 	});
@@ -69,9 +69,9 @@ let addRole = function (roleObj, successCB, errorCB) {
 
 let updateRole = function (roleObj, successCB, errorCB) {
 	console.log('Role obj in Mongo', roleObj)
-	console.log(roleObj.name)
+	console.log(roleObj.role)
 	roleObj.lastModified= new Date();
-	RoleModel.update({"name": roleObj.name}, roleObj, function(err, status) {
+	RoleModel.update({"role": roleObj.role}, roleObj, function(err, status) {
 		if(err)
 			errorCB(err);
 		successCB(status);
@@ -88,9 +88,9 @@ let deleteRole = function (roleObj, successCB, errorCB) {
 		})
 }
 
-let getAccessControls = function(successCB, errorCB) {
-	AccessControlModel.find({},function(err, result) {
-		if (err) 
+let getPermissions = function(successCB, errorCB) {
+	PermissionModel.find({},function(err, result) {
+		if (err)
 				errorCB(err);
 		successCB(result);
 	});
@@ -99,7 +99,7 @@ let getAccessControls = function(successCB, errorCB) {
 module.exports = {
 	getUsers: getUsers,
 	getRoles: getRoles,
-	getAccessControls: getAccessControls,
+	getPermissions: getPermissions,
 	addUser: addUser,
 	addRole: addRole,
 	updateRole: updateRole,
