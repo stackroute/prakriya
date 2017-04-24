@@ -84,10 +84,10 @@ export default class RoleItem extends React.Component {
 		let th = this;
 		let date = new Date(this.props.roleperm.lastModified);
 		date = date.toString();
-		let formatDate = 
-			"Last modified: " + 
-			date.substr(8,2) + " " + 
-			date.substr(4,3) + " " + 
+		let formatDate =
+			"Last modified: " +
+			date.substr(8,2) + " " +
+			date.substr(4,3) + " " +
 			date.substr(11,4);
 		let controls = [];
 		let controlsList = [];
@@ -101,7 +101,7 @@ export default class RoleItem extends React.Component {
 			controls: controls,
 			controlsList: controlsList
 		})
-	} 
+	}
 	handleControlDelete(perm) {
 		let controls = this.state.controls.filter(function(control) {
 			return perm != control
@@ -223,10 +223,10 @@ export default class RoleItem extends React.Component {
 						</Paper>
 			    </CardText>
 			    <CardActions style={styles.cardActions}>
-			    	<FlatButton 
-			    		label="Apply" 
-			    		primary={true} 
-			    		disabled={this.state.disableSave} 
+			    	<FlatButton
+			    		label="Apply"
+			    		primary={true}
+			    		disabled={this.state.disableSave}
 			    		icon={<SaveIcon />}
 			    		onClick={this.savePerms}
 			    	/>

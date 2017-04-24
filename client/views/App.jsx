@@ -18,9 +18,9 @@ export default class App extends React.Component {
 
   render() {
 		return (
-			<div style={styles.container}>
+			<div style={styles.container} >
 				<Header />
-				<div style={styles.body}>
+				<div style={styles.body} >
 					{this.props.children}
 				</div>
 				<Footer />

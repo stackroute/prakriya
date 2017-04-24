@@ -5,10 +5,7 @@ import IconMenu from 'material-ui/IconMenu';
 import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
 import Drawer from 'material-ui/Drawer';
-import Card from 'material-ui/Card';
-import CardMedia from 'material-ui/Card';
-import CardTitle from 'material-ui/Card';
-import Avatar from 'material-ui/Avatar';
+import {Card, CardHeader, CardMedia, CardTitle} from 'material-ui/Card';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import {Link} from 'react-router';
@@ -39,13 +36,18 @@ export default class Header extends React.Component {
 			openDrawer: false,
 			actionMenu: '',
 			actions: [],
-			routes: []
+			routes: [],
+      user: {
+        name: '',
+        username: ''
+      }
 		}
 		this.logout = this.logout.bind(this);
 		this.getActions = this.getActions.bind(this);
 		this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
 		this.handleDrawerClose = this.handleDrawerClose.bind(this);
 		this.openDashboard = this.openDashboard.bind(this);
+    this.setIndexRoute = this.setIndexRoute.bind(this);
 	}
 
 	componentDidMount() {
@@ -72,9 +74,13 @@ export default class Header extends React.Component {
             username: res.body.username
           }
 				})
+        if(th.state.actions.length > 0) th.setIndexRoute(th.state.actions[0].toLowerCase())
 				console.log(th.state.actions)
 			});
 	}
+  setIndexRoute(indexRoute) {
+    this.context.router.push(indexRoute)
+  }
 	logout() {
 		localStorage.removeItem('token')
 		this.context.router.push('/')
@@ -90,30 +96,40 @@ export default class Header extends React.Component {
 		})
 	}
 	openDashboard() {
-		this.context.router.push('/app')
+		// this.context.router.push('/app')
 	}
 	render() {
-		let th = this;
+		let th = this
 		return(
 			<div style={styles.header}>
 				<Drawer
 		      docked={false}
 		      width={250}
 		      open={this.state.openDrawer}
-		      onRequestChange={(openDrawer) => this.setState({openDrawer})}>
-
+		      onRequestChange={(openDrawer) => this.setState({openDrawer})}
+          >
           <Card>
-             <CardMedia>
-                 <img src="./assets/images/avt-default.jpg" style={{width: '100%'}}/>
+             <CardMedia
+              overlay={
+                <CardHeader
+                  subtitle={this.state.user.username}
+                  title={this.state.user.name}
+					        avatar="../assets/images/avt-default.jpg"
+					      />
+              }
+             >
+                 <img src="./assets/images/drawer_top.jpg" style={{width: '100%'}}/>
              </CardMedia>
           </Card>
-
 		      {
 		      	localStorage.getItem('token') &&
 		      	this.state.actions.map(function(action, key) {
 		      		return (
 		      			<Link to={th.state.routes[key]} key={key} style={{textDecoration: 'none'}} >
-					      	<MenuItem primaryText={action} onTouchTap={th.handleDrawerClose} />
+					      	<MenuItem
+                    primaryText={action}
+                    onTouchTap={th.handleDrawerClose}
+                  />
 				      	</Link>
 				      )
 		      	})

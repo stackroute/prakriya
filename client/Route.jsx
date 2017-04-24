@@ -67,7 +67,7 @@ ReactDOM.render(
 			<Route path="/" component={Welcome} onEnter={alreadyLoggedIn} />
 			<Route path="/login" component={Login} onEnter={alreadyLoggedIn} />
 			<Route path="/app" component={App} onEnter={requireAuth} >
-				<IndexRoute component={Dashboard} />
+				{/*<IndexRoute component={Dashboard} />*/}
 				<Route path="/roles" component={Roles} onEnter={rolesAccess} />
 				<Route path="/users" component={Users} />
 				<Route path="/candidates" component={Candidates} />
