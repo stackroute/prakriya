@@ -139,6 +139,15 @@ export default class Feedback extends React.Component {
 				open: true
 					})
 	}
+	getInitialState() {
+	 return {
+		 invalidData: true,
+	 }
+ }
+
+ componentWillUpdate(nextProps, nextState) {
+	 nextState.invalidData = !(nextState.mostLiked && nextState.leastLiked);
+ }
 
 	handleChange(val, type, key) {
 		let temp = this.state[type];
@@ -257,7 +266,7 @@ export default class Feedback extends React.Component {
 
 					<Row>
 						<Col md={8} mdOffset={2} style={styles.submit}>
-							<RaisedButton label="Submit" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled}/>
+							<RaisedButton label="Submit" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled} disabled={this.state.invalidData}/>
 							<Snackbar bodyStyle={{ backgroundColor: 'teal', color: 'coral' }}
 								open={this.state.open}
           							message="Feedback submitted"
