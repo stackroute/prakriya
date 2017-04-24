@@ -92,7 +92,9 @@ export default class Feedback extends React.Component {
 			facilities: {},
 			overall: {},
 			mostLiked: '',
-			leastLiked: ''
+			leastLiked: '',
+			open: false,
+			buttonDisabled: false
 		}
 		this.getCadet = this.getCadet.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -121,6 +123,7 @@ export default class Feedback extends React.Component {
 		  })
 	}
 	saveFeedback(feedbackObj) {
+		let th = this;
 		Request
 			.post('/dashboard/savefeedback')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -132,6 +135,9 @@ export default class Feedback extends React.Component {
 		    	console.log('Feedback saved successfully', res.body);
 		    }
 		  })
+		th.setState({
+				open: true
+					})
 	}
 
 	handleChange(val, type, key) {
@@ -166,6 +172,9 @@ export default class Feedback extends React.Component {
 		feedbackObj.mostLiked = this.state.mostLiked;
 		feedbackObj.leastLiked = this.state.leastLiked;
 		this.saveFeedback(feedbackObj);
+		this.setState({
+      			buttonDisabled: true
+    });
 	}
 
 	render() {
@@ -248,7 +257,12 @@ export default class Feedback extends React.Component {
 
 					<Row>
 						<Col md={8} mdOffset={2} style={styles.submit}>
-							<RaisedButton label="Submit" primary={true} onClick={this.handleSubmit}/>
+							<RaisedButton label="Submit" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled}/>
+							<Snackbar bodyStyle={{ backgroundColor: 'teal', color: 'coral' }}
+								open={this.state.open}
+          							message="Feedback submitted"
+								autoHideDuration={2000}
+        			/>
 						</Col>
 					</Row>
 				</Grid>
