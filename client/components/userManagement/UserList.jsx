@@ -157,7 +157,7 @@ export default class UserList extends React.Component {
 						</CardActions>
 						{
 							this.state.openDialog &&
-							<AddUser user={this.props.currUser} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateUser} />
+							<AddUser user={this.props.currUser} roles={this.props.roles} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateUser} />
 						}
 				  </Card>
 			  

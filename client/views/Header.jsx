@@ -129,7 +129,7 @@ export default class Header extends React.Component {
 					      	<MenuItem
                     primaryText={action}
                     onTouchTap={th.handleDrawerClose}
-                  />
+                   />
 				      	</Link>
 				      )
 		      	})

@@ -4,6 +4,7 @@ import Request from 'superagent';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {Grid, Row, Col} from 'react-flexbox-grid';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
 	heading: {

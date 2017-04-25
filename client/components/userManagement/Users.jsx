@@ -159,7 +159,7 @@ export default class Users extends React.Component {
 								return(
 									user.role != 'candidate' &&
 									<Col style={styles.card} md={3} key={index}>
-										<UserList  currUser={user} lockUser={th.lockUser} deleteUser={th.deleteUser} updateUser={th.updateUser} />
+										<UserList  currUser={user} lockUser={th.lockUser} roles={th.state.roles} deleteUser={th.deleteUser} updateUser={th.updateUser} />
 									</Col>
 								)
 							})
