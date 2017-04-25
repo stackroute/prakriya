@@ -47,7 +47,6 @@ export default class Header extends React.Component {
 		this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
 		this.handleDrawerClose = this.handleDrawerClose.bind(this);
 		this.openDashboard = this.openDashboard.bind(this);
-    this.setIndexRoute = this.setIndexRoute.bind(this);
 	}
 
 	componentDidMount() {
@@ -74,13 +73,9 @@ export default class Header extends React.Component {
             username: res.body.username
           }
 				})
-        if(th.state.actions.length > 0) th.setIndexRoute(th.state.actions[0].toLowerCase().replace(/\s/g,''))
 				console.log(th.state.actions)
 			});
 	}
-  setIndexRoute(indexRoute) {
-    this.context.router.push(indexRoute)
-  }
 	logout() {
 		localStorage.removeItem('token')
 		this.context.router.push('/')
@@ -96,7 +91,7 @@ export default class Header extends React.Component {
 		})
 	}
 	openDashboard() {
-		// this.context.router.push('/app')
+		this.context.router.push('/app')
 	}
 	render() {
 		let th = this
