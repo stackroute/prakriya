@@ -106,6 +106,14 @@ export default class Feedback extends React.Component {
 	}
 	componentDidMount() {
 		this.getCadet();
+		this.setState({
+			relevance: {'1':1, '2':1, '3':1, '4':1, '5':1},
+			training: {'1':1, '2':1, '3':1, '4':1},
+			confidence: {'1':1, '2':1, '3':1, '4':1, '5':1, '6':1},
+			mentors: {'1':1, '2':1, '3':1, '4':1, '5':1},
+			facilities: {'1':1, '2':1, '3':1, '4':1},
+			overall: {'1':1, '2':1, '3':1}
+		});
 	}
 	getCadet() {
 		let th = this;
