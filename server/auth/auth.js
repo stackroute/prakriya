@@ -1,6 +1,7 @@
 var passport = require("passport");  
 var passportJWT = require("passport-jwt");  
-const userModel = require('../../models/users.js');
+var userModel = require('../../models/users.js');
+var roleModel = require('../../models/roles.js');
 var cfg = require("../../config");  
 var ExtractJwt = passportJWT.ExtractJwt;  
 var JwtStrategy = passportJWT.Strategy;  
@@ -43,6 +44,22 @@ module.exports = function() {
           next();
         else 
           res.status(401).json({error: 'User is not authorized'});
+      }
+    },
+    controlledBy: function (allowedControls) {
+      return function(req, res, next){
+        roleModel.findOne({'name': req.user.role}, function (err, role) {
+          let allowed = false;
+          role.controls.map(function(code, index) {
+            if(allowedControls.indexOf(code) >= 0) 
+              allowed = true;
+          })
+
+          if(allowed)
+            next();
+          else 
+            res.status(401).json({error: 'User is not authorized'});
+          })
       }
     }
   };

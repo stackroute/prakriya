@@ -36,7 +36,6 @@ let requireAuth = function(nextState, replace, callback) {
 
 let alreadyLoggedIn = function(nextState, replace, callback) {
   const token = localStorage.getItem('token')
-  console.log(token);
   if(token) {
   	replace('/app')
   	// Request

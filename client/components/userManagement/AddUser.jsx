@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
@@ -245,5 +246,5 @@ export default class AddUser extends React.Component {
 }
 
 AddUser.contextTypes = {
-  router: React.PropTypes.object.isRequired
+  router: PropTypes.object.isRequired
 };
