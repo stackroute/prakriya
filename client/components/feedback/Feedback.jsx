@@ -159,6 +159,7 @@ export default class Feedback extends React.Component {
 	}
 
 	handleMostLikedChange(event) {
+	console.log(this.state.open);
 		this.setState({
 			mostLiked: event.target.value
 		})
@@ -267,7 +268,12 @@ export default class Feedback extends React.Component {
 
 					<Row>
 						<Col md={8} mdOffset={2} style={styles.submit}>
-							<RaisedButton label="Submit" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled} disabled={this.state.invalidData}/>
+							<RaisedButton
+								label="Submit"
+								primary={true}
+								onClick={this.handleSubmit}
+								disabled={this.state.buttonDisabled || this.state.invalidData}
+							/>
 							<Snackbar
 								open={this.state.open}
           			message="Feedback submitted"
