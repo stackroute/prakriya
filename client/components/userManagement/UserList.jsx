@@ -63,7 +63,10 @@ export default class UserList extends React.Component {
 
   handleAccountSuspension() {
   	this.handleCloseLock();
-  	this.props.lockUser(this.props.currUser);
+  	if(this.props.currUser.actions.indexOf('login') > -1)
+			this.props.lockUser(this.props.currUser);
+		else 
+			this.props.unlockUser(this.props.currUser);
 		// console.log("yes!!!!!")
 	}
 
@@ -130,15 +133,26 @@ export default class UserList extends React.Component {
 							<IconButton tooltip={accountTooltip} onTouchTap={this.handleOpenLock} >
 					      <LockIcon color={color} />
 					    </IconButton>
-					    <Dialog
-			          title="Confirm user' account suspension?"
-			          actions={lockActions}
-			          modal={false}
-			          open={this.state.lockConfirm}
-			          onRequestClose={this.handleCloseLock}
-			        >
-			          Are you sure, you want to suspend the selected user account?
-			        </Dialog>
+					    {(this.props.currUser.actions.indexOf('login') > -1)?(<Dialog
+					          title="Confirm user' account suspension?"
+					          actions={lockActions}
+					          modal={false}
+					          open={this.state.lockConfirm}
+					          onRequestClose={this.handleCloseLock}
+					        >
+					          Are you sure, you want to suspend the selected user account?
+					        </Dialog>
+					      ):(
+					      	<Dialog
+					          title="Confirm user' account unsuspension?"
+					          actions={lockActions}
+					          modal={false}
+					          open={this.state.lockConfirm}
+					          onRequestClose={this.handleCloseLock}
+					        >
+					          Are you sure, you want to unsuspend the selected user account?
+					        </Dialog>
+					      )}
 							<IconButton tooltip="Edit User" onClick={this.handleEditUser} disabled={disabled}>
 					      <EditIcon color={lightBlack} />
 					    </IconButton>

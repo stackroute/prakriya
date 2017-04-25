@@ -41,7 +41,7 @@ export default class Users extends React.Component {
 		this.deleteUser = this.deleteUser.bind(this);
 		this.updateUser = this.updateUser.bind(this);
 		this.lockUser = this.lockUser.bind(this);
-
+		this.unlockUser = this.unlockUser.bind(this);
 	}
 
 	componentDidMount() {
@@ -146,6 +146,21 @@ export default class Users extends React.Component {
 		  });
 	}
 
+	unlockUser(user) {
+		let th = this
+		Request
+			.post('/admin/unlockuser')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(user)
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+		    	th.getUsers();
+		    }
+		  });
+	}
+
 	render() {
 		let th = this;
 		return (
@@ -159,7 +174,7 @@ export default class Users extends React.Component {
 								return(
 									user.role != 'candidate' &&
 									<Col style={styles.card} md={3} key={index}>
-										<UserList  currUser={user} lockUser={th.lockUser} roles={th.state.roles} deleteUser={th.deleteUser} updateUser={th.updateUser} />
+										<UserList  currUser={user} lockUser={th.lockUser} unlockUser={th.unlockUser} roles={th.state.roles} deleteUser={th.deleteUser} updateUser={th.updateUser} />
 									</Col>
 								)
 							})

@@ -52,6 +52,16 @@ let lockUser = function (userObj, successCB, errorCB) {
 	})
 }
 
+let unlockUser = function (userObj, successCB, errorCB) {
+	console.log('User obj from server', userObj)
+	console.log(userObj.username)
+	UserModel.update({"username": userObj.username}, {$push:{"actions": "login"}}, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
 let getRoles = function(successCB, errorCB) {
 	RoleModel.find({name: {$ne: 'admin'}},function(err, result) {
 		if (err)
@@ -108,5 +118,6 @@ module.exports = {
 	deleteRole: deleteRole,
 	deleteUser: deleteUser,
 	updateUser: updateUser,
-	lockUser: lockUser
+	lockUser: lockUser,
+	unlockUser: unlockUser
 }
