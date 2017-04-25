@@ -23,7 +23,7 @@ const styles = {
       position:'fixed',
       bottom: '60px',
       right: '15px',
-      zIndex: 2
+      zIndex: 1
     },
     dialog: {
       textAlign: 'center'
