@@ -12,6 +12,8 @@ let getUsers = function(successCB, errorCB) {
 }
 
 let addUser = function(userObj, successCB, errorCB) {
+	userObj.actions = ['login'];
+	console.log('Add User', userObj);
 	let saveUser = new UserModel(userObj)
 	saveUser.save(userObj, function (err, result) {
 		if(err)
