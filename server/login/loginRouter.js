@@ -39,6 +39,11 @@ router.post("/", function(req, res) {
           console.log('User object in the loginRouter',user);
           // user = doc;
           if (user) {
+            if(user.actions.indexOf('login') <= -1)
+            {
+              res.send('Account suspended');
+            }
+            else {
               var payload = {
                   id: user._id,
                   user: user.username
@@ -51,6 +56,7 @@ router.post("/", function(req, res) {
                   // user: user,
                   token: "JWT " + token
               });
+            }
           } else {
               res.sendStatus(401);
           }

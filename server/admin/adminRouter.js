@@ -94,7 +94,7 @@ router.post('/unlockuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
     adminMongoController.unlockUser(req.body, function (status) {
       res.status(200).json(status)
     }, function (err) {
-      res.status(500).json({ error: 'Cannot lock user account in db...!' });
+      res.status(500).json({ error: 'Cannot unlock user account in db...!' });
     })
   }
   catch(err) {

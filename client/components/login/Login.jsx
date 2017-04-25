@@ -48,6 +48,11 @@ export default class Login extends React.Component {
 		    		errMsg: "*Invalid username or password"
 		    	})
 		    }
+		    else if(res.text == 'Account suspended') {
+		    	th.setState({
+		    		errMsg: "*Account is suspended. Contact admin"
+		    	})
+		    }
 		    else if(err) {
 		    	th.setState({
 		    		errMsg: "*Internal Server Error"
