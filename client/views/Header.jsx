@@ -74,7 +74,7 @@ export default class Header extends React.Component {
             username: res.body.username
           }
 				})
-        if(th.state.actions.length > 0) th.setIndexRoute(th.state.actions[0].toLowerCase())
+        if(th.state.actions.length > 0) th.setIndexRoute(th.state.actions[0].toLowerCase().replace(/\s/g,''))
 				console.log(th.state.actions)
 			});
 	}

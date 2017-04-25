@@ -2,6 +2,7 @@ import React from 'react';
 import StarRating from 'react-stars';
 import Request from 'superagent';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 import TextField from 'material-ui/TextField';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 
