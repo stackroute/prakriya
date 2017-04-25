@@ -163,6 +163,19 @@ export default class RoleItem extends React.Component {
 	handleSnackBarClose() {
 		this.setState({openSnackBar: false})
 	}
+	componentWillReceiveProps(nextProps) {
+		let controls = [];
+		let controlsList = [];
+		let th = this;
+		this.props.controls.map(function (control, key) {
+			controlsList.push(control.name);
+			if(nextProps.roleperm.controls.indexOf(control.code) >= 0)
+				controls.push(control.name);
+		})
+		this.setState({
+			controls: controls,
+		})
+	}
 
 	render() {
 		let th = this;
