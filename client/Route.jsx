@@ -14,12 +14,13 @@ import Roles from './components/roleManagement/index.jsx';
 import Users from './components/userManagement/index.jsx';
 import Candidates from './components/candidateManagement/index.jsx';
 import BulkUpload from './components/bulkupload/index.jsx';
-import CourseManagement from './components/courseManagement/index.jsx';
+import Courses from './components/courseManagement/index.jsx';
 import AssessmentTracker from './components/assessmentTracker/index.jsx';
 import ProgramFlow from './components/programFlow/index.jsx';
 import MyProfile from './components/myProfile/index.jsx';
 import Projects from './components/projectManagement/index.jsx';
 import Feedback from './components/feedback/index.jsx';
+import EvaluationForms from './components/evaluationForms/index.jsx';
 
 injectTapEventPlugin();
 
@@ -52,7 +53,7 @@ let alreadyLoggedIn = function(nextState, replace, callback) {
   }
   return callback()
 }
-let rolesAccess = function (nextState, replace, callback) {
+let canAccess = function (nextState, replace, callback) {
 	if(user) {
 		if(user.actions.indexOf('Roles') < 0)
 			replace('/app')
@@ -67,16 +68,17 @@ ReactDOM.render(
 			<Route path="/login" component={Login} onEnter={alreadyLoggedIn} />
 			<Route path="/app" component={App} onEnter={requireAuth} >
 				<IndexRoute component={Dashboard} />
-				<Route path="/roles" component={Roles} onEnter={rolesAccess} />
+				<Route path="/roles" component={Roles} />
 				<Route path="/users" component={Users} />
 				<Route path="/candidates" component={Candidates} />
 				<Route path="/bulkupload" component={BulkUpload} />
-				<Route path="/coursemanagement" component={CourseManagement} />
+				<Route path="/courses" component={Courses} />
 				<Route path="/assessmenttracker" component={AssessmentTracker} />
 				<Route path="/programflow" component={ProgramFlow} />
 				<Route path="/myprofile" component={MyProfile} />
 				<Route path="/projects" component={Projects} />
 				<Route path="/feedback" component={Feedback} />
+				<Route path="/evaluationforms" component={EvaluationForms} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

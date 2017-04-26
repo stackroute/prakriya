@@ -39,7 +39,7 @@ router.post("/", function(req, res) {
           console.log('User object in the loginRouter',user);
           // user = doc;
           if (user) {
-            if(user.actions.indexOf('login') <= -1)
+            if(user.role != 'admin' && user.actions.indexOf('login') <= -1)
             {
               res.send('Account suspended');
             }

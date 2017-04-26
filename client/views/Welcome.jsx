@@ -39,7 +39,6 @@ export default class Welcome extends React.Component {
   };
 
   handleClose() {
-  	console.log('Remove dialog')
     this.setState({open: false});
   };
 	// openLoginPage() {
