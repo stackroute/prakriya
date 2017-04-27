@@ -74,7 +74,6 @@ export default class Header extends React.Component {
             username: res.body.username
           }
 				})
-				console.log(th.state.actions)
 			});
 	}
 	logout() {

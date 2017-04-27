@@ -3,6 +3,7 @@ const ProjectModel = require('../../models/projects.js');
 const CandidateModel = require('../../models/candidates.js');
 const FileModel = require('../../models/files.js');
 const FeedbackModel = require('../../models/feedback.js');
+const EvaluationModel = require('../../models/evaluation.js');
 const adminMongoController = require('../admin/adminMongoController.js');
 
 let getPermissions =  function(role, successCB, errorCB) {
@@ -87,10 +88,18 @@ let getFiles = function(successCB, errorCB) {
 }
 
 let saveFeedback = function(feedbackObj, successCB, errorCB) {
-	console.log('Feedback Obj in Mongo', feedbackObj)
 	let saveFeedbackObj = new FeedbackModel(feedbackObj);
-	console.log('Mongoose obj', saveFeedbackObj);
 	saveFeedbackObj.save(function (err, result) {
+		console.log(err);
+		if(err)
+			errorCB(err);
+		successCB(result);
+	})
+}
+
+let saveEvaluation = function(evaluationObj, successCB, errorCB) {
+	let saveEvaluationObj = new EvaluationModel(evaluationObj);
+	saveEvaluationObj.save(function (err, result) {
 		console.log(err);
 		if(err)
 			errorCB(err);
@@ -107,5 +116,6 @@ module.exports = {
 	getFiles: getFiles,
 	updateCadet: updateCadet,
 	deleteCadet: deleteCadet,
-	saveFeedback: saveFeedback
+	saveFeedback: saveFeedback,
+	saveEvaluation: saveEvaluation
 }

@@ -6,11 +6,11 @@ const styles = {
   container: {
 		position: 'relative',
 	  height: 'auto !important',
-	  minHeight: '100%'
 	},
 	body: {
 		fontFamily: 'sans-serif',
-		marginTop: '100px'
+		marginTop: 100,
+		minHeight: 450
 	}
 };
 

@@ -8,7 +8,8 @@ let config = {
 	MENTOR: ['mentor'],
 	CANDIDATE: ['candidate'],
 	ADMCAN: ['administrator', 'candidate'],
-	MENCAN: ['mentor', 'candidate']
+	MENCAN: ['mentor', 'candidate'],
+	ADMMEN: ['administrator', 'mentor']
 }
 
 module.exports = config;

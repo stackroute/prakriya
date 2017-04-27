@@ -142,21 +142,24 @@ export default class Feedback extends React.Component {
 		    	console.log(err);
 		    else {
 		    	console.log('Feedback saved successfully', res.body);
+		    	th.setState({
+						open: true
+					})
 		    }
 		  })
-		th.setState({
-				open: true
-					})
 	}
 	getInitialState() {
-	 return {
-		 invalidData: true,
-	 }
- }
+	 	return {
+		 	invalidData: true,
+	 	}
+ 	}
 
- componentWillUpdate(nextProps, nextState) {
-	 nextState.invalidData = !(nextState.mostLiked && nextState.leastLiked);
- }
+ 	componentWillUpdate(nextProps, nextState) {
+	 	nextState.invalidData = !(
+	 		nextState.mostLiked.trim() != '' && 
+	 		nextState.leastLiked.trim() != ''
+	 	);
+ 	}
 
 	handleChange(val, type, key) {
 		let temp = this.state[type];
@@ -207,7 +210,6 @@ export default class Feedback extends React.Component {
 							<h3>{this.state.cadet.EmployeeName}</h3>
 						</Col>
 					</Row>
-
 					{
 						feedback.map(function(item, key) {
 							return (
@@ -219,7 +221,6 @@ export default class Feedback extends React.Component {
 									</Row>
 									{
 										item.options.map(function (option, index) {
-											let val = th.state[item.type]
 											return(
 												<Row key={index}>
 													<Col md ={6} mdOffset={2} style={{marginTop: 10}}>

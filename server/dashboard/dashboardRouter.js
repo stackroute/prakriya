@@ -94,7 +94,7 @@ router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
 })
 
 // Get all the cadets
-router.get('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   try{
     dashboardMongoController.getCadets(function(cadets) {
       res.status(201).json(cadets);
@@ -165,6 +165,22 @@ router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res
       res.status(200).json(feedback)
     }, function (err) {
       res.status(500).json({ error: 'Cannot save feedback in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
+// Save the cadet evaluation
+router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    dashboardMongoController.saveEvaluation(req.body, function (eval) {
+      res.status(200).json(eval)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot save cadet evaluation in db...!' });
     })
   }
   catch(err) {
