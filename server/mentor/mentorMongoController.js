@@ -47,6 +47,15 @@ let getAssesmentTrack = function(trainingTrack, wave, course, successCB, errorCB
 	});
 }
 
+let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
+	console.log('candidate obj from client side', candidateObj)
+	CandidateModel.update({"EmployeeID": candidateObj.EmployeeID}, candidateObj, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
 //
 // let addAssessmentTrack = function(assessmentTrack, successCB, errorCB) {
 // 	console.log('Add AssessmentTrack', assessmentTrack);
@@ -81,15 +90,7 @@ let getAssesmentTrack = function(trainingTrack, wave, course, successCB, errorCB
 // 		})
 // }
 //
-// let updateUser = function (userObj, successCB, errorCB) {
-// 	console.log('User obj from server', userObj)
-// 	console.log(userObj.username)
-// 	UserModel.update({"username": userObj.username}, userObj, function(err, status) {
-// 		if(err)
-// 			errorCB(err);
-// 		successCB(status);
-// 	})
-// }
+
 //
 // let lockUser = function (userObj, successCB, errorCB) {
 // 	console.log('User obj from server', userObj)
@@ -162,5 +163,6 @@ module.exports = {
 	getTrainingTracks,
 	getCourses,
 	getCandidates,
-	getAssesmentTrack
+	getAssesmentTrack,
+	updateCandidateAssessment
 }

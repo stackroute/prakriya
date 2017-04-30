@@ -1,13 +1,13 @@
-import React from 'react';
-import Request from 'superagent';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import {Grid, Row, Col} from 'react-flexbox-grid';
-import TrackItem from './TrackItem.jsx';
+import React from 'react'
+import Request from 'superagent'
+import SelectField from 'material-ui/SelectField'
+import MenuItem from 'material-ui/MenuItem'
+import {Grid, Row, Col} from 'react-flexbox-grid'
+import TrackItem from './TrackItem.jsx'
 
 export default class AssessmentTracker extends React.Component {
 	constructor(props) {
-		super(props);
+		super(props)
 		this.state = {
 			trainingTracks: [],
 			waves: [],
@@ -19,21 +19,21 @@ export default class AssessmentTracker extends React.Component {
 			course: '',
 			assessmentCategories: []
 		}
-		this.getTrainingTracks = this.getTrainingTracks.bind(this);
-		this.getWaves = this.getWaves.bind(this);
-		this.getCandidates = this.getCandidates.bind(this);
-		this.getCourses = this.getCourses.bind(this);
-		this.onTrainingTrackChange = this.onTrainingTrackChange.bind(this);
-		this.onWaveChange = this.onWaveChange.bind(this);
-		this.onCourseChange = this.onCourseChange.bind(this);
+		this.getTrainingTracks = this.getTrainingTracks.bind(this)
+		this.getWaves = this.getWaves.bind(this)
+		this.getCandidates = this.getCandidates.bind(this)
+		this.getCourses = this.getCourses.bind(this)
+		this.onTrainingTrackChange = this.onTrainingTrackChange.bind(this)
+		this.onWaveChange = this.onWaveChange.bind(this)
+		this.onCourseChange = this.onCourseChange.bind(this)
+		this.updateComments = this.updateComments.bind(this)
+		this.saveAssessmentTrack = this.saveAssessmentTrack.bind(this)
 	}
 
 	componentWillMount() {
-		console.log('at hi')
 		if(localStorage.getItem('token')) {
 			this.getTrainingTracks()
 		}
-		console.log('at bi')
 	}
 
 	getTrainingTracks() {
@@ -45,8 +45,7 @@ export default class AssessmentTracker extends React.Component {
 				th.setState({
 					trainingTracks: res.body.trainingtracks
 				})
-				console.log('TrainingTracks Retrieved: ', res.body.trainingtracks)
-			});
+			})
 	}
 
 	getWaves(trainingTrack) {
@@ -57,9 +56,8 @@ export default class AssessmentTracker extends React.Component {
 			.end(function(err, res){
 				th.setState({
 					waves: res.body.waves
-				});
-				console.log('Waves Retrieved: ', res.body.waves)
-			});
+				})
+			})
 	}
 
 	getCourses(wave) {
@@ -70,9 +68,8 @@ export default class AssessmentTracker extends React.Component {
 			.end(function(err, res){
 				th.setState({
 					courses: res.body.courses
-				});
-				console.log('Courses Retrieved: ', res.body.courses)
-			});
+				})
+			})
 	}
 
 	getCandidates(trainingTrack, wave, course) {
@@ -83,15 +80,27 @@ export default class AssessmentTracker extends React.Component {
 			.end(function(err, res){
 				th.setState({
 					candidates: res.body.candidates,
-					assessmentCategories: res.body.assessmentTrack.categories
-				});
-				console.log('Candidates Retrieved: ', res.body.candidates)
-			});
+					assessmentCategories: res.body.assessmentTrack.Categories
+				})
+			})
+	}
+
+	saveAssessmentTrack(index) {
+		let candidateObj = this.state.candidates[index]
+		Request
+			.post('/mentor/updatecandidateassessment')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(candidateObj)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err)
+		    else
+		    	console.log('Updated candidate assessment and Server responded', res.body)
+			})
 	}
 
 	onTrainingTrackChange(e) {
 		let th = this
-		console.log('Track Changed: ', e.target.outerText)
 		th.setState({
 			trainingTrack: e.target.outerText
 		})
@@ -100,7 +109,6 @@ export default class AssessmentTracker extends React.Component {
 
 	onWaveChange(e) {
 		let th = this
-		console.log('Wave Changed: ', e.target.outerText)
 		th.setState({
 			wave: e.target.outerText
 		})
@@ -109,11 +117,18 @@ export default class AssessmentTracker extends React.Component {
 
 	onCourseChange(e) {
 		let th = this
-		console.log('Course Changed: ', e.target.outerText)
 		th.setState({
 			course: e.target.outerText
 		})
 		th.getCandidates(th.state.trainingTrack, th.state.wave, e.target.outerText)
+	}
+
+	updateComments(index, comments) {
+		let candidates = this.state.candidates
+		candidates[index].AssessmentTrack = comments
+		this.setState({
+			candidates: candidates
+		})
 	}
 
 	render() {
@@ -167,6 +182,7 @@ export default class AssessmentTracker extends React.Component {
 					</Row>
 					{
 						th.state.candidates.map(function(candidate, index) {
+							let categories = th.state.assessmentCategories
 							return <TrackItem
 								key={index}
 								track={
@@ -175,9 +191,11 @@ export default class AssessmentTracker extends React.Component {
 										candidateName: candidate.EmployeeName,
 										candidateEmail: candidate.EmailID,
 										comments: candidate.AssessmentTrack,
-										categories: th.state.assessmentCategories
+										categories: categories
 									}
-								}/>
+								}
+								onUpdateComments={(comments)=>{th.updateComments(index, comments)}}
+								onSaveComments={()=>{th.saveAssessmentTrack(index)}} />
 						})
 					}
 				</Grid>
