@@ -123,7 +123,7 @@ export default class AddCourse extends React.Component {
           onRequestClose={this.handleClose}
         >
         <h4>
-        Sorry you have not deleted any course to retrieve them.
+        Sorry you have not deleted any course to restore.
 				</h4>
 		</Dialog>
 		</div>

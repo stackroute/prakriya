@@ -204,42 +204,42 @@ export default class CourseCard extends React.Component {
         >
         	<TextField
 						    		hintText="Category Name"
-						    		floatingLabelText="Assessment Category Name"
+						    		floatingLabelText="Category Name"
 						    		value={this.state.AssessmentName}
 						    		onChange={this.onChangeAssessmentName}
 					/>
 					<br/>
 		    	<TextField
 		    		hintText="Mentor Name"
-		    		floatingLabelText="Assessment Mentor"
+		    		floatingLabelText="Mentor"
 		    		value={this.state.AssessmentMentor}
 		    		onChange={this.onChangeAssessmentMentor}
 		    	/>
 					<br/>
 		    	<TextField
 						    		hintText="Duration"
-						    		floatingLabelText="Assessment Duration"
+						    		floatingLabelText="Duration"
 						    		value={this.state.AssessmentDuration}
 						    		onChange={this.onChangeAssessmentDuration}
 					/>
 					<br/>
 					<TextField
-						    		hintText="Assessment videos"
-						    		floatingLabelText="Assessment Videos"
+						    		hintText="videos"
+						    		floatingLabelText="Videos"
 						    		value={this.state.AssessmentVideos}
 						    		onChange={this.onChangeAssessmentVideos}
 					/>
 					<br/>
 					<TextField
-						    		hintText="assessment blogs"
-						    		floatingLabelText="Assessment Blogs"
+						    		hintText="blogs"
+						    		floatingLabelText="Blogs"
 						    		value={this.state.AssessmentBlogs}
 						    		onChange={this.onChangeAssessmentBlogs}
 					/>
 					<br/>
 					<TextField
-						    		hintText="assessment docs"
-						    		floatingLabelText="Assessment Docs"
+						    		hintText="docs"
+						    		floatingLabelText="Docs"
 						    		value={this.state.AssessmentDocs}
 						    		onChange={this.onChangeAssessmentDocs}
 					/>

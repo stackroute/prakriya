@@ -63,7 +63,7 @@ export default class AssessmentTracker extends React.Component {
 	getCourses(wave) {
 		let th = this
 		Request
-			.get('/mentor/courses/'+wave)
+			.get('/mentor/coursesfrom/'+wave)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 				th.setState({

@@ -1,5 +1,10 @@
 const CandidateModel = require('../../models/candidates.js');
 const AssessmentTrackModel = require('../../models/assessmenttracks.js');
+const CourseModel = require('../../models/courses.js');
+
+/**************************************************
+*******          AssessmentTrack           ********
+***************************************************/
 
 let getTrainingTracks = function(successCB, errorCB) {
 	CandidateModel.find().distinct('TrainingTrack', function(err, result) {
@@ -19,7 +24,7 @@ let getWaves = function(trainingTrack, successCB, errorCB) {
 	});
 }
 
-let getCourses = function(wave, successCB, errorCB) {
+let getCoursesFrom = function(wave, successCB, errorCB) {
 	CandidateModel.find({Wave: wave}).distinct('CourseName', function(err, result) {
 		if(err) {
 			errorCB(err);
@@ -56,113 +61,85 @@ let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 	})
 }
 
-//
-// let addAssessmentTrack = function(assessmentTrack, successCB, errorCB) {
-// 	console.log('Add AssessmentTrack', assessmentTrack);
-// 	let saveAssessmentTrack = new AssessmentTrackModel(assessmentTrack);
-// 	saveAssessmentTrack.save(assessmentTrack, function(err, result) {
-//
-// 	});
-// }
+/****************************************************
+*******          Course Management           ********
+****************************************************/
 
 
-// let getTracks
-//
-//
-// let addUser = function(userObj, successCB, errorCB) {
-// 	userObj.actions = ['login'];
-// 	console.log('Add User', userObj);
-// 	let saveUser = new UserModel(userObj)
-// 	saveUser.save(userObj, function (err, result) {
-// 		if(err)
-// 			errorCB(err);
-// 		successCB(result);
-// 	})
-// }
-//
-// let deleteUser = function (userObj, successCB, errorCB) {
-// 	UserModel
-// 		.find(userObj)
-// 		.remove(function (err, status) {
-// 			if(err)
-// 				errorCB(err);
-// 			successCB(status);
-// 		})
-// }
-//
+let getCourses = function(successCB, errorCB) {
+	CourseModel.find({},function(err, result) {
+		if (err) 
+				errorCB(err);
+		successCB(result);
+	});
+}
 
-//
-// let lockUser = function (userObj, successCB, errorCB) {
-// 	console.log('User obj from server', userObj)
-// 	console.log(userObj.username)
-// 	UserModel.update({"username": userObj.username}, {$pull:{"actions": "login"}}, function(err, status) {
-// 		if(err)
-// 			errorCB(err);
-// 		successCB(status);
-// 	})
-// }
-//
-// let unlockUser = function (userObj, successCB, errorCB) {
-// 	console.log('User obj from server', userObj)
-// 	console.log(userObj.username)
-// 	UserModel.update({"username": userObj.username}, {$push:{"actions": "login"}}, function(err, status) {
-// 		if(err)
-// 			errorCB(err);
-// 		successCB(status);
-// 	})
-// }
-//
-// let getRoles = function(successCB, errorCB) {
-// 	RoleModel.find({name: {$ne: 'admin'}},function(err, result) {
-// 		if (err)
-// 				errorCB(err);
-// 		successCB(result);
-// 	});
-// }
-//
-// let addRole = function (roleObj, successCB, errorCB) {
-// 	let saveRole = new RoleModel(roleObj)
-// 	saveRole.save(roleObj, function (err, result) {
-// 		if(err)
-// 			errorCB(err);
-// 		successCB(result);
-// 	})
-// }
-//
-// let updateRole = function (roleObj, successCB, errorCB) {
-// 	console.log('Role obj in Mongo', roleObj)
-// 	console.log(roleObj.name)
-// 	roleObj.lastModified= new Date();
-// 	RoleModel.update({"name": roleObj.name}, roleObj, function(err, status) {
-// 		if(err)
-// 			errorCB(err);
-// 		successCB(status);
-// 	})
-// }
-//
-// let deleteRole = function (roleObj, successCB, errorCB) {
-// 	RoleModel
-// 		.find(roleObj)
-// 		.remove(function (err, status) {
-// 			if(err)
-// 				errorCB(err);
-// 			successCB(status);
-// 		})
-// }
-//
-// let getAccessControls = function(successCB, errorCB) {
-// 	AccessControlModel.find({},function(err, result) {
-// 		if (err)
-// 				errorCB(err);
-// 		successCB(result);
-// 	});
-// }
+let updateCourse = function (CourseObj, successCB, errorCB) {
+	console.log('Course obj from server', CourseObj)
+	console.log(CourseObj.CourseName)
+	CourseModel.update({"CourseID": CourseObj.CourseID}, {$set:{'CourseName':CourseObj.CourseName,'AssessmentCategories':CourseObj.AssessmentCategories,'Duration':CourseObj.Duration}}, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
+let addCourse = function (CourseObj, successCB, errorCB) {
+	console.log(CourseObj);
+	let CourseModelObj = new CourseModel(CourseObj);
+	CourseModelObj.save(function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
+let deleteCourse = function(courseObj, successCB, errorCB) {
+	console.log('cadetObj to delete', courseObj);
+	CourseModel.update({'CourseID':courseObj.CourseID},{$set:{'Removed':true}}, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
+let restoreCourse = function(restoreObj, successCB, errorCB) {
+	console.log('restoreObj', restoreObj.length);
+	CourseModel.updateMany({CourseName:{$in:restoreObj}},{$set:{'Removed':false}}, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
+let addCategory = function(categoryObj, successCB, errorCB) {
+	CourseModel.update({'CourseID':categoryObj.CourseID},{$push:{'Categories':{'Name':categoryObj.Name,'Mentor':categoryObj.Mentor,'Duration':categoryObj.Duration,'Videos':categoryObj.Videos,'Blogs':categoryObj.Blogs,'Docs':categoryObj.Blogs}}}, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
+let deleteCategory = function(categoryObj, successCB, errorCB) {
+	CourseModel.update({'CourseID':categoryObj.CourseID},{$pull:{'Categories':{'Name':categoryObj.Name,'Mentor':categoryObj.Mentor,'Duration':categoryObj.Duration,'Videos':categoryObj.Videos,'Blogs':categoryObj.Blogs,'Docs':categoryObj.Blogs}}}, function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
 
 module.exports = {
 	getWaves,
 	getTrainingTracks,
-	getCourses,
+	getCoursesFrom,
 	getCandidates,
 	getAssesmentTrack,
-	updateCandidateAssessment
+	updateCandidateAssessment,
+	getCourses,
+	updateCourse,
+	deleteCourse,
+	restoreCourse,
+	addCategory,
+	deleteCategory,
+	addCourse
 }

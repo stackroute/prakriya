@@ -62,7 +62,7 @@ export default class Header extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 
-				let actions = res.body.actions;
+				let actions = res.body.actions.sort();
 				let routes = actions.map(function(item) {
 					return item.replace(/\s/g,'').toLowerCase()
 				});

@@ -66,10 +66,6 @@ export default class Login extends React.Component {
 	}
 
 	render() {
-		const appBarStyle = {
-			marginLeft: '-8px',
-			marginTop: '-8px'
-		}
 		const bodyStyle = {
 			textAlign: 'center'
 			// margin: 'auto',
@@ -92,24 +88,6 @@ export default class Login extends React.Component {
 				</div>
 			</div>
 		)
-		// return(
-		// 	<div>
-		// 		<AppBar
-		// 			style={appBarStyle}
-	 //        title="Prakriya"
-	 //        showMenuIconButton={false}
-	 //        iconElementRight={<FlatButton label="Login" onClick={this.openLoginPage} />}
-		//     />
-		//     <div style={bodyStyle}>
-		//     	<h2>Log In to Continue</h2>
-		// 			<TextField style={inputStyle} hintText="Username" onChange={this.onChangeUsername} /> <br />
-		// 			<TextField style={inputStyle} hintText="Password" type="password" onChange={this.onChangePassword} /> 
-		// 			<br /><br />
-		// 			<RaisedButton label="Login" primary={true} onClick={this.login} />
-		// 		</div>
-		// 		<Footer />
-		// 	</div>
-		// )
 	}
 }
 

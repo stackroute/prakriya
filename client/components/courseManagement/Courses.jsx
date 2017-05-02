@@ -66,7 +66,7 @@ export default class Courses extends React.Component {
 	getCourses() {
 		let th = this;
 		Request
-			.get('/dashboard/courses')
+			.get('/mentor/courses')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
@@ -84,7 +84,7 @@ export default class Courses extends React.Component {
 		let th = this
 		course.CourseID = this.state.courses.length + 1;
 		Request
-			.post('/dashboard/addcourse')
+			.post('/mentor/addcourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(course)
 			.end(function(err, res){
@@ -99,7 +99,7 @@ export default class Courses extends React.Component {
 	updateCourse(course){
 		let th = this
 		Request
-			.post('/dashboard/updatecourse')
+			.post('/mentor/updatecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(course)
 			.end(function(err, res){
@@ -115,7 +115,7 @@ export default class Courses extends React.Component {
 		let th = this
 		console.log(course)
 		Request
-			.delete('/dashboard/deletecourse')
+			.delete('/mentor/deletecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(course)
 			.end(function(err, res){
@@ -130,7 +130,7 @@ export default class Courses extends React.Component {
 	restoreCourses(actions){
 		let th = this
 		Request
-			.post('/dashboard/restorecourse')
+			.post('/mentor/restorecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(actions)
 			.end(function(err, res){
@@ -146,7 +146,7 @@ export default class Courses extends React.Component {
 		console.log('here3');
 		let th = this
 		Request
-			.post('/dashboard/addcategory')
+			.post('/mentor/addcategory')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(category)
 			.end(function(err, res){
@@ -161,7 +161,7 @@ export default class Courses extends React.Component {
 	deleteCategory(category){
 		let th = this
 		Request
-			.post('/dashboard/deletecategory')
+			.post('/mentor/deletecategory')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(category)
 			.end(function(err, res){

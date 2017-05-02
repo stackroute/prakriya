@@ -45,11 +45,11 @@ router.get("/waves/:trainingTrack", auth.canAccess(CONFIG.MENTOR), function(req,
 });
 
 // Get all courses
-router.get("/courses/:wave", auth.canAccess(CONFIG.MENTOR), function(req, res) {
+router.get("/coursesfrom/:wave", auth.canAccess(CONFIG.MENTOR), function(req, res) {
 
   console.log("API HIT ===> GET Courses");
   try{
-    mentorMongoController.getCourses(req.params.wave, function(courses) {
+    mentorMongoController.getCoursesFrom(req.params.wave, function(courses) {
       res.status(201).json({courses: courses});
     }, function(err) {
       res.status(500).json({ error: 'Cannot get all courses from db...!' });
@@ -111,5 +111,121 @@ router.post("/updatecandidateassessment", auth.canAccess(CONFIG.MENTOR), functio
     });
   }
 });
+
+/****************************************************
+*******          Course Management           ********
+****************************************************/
+
+// Get all courses
+router.get('/courses', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try{
+    mentorMongoController.getCourses(function(course) {
+      res.status(201).json(course);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all courses from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
+// update courses
+router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try{
+    mentorMongoController.updateCourse(req.body, function(courses) {
+      res.status(201).json(courses);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update course in db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
+// add courses
+router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try{
+    mentorMongoController.addCourse(req.body, function(courses) {
+      res.status(201).json(courses);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot add course in db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+// Delete a course
+router.delete('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try {
+    mentorMongoController.deleteCourse(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot delete course in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
+// restore a course
+router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try {
+    mentorMongoController.restoreCourse(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot restore course in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
+//Add category
+router.post('/addcategory', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try {
+    mentorMongoController.addCategory(req.body, function(status) {
+      res.json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot add the category...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//delete category
+router.post('/deletecategory', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try {
+    console.log('he is here');
+    mentorMongoController.deleteCategory(req.body, function(status) {
+      res.json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot delete the category...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
 
 module.exports = router;
