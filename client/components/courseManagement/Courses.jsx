@@ -5,6 +5,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 import RestoreIcon from 'material-ui/svg-icons/action/restore';
 import IconButton from 'material-ui/IconButton';
 import RestoreCourse from './RestoreCourse.jsx';
+import AddCourse from './AddCourse.jsx';
 
 const styles = {
 	heading: {
@@ -36,6 +37,7 @@ export default class Courses extends React.Component {
 		this.restoreCourses = this.restoreCourses.bind(this);
 		this.addCategory = this.addCategory.bind(this);
 		this.deleteCategory = this.deleteCategory.bind(this);
+		this.addCourse = this.addCourse.bind(this);
 	}
 
 	componentDidMount() {
@@ -77,10 +79,25 @@ export default class Courses extends React.Component {
 		    }
 			})
 	}
+
+	addCourse(course){
+		let th = this
+		course.CourseID = this.state.courses.length + 1;
+		Request
+			.post('/dashboard/addcourse')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(course)
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+		    	th.getCourses();
+		    }
+		  });
+	}
 	
 	updateCourse(course){
 		let th = this
-		console.log(course)
 		Request
 			.post('/dashboard/updatecourse')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -161,7 +178,8 @@ export default class Courses extends React.Component {
 		return(
 			<div>
 				<div>
-				<h2 style={styles.heading}>Courses</h2>
+				<h2 style={styles.heading}>Course Management</h2>
+				<AddCourse handleAdd={this.addCourse}/>
 				<Grid>
 					<Row>
 						{

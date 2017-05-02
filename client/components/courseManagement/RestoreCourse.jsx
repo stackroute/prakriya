@@ -20,15 +20,22 @@ export default class AddCourse extends React.Component {
 		super(props);
 		this.state = {
 			showDialog: false,
-			actions: []
+			actions: [],
+			removed: 0
 		}
 		this.handleRestore = this.handleRestore.bind(this);
 		this.handleClose = this.handleClose.bind(this);
 		this.onChangeActions = this.onChangeActions.bind(this);
 	}
 	componentDidMount() {
+		let totalRemoved = 0;
+		this.props.course.map(function(course,index) {
+			if(course.Removed === true)
+				totalRemoved = totalRemoved + 1;
+		})
 		this.setState({
-			showDialog: this.props.openDialog
+			showDialog: this.props.openDialog,
+			removed: totalRemoved
 		})
 	}
 	onChangeActions(event, isChecked) {
@@ -59,7 +66,9 @@ export default class AddCourse extends React.Component {
 
 	render() {
 		let th = this;
-		return(
+		if(this.state.removed > 0)
+			{
+			return(
 			<div>
 				<div>
 				<Dialog
@@ -101,5 +110,24 @@ export default class AddCourse extends React.Component {
 			</div>
 		</div>	
 		)
+	}
+	else
+	{
+		return (
+			<div>
+			<Dialog
+		    	style={styles.dialog}
+          title="Restore Course"
+          open={true}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleClose}
+        >
+        <h4>
+        Sorry you have not deleted any course to retrieve them.
+				</h4>
+		</Dialog>
+		</div>
+		)
+	}
 	}
 }

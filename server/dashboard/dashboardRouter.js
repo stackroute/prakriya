@@ -212,7 +212,7 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
     dashboardMongoController.updateCourse(req.body, function(courses) {
       res.status(201).json(courses);
     }, function(err) {
-      res.status(500).json({ error: 'Cannot update course from db...!' });
+      res.status(500).json({ error: 'Cannot update course in db...!' });
     });
   }
   catch(err) {
@@ -222,6 +222,21 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   }
 })
 
+// add courses
+router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try{
+    dashboardMongoController.addCourse(req.body, function(courses) {
+      res.status(201).json(courses);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot add course in db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
 // Delete a course
 router.delete('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {

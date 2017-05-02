@@ -127,6 +127,16 @@ let updateCourse = function (CourseObj, successCB, errorCB) {
 	})
 }
 
+let addCourse = function (CourseObj, successCB, errorCB) {
+	console.log(CourseObj);
+	let CourseModelObj = new CourseModel(CourseObj);
+	CourseModelObj.save(function(err, status) {
+		if(err)
+			errorCB(err);
+		successCB(status);
+	})
+}
+
 let deleteCourse = function(courseObj, successCB, errorCB) {
 	console.log('cadetObj to delete', courseObj);
 	CourseModel.update({'CourseID':courseObj.CourseID},{$set:{'Removed':true}}, function(err, status) {
@@ -177,5 +187,6 @@ module.exports = {
 	deleteCourse: deleteCourse,
 	restoreCourse: restoreCourse,
 	addCategory: addCategory,
-	deleteCategory: deleteCategory
+	deleteCategory: deleteCategory,
+	addCourse: addCourse
 }

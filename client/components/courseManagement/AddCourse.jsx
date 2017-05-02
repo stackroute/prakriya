@@ -35,7 +35,13 @@ const styles = {
 	chip: {
     margin: '4px',
     background: '#eee'
-  }
+  },
+  addButton: {
+		position:'fixed',
+	  bottom: '60px',
+	  right: '15px',
+	  zIndex: 1
+	}
 }
 
 export default class AddCourse extends React.Component {
@@ -58,6 +64,7 @@ export default class AddCourse extends React.Component {
 		this.onChangeAssessment = this.onChangeAssessment.bind(this);
 		this.handleUpdate = this.handleUpdate.bind(this);
 		this.resetFields = this.resetFields.bind(this);
+		this.handleAdd = this.handleAdd.bind(this);
 	}
 	componentDidMount() {
 		if(this.props.openDialog) {
@@ -104,7 +111,10 @@ export default class AddCourse extends React.Component {
 		this.setState({
 			showDialog: false
 		})
-		this.props.handleClose();
+		if(this.props.openDialog)
+		{
+			this.props.handleClose();
+		}
 	}
 	handleCourseDelete(perm) {
 		let category = this.state.AssessmentCategories.filter(function(control) {
@@ -136,76 +146,167 @@ export default class AddCourse extends React.Component {
 		this.props.handleUpdate(course);
 	}
 
+	handleAdd() {
+		let th = this
+		let course = {}
+		course.CourseID = 0;
+		course.CourseName = this.state.CourseName;
+		course.AssessmentCategories = this.state.AssessmentCategories;
+		course.Categories = [];
+		course.Removed = false;
+		course.Duration = this.state.Duration;
+		this.resetFields();
+		this.handleClose();
+		this.props.handleAdd(course);
+	}
+
 
 	render() {
 		let th = this;
-		return(
-			<div>
-				<Dialog
-		    	style={styles.dialog}
-          title="Update Course"
-          open={this.state.showDialog}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleClose}
-        >
-        <TextField
-						    		hintText="Course name"
-						    		floatingLabelText="Name"
-						    		value={this.state.CourseName}
-						    		onChange={this.onChangeName}
-						    	/><br/>
-						    	<TextField
-						    		hintText="assessment"
-						    		floatingLabelText="Assessment Category"
-						    		value={this.state.AssessmentName}
-						    		onChange={this.onChangeAssessment}
-						    	/>
-						    	<FlatButton
-						    		label="Apply"
-						    		primary={true}
-						    		disabled={this.state.disableSave}
-						    		icon={<SaveIcon />}
-						    		onClick={this.onChangeAssessmentCategory}
-						    	/>
-									<Paper style={styles.paper} zDepth={1} >
-												<div style={styles.wrapper}>
-													{
-														this.state.AssessmentCategories.map(function (category, index) {
-															return(
-																<Chip
-																	onRequestDelete={() => th.handleCourseDelete(category)}
-												          style={styles.chip}
-												          key={index}
-												        >
-												          <span style={styles.chipName}>{category}</span>
-												        </Chip>
-											        )
-														})
-													}
-												</div>
-									</Paper>
-									<TextField
-									    		hintText="In weeks"
-									    		floatingLabelText="Duration"
-									    		value={this.state.Duration}
-									    		onChange={this.onChangeDuration}
-									    	/>
-        					<div>
-      						<RaisedButton
-						    	 		label="Update Course"
-						    	   	primary={true}
-						    			onClick={this.handleUpdate}
-						    	 	/>
-				    				&emsp;
-					    			<RaisedButton
-						    	 		label="Cancel"
-						    	   	primary={true}
-						    			onTouchTap={this.handleClose}
-						    	 	/>
-				    			</div>
-				    			</Dialog>
-				    			</div>
+		if(this.props.openDialog)
+			{
+				return(
+				<div>
+					<Dialog
+			    	style={styles.dialog}
+	          title="Update Course"
+	          open={this.state.showDialog}
+	          autoScrollBodyContent={true}
+	          onRequestClose={this.handleClose}
+	        >
+	        <TextField
+							    		hintText="Course name"
+							    		floatingLabelText="Name"
+							    		value={this.state.CourseName}
+							    		onChange={this.onChangeName}
+							    	/><br/>
+							    	<TextField
+							    		hintText="assessment"
+							    		floatingLabelText="Assessment Category"
+							    		value={this.state.AssessmentName}
+							    		onChange={this.onChangeAssessment}
+							    	/>
+							    	<FlatButton
+							    		label="Apply"
+							    		primary={true}
+							    		disabled={this.state.disableSave}
+							    		icon={<SaveIcon />}
+							    		onClick={this.onChangeAssessmentCategory}
+							    	/>
+										<Paper style={styles.paper} zDepth={1} >
+													<div style={styles.wrapper}>
+														{
+															this.state.AssessmentCategories.map(function (category, index) {
+																return(
+																	<Chip
+																		onRequestDelete={() => th.handleCourseDelete(category)}
+													          style={styles.chip}
+													          key={index}
+													        >
+													          <span style={styles.chipName}>{category}</span>
+													        </Chip>
+												        )
+															})
+														}
+													</div>
+										</Paper>
+										<TextField
+										    		hintText="In weeks"
+										    		floatingLabelText="Duration"
+										    		value={this.state.Duration}
+										    		onChange={this.onChangeDuration}
+										    	/>
+	        					<div>
+	      						<RaisedButton
+							    	 		label="Update Course"
+							    	   	primary={true}
+							    			onClick={this.handleUpdate}
+							    	 	/>
+					    				&emsp;
+						    			<RaisedButton
+							    	 		label="Cancel"
+							    	   	primary={true}
+							    			onTouchTap={this.handleClose}
+							    	 	/>
+					    			</div>
+					    			</Dialog>
+					    			</div>
 
-		)
+					)
+				}
+				else
+				{
+					return(
+				<div>
+				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
+		      <ContentAdd />
+		    </FloatingActionButton>
+					<Dialog
+			    	style={styles.dialog}
+	          title="Add Course"
+	          open={this.state.showDialog}
+	          autoScrollBodyContent={true}
+	          onRequestClose={this.handleClose}
+	        >
+	        <TextField
+							    		hintText="Course name"
+							    		floatingLabelText="Name"
+							    		value={this.state.CourseName}
+							    		onChange={this.onChangeName}
+							    	/><br/>
+							    	<TextField
+							    		hintText="assessment"
+							    		floatingLabelText="Assessment Category"
+							    		value={this.state.AssessmentName}
+							    		onChange={this.onChangeAssessment}
+							    	/>
+							    	<FlatButton
+							    		label="Apply"
+							    		primary={true}
+							    		disabled={this.state.disableSave}
+							    		icon={<SaveIcon />}
+							    		onClick={this.onChangeAssessmentCategory}
+							    	/>
+										<Paper style={styles.paper} zDepth={1} >
+													<div style={styles.wrapper}>
+														{
+															this.state.AssessmentCategories.map(function (category, index) {
+																return(
+																	<Chip
+																		onRequestDelete={() => th.handleCourseDelete(category)}
+													          style={styles.chip}
+													          key={index}
+													        >
+													          <span style={styles.chipName}>{category}</span>
+													        </Chip>
+												        )
+															})
+														}
+													</div>
+										</Paper>
+										<TextField
+										    		hintText="In weeks"
+										    		floatingLabelText="Duration"
+										    		value={this.state.Duration}
+										    		onChange={this.onChangeDuration}
+										    	/>
+	        					<div>
+	      						<RaisedButton
+							    	 		label="Add Course"
+							    	   	primary={true}
+							    			onClick={this.handleAdd}
+							    	 	/>
+					    				&emsp;
+						    			<RaisedButton
+							    	 		label="Cancel"
+							    	   	primary={true}
+							    			onTouchTap={this.handleClose}
+							    	 	/>
+					    			</div>
+					    			</Dialog>
+					    			</div>
+
+					)
+				}
 	}
 }
