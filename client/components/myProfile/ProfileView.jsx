@@ -66,7 +66,10 @@ export default class ProfileView extends React.Component {
 			projectName: '',
 			projectDesc: '',
 			disableSave: true,
-			defaultProfilePic: '../../assets/images/avt-default.jpg'
+			disableSavePic: true,
+			defaultProfilePic: '../../assets/images/avt-default.jpg',
+			picFile: {},
+			picPreview: ''
 		}
 		this.openProjectDialog = this.openProjectDialog.bind(this);
 		this.closeProjectDialog = this.closeProjectDialog.bind(this);
@@ -76,14 +79,19 @@ export default class ProfileView extends React.Component {
 		this.handleAssetChange = this.handleAssetChange.bind(this);
 		this.handleUpdate = this.handleUpdate.bind(this);
 		this.handleDrop = this.handleDrop.bind(this);
+		this.handlePicSave = this.handlePicSave.bind(this);
 	}
 	componentDidMount() {
-		let cadet = this.props.cadet
-		if(cadet.ProfilePic == undefined || cadet.ProfilePic == "")
-			cadet.ProfilePic = this.state.defaultProfilePic;
+		let picPreview = this.state.defaultProfilePic;
 		this.setState({
-			cadet: cadet
-		})
+			cadet: this.props.cadet,
+  		picPreview: this.state.defaultProfilePic
+  	})
+	}
+	componentWillUpdate(nextProps, nextState) {
+		if(nextProps.imageURL != '') {
+			nextState.picPreview = nextProps.imageURL;
+		}
 	}
 	openProjectDialog() {
 		this.setState({
@@ -133,14 +141,27 @@ export default class ProfileView extends React.Component {
 		})
 		this.props.handleUpdate(this.state.cadet)
 	}
-	handleDrop(acceptedFiles, rejectedFiles) {
-		let cadet = this.state.cadet;
-		cadet.ProfilePic = acceptedFiles[0].preview
-		console.log('Accepted Files', acceptedFiles[0]);
+	handlePicSave() {
 		this.setState({
-			cadet: cadet
+			disableSavePic: true
 		})
-		// this.handleUpdate();
+		console.log('Save the pic');
+		this.props.handlePicSave(this.state.picFile)
+	}
+	handleDrop(acceptedFiles, rejectedFiles) {
+		this.setState({
+			picFile: acceptedFiles[0],
+			picPreview: acceptedFiles[0].preview,
+			disableSavePic: false
+		})
+		// let cadet = this.state.cadet;
+		// cadet.ProfilePic = acceptedFiles[0].preview
+		// console.log('Accepted Files', acceptedFiles[0]);
+		// this.setState({
+		// 	cadet: cadet,
+		// 	disableSavePic: false
+		// })
+		// this.handlePicSave();
 	}
 
 	render() {
@@ -190,11 +211,21 @@ export default class ProfileView extends React.Component {
 					</Row>
 					<Row>
 						<Col md={2} mdOffset={2} style={styles.pic}>
-							<Dropzone onDrop={this.handleDrop} style={styles.dropzone}>
+							<Dropzone 
+								accept="image/jpeg, image/png"
+								onDrop={this.handleDrop} 
+								style={styles.dropzone}
+							>
 								<CardMedia>
-									<img src={this.state.cadet.ProfilePic} style={styles.pic}/>
+									<img src={this.state.picPreview} style={styles.pic}/>
 								</CardMedia>
 							</Dropzone>
+							<RaisedButton 
+								label="Save" 
+								primary={true} 
+								disabled={this.state.disableSavePic}
+								onClick={this.handlePicSave}
+							/>
 							<p style={styles.basicDetails}>
 								Employee Id: {this.state.cadet.EmployeeID}<br/>
 								Career Band: {this.state.cadet.CareerBand}<br/>

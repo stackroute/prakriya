@@ -15,4 +15,5 @@ build
 .env
 npm-debug.log
 dist
+public/profilePics
 client/assets/bundle.js

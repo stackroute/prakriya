@@ -34,6 +34,6 @@ router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) 
 	    }
 		});
 	})
- })
+})
 
 module.exports = router;

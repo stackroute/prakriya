@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const formidable = require('formidable');
+const fs = require('fs');
 var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
 const adminMongoController = require('../admin/adminMongoController.js');
@@ -294,6 +296,50 @@ router.post('/deletecategory', auth.canAccess(CONFIG.MENCAN), function(req, res)
     }, function (err) {
       res.status(500).json({ error: 'Cannot delete the category...!' });
     })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+  var form = new formidable.IncomingForm();
+  form.parse(req, function(err, fields, files) {
+    fs.readFile(files.file.path, 'binary', (err, data) => {
+      try {
+        let buffer = new Buffer(data, 'binary')
+        let cadet = JSON.parse(fields.cadet);
+        let img = {};
+        img.data = buffer;
+        img.contentType = files.file.type;
+        cadet.ProfilePic = img;
+        let imagePath = 'public/profilePics/' + cadet.EmployeeID + '.jpeg'
+        fs.writeFile(imagePath, data, 'binary', function(err){
+            if (err) throw err
+            console.log('File saved.')
+        })
+        res.send(data);
+      }
+      catch(err) {
+        res.status(500).json({
+          error: 'Internal error occurred, please report...!'
+        }); 
+      }
+    });
+  })
+})
+
+router.get('/getimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+  try {
+    dashboardMongoController.getCadet(req.user.email, function(cadet) {
+      fs.readFile('public/profilePics/' + cadet.EmployeeID + '.jpeg', 'binary', (err, data) => {
+        res.send(data);
+      });
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get the cadet from db...!' });
+    });
   }
   catch(err) {
     res.status(500).json({

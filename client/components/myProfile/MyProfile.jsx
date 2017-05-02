@@ -13,11 +13,13 @@ export default class MyProfile extends React.Component {
 		super(props);
 		this.state = {
 			cadet: null,
-			projects: []
+			projects: [],
+			imageURL: ''
 		}
 		this.getProjects = this.getProjects.bind(this);
 		this.getCadet = this.getCadet.bind(this);
 		this.updateProfile = this.updateProfile.bind(this);
+		this.saveProfilePic = this.saveProfilePic.bind(this);
 	}
 	componentDidMount() {
 		this.getCadet();
@@ -51,7 +53,7 @@ export default class MyProfile extends React.Component {
 		    	th.setState({
 		    		cadet: res.body
 		    	})
-		    	console.log(th.state.cadet);
+		    	th.getProfilePic();
 		    }
 		  })
 	}
@@ -69,6 +71,52 @@ export default class MyProfile extends React.Component {
 		    }
 			});
 	}
+	saveProfilePic(picFile) {
+		let th = this;
+		Request
+			.post('/dashboard/saveimage')
+			.set({'Authorization': localStorage.getItem('token')})
+			.field('cadet', JSON.stringify(this.state.cadet))
+			.attach('file', picFile)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	let array = new Uint8Array(res.text.length);
+	        for (var i = 0; i < res.text.length; i++){
+	            array[i] = res.text.charCodeAt(i);
+	        }
+	        var blob = new Blob([array], {type: 'image/jpeg'});
+		    	let blobUrl = URL.createObjectURL(blob);
+		    	th.setState({
+		    		imageURL: blobUrl
+		    	})
+		    }
+			})
+	}
+	getProfilePic() {
+		let th = this;
+		Request
+			.get('/dashboard/getimage')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	if(res.text) {
+		    		let array = new Uint8Array(res.text.length);
+		        for (var i = 0; i < res.text.length; i++){
+		            array[i] = res.text.charCodeAt(i);
+		        }
+		        var blob = new Blob([array], {type: 'image/jpeg'});
+			    	let blobUrl = URL.createObjectURL(blob);
+			    	th.setState({
+			    		imageURL: blobUrl
+			    	})
+		    	}
+		    }
+			})
+	}
 
 	render() {
 		return(
@@ -78,7 +126,9 @@ export default class MyProfile extends React.Component {
 					<ProfileView
 						cadet={this.state.cadet}
 						projects={this.state.projects}
+						imageURL={this.state.imageURL}
 						handleUpdate={this.updateProfile}
+						handlePicSave={this.saveProfilePic}
 					/>
 				}
 			</div>
