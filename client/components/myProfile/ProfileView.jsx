@@ -1,7 +1,8 @@
 import React from 'react';
-import {Card, CardMedia} from 'material-ui/Card';
+import {Card, CardMedia, CardTitle} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import {Grid, Row, Col} from 'react-flexbox-grid';
@@ -11,6 +12,8 @@ import AssetIcon from 'material-ui/svg-icons/hardware/laptop';
 import {grey500, grey900, white} from 'material-ui/styles/colors';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import CameraIcon from 'material-ui/svg-icons/image/camera-alt';
+import SaveIcon from 'material-ui/svg-icons/content/save';
 import Dropzone from 'react-dropzone';
 
 const styles = {
@@ -89,9 +92,14 @@ export default class ProfileView extends React.Component {
   	})
 	}
 	componentWillUpdate(nextProps, nextState) {
-		if(nextProps.imageURL != '') {
+		console.log('Will Update');
+		console.log('this.state', this.state.picPreview);
+		console.log('nextState', nextState.picPreview);
+		console.log('nextProps', nextProps.imageURL);
+		if(nextState.picPreview != this.state.picPreview)
+			nextState.picPreview = nextState.picPreview;
+		else if(nextProps.imageURL != '')
 			nextState.picPreview = nextProps.imageURL;
-		}
 	}
 	openProjectDialog() {
 		this.setState({
@@ -149,19 +157,14 @@ export default class ProfileView extends React.Component {
 		this.props.handlePicSave(this.state.picFile)
 	}
 	handleDrop(acceptedFiles, rejectedFiles) {
+		console.log('Prev pic', this.state.picPreview);
 		this.setState({
 			picFile: acceptedFiles[0],
 			picPreview: acceptedFiles[0].preview,
 			disableSavePic: false
 		})
-		// let cadet = this.state.cadet;
-		// cadet.ProfilePic = acceptedFiles[0].preview
-		// console.log('Accepted Files', acceptedFiles[0]);
-		// this.setState({
-		// 	cadet: cadet,
-		// 	disableSavePic: false
-		// })
-		// this.handlePicSave();
+		console.log('Accepted Files', acceptedFiles);
+		console.log('New pic', this.state.picPreview);
 	}
 
 	render() {
@@ -220,13 +223,16 @@ export default class ProfileView extends React.Component {
 									<img src={this.state.picPreview} style={styles.pic}/>
 								</CardMedia>
 							</Dropzone>
-							<RaisedButton 
-								label="Save" 
-								primary={true} 
-								disabled={this.state.disableSavePic}
-								onClick={this.handlePicSave}
-							/>
+
 							<p style={styles.basicDetails}>
+								<IconButton 
+									disabled={this.state.disableSavePic}
+									onClick={this.handlePicSave}
+									style={{margin: 'auto'}}
+								>
+									<SaveIcon />
+								</IconButton>
+								<br/>
 								Employee Id: {this.state.cadet.EmployeeID}<br/>
 								Career Band: {this.state.cadet.CareerBand}<br/>
 								Email: {this.state.cadet.EmailID}<br/>

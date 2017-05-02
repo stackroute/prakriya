@@ -23,6 +23,7 @@ export default class MyProfile extends React.Component {
 	}
 	componentDidMount() {
 		this.getCadet();
+		this.getProfilePic();
 		this.getProjects();
 	}
 	getProjects() {
@@ -53,7 +54,6 @@ export default class MyProfile extends React.Component {
 		    	th.setState({
 		    		cadet: res.body
 		    	})
-		    	th.getProfilePic();
 		    }
 		  })
 	}
