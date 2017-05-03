@@ -10,6 +10,8 @@ import Chip from 'material-ui/Chip';
 import FlatButton from 'material-ui/FlatButton';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import RaisedButton from 'material-ui/RaisedButton';
+import AddIcon from 'material-ui/svg-icons/content/add';
+import IconButton from 'material-ui/IconButton';
 
 const styles = {
 	addButton: {
@@ -186,13 +188,10 @@ export default class AddCourse extends React.Component {
 							    		value={this.state.AssessmentName}
 							    		onChange={this.onChangeAssessment}
 							    	/>
-							    	<FlatButton
-							    		label="Apply"
-							    		primary={true}
-							    		disabled={this.state.disableSave}
-							    		icon={<SaveIcon />}
-							    		onClick={this.onChangeAssessmentCategory}
-							    	/>
+							    	<IconButton tooltip="Add assessment" onClick={this.onChangeAssessmentCategory} disabled={this.state.disableSave}
+							    		>
+								      <AddIcon/>
+								    </IconButton>
 										<Paper style={styles.paper} zDepth={1} >
 													<div style={styles.wrapper}>
 														{
@@ -260,13 +259,10 @@ export default class AddCourse extends React.Component {
 							    		value={this.state.AssessmentName}
 							    		onChange={this.onChangeAssessment}
 							    	/>
-							    	<FlatButton
-							    		label="Apply"
-							    		primary={true}
-							    		disabled={this.state.disableSave}
-							    		icon={<SaveIcon />}
-							    		onClick={this.onChangeAssessmentCategory}
-							    	/>
+							    	<IconButton tooltip="Add assessment" onClick={this.onChangeAssessmentCategory} disabled={this.state.disableSave}
+							    		>
+								      <AddIcon/>
+								    </IconButton>
 										<Paper style={styles.paper} zDepth={1} >
 													<div style={styles.wrapper}>
 														{

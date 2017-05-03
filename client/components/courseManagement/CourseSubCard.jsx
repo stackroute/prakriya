@@ -9,6 +9,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
+import AddIcon from 'material-ui/svg-icons/content/add';
+import RemoveIcon from 'material-ui/svg-icons/content/remove';
 
 const styles = {
     dialog: {
@@ -24,9 +26,12 @@ export default class CourseCard extends React.Component {
 			AssessmentName: '',
 			AssessmentMentor: '',
 			AssessmentDuration: '',
-			AssessmentVideos: '',
-			AssessmentBlogs: '',
-			AssementDocs: '',
+			AssessmentVideos: [''],
+			VideoUrl: '',
+			AssessmentBlogs: [''],
+			BlogUrl: '',
+			AssessmentDocs: [''],
+			DocUrl: '',
 			showDeleteDialog: false,
 		}
 		this.handleOpen = this.handleOpen.bind(this);
@@ -43,14 +48,25 @@ export default class CourseCard extends React.Component {
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 		this.handleDeleteCategory = this.handleDeleteCategory.bind(this);
+		this.onChangeAddVideo = this.onChangeAddVideo.bind(this);
+		this.onChangeRemoveVideo = this.onChangeRemoveVideo.bind(this);
+		this.pushVideo = this.pushVideo.bind(this);
+		this.onChangeAddBlog = this.onChangeAddBlog.bind(this);
+		this.onChangeRemoveBlog = this.onChangeRemoveBlog.bind(this);
+		this.pushBlog = this.pushBlog.bind(this);
+		this.onChangeAddDoc = this.onChangeAddDoc.bind(this);
+		this.onChangeRemoveDoc = this.onChangeRemoveDoc.bind(this);
+		this.pushDoc = this.pushDoc.bind(this);
+
 	}
 	componentDidMount() {
 		if(this.props.openDialog) {
 			this.setState({
-				open: true,
+					open: true,
 				})
 		}
 	}
+	
 	handleOpen() {
     this.setState({open: true});
   };
@@ -70,7 +86,9 @@ export default class CourseCard extends React.Component {
 	}
 
 	handleSubmit() {
-		console.log('here1')
+		this.pushVideo();
+		this.pushBlog();
+		this.pushDoc();
 		let th = this;
 		let category = {};
 		category.CourseID = this.props.courseID;
@@ -115,22 +133,51 @@ export default class CourseCard extends React.Component {
 		})
 	}
 
-	onChangeAssessmentVideos(e) {
-		this.setState({
-			AssessmentVideos: e.target.value
-		})
+	onChangeAssessmentVideos(e, prevValue) {
+		let prevArray = this.state.AssessmentVideos;
+		if(prevArray.indexOf(prevValue)>-1) {
+			let newVideoArray = prevArray;
+			let index = prevArray.indexOf(prevValue);
+			newVideoArray[index] = e.target.value;
+			this.setState({
+				AssessmentVideos: newVideoArray
+			})
+		} else {
+			this.setState({
+				VideoUrl: e.target.value
+			})
+		}
 	}
 
-	onChangeAssessmentBlogs(e) {
-		this.setState({
-			AssessmentBlogs: e.target.value
-		})
+	onChangeAssessmentBlogs(e, prevValue) {
+		let prevArray = this.state.AssessmentBlogs;
+		if(prevArray.indexOf(prevValue)>-1) {
+			let newBlogArray = prevArray;
+			let index = prevArray.indexOf(prevValue);
+			newBlogArray[index] = e.target.value;
+			this.setState({
+				AssessmentBlogs: newBlogArray
+			})
+		} else {
+			this.setState({
+				BlogUrl: e.target.value
+			})
+		}
 	}
-
-	onChangeAssessmentDocs(e) {
-		this.setState({
-			AssessmentDocs: e.target.value
-		})
+	onChangeAssessmentDocs(e, prevValue) {
+		let prevArray = this.state.AssessmentDocs;
+		if(prevArray.indexOf(prevValue)>-1) {
+			let newDocArray = prevArray;
+			let index = prevArray.indexOf(prevValue);
+			newDocArray[index] = e.target.value;
+			this.setState({
+				AssessmentDocs: newDocArray
+			})
+		} else {
+			this.setState({
+				DocUrl: e.target.value
+			})
+		}
 	}
 
 	openDeleteDialog() {
@@ -151,7 +198,105 @@ export default class CourseCard extends React.Component {
 		this.props.deleteCategory(this.props.category);
 	}
 
+	pushVideo() {
+		if(this.state.VideoUrl !== '')
+		{
+			let video = this.state.AssessmentVideos;
+			video.push(this.state.VideoUrl);
+			this.setState({
+				AssessmentVideos: video,
+				VideoUrl: ''
+			})
+		}
+	}
+
+	pushDoc() {
+		if(this.state.DocUrl !== '')
+		{
+			let doc = this.state.AssessmentDocs;
+			doc.push(this.state.DocUrl);
+			this.setState({
+				AssessmentDocs: doc,
+				DocUrl: ''
+			})
+		}
+	}
+
+	pushBlog() {
+		if(this.state.BlogUrl !== '')
+		{
+			let blog = this.state.AssessmentBlogs;
+			blog.push(this.state.BlogUrl);
+			this.setState({
+				AssessmentBlogs: blog,
+				BlogUrl: ''
+			})
+		}
+	}
+
+	onChangeAddVideo() {
+		this.pushVideo();
+		let a = this.state.AssessmentVideos;
+		a = a.concat('');
+		this.setState({
+			AssessmentVideos: a
+		})
+	}
+
+	onChangeAddBlog() {
+		this.pushBlog();
+		let a = this.state.AssessmentBlogs;
+		a = a.concat('');
+		this.setState({
+			AssessmentBlogs: a
+		})
+	}
+
+	onChangeAddDoc() {
+		this.pushDoc();
+		let a = this.state.AssessmentDocs;
+		a = a.concat('');
+		this.setState({
+			AssessmentDocs: a
+		})
+	}
+
+	onChangeRemoveVideo(id) {
+		let value = this.state.AssessmentVideos[id];
+		let th = this;
+		let a = this.state.AssessmentVideos;
+		a.splice(id,1);
+		this.pushVideo();
+		 this.setState({
+      AssessmentVideos: a
+    })
+	}
+	
+	onChangeRemoveBlog(id) {
+		let value = this.state.AssessmentBlogs[id];
+		let th = this;
+		let a = this.state.AssessmentBlogs;
+		a.splice(id,1);
+		this.pushBlog();
+		 this.setState({
+      AssessmentBlogs: a
+    })
+	}
+		
+	onChangeRemoveDoc(id) {
+		let value = this.state.AssessmentDocs[id];
+		let th = this;
+		let a = this.state.AssessmentDocs;
+		a.splice(id,1);
+		this.pushDoc();
+		 this.setState({
+      AssessmentDocs: a
+    })
+	}
+			
 	render() {
+		let text = '';
+		let th = this;
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
@@ -223,27 +368,73 @@ export default class CourseCard extends React.Component {
 						    		onChange={this.onChangeAssessmentDuration}
 					/>
 					<br/>
-					<TextField
+					{th.state.AssessmentVideos.map(function(video,index){
+						text = "Videos #"+index;
+						return (
+						<div>
+						<TextField
 						    		hintText="videos"
-						    		floatingLabelText="Videos"
-						    		value={this.state.AssessmentVideos}
-						    		onChange={this.onChangeAssessmentVideos}
-					/>
+						    		floatingLabelText= {text}
+						    		value={video}
+						    		onChange={(event) => th.onChangeAssessmentVideos(
+						    				event, 
+						    				video
+						    			)}
+						/>
+						<IconButton tooltip="Remove video" onClick={th.onChangeRemoveVideo.bind(th,index)}>
+			      <RemoveIcon/>
+			    </IconButton>
+						</div>)				  	
+					})}
+					<IconButton tooltip="Add video" onClick={this.onChangeAddVideo} disabled={this.state.disableSave}>
+			      <AddIcon/>
+			    </IconButton>
+
 					<br/>
-					<TextField
+					{th.state.AssessmentBlogs.map(function(blog,index){
+						text = "Blogs #"+index;
+						return (
+						<div>
+						<TextField
 						    		hintText="blogs"
-						    		floatingLabelText="Blogs"
-						    		value={this.state.AssessmentBlogs}
-						    		onChange={this.onChangeAssessmentBlogs}
-					/>
+						    		floatingLabelText= {text}
+						    		value={blog}
+						    		onChange={(event) => th.onChangeAssessmentBlogs(
+						    				event, 
+						    				blog
+						    			)}
+						/>
+						<IconButton tooltip="Remove blog" onClick={th.onChangeRemoveBlog.bind(th,index)}>
+			      <RemoveIcon/>
+			    </IconButton>
+						</div>)				  	
+					})}
+					<IconButton tooltip="Add blog" onClick={this.onChangeAddBlog} disabled={this.state.disableSave}>
+			      <AddIcon/>
+			    </IconButton>
 					<br/>
-					<TextField
-						    		hintText="docs"
-						    		floatingLabelText="Docs"
-						    		value={this.state.AssessmentDocs}
-						    		onChange={this.onChangeAssessmentDocs}
-					/>
-					
+					{th.state.AssessmentDocs.map(function(doc,index){
+						text = "Document #"+index;
+						return (
+						<div>
+						<TextField
+						    		hintText="document"
+						    		floatingLabelText= {text}
+						    		value={doc}
+						    		onChange={(event) => th.onChangeAssessmentDocs(
+						    				event, 
+						    				doc
+						    			)}
+						/>
+						<IconButton tooltip="Add assessment" onClick={th.onChangeRemoveDoc.bind(th,index)}>
+			      <RemoveIcon/>
+			    </IconButton>
+						</div>)				  	
+					})}
+					<IconButton tooltip="Add assessment" onClick={this.onChangeAddDoc} disabled={this.state.disableSave}>
+			      <AddIcon/>
+			    </IconButton>
+					<br/>
 				    			<div>
 				    				{submitButton}
 				    				&emsp;
@@ -270,7 +461,7 @@ export default class CourseCard extends React.Component {
 			      }
 			      actAsExpander={true}
       			showExpandableButton={true} >
-      				<IconButton tooltip="Delete category" style={{marginRight:'25px'}}  onClick={this.openDeleteDialog}>
+      				<IconButton tooltip="Delete category" style={{marginLeft:'-80px'}}  onClick={this.openDeleteDialog}>
 					      <DeleteIcon/>
 					    </IconButton>
 					 </CardHeader>

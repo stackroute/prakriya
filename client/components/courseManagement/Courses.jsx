@@ -143,7 +143,6 @@ export default class Courses extends React.Component {
 	}
 
 	addCategory(category){
-		console.log('here3');
 		let th = this
 		Request
 			.post('/mentor/addcategory')

@@ -89,7 +89,6 @@ export default class CourseCard extends React.Component {
 	}
 
 	handleAddCategory(category) {
-		console.log('coming here2');
 		this.props.addCategory(category);
 		this.handleClose();
 	}
