@@ -66,7 +66,7 @@ export default class Welcome extends React.Component {
 		    />
 		    <div style={styles.body}>
 		    	<Dialog
-	          title="Login To Continue"
+	          title="Login to Continue"
 						titleStyle={{textAlign: 'center'}}
 	          contentStyle={styles.customContent}
 	          open={this.state.open}

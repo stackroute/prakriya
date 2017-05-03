@@ -10,6 +10,8 @@ var candidates = new Schema({
 		EmployeeID: {type: Number, unique: true},
 		EmployeeName: String,
 		EmailID: String,
+		AltEmail: String,
+		Contact: Number,
 		DigiThonQualified: String,
 		Selected: String,
 		Remarks: String,

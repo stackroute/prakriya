@@ -64,6 +64,7 @@ export default class ProfileView extends React.Component {
 		super(props);
 		this.state = {
 			cadet: {},
+			showPersonalDialog: false,
 			showProjectDialog: false,
 			showAssetDialog: false,
 			projectName: '',
@@ -80,6 +81,10 @@ export default class ProfileView extends React.Component {
 		this.openAssetDialog = this.openAssetDialog.bind(this);
 		this.closeAssetDialog = this.closeAssetDialog.bind(this);
 		this.handleAssetChange = this.handleAssetChange.bind(this);
+		this.openPersonalDialog = this.openPersonalDialog.bind(this);
+		this.closePersonalDialog = this.closePersonalDialog.bind(this);
+		this.handleAltEmailChange = this.handleAltEmailChange.bind(this);
+		this.handleContactChange = this.handleContactChange.bind(this);
 		this.handleUpdate = this.handleUpdate.bind(this);
 		this.handleDrop = this.handleDrop.bind(this);
 		this.handlePicSave = this.handlePicSave.bind(this);
@@ -92,14 +97,36 @@ export default class ProfileView extends React.Component {
   	})
 	}
 	componentWillUpdate(nextProps, nextState) {
-		console.log('Will Update');
-		console.log('this.state', this.state.picPreview);
-		console.log('nextState', nextState.picPreview);
-		console.log('nextProps', nextProps.imageURL);
 		if(nextState.picPreview != this.state.picPreview)
 			nextState.picPreview = nextState.picPreview;
 		else if(nextProps.imageURL != '')
 			nextState.picPreview = nextProps.imageURL;
+	}
+	openPersonalDialog() {
+		this.setState({
+			showPersonalDialog: true
+		})
+	}
+	closePersonalDialog() {
+		this.setState({
+			showPersonalDialog: false
+		})
+	}
+	handleAltEmailChange(event) {
+		let cadet = this.state.cadet;
+		cadet.AltEmail = event.target.value;
+		this.setState({
+			disableSave: false,
+			cadet: cadet
+		})
+	}
+	handleContactChange(event) {
+		let cadet = this.state.cadet;
+		cadet.Contact = event.target.value;
+		this.setState({
+			disableSave: false,
+			cadet: cadet
+		})
 	}
 	openProjectDialog() {
 		this.setState({
@@ -196,6 +223,20 @@ export default class ProfileView extends React.Component {
         disabled={this.state.disableSave}
       />,
     ];
+    const perosnalDialogActions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onTouchTap={this.closePersonalDialog}
+      />,
+      <FlatButton
+        label="Save"
+        primary={true}
+        onTouchTap={this.closePersonalDialog}
+        onClick={this.handleUpdate}
+        disabled={this.state.disableSave}
+      />,
+    ];
     let pic = <CardMedia>
 								<img src='../../assets/images/avt-default.jpg'/>
 							</CardMedia>
@@ -240,6 +281,20 @@ export default class ProfileView extends React.Component {
 							</p>
 						</Col>
 						<Col md={6} mdOffset={1}>
+
+							<h4>
+								Personal
+								<span>
+									<EditIcon 
+										style={styles.editIcon} 
+										onClick={this.openPersonalDialog}
+									/>
+								</span>
+							</h4>
+ 							<p style={styles.details}>
+								Alternate Email: {this.state.cadet.AltEmail}<br/>
+								Contact: {this.state.cadet.Contact}
+							</p>
 
 							<h4>Experience</h4>
  							<p style={styles.details}>
@@ -345,6 +400,23 @@ export default class ProfileView extends React.Component {
 						</Col>
 					</Row>
 				</Grid>
+				<Dialog
+					title="Add your personal details"
+          actions={perosnalDialogActions}
+          open={this.state.showPersonalDialog}
+          onRequestClose={this.closePersonalDialog}
+        >
+        	<TextField
+			      floatingLabelText="Alternate Email"
+			      value={this.state.cadet.AltEmail}
+			      onChange={this.handleAltEmailChange}
+			    />
+			    <TextField
+			      floatingLabelText="Contact"
+			      value={this.state.cadet.Contact}
+			      onChange={this.handleContactChange}
+			    />
+        </Dialog>
 				<Dialog
 					title="Add your project"
           actions={projectDialogActions}
