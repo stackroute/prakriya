@@ -17,7 +17,10 @@ const styles = {
 	},
 	col: {
 		marginBottom: 20
-	}
+	},
+	card: {
+    	width: '300px'
+    }
 }
 
 export default class CourseCard extends React.Component {
@@ -118,7 +121,7 @@ export default class CourseCard extends React.Component {
     let th = this;
 		return (
 			<div>
-				<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange}>
+				<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={styles.card}>
 					<CardHeader
 			      title={this.props.course.CourseName}
 			      subtitle={this.props.course.Duration}

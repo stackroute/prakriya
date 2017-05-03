@@ -15,6 +15,9 @@ import RemoveIcon from 'material-ui/svg-icons/content/remove';
 const styles = {
     dialog: {
       textAlign: 'center'
+    },
+    link: {
+      wordWrap: 'break-word'
     }
 };
 
@@ -469,19 +472,19 @@ export default class CourseCard extends React.Component {
 			    		<h3>Blogs:</h3>
 					    {
 					    	this.props.category.Blogs.map(function(Blog,index) {
-					    	return (<p>{Blog}</p>)
+					    		return (<div>{index+1} . <a href={Blog} target="_blank" style={styles.link}>{Blog}</a></div>)
 					    })
 					    }
 					    <h3>Videos:</h3>
 					    {
 					    	this.props.category.Videos.map(function(Video,index) {
-					    	return (<p>{Video}</p>)
+					    	return (<div>{index+1} . <a href={Video} target="_blank" style={styles.link}>{Video}</a></div>)
 					    })
 					    }
 					    <h3>Docs:</h3>
 					    {
 					    	this.props.category.Docs.map(function(Doc,index) {
-					    	return (<p>{Doc}</p>)
+					    	return (<div>{index+1} . <a href={Doc} target="_blank" style={styles.link}>{Doc}</a></div>)
 					    })
 					    }
 					    <h3>Mentors:</h3>

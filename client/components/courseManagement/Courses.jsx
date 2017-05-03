@@ -179,7 +179,7 @@ export default class Courses extends React.Component {
 				<div>
 				<h2 style={styles.heading}>Course Management</h2>
 				<AddCourse handleAdd={this.addCourse}/>
-				<Grid>
+				<Grid style={styles.grid}>
 					<Row>
 						{
 							this.state.courses.map(function (course, key) {
