@@ -113,7 +113,7 @@ let restoreCourse = function(restoreObj, successCB, errorCB) {
 }
 
 let addCategory = function(categoryObj, successCB, errorCB) {
-	CourseModel.update({'CourseID':categoryObj.CourseID},{$push:{'Categories':{'Name':categoryObj.Name,'Mentor':categoryObj.Mentor,'Duration':categoryObj.Duration,'Videos':categoryObj.Videos,'Blogs':categoryObj.Blogs,'Docs':categoryObj.Doc s}}}, function(err, status) {
+	CourseModel.update({'CourseID':categoryObj.CourseID},{$push:{'Categories':{'Name':categoryObj.Name,'Mentor':categoryObj.Mentor,'Duration':categoryObj.Duration,'Videos':categoryObj.Videos,'Blogs':categoryObj.Blogs,'Docs':categoryObj.Docs}}}, function(err, status) {
 		if(err)
 			errorCB(err);
 		successCB(status);
