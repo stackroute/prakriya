@@ -128,14 +128,16 @@ router.get('/courses', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    });
+    }); 
   }
 })
 
 // update courses
 router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try{
-    mentorMongoController.updateCourse(req.body, function(courses) {
+    let courseObj = req.body;
+    courseObj.History = courseObj.History + " last update by "+ req.user.name + " on " + new Date() + "\n";
+    mentorMongoController.updateCourse(courseObj, function(courses) {
       res.status(201).json(courses);
     }, function(err) {
       res.status(500).json({ error: 'Cannot update course in db...!' });
@@ -144,14 +146,16 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    });
+    }); 
   }
 })
 
 // add courses
 router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try{
-    mentorMongoController.addCourse(req.body, function(courses) {
+    let courseObj = req.body;
+    courseObj.History = courseObj.History + " added by "+ req.user.name + " on " + new Date() + "\n";
+    mentorMongoController.addCourse(courseObj, function(courses) {
       res.status(201).json(courses);
     }, function(err) {
       res.status(500).json({ error: 'Cannot add course in db...!' });
@@ -160,13 +164,15 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    });
+    }); 
   }
 })
 // Delete a course
 router.delete('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {
-    mentorMongoController.deleteCourse(req.body, function (status) {
+    let courseObj = req.body;
+    courseObj.History = courseObj.History + " deleted by "+ req.user.name + " on " + new Date() + "\n";
+    mentorMongoController.deleteCourse(courseObj, function (status) {
       res.status(200).json(status)
     }, function (err) {
       res.status(500).json({ error: 'Cannot delete course in db...!' });
@@ -175,14 +181,16 @@ router.delete('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res)
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    });
+    }); 
   }
 })
 
 // restore a course
 router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {
-    mentorMongoController.restoreCourse(req.body, function (status) {
+    let courseObj = req.body;
+    courseObj.History = "restored by "+ req.user.name + " on " + new Date() + "\n";
+    mentorMongoController.restoreCourse(courseObj, function (status) {
       res.status(200).json(status)
     }, function (err) {
       res.status(500).json({ error: 'Cannot restore course in db...!' });
@@ -191,14 +199,16 @@ router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) 
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    });
+    }); 
   }
 })
 
 //Add category
 router.post('/addcategory', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {
-    mentorMongoController.addCategory(req.body, function(status) {
+    let categoryObj = req.body;
+    categoryObj.History = categoryObj.History + " last modification by "+ req.user.name + " on " + new Date() + " : added new sub course \n";
+    mentorMongoController.addCategory(categoryObj, function(status) {
       res.json(status)
     }, function (err) {
       res.status(500).json({ error: 'Cannot add the category...!' });
@@ -214,8 +224,9 @@ router.post('/addcategory', auth.canAccess(CONFIG.MENCAN), function(req, res) {
 //delete category
 router.post('/deletecategory', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {
-    console.log('he is here');
-    mentorMongoController.deleteCategory(req.body, function(status) {
+    let categoryObj = req.body;
+    categoryObj.History = categoryObj.History + " last modification by "+ req.user.name + " on " + new Date() + " : deleted a sub course \n";
+    mentorMongoController.deleteCategory(categoryObj, function(status) {
       res.json(status)
     }, function (err) {
       res.status(500).json({ error: 'Cannot delete the category...!' });

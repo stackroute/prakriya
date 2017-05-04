@@ -69,16 +69,14 @@ let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 
 let getCourses = function(successCB, errorCB) {
 	CourseModel.find({},function(err, result) {
-		if (err)
+		if (err) 
 				errorCB(err);
 		successCB(result);
 	});
 }
 
 let updateCourse = function (CourseObj, successCB, errorCB) {
-	console.log('Course obj from server', CourseObj)
-	console.log(CourseObj.CourseName)
-	CourseModel.update({"CourseID": CourseObj.CourseID}, {$set:{'CourseName':CourseObj.CourseName,'AssessmentCategories':CourseObj.AssessmentCategories,'Duration':CourseObj.Duration}}, function(err, status) {
+	CourseModel.update({"CourseID": CourseObj.CourseID}, {$set:{'CourseName':CourseObj.CourseName,'AssessmentCategories':CourseObj.AssessmentCategories,'Duration':CourseObj.Duration,'History':CourseObj.History}}, function(err, status) {
 		if(err)
 			errorCB(err);
 		successCB(status);
@@ -96,7 +94,6 @@ let addCourse = function (CourseObj, successCB, errorCB) {
 }
 
 let deleteCourse = function(courseObj, successCB, errorCB) {
-	console.log('cadetObj to delete', courseObj);
 	CourseModel.update({'CourseID':courseObj.CourseID},{$set:{'Removed':true}}, function(err, status) {
 		if(err)
 			errorCB(err);
@@ -105,7 +102,6 @@ let deleteCourse = function(courseObj, successCB, errorCB) {
 }
 
 let restoreCourse = function(restoreObj, successCB, errorCB) {
-	console.log('restoreObj', restoreObj.length);
 	CourseModel.updateMany({CourseName:{$in:restoreObj}},{$set:{'Removed':false}}, function(err, status) {
 		if(err)
 			errorCB(err);
@@ -113,16 +109,18 @@ let restoreCourse = function(restoreObj, successCB, errorCB) {
 	})
 }
 
-let addCategory = function(categoryObj, successCB, errorCB) {
-	CourseModel.update({'CourseID':categoryObj.CourseID},{$push:{'Categories':{'Name':categoryObj.Name,'Mentor':categoryObj.Mentor,'Duration':categoryObj.Duration,'Videos':categoryObj.Videos,'Blogs':categoryObj.Blogs,'Docs':categoryObj.Docs}}}, function(err, status) {
+let addCategory = function(object, successCB, errorCB) {
+	let categoryObj = object.Categories;
+	CourseModel.update({'CourseID':object.CourseID},{$set:{History:object.History},$push:{'Categories':{'Name':categoryObj.Name,'Mentor':categoryObj.Mentor,'Duration':categoryObj.Duration,'Videos':categoryObj.Videos,'Blogs':categoryObj.Blogs,'Docs':categoryObj.Docs}}}, function(err, status) {
 		if(err)
 			errorCB(err);
 		successCB(status);
 	})
 }
 
-let deleteCategory = function(categoryObj, successCB, errorCB) {
-	CourseModel.update({'CourseID':categoryObj.CourseID},{$pull:{'Categories':{'Name':categoryObj.Name,'Mentor':categoryObj.Mentor,'Duration':categoryObj.Duration,'Videos':categoryObj.Videos,'Blogs':categoryObj.Blogs,'Docs':categoryObj.Docs}}}, function(err, status) {
+let deleteCategory = function(object, successCB, errorCB) {
+	let categoryObj = object.Categories;
+	CourseModel.update({'CourseID':object.CourseID},{$set:{History:object.History},$pull:{'Categories':{'Name':categoryObj.Name,'Mentor':categoryObj.Mentor,'Duration':categoryObj.Duration,'Videos':categoryObj.Videos,'Blogs':categoryObj.Blogs,'Docs':categoryObj.Docs}}}, function(err, status) {
 		if(err)
 			errorCB(err);
 		successCB(status);

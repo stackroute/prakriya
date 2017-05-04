@@ -131,7 +131,12 @@ export default class CourseCard extends React.Component {
     ];
     let th = this;
     let history = this.props.course.History.split('\n');
-    history = history[history.length-2].split('on');
+    history = history[history.length-2].split(' on ');
+    if(history[1].includes(':'))
+    {
+    	let date = history[1].split(' : ');
+    	history[1] = date[0];
+    }
 		return (
 			<div>
 				<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style = {{width:'300px', marginRight:'20px', marginBottom:'20px'}}>

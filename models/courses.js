@@ -16,6 +16,7 @@ var courses = new Schema({
 			  Categories: [Category],
 			  Duration: String,
         AssessmentCategories: [String],
+        History: {type:String, default:''},
    			Removed: {type:Boolean, default:false}
 	});
 
