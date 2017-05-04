@@ -1,6 +1,7 @@
 const CandidateModel = require('../../models/candidates.js');
 const AssessmentTrackModel = require('../../models/assessmenttracks.js');
 const CourseModel = require('../../models/courses.js');
+const WaveModel = require('../../models/waves.js');
 
 /**************************************************
 *******          AssessmentTrack           ********
@@ -68,7 +69,7 @@ let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 
 let getCourses = function(successCB, errorCB) {
 	CourseModel.find({},function(err, result) {
-		if (err) 
+		if (err)
 				errorCB(err);
 		successCB(result);
 	});
@@ -128,6 +129,65 @@ let deleteCategory = function(categoryObj, successCB, errorCB) {
 	})
 }
 
+/***********************************************
+*******          Program Flow           ********
+***********************************************/
+
+let getWaveObject = function(trainingTrack, waveNumber, successCB, errorCB) {
+	WaveModel.findOne({TrainingTrack: trainingTrack, WaveNumber: waveNumber}, function(err, result) {
+		if(err) {
+			errorCB(err)
+		}
+		successCB(result)
+	});
+}
+
+let addNewSession = function(object, successCB, errorCB) {
+	let timeStamp = new Date().getTime()
+	console.log('addNewSession: '+ JSON.stringify(object))
+	WaveModel.findOneAndUpdate(
+		{'WaveID': object.waveID},
+		{'$push':
+			{'Sessions':
+				{
+					'SessionID': timeStamp,
+				  'CourseName': object.session.CourseName,
+				  'Week': object.session.Week,
+				  'Activities': object.session.Activities,
+				  'Status': object.session.Status,
+				  'ContextSetSession': object.session.ContextSetSession,
+				  'SessionBy': object.session.SessionBy,
+				  'SessionOn': object.session.SessionOn,
+				  'Remarks': object.session.Remarks
+				}
+			}
+		}, function(err, result) {
+		if(err) {
+			errorCB(err)
+		}
+		successCB(result)
+	})
+}
+
+let updateSession = function(object, successCB, errorCB) {
+	console.log('updateSession: ', JSON.stringify(object))
+	WaveModel.findOneAndUpdate(
+		{
+			'WaveID': object.waveID,
+			'Sessions.SessionID': object.session.SessionID
+		},
+		{
+			'$set': {
+				'Sessions.$': object.session
+			}
+		}, function(err, result) {
+		if(err) {
+			errorCB(err)
+		}
+		successCB(result)
+	})
+}
+
 module.exports = {
 	getWaves,
 	getTrainingTracks,
@@ -141,5 +201,8 @@ module.exports = {
 	restoreCourse,
 	addCategory,
 	deleteCategory,
-	addCourse
+	addCourse,
+	getWaveObject,
+	addNewSession,
+	updateSession
 }

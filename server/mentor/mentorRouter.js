@@ -128,7 +128,7 @@ router.get('/courses', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -144,7 +144,7 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -160,7 +160,7 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 // Delete a course
@@ -175,7 +175,7 @@ router.delete('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res)
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -191,7 +191,7 @@ router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) 
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -222,6 +222,64 @@ router.post('/deletecategory', auth.canAccess(CONFIG.MENCAN), function(req, res)
     })
   }
   catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+/***********************************************
+*******          Program Flow           ********
+***********************************************/
+
+// Get all waves
+router.get("/waveobject/:trainingTrack/:waveNumber", auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  console.log("API HIT ===> GET Wave Object");
+  try{
+    mentorMongoController.getWaveObject(req.params.trainingTrack, req.params.waveNumber, function(waveObject) {
+      console.log('Recieved: ', JSON.stringify(waveObject))
+      res.status(201).json({waveObject: waveObject});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get the wave from db...!' });
+    });
+  }
+  catch(err){
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+//Add new session
+router.post('/addnewsession', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    mentorMongoController.addNewSession(req.body, function(status) {
+      console.log('Status: ', status)
+      res.status(201).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot add new session...!' });
+    })
+  }
+  catch(err) {
+    console.log(err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//Update session
+router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    mentorMongoController.updateSession(req.body, function(status) {
+      console.log('Status: ', status)
+      res.status(201).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot add new session...!' });
+    })
+  }
+  catch(err) {
+    console.log(err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
