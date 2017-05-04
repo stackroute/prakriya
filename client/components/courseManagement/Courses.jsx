@@ -2,7 +2,7 @@ import React from 'react';
 import CourseCard from './CourseCard.jsx';
 import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
-import RestoreIcon from 'material-ui/svg-icons/action/restore';
+import RestoreIcon from 'material-ui/svg-icons/content/undo';
 import IconButton from 'material-ui/IconButton';
 import RestoreCourse from './RestoreCourse.jsx';
 import AddCourse from './AddCourse.jsx';

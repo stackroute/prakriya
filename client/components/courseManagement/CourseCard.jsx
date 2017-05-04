@@ -6,6 +6,7 @@ import Moment from 'moment';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import HistoryIcon from 'material-ui/svg-icons/action/history';
 import CourseSubCard from './CourseSubCard.jsx';
 import AddCourse from './AddCourse.jsx';
 import FlatButton from 'material-ui/FlatButton';
@@ -17,10 +18,7 @@ const styles = {
 	},
 	col: {
 		marginBottom: 20
-	},
-	card: {
-    	width: '300px'
-    }
+	}
 }
 
 export default class CourseCard extends React.Component {
@@ -44,6 +42,7 @@ export default class CourseCard extends React.Component {
 			this.handleAddCategory = this.handleAddCategory.bind(this);
 			this.openAddCategoryDialog = this.openAddCategoryDialog.bind(this);
 			this.handleDeleteCategory = this.handleDeleteCategory.bind(this);
+			this.formatDate = this.formatDate.bind(this);
 	}
 
 	handleExpandChange = (expanded) => {
@@ -88,10 +87,12 @@ export default class CourseCard extends React.Component {
 	}
 
 	handleUpdateCourse(course) {
+		course.History = this.props.course.History;
 		this.props.updateCourse(course);
 	}
 
 	handleAddCategory(category) {
+		category.History = this.props.course.History;
 		this.props.addCategory(category);
 		this.handleClose();
 	}
@@ -101,7 +102,17 @@ export default class CourseCard extends React.Component {
 	}
 
 	handleDeleteCategory(category) {
+		category.History = this.props.course.History;
 		this.props.deleteCategory(category);
+	}
+
+	formatDate(date) {
+		if(date) {
+			return Moment(date).fromNow();
+			// return Humanize.naturalDay(newdate,'H:i:s dS M, Y')
+		}
+		else 
+			return '-' 
 	}
 
 	render() {
@@ -119,9 +130,11 @@ export default class CourseCard extends React.Component {
       />,
     ];
     let th = this;
+    let history = this.props.course.History.split('\n');
+    history = history[history.length-2].split('on');
 		return (
 			<div>
-				<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={styles.card}>
+				<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style = {{width:'300px', marginRight:'20px', marginBottom:'20px'}}>
 					<CardHeader
 			      title={this.props.course.CourseName}
 			      subtitle={this.props.course.Duration}
@@ -138,8 +151,11 @@ export default class CourseCard extends React.Component {
 			    			return (<CourseSubCard category={category} key={key} deleteCategory={th.handleDeleteCategory} courseID={th.props.course.CourseID}/>)
 			    		})
 			    	}
+			    	
 			    </CardText>
-			    <IconButton tooltip="Edit Course" onClick={this.handleEditCourse} style={{display:this.state.hide}}>
+			    <h4 style={{display:this.state.hide,marginLeft:'20px'}}>{history[0]}</h4><br/>
+					<h5 style={{display:this.state.hide,marginLeft:'20px',color:'grey'}}>{th.formatDate(history[1])}</h5><br/>
+					<IconButton tooltip="Edit Course" onClick={this.handleEditCourse} style={{display:this.state.hide,marginLeft:'10px'}}>
 					      <EditIcon/>
 					    </IconButton>
 					    <IconButton tooltip="Delete Course" style={{display:this.state.hide}} onClick={this.openDeleteDialog}>

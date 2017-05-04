@@ -40,7 +40,6 @@ export default class CourseCard extends React.Component {
 		this.handleOpen = this.handleOpen.bind(this);
 	  this.handleClose = this.handleClose.bind(this);
 	  this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleUpdate = this.handleUpdate.bind(this);
 		this.resetFields = this.resetFields.bind(this);
 		this.onChangeAssessmentName = this.onChangeAssessmentName.bind(this);
 		this.onChangeAssessmentMentor = this.onChangeAssessmentMentor.bind(this);
@@ -93,29 +92,19 @@ export default class CourseCard extends React.Component {
 		this.pushBlog();
 		this.pushDoc();
 		let th = this;
+		let course = {};
+		course.CourseID = this.props.courseID;
 		let category = {};
-		category.CourseID = this.props.courseID;
 		category.Name = this.state.AssessmentName;
 		category.Mentor= this.state.AssessmentMentor;
 		category.Duration= this.state.AssessmentDuration;
 		category.Videos= this.state.AssessmentVideos;
 		category.Blogs= this.state.AssessmentBlogs;
 		category.Docs= this.state.AssessmentDocs;
+		course.Categories = category;
+		course.History = '';
 		this.resetFields();
-		this.props.handleAddCategory(category);
-	}
-
-	handleUpdate() {
-		let th = this
-		let user = {}
-		user.name = this.state.name
-		user.username = this.state.username
-		user.email = this.state.email
-		user.password = this.state.password
-		user.role = this.state.role
-		this.resetFields();
-		this.props.handleUpdate(user);
-
+		this.props.handleAddCategory(course);
 	}
 
 	onChangeAssessmentName(e) {
@@ -196,9 +185,12 @@ export default class CourseCard extends React.Component {
 	}
 
 	handleDeleteCategory() {
+		let course = {};
 		let category = this.props.category;
-		category.CourseID = this.props.courseID;
-		this.props.deleteCategory(this.props.category);
+		course.CourseID = this.props.courseID;
+		course.Categories = category;
+		course.History = '';
+		this.props.deleteCategory(course);
 	}
 
 	pushVideo() {
@@ -331,13 +323,6 @@ export default class CourseCard extends React.Component {
 						    	 		label="Add Category"
 						    	   	primary={true}
 						    			onClick={this.handleSubmit}
-						    	 	/>
-		}
-		else {
-			submitButton = <RaisedButton
-						    	 		label="Update Category"
-						    	   	primary={true}
-						    			onClick={this.handleUpdate}
 						    	 	/>
 		}
 		if(this.props.openDialog)

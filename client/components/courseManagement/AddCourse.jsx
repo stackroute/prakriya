@@ -143,6 +143,7 @@ export default class AddCourse extends React.Component {
 		course.CourseName = this.state.CourseName;
 		course.AssessmentCategories = this.state.AssessmentCategories;
 		course.Duration = this.state.Duration;
+		course.History = '';
 		this.resetFields();
 		this.handleClose();
 		this.props.handleUpdate(course);
@@ -157,6 +158,7 @@ export default class AddCourse extends React.Component {
 		course.Categories = [];
 		course.Removed = false;
 		course.Duration = this.state.Duration;
+		course.History = '';
 		this.resetFields();
 		this.handleClose();
 		this.props.handleAdd(course);

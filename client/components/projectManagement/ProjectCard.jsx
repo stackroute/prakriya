@@ -3,6 +3,12 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import Avatar from 'material-ui/Avatar';
 import Moment from 'moment';
 
+const styles = {
+    text: {
+      wordWrap: 'break-word'
+    }
+};
+
 export default class ProjectCard extends React.Component {
 	constructor(props) {
 		super(props);
@@ -15,7 +21,7 @@ export default class ProjectCard extends React.Component {
 	render() {
 		return (
 			<div>
-				<Card>
+				<Card style = {{width:'300px', marginRight:'20px', marginBottom:'20px'}}>
 					<CardHeader
 			      title={this.props.project.name}
 			      subtitle={this.props.project.addedBy + ' added ' + this.formatDate(this.props.project.addedOn)}
@@ -23,11 +29,8 @@ export default class ProjectCard extends React.Component {
 			      	<Avatar>
 			      		{this.props.project.name.charAt(0).toUpperCase()}
 			      	</Avatar>
-			      }
-			      actAsExpander={true}
-      			showExpandableButton={true}
-			    />
-			    <CardText expandable={true}>
+			      }/>
+			    <CardText style={styles.text}>
 			    	{this.props.project.description}
 			    </CardText>
 				</Card>

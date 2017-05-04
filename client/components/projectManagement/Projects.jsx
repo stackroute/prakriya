@@ -3,6 +3,7 @@ import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import AddProject from './AddProject.jsx';
 import ProjectCard from './ProjectCard.jsx';
+import Masonry from 'react-masonry-component';
 
 const styles = {
 	heading: {
@@ -12,7 +13,10 @@ const styles = {
 		marginBottom: 20
 	}
 }
-
+var masonryOptions = {
+    transitionDuration: 0
+};
+ 
 export default class Projects extends React.Component {
 	constructor(props) {
 		super(props);
@@ -67,19 +71,18 @@ export default class Projects extends React.Component {
 			<div>
 				<h2 style={styles.heading}>Projects</h2>
 				<AddProject addProject={this.addProject}/>
-				<Grid>
-					<Row>
-						{
+				<Masonry
+                className={'my-class'} 
+                elementType={'ul'} 
+                options={masonryOptions}>
+          	{
 							this.state.projects.map(function (project, key) {
 								return (
-									<Col md={3} key={key} style={styles.col}>
-										<ProjectCard project={project}/>
-									</Col>
+									<ProjectCard key={key} project={project}/>
 								)
 							})
 						}
-					</Row>
-				</Grid>
+				</Masonry>
 			</div>
 		)
 	}
