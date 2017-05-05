@@ -8,6 +8,7 @@ let registerCandidates = function () {
 	client.brpop('fileImport', 0, function(err, fileId) {
 		let importedCadets = [], failedCadets = [];
 		let total = 0;
+		let cadetsFetched = 0;
 		try {
 			uploadMongoController.getFileById(fileId, function (fileObj) {
 
@@ -62,8 +63,7 @@ let registerCandidates = function () {
 			console.log(err);
 		}
 	})
-
-  setTimeout(registerCandidates, 1000);
+  setTimeout(registerCandidates, 2000);
 }
 
 module.exports = {

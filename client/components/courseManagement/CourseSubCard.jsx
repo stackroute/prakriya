@@ -454,22 +454,40 @@ export default class CourseCard extends React.Component {
 					    </IconButton>
 					 </CardHeader>
 			    <CardText expandable={true}>
-			    		<h3>Blogs:</h3>
-					    {
-					    	this.props.category.Blogs.map(function(Blog,index) {
-					    		return (<div>{index+1} . <a href={Blog} target="_blank" style={styles.link}>{Blog}</a></div>)
+			    		{
+			    			this.props.category.Blogs.map(function(Blog,index) {
+					    		if(Blog !== '')
+					    		{
+										if(index === 0)
+										{
+											return(<div><h3>Blogs:</h3>{index+1} . <a href={Blog} target="_blank" style={styles.link}>{Blog}</a></div>);
+										}
+										return (<div>{index+1} . <a href={Blog} target="_blank" style={styles.link}>{Blog}</a></div>)
+									}
 					    })
 					    }
-					    <h3>Videos:</h3>
 					    {
 					    	this.props.category.Videos.map(function(Video,index) {
-					    	return (<div>{index+1} . <a href={Video} target="_blank" style={styles.link}>{Video}</a></div>)
+					    		if(Video !== '')
+					    		{
+										if(index === 0)
+										{
+											return (<div><h3>Videos:</h3>{index+1} . <a href={Video} target="_blank" style={styles.link}>{Video}</a></div>);
+										}
+										return (<div>{index+1} . <a href={Video} target="_blank" style={styles.link}>{Video}</a></div>)
+									}
 					    })
 					    }
-					    <h3>Docs:</h3>
 					    {
 					    	this.props.category.Docs.map(function(Doc,index) {
-					    	return (<div>{index+1} . <a href={Doc} target="_blank" style={styles.link}>{Doc}</a></div>)
+					    		if(Doc !== '')
+									{
+										if(index === 0)
+										{
+											return (<div><h3>Docs:</h3>{index+1} . <a href={Doc} target="_blank" style={styles.link}>{Doc}</a></div>);
+										}
+										return (<div>{index+1} . <a href={Doc} target="_blank" style={styles.link}>{Doc}</a></div>)
+					    		}
 					    })
 					    }
 					    <h3>Mentors:</h3>
