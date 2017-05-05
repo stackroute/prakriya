@@ -18,7 +18,7 @@ const styles = {
 		position:'fixed',
 	  bottom: '60px',
 	  right: '15px',
-	  zIndex: 2
+	  zIndex: 1
 	},
 	dialog: {
 	  textAlign: 'center'
@@ -37,13 +37,7 @@ const styles = {
 	chip: {
     margin: '4px',
     background: '#eee'
-  },
-  addButton: {
-		position:'fixed',
-	  bottom: '60px',
-	  right: '15px',
-	  zIndex: 1
-	}
+  }
 }
 
 export default class AddCourse extends React.Component {

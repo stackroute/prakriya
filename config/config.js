@@ -3,6 +3,7 @@ let config = {
   jwtSession: {
       session: false
   },
+  ALL: ['admin', 'administrator', 'mentor', 'candidate'],
 	ADMIN: ['admin'],
 	ADMINISTRATOR: ['administrator'],
 	MENTOR: ['mentor'],

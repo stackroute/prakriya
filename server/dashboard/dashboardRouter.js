@@ -112,7 +112,7 @@ router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
 })
 
 // Update a cadet
-router.post('/updatecadet', auth.canAccess(CONFIG.ADMCAN), function(req, res) {
+router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function(req, res) {
   try {
     dashboardMongoController.updateCadet(req.body, function (status) {
       res.status(200).json(status)
