@@ -32,8 +32,10 @@
 			this.state = {
 			WaveIds:[],
 			WaveId:'',
-			candidates:[],
+			candidatesName:[],
+			candidatesID:[],
 			absentList:[],
+			absentListNames:[],
 			searchPerm: '',
 			openSnackBar: false,
 			snackBarMsg: '',
@@ -59,10 +61,15 @@
 		}
 
 		handleControlDelete(perm) {
-			let absentList = this.state.absentList.filter(function(control) {
+			let index = this.state.absentListNames.indexOf(perm);
+			let absentListNames = this.state.absentListNames.filter(function(control) {
 				return perm != control
 			})
+			let absentList = this.state.absentList.filter(function(control, id) {
+				return index != id
+			})
 			this.setState({
+				absentListNames: absentListNames,
 				absentList: absentList,
 				disableSave: false
 			})
@@ -76,19 +83,26 @@
 
 		handleAddNewPerm() {
 			let perms = [];
-			if(this.state.candidates.indexOf(this.state.searchPerm)> -1 && this.state.absentList.indexOf(this.state.searchPerm) === -1)
+			let permName = [];
+			let permIndex = 0;
+			let th = this;
+			if(this.state.candidatesName.indexOf(this.state.searchPerm)> -1 && this.state.absentListNames.indexOf(this.state.searchPerm) === -1)
 			{
-					perms = this.state.absentList
-					perms.push(this.state.searchPerm)
+					perms = this.state.absentList;
+					permName = this.state.absentListNames;
+					permName.push(this.state.searchPerm);
+					permIndex = this.state.candidatesName.indexOf(this.state.searchPerm);
+					perms.push(this.state.candidatesID[permIndex]);
 					this.setState({
 						absentList: perms,
 						searchPerm: '',
-						disableSave: false
+						disableSave: false,
+						absentListNames: permName
 					})
 			}
 			else
 			{
-				if(this.state.absentList.indexOf(this.state.searchPerm) >= 0)
+				if(this.state.absentListNames.indexOf(this.state.searchPerm) >= 0)
 				{
 				this.setState({
 					snackBarMsg: "Candidate already added",
@@ -127,7 +141,9 @@
 
 		handleSessionOn(e,date) {
 			this.setState({
-				sessionOn: date
+				sessionOn: date,
+				absentList: [],
+				absentListNames: []
 			})
 		}
 
@@ -150,28 +166,33 @@
 			getWaveSpecificCandidates(waveId){
 			let th = this;
 			let candidateName = [];
+			let candidateID = [];
 			Request
 				.get('/dashboard/WaveSpecificCandidates?waveId='+waveId)
 				.set({'Authorization': localStorage.getItem('token')})
 				.end(function(err, res){
 				th.setState({
-            candidates:res.body.data
+            candidatesName:res.body.data
 				})
-				th.state.candidates.map(function(candidate,index) {
+				th.state.candidatesName.map(function(candidate,index) {
 					candidateName.push(candidate.EmployeeName);
+					candidateID.push(candidate.EmployeeID);
 				})
 				th.setState({
-					candidates: candidateName
+					candidatesName: candidateName,
+					candidatesID: candidateID
 				})
 				})
 			}
 
 		onWaveIdChange(e) {
 			this.setState({
-				WaveId: e.target.textContent
+				WaveId: e.target.textContent,
+				absentList: [],
+				absentListNames: []
 			})
 			console.log(e.target.textContent);
-			this.getWaveSpecificCandidates(this.state.WaveId);
+			this.getWaveSpecificCandidates(e.target.textContent);
 		}
 
 		render() {
@@ -197,7 +218,7 @@
 
 						      <DatePicker hintText="select Date" mode="landscape" value={this.state.sessionOn} onChange={this.handleSessionOn}/>
 									{
-										th.state.candidates.map(function(cand, index) {
+										th.state.candidatesName.map(function(cand, index) {
 											return (
 												<div>{cand.EmployeeName}</div>
 												);
@@ -211,13 +232,13 @@
 							      searchText={this.state.searchPerm}
 					          onUpdateInput={this.handleUpdateInputPerm}
 					          onNewRequest={this.handleAddNewPerm}
-							      dataSource={this.state.candidates}
+							      dataSource={this.state.candidatesName}
 							      maxSearchResults={5}
 							    />
 						    	<Paper style={styles.paper} zDepth={1} >
 										<div style={styles.wrapper}>
 											{
-												this.state.absentList.map(function (absent, index) {
+												th.state.absentListNames.map(function (absent, index) {
 													return(
 														<Chip
 															onRequestDelete={() => th.handleControlDelete(absent)}

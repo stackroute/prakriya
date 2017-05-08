@@ -125,7 +125,7 @@ let getWaveId = function(successCB, errorCB) {
 //get all candidates of specific wave
 let getWaveSpecificCandidates = function(WaveID,successCB, errorCB) {
 	console.log("insidemongo controller"+WaveID)
-	CandidateModel.find({Wave:WaveID},'EmployeeName', function(err, result) {
+	CandidateModel.find({Wave:WaveID},['EmployeeID','EmployeeName'], function(err, result) {
 		if(err) {
 			console.log("error")
 			errorCB(err);
@@ -138,7 +138,7 @@ let getWaveSpecificCandidates = function(WaveID,successCB, errorCB) {
 //update absentees
 let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
 	console.log("absentees"+AbsenteesID.absentees);
-	CandidateModel.update({EmployeeName:{$in:AbsenteesID.absentees}},{$push:{'Attendance.DaysAbsent':AbsenteesID.date}}, function(err, result) {
+	CandidateModel.update({EmployeeID:{$in:AbsenteesID.absentees}},{$push:{'Attendance.DaysAbsent':AbsenteesID.date}}, function(err, result) {
 		if(err) {
 			console.log("error"+err)
 			errorCB(err);
