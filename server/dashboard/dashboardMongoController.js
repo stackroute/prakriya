@@ -6,7 +6,6 @@ const FileModel = require('../../models/files.js');
 const FeedbackModel = require('../../models/feedback.js');
 const EvaluationModel = require('../../models/evaluation.js');
 const adminMongoController = require('../admin/adminMongoController.js');
-const WaveModel = require('../../models/waves.js');
 
 let getPermissions =  function(role, successCB, errorCB) {
 	RoleModel.findOne({"name": role},function(err, result) {
