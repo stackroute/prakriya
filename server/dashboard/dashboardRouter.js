@@ -62,8 +62,7 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
 })
 
 // Get all projects
-// router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
-router.get('/projects', auth.controlledBy("PROJECTS"), function(req, res) {
+router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try{
     dashboardMongoController.getProjects(function(projects) {
       res.status(201).json(projects);
