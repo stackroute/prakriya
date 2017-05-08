@@ -37,7 +37,6 @@ export default class Dashboard extends React.Component {
 					th.setState({
 						user: res.body
 					})
-					console.log(th.state.user)
 				}
 			})
 	}

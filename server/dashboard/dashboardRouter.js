@@ -45,8 +45,25 @@ router.get("/user", function(req, res) {
   }
 });
 
+// Add a new Wave
+router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try {
+    dashboardMongoController.addWave(req.body, function (wave) {
+      res.status(200).json(wave)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot add wave in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    }); 
+  }
+})
+
 // Get all projects
-router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+// router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+router.get('/projects', auth.controlledBy("PROJECTS"), function(req, res) {
   try{
     dashboardMongoController.getProjects(function(projects) {
       res.status(201).json(projects);

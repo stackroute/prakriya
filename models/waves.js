@@ -21,6 +21,7 @@ var wave = new Schema({
   StartDate: Date,
   EndDate: Date,
   Location: String,
+  Cadets: [Number],
   Sessions: [subSchema]
 });
 

@@ -16,8 +16,10 @@ let addCadet = function (cadetObj, successCB, errorCB) {
 			user.password = 'digital@123';
 			user.role = 'candidate';
 			adminMongoController.addUser(user, function (user) {
+				console.log('SuccessCB')
 				successCB(result);
 			}, function (err) {
+				console.log('ErrorCB')
 				errorCB(err);
 			})
 		}

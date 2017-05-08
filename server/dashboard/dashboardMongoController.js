@@ -1,4 +1,5 @@
 const RoleModel = require('../../models/roles.js');
+const WaveModel = require('../../models/waves.js');
 const ProjectModel = require('../../models/projects.js');
 const CandidateModel = require('../../models/candidates.js');
 const FileModel = require('../../models/files.js');
@@ -16,6 +17,22 @@ let getPermissions =  function(role, successCB, errorCB) {
 	});
 }
 
+let addWave = function (waveObj, successCB, errorCB) {
+	console.log('WaveObj', waveObj)
+	let saveWave = new WaveModel(waveObj);
+	saveWave.save(function (err, result) {
+		if(err)
+			errorCB(err);
+		result.Cadets.map(function(cadetID) {
+			CandidateModel.update({"EmployeeID": cadetID}, {$set: {"Wave": result.WaveID}}, function(err, status) {
+				if(err)
+					errorCB(err);
+			})
+		})
+		successCB(result);
+	})
+}
+
 let getProjects = function(successCB, errorCB) {
 	ProjectModel.find({},function(err, result) {
 		if (err)
@@ -29,7 +46,7 @@ let addProject = function (projectObj, successCB, errorCB) {
 	saveProject.save(function (err, result) {
 		if(err)
 			errorCB(err);
-		successCB(result);
+		successCB(result)
 	})
 }
 
@@ -150,6 +167,7 @@ let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
 
 module.exports = {
 	getPermissions: getPermissions,
+	addWave: addWave,
 	getCadet: getCadet,
 	getCadets: getCadets,
 	getProjects: getProjects,

@@ -3,6 +3,7 @@ import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
+import Snackbar from 'material-ui/Snackbar';
 import CadetItem from './CadetItem.jsx';
 import AddWave from './AddWave.jsx';
  
@@ -24,19 +25,40 @@ export default class MentorConnect extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			user: {},
 			cadets: [],
-			filterCadet: ''
+			filterCadet: '',
+			open: false,
+			message: ''
 		}
 		this.getCadets = this.getCadets.bind(this);
 		this.saveRemarks = this.saveRemarks.bind(this);
+		this.addWave = this.addWave.bind(this);
 		this.handleFilter = this.handleFilter.bind(this);
 		this.handleClearFilter = this.handleClearFilter.bind(this);
+		this.handleRequestClose = this.handleRequestClose.bind(this);
 	}
 
 	componentDidMount() {
+		this.getUser();
 		this.getCadets();
 	}
 
+	getUser() {
+		let th = this
+		Request
+			.get('/dashboard/user')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res){
+				if(err)
+					console.log(err)
+				else {
+					th.setState({
+						user: res.body
+					})
+				}
+			})
+	}
 	getCadets() {
 		let th = this;
 		Request
@@ -66,6 +88,24 @@ export default class MentorConnect extends React.Component {
 		    }
 			});
 	}
+	addWave(wave) {
+		let th = this;
+		Request
+			.post('/dashboard/addwave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(wave)
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+		    	th.setState({
+		    		open: true,
+		    		message: "Wave added successfully with Wave ID: " + res.body.WaveID
+		    	})
+		    	th.getCadets();
+		    }
+			});
+	}
 	handleFilter(val) {
 		this.setState({
 			filterCadet: val
@@ -74,6 +114,11 @@ export default class MentorConnect extends React.Component {
 	handleClearFilter() {
 		this.setState({
 			filterCadet: ''
+		})
+	}
+	handleRequestClose() {
+		this.setState({
+			open: false
 		})
 	}
 	
@@ -140,7 +185,17 @@ export default class MentorConnect extends React.Component {
 						})
 					}
 				</Grid>
-				<AddWave cadets={this.state.cadets}/>
+				{
+					this.state.user.role == "administrator" &&
+					this.state.cadets.length > 0 &&
+					<AddWave cadets={this.state.cadets} handleWaveAdd={this.addWave}/>
+				}
+				<Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={4000}
+          onRequestClose={this.handleRequestClose}
+        />
 			</div>
 		)
 	}	

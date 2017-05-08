@@ -38,9 +38,11 @@ let registerCandidates = function () {
 				  function(cadetObj, callback){
 				    uploadMongoController.addCadet(cadetObj, function (cadet) {
 			  			importedCadets.push(cadet);
+			  			console.log('Pushed')
 			  			callback();
 			  		}, function (err) {
 			  			failedCadets.push(cadetObj);
+			  			console.log('error')
 			  			callback();
 			  		})
 				  },
