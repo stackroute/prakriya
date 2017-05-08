@@ -1,11 +1,11 @@
 const RoleModel = require('../../models/roles.js');
+const WaveModel = require('../../models/waves.js');
 const ProjectModel = require('../../models/projects.js');
 const CandidateModel = require('../../models/candidates.js');
 const FileModel = require('../../models/files.js');
 const FeedbackModel = require('../../models/feedback.js');
 const EvaluationModel = require('../../models/evaluation.js');
 const adminMongoController = require('../admin/adminMongoController.js');
-const WaveModel = require('../../models/waves.js');
 
 let getPermissions =  function(role, successCB, errorCB) {
 	RoleModel.findOne({"name": role},function(err, result) {
@@ -14,6 +14,22 @@ let getPermissions =  function(role, successCB, errorCB) {
 		}
 		successCB(result);
 	});
+}
+
+let addWave = function (waveObj, successCB, errorCB) {
+	console.log('WaveObj', waveObj)
+	let saveWave = new WaveModel(waveObj);
+	saveWave.save(function (err, result) {
+		if(err)
+			errorCB(err);
+		result.Cadets.map(function(cadetID) {
+			CandidateModel.update({"EmployeeID": cadetID}, {$set: {"Wave": result.WaveID}}, function(err, status) {
+				if(err)
+					errorCB(err);
+			})
+		})
+		successCB(result);
+	})
 }
 
 let getProjects = function(successCB, errorCB) {
@@ -29,7 +45,7 @@ let addProject = function (projectObj, successCB, errorCB) {
 	saveProject.save(function (err, result) {
 		if(err)
 			errorCB(err);
-		successCB(result);
+		successCB(result)
 	})
 }
 
@@ -150,6 +166,7 @@ let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
 
 module.exports = {
 	getPermissions: getPermissions,
+	addWave: addWave,
 	getCadet: getCadet,
 	getCadets: getCadets,
 	getProjects: getProjects,
