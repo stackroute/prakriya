@@ -22,6 +22,7 @@ import MyProfile from './components/myProfile/index.jsx';
 import Projects from './components/projectManagement/index.jsx';
 import Feedback from './components/feedback/index.jsx';
 import EvaluationForms from './components/evaluationForms/index.jsx';
+import Attendance from './components/attendance/index.jsx';
 
 injectTapEventPlugin();
 
@@ -81,6 +82,7 @@ ReactDOM.render(
 				<Route path="/projects" component={Projects} />
 				<Route path="/feedback" component={Feedback} />
 				<Route path="/evaluationforms" component={EvaluationForms} />
+				<Route path="/attendance" component={Attendance} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

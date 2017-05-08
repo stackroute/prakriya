@@ -7,7 +7,7 @@ const adminMongoController = require('../admin/adminMongoController.js');
 var auth = require('../auth')();
 var CONFIG = require('../../config');
 
-router.get("/user", function(req, res) {  
+router.get("/user", function(req, res) {
   // res.json(users[req.user.id]);
   console.log("req from user!!!")
   console.log('User object sent ', req.user);
@@ -41,7 +41,7 @@ router.get("/user", function(req, res) {
   catch(err){
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 });
 
@@ -57,7 +57,7 @@ router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -107,7 +107,7 @@ router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -123,7 +123,7 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -140,7 +140,7 @@ router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function(req
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -156,7 +156,7 @@ router.get('/files', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -172,7 +172,7 @@ router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -188,7 +188,7 @@ router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function(req, res)
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -214,7 +214,7 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
       catch(err) {
         res.status(500).json({
           error: 'Internal error occurred, please report...!'
-        }); 
+        });
       }
     });
   })
@@ -236,5 +236,66 @@ router.get('/getimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
     });
   }
 })
+
+
+/****************************************************
+*******          Attendance         ********
+****************************************************/
+
+//get all unique waveid
+router.get("/WaveId", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+
+  console.log("INSIDE WAVEID");
+  try{
+    console.log("inside try block")
+    dashboardMongoController.getWaveId(function(WaveId) {
+      console.log(WaveId)
+      res.status(201).json({WaveId:WaveId});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all unique waveId from db...!' });
+    });
+  }
+  catch(err){
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+//get all candidates for specific wave
+router.get("/WaveSpecificCandidates", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  console.log(req.query.waveId+'in router');
+  try{
+    dashboardMongoController.getWaveSpecificCandidates(req.query.waveId,function(data) {
+      res.status(201).json({data:data});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all candidate for specific wave from db...!' });
+    });
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+//update absentees
+router.post("/updateabsentees", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+
+  try{
+    dashboardMongoController.updateAbsentees(req.body,function(status) {
+      res.status(201);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!' });
+    });
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 
 module.exports = router;

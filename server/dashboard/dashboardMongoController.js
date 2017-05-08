@@ -5,6 +5,7 @@ const FileModel = require('../../models/files.js');
 const FeedbackModel = require('../../models/feedback.js');
 const EvaluationModel = require('../../models/evaluation.js');
 const adminMongoController = require('../admin/adminMongoController.js');
+const WaveModel = require('../../models/waves.js');
 
 let getPermissions =  function(role, successCB, errorCB) {
 	RoleModel.findOne({"name": role},function(err, result) {
@@ -17,7 +18,7 @@ let getPermissions =  function(role, successCB, errorCB) {
 
 let getProjects = function(successCB, errorCB) {
 	ProjectModel.find({},function(err, result) {
-		if (err) 
+		if (err)
 				errorCB(err);
 		successCB(result);
 	});
@@ -35,7 +36,7 @@ let addProject = function (projectObj, successCB, errorCB) {
 let getCadet = function(email, successCB, errorCB) {
 	console.log();
 	CandidateModel.findOne({'EmailID': email},function(err, result) {
-		if (err) 
+		if (err)
 				errorCB(err);
 		successCB(result);
 	});
@@ -43,7 +44,7 @@ let getCadet = function(email, successCB, errorCB) {
 
 let getCadets = function(successCB, errorCB) {
 	CandidateModel.find({},function(err, result) {
-		if (err) 
+		if (err)
 				errorCB(err);
 		successCB(result);
 	});
@@ -81,7 +82,7 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
 
 let getFiles = function(successCB, errorCB) {
 	FileModel.find({},function(err, result) {
-		if (err) 
+		if (err)
 				errorCB(err);
 		successCB(result);
 	});
@@ -108,6 +109,45 @@ let saveEvaluation = function(evaluationObj, successCB, errorCB) {
 }
 
 
+/****************************************************
+*******          Attendance         ********
+****************************************************/
+let getWaveId = function(successCB, errorCB) {
+	console.log("insidemongo controller")
+	WaveModel.find().distinct('WaveID', function(err, result) {
+		if(err) {
+			console.log("error")
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+//get all candidates of specific wave
+let getWaveSpecificCandidates = function(WaveID,successCB, errorCB) {
+	console.log("insidemongo controller"+WaveID)
+	CandidateModel.find({Wave:WaveID},'EmployeeName', function(err, result) {
+		if(err) {
+			console.log("error")
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	});
+}
+
+//update absentees
+let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
+	console.log("absentees"+AbsenteesID.absentees);
+	CandidateModel.update({EmployeeName:{$in:AbsenteesID.absentees}},{$push:{'Attendance.DaysAbsent':AbsenteesID.date}}, function(err, result) {
+		if(err) {
+			console.log("error"+err)
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	});
+}
+
 module.exports = {
 	getPermissions: getPermissions,
 	getCadet: getCadet,
@@ -118,5 +158,8 @@ module.exports = {
 	updateCadet: updateCadet,
 	deleteCadet: deleteCadet,
 	saveFeedback: saveFeedback,
-	saveEvaluation: saveEvaluation
+	saveEvaluation: saveEvaluation,
+	getWaveId,
+	getWaveSpecificCandidates,
+	updateAbsentees
 }
