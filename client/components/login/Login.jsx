@@ -7,6 +7,8 @@ import Request from 'superagent';
 import {Link} from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import Footer from '../../views/Footer.jsx';
+import {Card, CardMedia, CardText} from 'material-ui/Card';
+
 
 export default class Login extends React.Component {
 
@@ -15,7 +17,9 @@ export default class Login extends React.Component {
 		this.state = {
 			username: "",
 			password: "",
-			errMsg: ""
+			errMsg: "",
+			usernameErrorText: "",
+			passwordErrorText: ""
 		}
 		this.onChangeUsername = this.onChangeUsername.bind(this)
 		this.onChangePassword = this.onChangePassword.bind(this)
@@ -25,6 +29,7 @@ export default class Login extends React.Component {
 	onChangeUsername(e) {
 		this.setState({
 			errMsg: "",
+			usernameErrorText: "",
 			username: e.target.value
 		})
 	}
@@ -32,61 +37,77 @@ export default class Login extends React.Component {
 	onChangePassword(e) {
 		this.setState({
 			errMsg: "",
+			passwordErrorText: "",
 			password: e.target.value
 		})
 	}
 
 	login() {
 		let th = this
-		Request
-			.post('/login')
-			.send({username: this.state.username, password: this.state.password})
-			.end(function(err, res){
-		    // Do something 
-		    if(res.status == 401) {
-		    	th.setState({
-		    		errMsg: "*Invalid username or password"
-		    	})
-		    }
-		    else if(res.text == 'Account suspended') {
-		    	th.setState({
-		    		errMsg: "*Account is suspended. Contact admin"
-		    	})
-		    }
-		    else if(err) {
-		    	th.setState({
-		    		errMsg: "*Internal Server Error"
-		    	})
-		    }
-		    else {
-		    	localStorage.setItem('token', res.body.token);
-		    	th.context.router.push('/app')
-		    }
-		  });
+		if(th.state.username.trim().length === 0) th.setState({
+			usernameErrorText: "This field cannot be empty"
+		})
+		if(th.state.password.trim().length === 0) th.setState({
+			passwordErrorText: "This field cannot be empty"
+		})
+		if(th.state.username.trim().length !== 0 && th.state.password.trim().length !== 0) {
+			Request
+				.post('/login')
+				.send({username: this.state.username, password: this.state.password})
+				.end(function(err, res){
+			    // Do something
+			    if(res.status == 401) {
+			    	th.setState({
+			    		errMsg: "Invalid username or password. Try again."
+			    	})
+			    }
+			    else if(res.text == 'Account suspended') {
+			    	th.setState({
+			    		errMsg: "Account is suspended. Contact admin."
+			    	})
+			    }
+			    else if(err) {
+			    	th.setState({
+			    		errMsg: "Internal Server Error."
+			    	})
+			    }
+			    else {
+			    	localStorage.setItem('token', res.body.token);
+			    	th.context.router.push('/app')
+			    }
+			  })
+		}
 	}
 
 	render() {
-		const bodyStyle = {
-			textAlign: 'center'
-			// margin: 'auto',
-			// marginTop: '20px',
-			// width: '350px',
-			// padding: '10px 0px 20px 0px',
-			// fontFamily: 'sans-serif',
-			// backgroundColor: '#eee',
-			// boxShadow: '1px 1px 10px 1px #444',
-			// borderRadius: '10px'
-		}
+
 		return(
-			<div>
-		    <div style={bodyStyle}>
-					<TextField hintText="Username" onChange={this.onChangeUsername} /> <br />
-					<TextField hintText="Password" type="password" onChange={this.onChangePassword} /> 
-					<br /><br />
-					<RaisedButton label="Login" primary={true} onClick={this.login} /><br />
-					<div style={{color: 'red'}}>{this.state.errMsg}</div>
-				</div>
-			</div>
+			<Card>
+				 <CardMedia>
+						 <img src="./assets/images/login_head.png"/>
+				 </CardMedia>
+				 <CardText>
+					 <TextField
+					 	floatingLabelText="Username"
+					 	onChange={this.onChangeUsername}
+						style={{width: '100%'}}
+						errorText={this.state.usernameErrorText}/> <br />
+					 <TextField
+					 	floatingLabelText="Password"
+						type="password"
+						onChange={this.onChangePassword}
+						style={{width: '100%'}}
+						errorText={this.state.passwordErrorText}/>
+					 <br /><br />
+					 <RaisedButton
+					 	label="Login"
+						primary={true}
+						onClick={this.login}
+						style={{width: '100%'}} />
+						<br /><br />
+					 <div style={{color: 'red', fontWeight: 'bold', textAlign: 'center'}}>{this.state.errMsg}</div>
+				 </CardText>
+			</Card>
 		)
 	}
 }
