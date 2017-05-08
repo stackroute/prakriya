@@ -9,7 +9,8 @@ import {lightBlack} from 'material-ui/styles/colors';
 const styles = {
 	card: {
 		box: {
-				border: '0.5px solid #009ab1'
+				border: '0.5px solid #009ab1',
+				padding: '5px'
 		},
 		header: {
 			backgroundColor: '#00bcd4'
@@ -19,21 +20,19 @@ const styles = {
 			fontSize: '1.2em'
 		},
 		text: {
-			backgroundColor: '#c4edf2',
+			border: '1px solid #c4edf2',
 			borderTop: '0.5px solid white'
 		}
 	},
 	action: {
-		edit: {
-			position:'relative',
-      left: '92%',
-			bottom: '45px'
-		},
 		save: {
-			position: 'relative',
-      left: '42%',
-			bottom: '10px'
+			position:'absolute',
+      right: '10px',
+			bottom: '15px'
 		}
+	},
+	underline: {
+		display: 'none'
 	}
 }
 
@@ -93,7 +92,6 @@ export default class TrackItem extends React.Component {
 		let th = this;
 
 		return (
-			<div>
 				<Card style={styles.card.box}>
 					<CardHeader
 			      title={th.state.track.candidateName}
@@ -117,13 +115,15 @@ export default class TrackItem extends React.Component {
 							    		value={value}
 											onChange={(e)=>{e.persist(); th.onCommentChange(index, e)}}
 											onBlur={th.updateComments}
+											fullWidth={true}
+											multiLine={true}
+											underlineStyle={styles.underline}
 							    	/>
                   </CardText>
                 )
               })
           }
 			  </Card>
-			</div>
 		);
 	}
 }
