@@ -140,7 +140,7 @@ export default class AssessmentTracker extends React.Component {
 						<h1>Assessment Tracker</h1>
 					</Row>
 					<Row>
-						<Col>
+						<Col md={6}>
 						<SelectField
 							onChange={th.onTrainingTrackChange}
 							floatingLabelText="Select Training Track"
@@ -152,8 +152,6 @@ export default class AssessmentTracker extends React.Component {
 								})
 							}
 						</SelectField>
-						</Col>
-						<Col>
 						<SelectField
 							onChange={th.onWaveChange}
 							floatingLabelText="Select Wave"
@@ -166,7 +164,7 @@ export default class AssessmentTracker extends React.Component {
 							}
 						</SelectField>
 						</Col>
-						<Col>
+						<Col md={6}>
 						<SelectField
 							onChange={th.onCourseChange}
 							floatingLabelText="Select Course"
@@ -180,10 +178,13 @@ export default class AssessmentTracker extends React.Component {
 						</SelectField>
 						</Col>
 					</Row>
+				</Grid>
+
+				<Grid><Row>
 					{
 						th.state.candidates.map(function(candidate, index) {
 							let categories = th.state.assessmentCategories
-							return <TrackItem
+							return <Col md={6}><TrackItem
 								key={index}
 								track={
 									{
@@ -195,10 +196,10 @@ export default class AssessmentTracker extends React.Component {
 									}
 								}
 								onUpdateComments={(comments)=>{th.updateComments(index, comments)}}
-								onSaveComments={()=>{th.saveAssessmentTrack(index)}} />
+								onSaveComments={()=>{th.saveAssessmentTrack(index)}} /></Col>
 						})
 					}
-				</Grid>
+				</Row></Grid>
 			</div>
 		)
 	}
