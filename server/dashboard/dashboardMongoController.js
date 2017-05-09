@@ -164,19 +164,51 @@ let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
 	});
 }
 
+let getCoursesForWave = function(waveID, successCB, errorCB) {
+	console.log('getCoursesForWave: ', waveID)
+	WaveModel.findOne({WaveID: waveID}, 'CourseNames' , function(err, result) {
+		if(err)
+			errorCB(err)
+		console.log('Result for getCoursesForWave: ', result);
+		successCB(result);
+	});
+}
+
+let getCandidates = function(waveID, courseName, successCB, errorCB) {
+	CandidateModel.find({Wave: waveID, CourseName: courseName}, function(err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
+let getAssesmentTrack = function(waveID, courseName, successCB, errorCB) {
+	console.log('getAssesmentTrack: ', + waveID + ' - ' + courseName)
+	AssessmentTrackModel.findOne({Wave: waveID, CourseName: courseName}, function(err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
 module.exports = {
-	getPermissions: getPermissions,
-	addWave: addWave,
-	getCadet: getCadet,
-	getCadets: getCadets,
-	getProjects: getProjects,
-	addProject: addProject,
-	getFiles: getFiles,
-	updateCadet: updateCadet,
-	deleteCadet: deleteCadet,
-	saveFeedback: saveFeedback,
-	saveEvaluation: saveEvaluation,
+	getPermissions,
+	addWave,
+	getCadet,
+	getCadets,
+	getProjects,
+	addProject,
+	getFiles,
+	updateCadet,
+	deleteCadet,
+	saveFeedback,
+	saveEvaluation,
 	getWaveId,
 	getWaveSpecificCandidates,
-	updateAbsentees
+	updateAbsentees,
+	getCoursesForWave,
+	getCandidates,
+	getAssesmentTrack
 }
