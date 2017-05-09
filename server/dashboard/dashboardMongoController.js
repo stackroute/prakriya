@@ -129,7 +129,7 @@ let saveEvaluation = function(evaluationObj, successCB, errorCB) {
 /****************************************************
 *******          Attendance         ********
 ****************************************************/
-let getWaveId = function(successCB, errorCB) {
+let getWaveIDs = function(successCB, errorCB) {
 	console.log("insidemongo controller")
 	WaveModel.find().distinct('WaveID', function(err, result) {
 		if(err) {
@@ -140,9 +140,9 @@ let getWaveId = function(successCB, errorCB) {
 	});
 }
 //get all candidates of specific wave
-let getWaveSpecificCandidates = function(WaveID,successCB, errorCB) {
-	console.log("insidemongo controller"+WaveID)
-	CandidateModel.find({Wave:WaveID},['EmployeeID','EmployeeName'], function(err, result) {
+let getWaveSpecificCandidates = function(waveID,successCB, errorCB) {
+	console.log("insidemongo controller"+waveID)
+	CandidateModel.find({Wave: waveID},['EmployeeID','EmployeeName'], function(err, result) {
 		if(err) {
 			console.log("error")
 			errorCB(err);
@@ -206,7 +206,7 @@ module.exports = {
 	deleteCadet,
 	saveFeedback,
 	saveEvaluation,
-	getWaveId,
+	getWaveIDs,
 	getWaveSpecificCandidates,
 	updateAbsentees,
 	getCoursesForWave,

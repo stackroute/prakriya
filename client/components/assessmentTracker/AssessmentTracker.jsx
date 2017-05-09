@@ -38,12 +38,12 @@ export default class AssessmentTracker extends React.Component {
 	getWaveIDs() {
 		let th = this
 		Request
-			.get('/dashboard/WaveId')
+			.get('/dashboard/waveids')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
-				console.log("WaveIDs Fetched: ", res.body.WaveId)
+				console.log("WaveIDs Fetched: ", res.body.waveids)
 				th.setState({
-					waves: res.body.WaveId
+					waves: res.body.waveids
 				})
 			})
 	}
@@ -169,7 +169,7 @@ export default class AssessmentTracker extends React.Component {
 						})
 					}
 				</Row></Grid>
-				
+
 			</div>
 		)
 	}

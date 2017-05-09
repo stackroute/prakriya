@@ -57,7 +57,7 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -259,16 +259,16 @@ router.get('/getimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
 ****************************************************/
 
 //get all unique waveid
-router.get("/WaveId", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+router.get("/waveids", auth.canAccess(CONFIG.ADMMEN), function(req, res) {
 
   console.log("INSIDE WAVEID");
   try{
     console.log("inside try block")
-    dashboardMongoController.getWaveId(function(WaveId) {
-      console.log(WaveId)
-      res.status(201).json({WaveId:WaveId});
+    dashboardMongoController.getWaveIDs(function(waveids) {
+      console.log(waveids)
+      res.status(201).json({waveids: waveids});
     }, function(err) {
-      res.status(500).json({ error: 'Cannot get all unique waveId from db...!' });
+      res.status(500).json({ error: 'Cannot get all unique waveIDs from db...!' });
     });
   }
   catch(err){
@@ -278,10 +278,10 @@ router.get("/WaveId", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   }
 });
 //get all candidates for specific wave
-router.get("/WaveSpecificCandidates", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
-  console.log(req.query.waveId+'in router');
+router.get("/wavespecificcandidates", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  console.log(req.query.waveID+'in router');
   try{
-    dashboardMongoController.getWaveSpecificCandidates(req.query.waveId,function(data) {
+    dashboardMongoController.getWaveSpecificCandidates(req.query.waveID,function(data) {
       res.status(201).json({data:data});
     }, function(err) {
       res.status(500).json({ error: 'Cannot get all candidate for specific wave from db...!' });
