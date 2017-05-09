@@ -68,7 +68,6 @@ let getCadets = function(successCB, errorCB) {
 }
 
 let updateCadet = function (cadetObj, successCB, errorCB) {
-	console.log('CadetObj to update', cadetObj)
 	CandidateModel.update({"EmployeeID": cadetObj.EmployeeID}, cadetObj, function(err, status) {
 		if(err)
 			errorCB(err);
