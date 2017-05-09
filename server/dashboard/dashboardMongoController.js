@@ -5,6 +5,7 @@ const CandidateModel = require('../../models/candidates.js');
 const FileModel = require('../../models/files.js');
 const FeedbackModel = require('../../models/feedback.js');
 const EvaluationModel = require('../../models/evaluation.js');
+const AssessmentTrackModel = require('../../models/assessmenttracks.js');
 const adminMongoController = require('../admin/adminMongoController.js');
 
 let getPermissions =  function(role, successCB, errorCB) {
