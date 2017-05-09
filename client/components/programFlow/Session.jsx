@@ -31,9 +31,9 @@ const styles = {
 			bottom: '45px'
 		},
 		save: {
-			position: 'relative',
-			left: '42%',
-			bottom: '10px'
+			position: 'absolute',
+			right: '10%',
+			bottom: '15px'
 		}
 	}
 }

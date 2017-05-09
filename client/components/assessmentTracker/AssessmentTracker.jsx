@@ -9,21 +9,19 @@ export default class AssessmentTracker extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			trainingTracks: [],
 			waves: [],
 			courses: [],
 			categories: [],
 			candidates: [],
-			trainingTrack: '',
 			wave: '',
 			course: '',
 			assessmentCategories: []
 		}
-		this.getTrainingTracks = this.getTrainingTracks.bind(this)
-		this.getWaves = this.getWaves.bind(this)
-		this.getCandidates = this.getCandidates.bind(this)
+
 		this.getCourses = this.getCourses.bind(this)
-		this.onTrainingTrackChange = this.onTrainingTrackChange.bind(this)
+		this.getWaveIDs = this.getWaveIDs.bind(this)
+
+		this.getCandidates = this.getCandidates.bind(this)
 		this.onWaveChange = this.onWaveChange.bind(this)
 		this.onCourseChange = this.onCourseChange.bind(this)
 		this.updateComments = this.updateComments.bind(this)
@@ -32,56 +30,47 @@ export default class AssessmentTracker extends React.Component {
 
 	componentWillMount() {
 		if(localStorage.getItem('token')) {
-			this.getTrainingTracks()
+			this.getWaveIDs()
 		}
 	}
 
-	getTrainingTracks() {
+	getWaveIDs() {
 		let th = this
 		Request
-			.get('/mentor/trainingtracks')
+			.get('/dashboard/waveids')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
+				console.log("WaveIDs Fetched: ", res.body.waveids)
 				th.setState({
-					trainingTracks: res.body.trainingtracks
+					waves: res.body.waveids
 				})
 			})
 	}
 
-	getWaves(trainingTrack) {
+	getCourses(waveID) {
 		let th = this
 		Request
-			.get('/mentor/waves/'+trainingTrack)
+			.get('/dashboard/coursesforwave?waveID=' + waveID)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
-				th.setState({
-					waves: res.body.waves
-				})
-			})
-	}
-
-	getCourses(wave) {
-		let th = this
-		Request
-			.get('/mentor/coursesfrom/'+wave)
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res){
+				console.log('Courses: ', res.body.courses)
 				th.setState({
 					courses: res.body.courses
 				})
 			})
 	}
 
-	getCandidates(trainingTrack, wave, course) {
+	getCandidates(waveID, courseName) {
 		let th = this
 		Request
-			.get(`/mentor/candidatesandtracks/${trainingTrack}/${wave}/${course}`)
+			.get(`/dashboard/candidatesandtracks/${waveID}/${courseName}`)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 				th.setState({
 					candidates: res.body.candidates,
 					assessmentCategories: res.body.assessmentTrack.Categories
 				})
+				console.log('getCandidates Object: ', res.body)
 			})
 	}
 
@@ -99,18 +88,12 @@ export default class AssessmentTracker extends React.Component {
 			})
 	}
 
-	onTrainingTrackChange(e) {
-		let th = this
-		th.setState({
-			trainingTrack: e.target.outerText
-		})
-		th.getWaves(e.target.outerText)
-	}
-
 	onWaveChange(e) {
 		let th = this
 		th.setState({
-			wave: e.target.outerText
+			wave: e.target.outerText,
+			course: '',
+			candidates: []
 		})
 		th.getCourses(e.target.outerText)
 	}
@@ -120,7 +103,7 @@ export default class AssessmentTracker extends React.Component {
 		th.setState({
 			course: e.target.outerText
 		})
-		th.getCandidates(th.state.trainingTrack, th.state.wave, e.target.outerText)
+		th.getCandidates(th.state.wave, e.target.outerText)
 	}
 
 	updateComments(index, comments) {
@@ -142,17 +125,6 @@ export default class AssessmentTracker extends React.Component {
 					<Row>
 						<Col md={6}>
 						<SelectField
-							onChange={th.onTrainingTrackChange}
-							floatingLabelText="Select Training Track"
-							value={th.state.trainingTrack}
-						>
-							{
-								th.state.trainingTracks.map(function(val, key) {
-									return <MenuItem key={key} value={val} primaryText={val} />
-								})
-							}
-						</SelectField>
-						<SelectField
 							onChange={th.onWaveChange}
 							floatingLabelText="Select Wave"
 							value={th.state.wave}
@@ -163,8 +135,6 @@ export default class AssessmentTracker extends React.Component {
 								})
 							}
 						</SelectField>
-						</Col>
-						<Col md={6}>
 						<SelectField
 							onChange={th.onCourseChange}
 							floatingLabelText="Select Course"
@@ -200,6 +170,7 @@ export default class AssessmentTracker extends React.Component {
 						})
 					}
 				</Row></Grid>
+
 			</div>
 		)
 	}

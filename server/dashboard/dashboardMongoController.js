@@ -5,6 +5,7 @@ const CandidateModel = require('../../models/candidates.js');
 const FileModel = require('../../models/files.js');
 const FeedbackModel = require('../../models/feedback.js');
 const EvaluationModel = require('../../models/evaluation.js');
+const AssessmentTrackModel = require('../../models/assessmenttracks.js');
 const adminMongoController = require('../admin/adminMongoController.js');
 
 let getPermissions =  function(role, successCB, errorCB) {
@@ -67,7 +68,6 @@ let getCadets = function(successCB, errorCB) {
 }
 
 let updateCadet = function (cadetObj, successCB, errorCB) {
-	console.log('CadetObj to update', cadetObj)
 	CandidateModel.update({"EmployeeID": cadetObj.EmployeeID}, cadetObj, function(err, status) {
 		if(err)
 			errorCB(err);
@@ -128,20 +128,11 @@ let saveEvaluation = function(evaluationObj, successCB, errorCB) {
 /****************************************************
 *******          Attendance         ********
 ****************************************************/
-let getWaveId = function(successCB, errorCB) {
-	console.log("insidemongo controller")
-	WaveModel.find().distinct('WaveID', function(err, result) {
-		if(err) {
-			console.log("error")
-			errorCB(err);
-		}
-		successCB(result);
-	});
-}
+
 //get all candidates of specific wave
-let getWaveSpecificCandidates = function(WaveID,successCB, errorCB) {
-	console.log("insidemongo controller"+WaveID)
-	CandidateModel.find({Wave:WaveID},['EmployeeID','EmployeeName'], function(err, result) {
+let getWaveSpecificCandidates = function(waveID,successCB, errorCB) {
+	console.log("insidemongo controller"+waveID)
+	CandidateModel.find({Wave: waveID},['EmployeeID','EmployeeName'], function(err, result) {
 		if(err) {
 			console.log("error")
 			errorCB(err);
@@ -174,23 +165,80 @@ let saveCandidate = function(candidate,successCB, errorCB) {
 		if(err)
 			errorCB(err);
 		successCB(result)
-	})
+	});
+}
+
+let getCoursesForWave = function(waveID, successCB, errorCB) {
+	console.log('getCoursesForWave: ', waveID)
+	WaveModel.findOne({WaveID: waveID}, 'CourseNames' , function(err, result) {
+		if(err)
+			errorCB(err)
+		console.log('Result for getCoursesForWave: ', result);
+		successCB(result);
+	});
+}
+
+let getCandidates = function(waveID, courseName, successCB, errorCB) {
+	CandidateModel.find({Wave: waveID, CourseName: courseName}, function(err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
+let getAssesmentTrack = function(waveID, courseName, successCB, errorCB) {
+	console.log('getAssesmentTrack: ', + waveID + ' - ' + courseName)
+	AssessmentTrackModel.findOne({Wave: waveID, CourseName: courseName}, function(err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
+/****************************************************
+*******             Common Functions         ********
+****************************************************/
+
+let getWaveIDs = function(successCB, errorCB) {
+	WaveModel.find().distinct('WaveID', function(err, result) {
+		if(err) {
+			console.log("error")
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
+let getWaveObject = function(waveID, successCB, errorCB) {
+	WaveModel.findOne({WaveID: waveID}, function(err, result) {
+		if(err) {
+			console.log("error")
+			errorCB(err);
+		}
+		successCB(result);
+	});
 }
 
 module.exports = {
-	getPermissions: getPermissions,
-	addWave: addWave,
-	getCadet: getCadet,
-	getCadets: getCadets,
-	getProjects: getProjects,
-	addProject: addProject,
-	getFiles: getFiles,
-	updateCadet: updateCadet,
-	deleteCadet: deleteCadet,
-	saveFeedback: saveFeedback,
-	saveEvaluation: saveEvaluation,
-	getWaveId,
+	getPermissions,
+	addWave,
+	getCadet,
+	getCadets,
+	getProjects,
+	addProject,
+	getFiles,
+	updateCadet,
+	deleteCadet,
+	saveFeedback,
+	saveEvaluation,
+	getWaveIDs,
 	getWaveSpecificCandidates,
 	updateAbsentees,
-	saveCandidate
+	saveCandidate,
+	getCoursesForWave,
+	getCandidates,
+	getAssesmentTrack,
+	getWaveObject
 }

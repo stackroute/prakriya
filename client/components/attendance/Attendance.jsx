@@ -154,11 +154,11 @@
 		getWaveId() {
 			let th = this
 			Request
-				.get('/dashboard/WaveId')
+				.get('/dashboard/waveids')
 				.set({'Authorization': localStorage.getItem('token')})
 				.end(function(err, res){
 				th.setState({
-					WaveIds: res.body.WaveId
+					WaveIds: res.body.waveids
 				})
 				})
 			}
@@ -168,7 +168,7 @@
 			let candidateName = [];
 			let candidateID = [];
 			Request
-				.get('/dashboard/WaveSpecificCandidates?waveId='+waveId)
+				.get('/dashboard/wavespecificcandidates?waveID='+waveId)
 				.set({'Authorization': localStorage.getItem('token')})
 				.end(function(err, res){
 				th.setState({

@@ -35,8 +35,6 @@ export default class Wave extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			trainingTracks: [],
-			trainingTrack: '',
 			waves: [],
 			waveString: '',
 			waveObject: {},
@@ -44,10 +42,8 @@ export default class Wave extends React.Component {
 			canCreateSession: true
 		}
 
-		this.getTrainingTracks = this.getTrainingTracks.bind(this)
-		this.getWaves = this.getWaves.bind(this)
+		this.getWaveIDs = this.getWaveIDs.bind(this)
 		this.getWaveObject = this.getWaveObject.bind(this)
-		this.onTrainingTrackChange = this.onTrainingTrackChange.bind(this)
 		this.onWaveChange = this.onWaveChange.bind(this)
 		this.onCourseChange = this.onCourseChange.bind(this)
 		this.addSession = this.addSession.bind(this)
@@ -56,53 +52,34 @@ export default class Wave extends React.Component {
 
 	componentWillMount() {
 		if(localStorage.getItem('token')) {
-			this.getTrainingTracks()
+			this.getWaveIDs()
 		}
 	}
 
-	getTrainingTracks() {
+	getWaveIDs() {
 		let th = this
 		Request
-			.get('/mentor/trainingtracks')
+			.get('/dashboard/waveids')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 				th.setState({
-					trainingTracks: res.body.trainingtracks
+					waves: res.body.waveids
 				})
 			})
 	}
 
-	getWaves(trainingTrack) {
+	getWaveObject(waveID) {
 		let th = this
 		Request
-			.get('/mentor/waves/'+trainingTrack)
+			.get(`/dashboard/waveobject/${waveID}`)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
+				// console.log('Wave recieved from server: ', res.body.waveObject)
 				th.setState({
-					waves: res.body.waves
+					waveObject: res.body.waveObject,
 				})
+				console.log('State Changed: ', th.state.waveObject)
 			})
-	}
-
-	getWaveObject(trainingTrack, waveNumber) {
-		let th = this
-		Request
-			.get(`/mentor/waveobject/${trainingTrack}/${waveNumber}`)
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res){
-				console.log('Wave recieved from server: ', res.body.waveObject)
-				th.setState({
-					waveObject: res.body.waveObject
-				})
-			})
-	}
-
-	onTrainingTrackChange(e) {
-		let th = this
-		th.setState({
-			trainingTrack: e.target.outerText
-		})
-		th.getWaves(e.target.outerText)
 	}
 
 	onWaveChange(e) {
@@ -110,7 +87,7 @@ export default class Wave extends React.Component {
 		th.setState({
 			waveString: e.target.outerText
 		})
-		th.getWaveObject(th.state.trainingTrack, e.target.outerText)
+		th.getWaveObject(e.target.outerText)
 	}
 
 	onCourseChange(e) {
@@ -124,7 +101,6 @@ export default class Wave extends React.Component {
 		let th = this
 		console.log('into addSession: ', th.state)
 		if(th.state.canCreateSession
-			&& th.state.trainingTrack.length !== 0
 			&& th.state.waveString.length !== 0
 			&& th.state.course.length !== 0) {
 			console.log('if')
@@ -164,20 +140,7 @@ export default class Wave extends React.Component {
 						<h2 style={styles.heading}>Program Flow</h2>
 					</Row>
 					<Row>
-						<Col>
-						<SelectField
-							onChange={th.onTrainingTrackChange}
-							floatingLabelText="Select Training Track"
-							value={th.state.trainingTrack}
-						>
-							{
-								th.state.trainingTracks.map(function(val, key) {
-									return <MenuItem key={key} value={val} primaryText={val} />
-								})
-							}
-						</SelectField>
-						</Col>
-						<Col>
+						<Col md={6}>
 						<SelectField
 							onChange={th.onWaveChange}
 							floatingLabelText="Select Wave"
@@ -189,8 +152,6 @@ export default class Wave extends React.Component {
 								})
 							}
 						</SelectField>
-						</Col>
-						<Col>
 						<SelectField
 							onChange={th.onCourseChange}
 							floatingLabelText="Select Course"
@@ -205,12 +166,14 @@ export default class Wave extends React.Component {
 						</SelectField>
 						</Col>
 					</Row>
+					<Row>
 					{
 						th.state.waveObject.Sessions === undefined ? '' :
 						th.state.waveObject.Sessions.map(function(session, index) {
-							return <Session key={index} session={session} waveID={th.state.waveObject.WaveID} onSessionAddition={th.onSessionAddition} />
+							return <Col md={6}><Session key={index} session={session} waveID={th.state.waveObject.WaveID} onSessionAddition={th.onSessionAddition} /></Col>
 						})
 					}
+					</Row>
 				</Grid>
 					<FloatingActionButton style={styles.addButton} mini={true} onTouchTap={this.addSession}>
 						<AddIcon />

@@ -70,8 +70,11 @@ export default class AddWave extends React.Component {
 		})
 	}
 	handleStartDateChange(event, date) {
+		let startDate = new Date(date);
+		let endDate = new Date(date.setDate(date.getDate() + 84));
 		this.setState({
-			StartDate: date
+			StartDate: startDate,
+			EndDate: endDate
 		})
 	}
 	handleEndDateChange(event, date) {
@@ -147,10 +150,12 @@ export default class AddWave extends React.Component {
 			    />
 			    <DatePicker 
 			    	hintText="Start Date" 
+			    	value={this.state.StartDate}
 			    	onChange={this.handleStartDateChange}
 			    />
 			    <DatePicker 
 			    	hintText="End Date" 
+			    	value={this.state.EndDate}
 			    	onChange={this.handleEndDateChange}
 			    />
 			    <SelectField

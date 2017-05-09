@@ -26,9 +26,6 @@ let registerCandidates = function () {
 			  					cadetObj[head] = line_col[key];
 			  			}
 			  		})
-			  		// cadetObj['username'] = cadetObj.EmailID.split('@')[0];
-			  		// cadetObj['password'] = 'digital@123';
-			  		// cadetObj['role'] = 'candidate';
 			  		cadetColln.push(cadetObj);
 			  		total++;
 			  	}

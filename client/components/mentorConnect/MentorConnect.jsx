@@ -4,6 +4,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
 import Snackbar from 'material-ui/Snackbar';
+import FileDrop from './FileDrop.jsx';
 import CadetItem from './CadetItem.jsx';
 import AddWave from './AddWave.jsx';
  
@@ -74,6 +75,19 @@ export default class MentorConnect extends React.Component {
 		    }
 		  })
 	}
+	updateBulkRemarks(file) {
+		Request
+			.post('/upload/remarks')
+			.set({'Authorization': localStorage.getItem('token')})
+			.attach('file', file)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('File uploaded and remarks saved')
+		    }
+			})
+	}
 	saveRemarks(cadet) {
 		let th = this;
 		Request
@@ -135,11 +149,14 @@ export default class MentorConnect extends React.Component {
 					//</div>
 				}
 				<h1 style={styles.heading}>Mentor Connect</h1>
+				<FileDrop handleBulkUpdateRemarks={this.updateBulkRemarks}/>
 				<Grid>
 					<Row style={{textAlign: 'center'}}>
 						<Col md={4} mdOffset={4}>
 							<AutoComplete
 			          hintText="Search Candidate"
+				  filter={AutoComplete.fuzzyFilter}
+						
 			          style={styles.heading}
 			          dataSource={cadetsName}
 			          onNewRequest={this.handleFilter}
