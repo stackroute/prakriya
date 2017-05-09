@@ -258,25 +258,6 @@ router.get('/getimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
 *******          Attendance         ********
 ****************************************************/
 
-//get all unique waveid
-router.get("/waveids", auth.canAccess(CONFIG.ADMMEN), function(req, res) {
-
-  console.log("INSIDE WAVEID");
-  try{
-    console.log("inside try block")
-    dashboardMongoController.getWaveIDs(function(waveids) {
-      console.log(waveids)
-      res.status(201).json({waveids: waveids});
-    }, function(err) {
-      res.status(500).json({ error: 'Cannot get all unique waveIDs from db...!' });
-    });
-  }
-  catch(err){
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
 //get all candidates for specific wave
 router.get("/wavespecificcandidates", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   console.log(req.query.waveID+'in router');
@@ -363,5 +344,51 @@ router.get("/candidatesandtracks/:waveID/:courseName", auth.canAccess(CONFIG.MEN
     });
   }
 });
+
+/****************************************************
+**************          Common Routes        ********
+****************************************************/
+
+//get all unique waveid
+router.get("/waveids", auth.canAccess(CONFIG.ADMMEN), function(req, res) {
+
+  console.log("API HIT ===> GET WAVEIDS");
+  try{
+    console.log("inside try block")
+    dashboardMongoController.getWaveIDs(function(waveids) {
+      console.log(waveids)
+      res.status(201).json({waveids: waveids});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all unique waveIDs from db...!' });
+    });
+  }
+  catch(err){
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Get a particular wave object based on wave id
+router.get("/waveobject/:waveID", auth.canAccess(CONFIG.ADMMEN), function(req, res) {
+
+  console.log("API HIT ===> GET Wave Object");
+  try{
+    dashboardMongoController.getWaveObject(req.params.waveID,
+       function(wave) {
+         console.log('Wave Fetched: ', JSON.stringify(wave))
+         res.status(201).json({waveObject: wave})
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get wave from db...!'});
+    });
+  }
+  catch(err){
+    console.log('Caught: ', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 
 module.exports = router;

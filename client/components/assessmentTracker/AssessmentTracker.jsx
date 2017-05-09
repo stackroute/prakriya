@@ -18,7 +18,6 @@ export default class AssessmentTracker extends React.Component {
 			assessmentCategories: []
 		}
 
-
 		this.getCourses = this.getCourses.bind(this)
 		this.getWaveIDs = this.getWaveIDs.bind(this)
 
@@ -92,7 +91,9 @@ export default class AssessmentTracker extends React.Component {
 	onWaveChange(e) {
 		let th = this
 		th.setState({
-			wave: e.target.outerText
+			wave: e.target.outerText,
+			course: '',
+			candidates: []
 		})
 		th.getCourses(e.target.outerText)
 	}

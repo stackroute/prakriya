@@ -129,16 +129,7 @@ let saveEvaluation = function(evaluationObj, successCB, errorCB) {
 /****************************************************
 *******          Attendance         ********
 ****************************************************/
-let getWaveIDs = function(successCB, errorCB) {
-	console.log("insidemongo controller")
-	WaveModel.find().distinct('WaveID', function(err, result) {
-		if(err) {
-			console.log("error")
-			errorCB(err);
-		}
-		successCB(result);
-	});
-}
+
 //get all candidates of specific wave
 let getWaveSpecificCandidates = function(waveID,successCB, errorCB) {
 	console.log("insidemongo controller"+waveID)
@@ -194,6 +185,30 @@ let getAssesmentTrack = function(waveID, courseName, successCB, errorCB) {
 	});
 }
 
+/****************************************************
+*******             Common Functions         ********
+****************************************************/
+
+let getWaveIDs = function(successCB, errorCB) {
+	WaveModel.find().distinct('WaveID', function(err, result) {
+		if(err) {
+			console.log("error")
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
+let getWaveObject = function(waveID, successCB, errorCB) {
+	WaveModel.findOne({WaveID: waveID}, function(err, result) {
+		if(err) {
+			console.log("error")
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
 module.exports = {
 	getPermissions,
 	addWave,
@@ -211,5 +226,6 @@ module.exports = {
 	updateAbsentees,
 	getCoursesForWave,
 	getCandidates,
-	getAssesmentTrack
+	getAssesmentTrack,
+	getWaveObject
 }
