@@ -140,6 +140,8 @@ export default class MentorConnect extends React.Component {
 						<Col md={4} mdOffset={4}>
 							<AutoComplete
 			          hintText="Search Candidate"
+				  filter={AutoComplete.fuzzyFilter}
+						
 			          style={styles.heading}
 			          dataSource={cadetsName}
 			          onNewRequest={this.handleFilter}
