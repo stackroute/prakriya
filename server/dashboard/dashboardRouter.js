@@ -314,4 +314,25 @@ router.post("/updateabsentees", auth.canAccess(CONFIG.ADMINISTRATOR), function(r
 });
 
 
+/****************************************************
+*******          Candidates                 ********
+****************************************************/
+
+// Save the cadet information
+router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try {
+    dashboardMongoController.saveCandidate(req.body, function (eval) {
+      res.status(200).json(eval)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot save cadidate in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+
 module.exports = router;

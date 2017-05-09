@@ -3,6 +3,7 @@ import Request from 'superagent';
 import FileList from './FileList.jsx';
 import FileDrop from './FileDrop.jsx';
 import {Grid, Row, Col} from 'react-flexbox-grid';
+import AddCandidate from './AddCandidate.jsx';
 
 export default class BulkUpload extends React.Component {
 	constructor(props) {
@@ -12,6 +13,7 @@ export default class BulkUpload extends React.Component {
 		}
 		this.getFiles = this.getFiles.bind(this);
 		this.handleUpload = this.handleUpload.bind(this);
+		this.addCandidate = this.addCandidate.bind(this);
 	}
 	componentDidMount() {
 		this.getFiles();
@@ -41,6 +43,7 @@ export default class BulkUpload extends React.Component {
 		    }
 		  })
 	}
+
 	handleUpload(file) {
 		let th = this;
 		Request
@@ -57,11 +60,27 @@ export default class BulkUpload extends React.Component {
 			})
 	}
 
+	addCandidate(candidate) {
+		let th = this;
+		Request
+			.post('/dashboard/addcandidate')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(candidate)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Success');
+		    }
+			})
+	}
+
 	render() {
 		let th = this;
 		return(
 			<div>
-		    <FileDrop uploadCadets={this.handleUpload}/>
+		   <AddCandidate addCandidate={this.addCandidate}/>
+				 <FileDrop uploadCadets={this.handleUpload}/>
 		    {
 		    	this.state.files.length > 0 &&
 		    	<FileList files={this.state.files}/>

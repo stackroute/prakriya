@@ -164,6 +164,19 @@ let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
 	});
 }
 
+/****************************************************
+*******          Candidates                 ********
+****************************************************/
+
+let saveCandidate = function(candidate,successCB, errorCB) {
+	let newCadet = new CandidateModel(candidate);
+	newCadet.save(function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result)
+	})
+}
+
 module.exports = {
 	getPermissions: getPermissions,
 	addWave: addWave,
@@ -178,5 +191,6 @@ module.exports = {
 	saveEvaluation: saveEvaluation,
 	getWaveId,
 	getWaveSpecificCandidates,
-	updateAbsentees
+	updateAbsentees,
+	saveCandidate
 }
