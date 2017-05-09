@@ -4,6 +4,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const flash = require('connect-flash');
 const auth = require("./auth")();
+const CONFIG = require('../config')
 
 // const logger = require('../applogger');
 const logger = require('log4js').getLogger();
@@ -101,6 +102,26 @@ function setupMongooseConnections() {
 
   mongoose.connection.on('connected', function() {
     logger.debug('Mongoose is now connected to ', 'mongodb://localhost:27017/prakriya');
+    const ControlsModel = require('../models/accesscontrols.js');
+    const RoleModel = require('../models/roles.js');
+    const UserModel = require('../models/users.js');
+    CONFIG.BASEDATA.ACCESS_CONTROLS.map(function(control) {
+      let saveControl = new ControlsModel(control);
+      saveControl.save(function(err, control) {
+        if(!err)
+          logger.info('Access Control added', control.name);
+      })
+    })
+    let saveRole = new RoleModel(CONFIG.BASEDATA.ADMIN_ROLE);
+    saveRole.save(function(err, role) {
+      if(!err)
+          logger.info('Role added', role.name);
+    })
+    let saveUser = new UserModel(CONFIG.BASEDATA.ADMIN_USER);
+    saveUser.save(function(err, user) {
+      if(!err)
+          logger.info('User added', user.name);
+    })
   });
 
   mongoose.connection.on('error', function(err) {
