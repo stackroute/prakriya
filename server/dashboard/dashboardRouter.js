@@ -314,4 +314,54 @@ router.post("/updateabsentees", auth.canAccess(CONFIG.ADMINISTRATOR), function(r
 });
 
 
+// Get all courses for specific wave
+router.get('/coursesforwave', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
+  console.log(req.query.waveID + ' query param in router');
+  try{
+    dashboardMongoController.getCoursesForWave(req.query.waveID, function(data) {
+      res.status(201).json({courses: data.CourseNames});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all candidate for specific wave from db...!' });
+    });
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Get all candidates and tracks
+router.get("/candidatesandtracks/:waveID/:courseName", auth.canAccess(CONFIG.MENTOR), function(req, res) {
+
+  console.log("API HIT ===> GET Candidates And Tracks");
+  try{
+    dashboardMongoController.getCandidates(req.params.waveID, req.params.courseName,
+       function(candidates) {
+         console.log('Candidates Fetched: ', JSON.stringify(candidates))
+         dashboardMongoController.getAssesmentTrack(req.params.waveID, req.params.courseName,
+           function(assessmentTrack) {
+             console.log('AssessmentTrack Fetched: ', JSON.stringify(assessmentTrack))
+              res.status(201).json({
+                candidates: candidates,
+                assessmentTrack: assessmentTrack
+              });
+           },
+           function(err) {
+              res.status(500).json({ error: 'Cannot get the assessment track from db...!'});
+           }
+         )
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all candidates from db...!'});
+    });
+  }
+  catch(err){
+    console.log('Caught: ', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 module.exports = router;
