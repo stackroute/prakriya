@@ -76,6 +76,7 @@ export default class MentorConnect extends React.Component {
 		  })
 	}
 	updateBulkRemarks(file) {
+		let th = this;
 		Request
 			.post('/upload/remarks')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -85,6 +86,7 @@ export default class MentorConnect extends React.Component {
 		    	console.log(err);
 		    else {
 		    	console.log('File uploaded and remarks saved')
+		    	th.getCadets();
 		    }
 			})
 	}
