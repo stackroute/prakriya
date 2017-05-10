@@ -5,6 +5,7 @@ import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import CandidateCard from './CandidateCard.jsx';
 import CandidateHome from './CandidateHome.jsx';
+import AddCandidate from './AddCandidate.jsx';
 
 const styles = {
 	heading: {
@@ -42,6 +43,7 @@ export default class Candidates extends React.Component {
 		this.deleteCandidate = this.deleteCandidate.bind(this);
 		this.updateCandidate = this.updateCandidate.bind(this);
 		this.handleWaveChange = this.handleWaveChange.bind(this);
+		this.addCandidate = this.addCandidate.bind(this);
 	}
 	componentDidMount() {
 		this.getCandidates();
@@ -107,6 +109,24 @@ export default class Candidates extends React.Component {
 		})
 	}
 
+
+	addCandidate(candidate) {
+		let th = this;
+		Request
+			.post('/dashboard/addcandidate')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(candidate)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	th.getCandidates();
+		    	console.log('Success');
+		    }
+			})
+	}
+
+
 	render() {
 		let th = this;
 		// let filter = Filter:
@@ -119,6 +139,7 @@ export default class Candidates extends React.Component {
 	 //        </SelectField>
 		return(
 			<div>
+			<AddCandidate addCandidate={this.addCandidate}/>
 			{
 				!this.state.showCandidate ?
 				<div>
