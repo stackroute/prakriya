@@ -47,6 +47,10 @@ let BASEDATA = {
 		{
 			name: "Feedback",
 			code: "FEEDBACK"
+		},
+		{
+			name: "Attendance",
+			code: "ATTENDANCE"
 		}
 	],
 	ADMIN_ROLE: {
