@@ -69,8 +69,12 @@ export default class MentorConnect extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+		    	let cadets = res.body.filter(function(cadet) {
+		    		if(cadet.Wave == undefined || cadet.Wave == '')
+		    			return cadet;
+		    	})
 		    	th.setState({
-		    		cadets: res.body
+		    		cadets: cadets
 		    	})
 		    }
 		  })

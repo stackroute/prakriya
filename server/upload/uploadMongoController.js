@@ -8,21 +8,6 @@ let addCadet = function (cadetObj, successCB, errorCB) {
 	saveCadet.save(cadetObj, function (err, result) {
 		if(err)
 			errorCB(err);
-		else {
-			let user = {};
-			user.name = cadetObj.EmployeeName;
-			user.email = cadetObj.EmailID;
-			user.username = cadetObj.EmailID.split('@')[0];
-			user.password = 'digital@123';
-			user.role = 'candidate';
-			adminMongoController.addUser(user, function (user) {
-				console.log('SuccessCB')
-				successCB(result);
-			}, function (err) {
-				console.log('ErrorCB')
-				errorCB(err);
-			})
-		}
 	})
 }
 

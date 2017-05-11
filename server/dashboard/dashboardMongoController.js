@@ -19,14 +19,30 @@ let getPermissions =  function(role, successCB, errorCB) {
 
 let addWave = function (waveObj, successCB, errorCB) {
 	console.log('WaveObj', waveObj)
+	let user = {};
 	let saveWave = new WaveModel(waveObj);
 	saveWave.save(function (err, result) {
 		if(err)
 			errorCB(err);
+		console.log(result);
 		result.Cadets.map(function(cadetID) {
-			CandidateModel.update({"EmployeeID": cadetID}, {$set: {"Wave": result.WaveID}}, function(err, status) {
+			CandidateModel.findOneAndUpdate({"EmployeeID": cadetID}, {$set: {"Wave": result.WaveID}}, function(err, status) {
 				if(err)
 					errorCB(err);
+				else
+				{
+					console.log(status.EmployeeName);
+					user.name = status.EmployeeName;
+					user.email = status.EmailID;
+					user.username = status.EmailID.split('@')[0];
+					user.password = 'digital@123';
+					user.role = 'candidate';
+					adminMongoController.addUser(user, function (user) {
+						console.log('SuccessCB')
+					}, function (err) {
+						console.log('ErrorCB')
+					})
+				}
 			})
 		})
 		successCB(result);
