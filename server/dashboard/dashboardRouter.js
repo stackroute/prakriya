@@ -259,7 +259,7 @@ router.get('/getimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
 ****************************************************/
 
 //get all candidates for specific wave
-router.get("/wavespecificcandidates", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+router.get("/wavespecificcandidates", auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   console.log(req.query.waveID+'in router');
   try{
     dashboardMongoController.getWaveSpecificCandidates(req.query.waveID,function(data) {

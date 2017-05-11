@@ -2,20 +2,44 @@ import React from 'react';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import Avatar from 'material-ui/Avatar';
 import Moment from 'moment';
+import Dialog from 'material-ui/Dialog';
 
 const styles = {
     text: {
       wordWrap: 'break-word'
+    },
+    view: {
+    	cursor: 'pointer',
+    	textDecoration: 'underline',
+    	color: 'blue'
     }
 };
 
 export default class ProjectCard extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			dialog: false
+		}
 		this.formatDate = this.formatDate.bind(this);
+		this.handleClose = this.handleClose.bind(this);
+		this.handleOpen = this.handleOpen.bind(this);
 	}
+
 	formatDate(date) {
 		return Moment(date).fromNow();
+	}
+
+	handleClose() {
+		this.setState({
+			dialog: false
+		})
+	}
+
+	handleOpen() {
+		this.setState({
+			dialog: true
+		})
 	}
 
 	render() {
@@ -31,9 +55,27 @@ export default class ProjectCard extends React.Component {
 			      	</Avatar>
 			      }/>
 			    <CardText style={styles.text}>
-			    	{this.props.project.description}
-			    </CardText>
+			    	<h3>Description:</h3>{this.props.project.description}
+			    	<h3>Tech Skills:</h3><ul>{this.props.project.skills.map(function(skill){
+        		return <li>{skill}</li>
+        		})}</ul>
+			    	<h3>Developed By:</h3>{this.props.project.wave}
+			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>View members</span>
+			    	</CardText>
 				</Card>
+				 <Dialog
+		    	style={styles.dialog}
+          title="Team Members"
+          open={this.state.dialog}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleClose}
+        >
+        {
+        	this.props.project.members.map(function(member){
+        		return <h5>{member}</h5>
+        	})
+        }
+        </Dialog>
 			</div>
 		)
 	}
