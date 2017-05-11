@@ -8,6 +8,7 @@ let addCadet = function (cadetObj, successCB, errorCB) {
 	saveCadet.save(cadetObj, function (err, result) {
 		if(err)
 			errorCB(err);
+		successCB(result);
 	})
 }
 
