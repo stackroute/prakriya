@@ -60,7 +60,9 @@ var evaluation = new Schema({
   },
   overall: Number,
   doneWell: String,
-  improvement: String
+  improvement: String,
+	suggestions: String
 });
+
 
 module.exports = mongoose.model('Evaluation', evaluation);
