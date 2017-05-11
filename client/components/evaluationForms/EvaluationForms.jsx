@@ -119,6 +119,7 @@ export default class EvaluationForms extends React.Component {
 			overall: 1,
 			doneWell: '',
 			improvement: '',
+			suggestions: '',
 			open: false,
 			disableSave: true
 		}
@@ -128,6 +129,7 @@ export default class EvaluationForms extends React.Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleDoneWellChange = this.handleDoneWellChange.bind(this);
 		this.handleAreasOfImprovementChange = this.handleAreasOfImprovementChange.bind(this);
+		this.handleSuggestionsChange = this.handleSuggestionsChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.saveEvaluation = this.saveEvaluation.bind(this);
 	}
@@ -139,7 +141,7 @@ export default class EvaluationForms extends React.Component {
 			testability: {'1':1, '2':1, '3':1, '4':1, '5':1, '6': 1},
 			engineeringculture: {'1':1, '2':1, '3':1, '4':1, '5':1},
 			technology: {
-				'1':1, '2':1, '3':1, '4':1, '5':1, 
+				'1':1, '2':1, '3':1, '4':1, '5':1,
 				'6':1, '7':1, '8':1, '9':1, '10':1,
 				'11':1, '12':1, '13':1, '14':1, '15':1, '16': 1
 			},
@@ -148,9 +150,9 @@ export default class EvaluationForms extends React.Component {
 	}
 	componentWillUpdate(nextProps, nextState) {
 		nextState.disableSave = !(
-			nextState.wave.trim() != '' && 
-			nextState.cadetName.trim() != '' && 
-			nextState.doneWell.trim() != '' && 
+			nextState.wave.trim() != '' &&
+			nextState.cadetName.trim() != '' &&
+			nextState.doneWell.trim() != '' &&
 			nextState.improvement.trim() != ''
 		)
 	}
@@ -216,6 +218,11 @@ export default class EvaluationForms extends React.Component {
 			improvement: event.target.value
 		})
 	}
+	handleSuggestionsChange(event) {
+		this.setState({
+			suggestions: event.target.value
+		})
+	}
 	handleSubmit() {
 		let evaluationObj = {}
 		evaluationObj.cadetID = this.state.cadetID;
@@ -231,6 +238,7 @@ export default class EvaluationForms extends React.Component {
 		evaluationObj.overall = this.state.overall;
 		evaluationObj.doneWell = this.state.doneWell;
 		evaluationObj.improvement = this.state.improvement;
+		evaluationObj.suggestions = this.state.suggestions;
 		console.log('Evaluation Obj', evaluationObj);
 		this.saveEvaluation(evaluationObj);
 	}
@@ -294,7 +302,7 @@ export default class EvaluationForms extends React.Component {
 					</Row>
 					<Row>
 						<Col md={6} mdOffset={2} style={styles.single}>
-							Attitude – Interest, inclination and involvement 
+							Attitude – Interest, inclination and involvement
 						</Col>
 						<Col md={2}>
 							<StarRating
@@ -323,7 +331,7 @@ export default class EvaluationForms extends React.Component {
 					{
 						evaluation.map(function (item, key) {
 							return (
-								<div key={key}> 
+								<div key={key}>
 									<Row>
 										<Col md={8} mdOffset={2}>
 											<h3>{item.type.toUpperCase()}</h3>
@@ -394,6 +402,19 @@ export default class EvaluationForms extends React.Component {
 					      onChange={this.handleAreasOfImprovementChange}
 					    />
 					  </Col>
+					</Row>
+					<Row>
+						<Col md={8} mdOffset={2}>
+							<TextField
+								floatingLabelText="Suggestions"
+								multiLine={true}
+								rows={3}
+								rowsMax={3}
+								fullWidth={true}
+								value={this.state.suggestions}
+								onChange={this.handleSuggestionsChange}
+							/>
+						</Col>
 					</Row>
 
 					<Row>
