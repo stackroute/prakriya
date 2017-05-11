@@ -45,7 +45,7 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
 		fs.readFile(files.file.path, 'utf8', (err, data) => {
 			try {
 				console.log('Data', data)
-				let lines = data.split('\r\n');
+				let lines = data.split('\n');
 			  let headers = lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 			  let cadetColln = [];
 			  lines.map(function (line, index) {

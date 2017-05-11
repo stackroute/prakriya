@@ -12,7 +12,7 @@ let registerCandidates = function () {
 		try {
 			uploadMongoController.getFileById(fileId, function (fileObj) {
 
-				let lines = fileObj.data.split('\r\n');
+				let lines = fileObj.data.split('\n');
 			  let headers = lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 			  let cadetColln = [];
 
