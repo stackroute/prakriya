@@ -41,6 +41,10 @@ export default class Login extends React.Component {
 			password: e.target.value
 		})
 	}
+	onSubmit(e){
+	 this.onCommentSubmit(e)
+	 } ;
+
 
 	login() {
 		let th = this
@@ -87,6 +91,7 @@ export default class Login extends React.Component {
 						 <img src="./assets/images/login_head.png"/>
 				 </CardMedia>
 				 <CardText>
+				 <form className="commentForm" onSubmit={this.onCommentSubmit}>
 					 <TextField
 					 	floatingLabelText="Username"
 					 	onChange={this.onChangeUsername}
@@ -100,11 +105,14 @@ export default class Login extends React.Component {
 						errorText={this.state.passwordErrorText}/>
 					 <br /><br />
 					 <RaisedButton
-					 	label="Login"
+					  type="submit"
 						primary={true}
 						onClick={this.login}
-						style={{width: '100%'}} />
+						style={{width: '100%'}} >
+						LOGIN
+						</RaisedButton>
 						<br /><br />
+						</form>
 					 <div style={{color: 'red', fontWeight: 'bold', textAlign: 'center'}}>{this.state.errMsg}</div>
 				 </CardText>
 			</Card>
