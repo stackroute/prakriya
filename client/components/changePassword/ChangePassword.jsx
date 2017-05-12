@@ -50,12 +50,17 @@ export default class ChangePassword extends React.Component {
 		if(th.state.confirmPassword.trim().length === 0) th.setState({
 			confirmPasswordErrorText: "This field cannot be empty"
 		})
+		if(th.state.confirmPassword.trim() !== th.state.newPassword.trim()) th.setState({
+		
+			confirmPasswordErrorText: "This field should be same as New Password"
+		})
 		/* need to be changed */
-		if(th.state.newPassword.trim().length !== 0 && th.state.confirmPassword.trim().length !== 0) {
+		if(th.state.newPassword.trim().length !== 0 && th.state.confirmPassword.trim().length !== 0 && th.state.confirmPassword.trim() === th.state.newPassword.trim()) {
 			console.log('changepassword - object sent: ', this.props.username, ' ', this.state.newPassword)
 			Request
 				.post('/dashboard/changepassword')
-				.send({username: this.props.username, password: this.state.newPpassword})
+				.set({'Authorization': localStorage.getItem('token')})
+				.send({username: this.props.username, password: this.state.newPassword})
 				.end(function(err, res){
 			    // Do something
 			    if(res.status == 401) {
@@ -78,6 +83,7 @@ export default class ChangePassword extends React.Component {
 			    	th.context.router.push('/app')
 			    }
 			  })
+			  this.props.handleClose();
 		}
 	}
 
@@ -114,3 +120,7 @@ export default class ChangePassword extends React.Component {
 		)
 	}
 }
+
+ChangePassword.contextTypes = {
+  router: PropTypes.object.isRequired
+};

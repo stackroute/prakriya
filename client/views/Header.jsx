@@ -81,6 +81,7 @@ export default class Header extends React.Component {
 		this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
 		this.handleDrawerClose = this.handleDrawerClose.bind(this);
 		this.openDashboard = this.openDashboard.bind(this);
+		this.handleClose = this.handleClose.bind(this);
 	}
 
 	componentDidMount() {
@@ -130,6 +131,12 @@ export default class Header extends React.Component {
 
 	openDashboard() {
 		this.context.router.push('/app')
+	}
+
+	handleClose() {
+		this.setState({
+			openDialog: !this.state.openDialog
+		})
 	}
 
   toggleChangePasswordDialog() {
@@ -212,7 +219,7 @@ export default class Header extends React.Component {
           open={th.state.openDialog}
           onRequestClose={th.toggleChangePasswordDialog}
         >
-          <ChangePassword username={this.props.username}/>
+          <ChangePassword username={this.props.username} handleClose={th.handleClose}/>
         </Dialog>
       </div>
 		)

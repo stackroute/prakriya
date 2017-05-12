@@ -9,9 +9,10 @@ const email = require('./../email');
 var auth = require('../auth')();
 var CONFIG = require('../../config');
 
-router.post('/changepassword', function(req, res) {
-  try {
-    dashboardMongoController.changePassword(req.user, function(status) {
+router.post('/changepassword', auth.canAccess(CONFIG.ALL), function(req, res) {
+   console.log('came to change password');
+   try {
+    dashboardMongoController.changePassword(req.body, function(status) {
       res.status(200).json(status);
     },
     function(err) {

@@ -10,10 +10,12 @@ const adminMongoController = require('../admin/adminMongoController.js');
 const UserModel = require('../../models/users.js');
 
 let changePassword = function(user, successCB, errorCB) {
-	UserModel.findOneAndUpdate({username: user.username}, {$set: {password: user.password}}, function(err, result){
+	console.log(user);
+	UserModel.update({username: user.username}, {$set: {password: user.password}}, function(err, result){
 		if(err) {
 			errorCB(err);
 		}
+		console.log(result);
 		successCB(result);
 	})
 }
