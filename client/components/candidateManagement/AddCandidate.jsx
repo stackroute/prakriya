@@ -41,7 +41,8 @@ export default class AddCourse extends React.Component {
 			digithonScore: '',
 			trainingStatus: '',
 			trainingsUndergone: '',
-			workExperience: '',
+			workExperienceYear: '',
+			workExperienceMonths: '',
 			primarySupervisor: '',
 			projectSupervisor: '',
 			college: '',
@@ -60,7 +61,8 @@ export default class AddCourse extends React.Component {
 		this.onChangeDigiThonScore = this.onChangeDigiThonScore.bind(this);
 		this.onChangeTrainingStatus = this.onChangeTrainingStatus.bind(this);
 		this.onChangeTrainingsUndergone = this.onChangeTrainingsUndergone.bind(this);
-		this.onChangeWorkExperience = this.onChangeWorkExperience.bind(this);
+		this.onChangeWorkExperienceYear = this.onChangeWorkExperienceYear.bind(this);
+		this.onChangeWorkExperienceMonths = this.onChangeWorkExperienceMonths.bind(this);
 		this.onChangePrimarySupervisor = this.onChangePrimarySupervisor.bind(this);
 		this.onChangeProjectSupervisor = this.onChangeProjectSupervisor.bind(this);
 		this.onChangeCollege = this.onChangeCollege.bind(this);
@@ -146,12 +148,17 @@ export default class AddCourse extends React.Component {
 		})
 	}
 
-	onChangeWorkExperience(e) {
+	onChangeWorkExperienceYear(e) {
 		this.setState({
-			workExperience: e.target.value
+			workExperienceYear: e.target.value
 		})
 	}
 
+	onChangeWorkExperienceMonths(e) {
+		this.setState({
+			workExperienceMonths: e.target.value
+		})
+	}
 	onChangePrimarySupervisor(e) {
 		this.setState({
 			primarySupervisor: e.target.value
@@ -188,7 +195,8 @@ export default class AddCourse extends React.Component {
 			digithonPhase: '',
 			trainingStatus: '',
 			trainingsUndergone: '',
-			workExperience: '',
+			workExperienceYear: '',
+			workExperienceMonths: '',
 			primarySupervisior: '',
 			projectSupervisior: '',
 			college: '',
@@ -210,7 +218,7 @@ export default class AddCourse extends React.Component {
 			candidate.DigiThonScore= this.state.digithonScore;
 			candidate.TrainingStatus= this.state.trainingStatus;
 			candidate.TrainingsUndergone= this.state.trainingsUndergone;
-			candidate.WorkExperience= this.state.workExperience;
+			candidate.WorkExperience= this.state.workExperienceYear+'Years '+this.state.workExperienceMonths+'Months';
 			candidate.PrimarySupervisor= this.state.primarySupervisor;
 			candidate.ProjectSupervisor= this.state.projectSupervisor;
 			candidate.College= this.state.college;
@@ -306,10 +314,21 @@ export default class AddCourse extends React.Component {
 			    	/><br/>
 			    	<TextField
 			    		hintText="Experience"
-			    		floatingLabelText="Work Experience"
-			    		value={this.state.workExperience}
-			    		onChange={this.onChangeWorkExperience}
-			    	/><br/>
+			    		floatingLabelText="Year"
+			    		value={this.state.workExperienceYear}
+			    		onChange={this.onChangeWorkExperienceYear}
+			    		type="number"
+			    		style = {{width:'50px'}}
+			    	/>Year(s)
+			    	<TextField
+			    		hintText="Experience"
+			    		floatingLabelText="Month"
+			    		value={this.state.workExperienceMonths}
+			    		onChange={this.onChangeWorkExperienceMonths}
+			    		type="number"
+			    		style = {{width:'50px'}}
+			    	/>Month(s)
+			    	<br/>
 			    	<TextField
 			    		hintText="Primary Supervisor"
 			    		floatingLabelText="Primary Supervisor"
