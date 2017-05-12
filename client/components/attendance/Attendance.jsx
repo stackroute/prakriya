@@ -21,6 +21,17 @@
 	  },
 	  chipName: {
 	  	// fontSize: '12px'
+	  },
+	  paper: {
+		margin: '5px',
+		padding: '5px',
+		width: 'auto',
+		height: '120px',
+		borderRadius: '2px'
+		},
+		wrapper: {
+	    display: 'flex',
+	    flexWrap: 'wrap',
 	  }
 	  }
 

@@ -3,7 +3,7 @@ const RoleModel = require('../../models/roles.js');
 const AccessControlModel = require('../../models/accesscontrols.js');
 
 let getUsers = function(successCB, errorCB) {
-	UserModel.find({role: {$ne: 'admin'}},function(err, result) {
+	UserModel.find({role: {$nin: ['admin', 'candidate']}},function(err, result) {
 		if (err) {
 			errorCB(err);
 		}

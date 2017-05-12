@@ -66,6 +66,22 @@ let addProject = function (projectObj, successCB, errorCB) {
 	})
 }
 
+let updateProject = function (projectObj, successCB, errorCB) {
+	ProjectModel.update({name:projectObj.name},projectObj,function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result)
+	})
+}
+
+let deleteProject = function (projectObj, successCB, errorCB) {
+	ProjectModel.remove({name:projectObj.name},function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result)
+	})
+}
+
 let getCadet = function(email, successCB, errorCB) {
 	console.log();
 	CandidateModel.findOne({'EmailID': email},function(err, result) {
@@ -244,6 +260,8 @@ module.exports = {
 	getCadets,
 	getProjects,
 	addProject,
+	deleteProject,
+	updateProject,
 	getFiles,
 	updateCadet,
 	deleteCadet,

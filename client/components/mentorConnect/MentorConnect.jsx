@@ -209,7 +209,7 @@ export default class MentorConnect extends React.Component {
 					}
 				</Grid>
 				{
-					this.state.user.role == "administrator" &&
+					this.state.user.role == "sradmin" &&
 					this.state.cadets.length > 0 &&
 					<AddWave cadets={this.state.cadets} handleWaveAdd={this.addWave}/>
 				}

@@ -32,27 +32,29 @@ var user;
 
 let requireAuth = function(nextState, replace, callback) {
   const token = localStorage.getItem('token')
-  if (!token)
+  if (!token) {
   	replace('/')
-  return callback()
+  	return callback();
+  }
+  else {
+  	Request
+  		.get('/dashboard/user')
+  		.set({'Authorization': token})
+			.end(function(err, res){
+				if(err)
+					console.log(err)
+				else {
+					user = res.body
+					return callback()
+				}
+			})
+  }
 }
 
 let alreadyLoggedIn = function(nextState, replace, callback) {
   const token = localStorage.getItem('token')
-  if(token) {
+  if(token) 
   	replace('/app')
-  	// Request
-  	// 	.get('/dashboard/user')
-  	// 	.set({'Authorization': token})
-			// .end(function(err, res){
-			// 	if(err)
-			// 		console.log(err)
-			// 	else {
-			// 		user = res.body
-			// 		replace('/app')
-			// 	}
-			// })
-  }
   return callback()
 }
 let canAccess = function (nextState, replace, callback) {
@@ -68,12 +70,12 @@ ReactDOM.render(
 		<Router history={hashHistory}>
 			<Route path="/" component={Welcome} onEnter={alreadyLoggedIn} />
 			<Route path="/login" component={Login} onEnter={alreadyLoggedIn} />
-			<Route path="/app" component={App} onEnter={requireAuth} >
+			<Route path="/app" component={(props)=><App user={user} children={props.children}/>} onEnter={requireAuth} >
 				<IndexRoute component={Dashboard} />
 				<Route path="/roles" component={Roles} />
 				<Route path="/users" component={Users} />
 				<Route path="/candidates" component={Candidates} />
-				<Route path="/bulkupload" component={BulkUpload} />
+				<Route path="/bulkupload" component={() => <BulkUpload user={user}/>} />
 				<Route path="/mentorconnect" component={MentorConnect} />
 				<Route path="/courses" component={Courses} />
 				<Route path="/assessmenttracker" component={AssessmentTracker} />

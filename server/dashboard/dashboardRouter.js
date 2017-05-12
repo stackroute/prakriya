@@ -1,9 +1,11 @@
 const router = require('express').Router();
 const formidable = require('formidable');
 const fs = require('fs');
+const logger = require('log4js').getLogger();
 var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
 const adminMongoController = require('../admin/adminMongoController.js');
+const email = require('./../email');
 var auth = require('../auth')();
 var CONFIG = require('../../config');
 
@@ -23,13 +25,11 @@ router.get("/user", function(req, res) {
           if(users.controls.indexOf(control.code) >= 0)
             accesscontrols.push(control.name)
         })
-        console.log('Permissions from role', users);
         userObj.name = req.user.name;
         userObj.role = req.user.role;
         userObj.username = req.user.username;
         userObj.email = req.user.email;
         userObj.actions = accesscontrols;
-        console.log('Converted User object ', userObj)
         res.status(201).json(userObj);
       }, function(err) {
         res.status(500).json({ error: 'Cannot get all controls from db...!' });
@@ -89,6 +89,45 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
     })
   }
   catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//update a project
+router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    let projectObj = req.body;
+    projectObj.addedBy = req.user.name;
+    projectObj.updatedBy = true;
+    dashboardMongoController.updateProject(projectObj, function(project) {
+      res.status(201).json(project);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update the project...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//update a project
+router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    let projectObj = req.body;
+    projectObj.addedBy = req.user.name;
+    projectObj.updatedBy = true;
+    dashboardMongoController.deleteProject(projectObj, function(project) {
+      res.status(201).json(project);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update the project...!' });
+    })
+  }
+  catch(err) {
+    console.log(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -259,7 +298,7 @@ router.get('/getimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
 ****************************************************/
 
 //get all candidates for specific wave
-router.get("/wavespecificcandidates", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+router.get("/wavespecificcandidates", auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   console.log(req.query.waveID+'in router');
   try{
     dashboardMongoController.getWaveSpecificCandidates(req.query.waveID,function(data) {
@@ -412,4 +451,31 @@ router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function(req,
 })
 
 
+/****************************************************
+*******               Email                  ********
+****************************************************/
+
+// Get all the users
+router.get('/users', auth.canAccess(CONFIG.ADMINISTRATOR), function(re,req) {
+  try{
+    adminMongoController.getUsers(function(users) {
+      res.status(201).json(users);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all users from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+// Send a new mail
+router.post('/sendmail', function(req, res) {
+  logger.debug('Email request', req.body)
+  email.sendEmail(req.body).then(function(result) {
+    logger.debug('Email status', result.msg);
+  });
+})
 module.exports = router;

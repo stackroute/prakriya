@@ -172,7 +172,6 @@ export default class Users extends React.Component {
 						{
 							this.state.users.map(function (user, index) {
 								return(
-									user.role != 'candidate' &&
 									<Col style={styles.card} md={3} key={index}>
 										<UserList  currUser={user} lockUser={th.lockUser} unlockUser={th.unlockUser} roles={th.state.roles} deleteUser={th.deleteUser} updateUser={th.updateUser} />
 									</Col>

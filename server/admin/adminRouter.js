@@ -10,7 +10,6 @@ var CONFIG = require('../../config');
 
 // Get all the users
 router.get("/users", auth.canAccess(CONFIG.ADMIN), function(req, res) {
-
   console.log("API HIT!!!");  
   try{
     adminMongoController.getUsers(function(users) {
