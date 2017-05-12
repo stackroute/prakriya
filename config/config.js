@@ -69,20 +69,27 @@ let BASEDATA = {
 	}
 }
 
+let EMAIL = {
+	USERNAME: 'srprakriya@gmail.com',
+	PASSWORD: 'prakriya@123',
+	SERVICE_PROVIDER: 'Gmail'
+}
+
 let config = {
 	BASEDATA: BASEDATA,
 	jwtSecret: "MyS3cr3tK3Y",
   jwtSession: {
     session: false
   },
-  ALL: ['admin', 'administrator', 'mentor', 'candidate'],
-	ADMIN: ['admin'],
-	ADMINISTRATOR: ['administrator'],
+  EMAIL: EMAIL,
+  ALL: ['admin', 'wiproadmin', 'sradmin', 'mentor', 'candidate'],
+	ADMIN: ['admin', 'wiproadmin', 'sradmin'],
+	ADMINISTRATOR: ['wiproadmin', 'sradmin'],
 	MENTOR: ['mentor'],
 	CANDIDATE: ['candidate'],
-	ADMCAN: ['administrator', 'candidate'],
+	ADMCAN: ['wiproadmin', 'sradmin', 'candidate'],
 	MENCAN: ['mentor', 'candidate'],
-	ADMMEN: ['administrator', 'mentor']
+	ADMMEN: ['wiproadmin', 'sradmin', 'mentor']
 }
 
 module.exports = config;

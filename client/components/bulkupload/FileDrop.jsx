@@ -3,6 +3,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Dropzone from 'react-dropzone';
 import UploadIcon from 'material-ui/svg-icons/file/file-upload';
 import {Grid, Row, Col} from 'react-flexbox-grid';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 const styles = {
 	container: {
@@ -24,16 +26,24 @@ export default class FileDrop extends React.Component {
 		super(props);
 		this.state = {
 			showSelFile: false,
-			selectedFile: {}
+			selectedFile: {},
+			email: ''
 		}
+		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.uploadCadets = this.uploadCadets.bind(this);
 		this.handleDrop = this.handleDrop.bind(this);
 	}
 	uploadCadets() {
+		this.props.uploadCadets(this.state.selectedFile, this.state.email)
 		this.setState({
-			showSelFile: false
+			showSelFile: false,
+			email: ''
 		})
-		this.props.uploadCadets(this.state.selectedFile)
+	}
+	handleEmailChange(event, key, val) {
+		this.setState({
+			email: val
+		})
 	}
 	handleDrop(acceptedFiles, rejectedFiles) {
 		this.setState({
@@ -53,12 +63,27 @@ export default class FileDrop extends React.Component {
 							<Dropzone style={styles.dropzone} onDrop={this.handleDrop}>
 			          <div>Drop or Click to upload csv files in required format</div>
 			        </Dropzone>
+			        <SelectField
+			          value={this.state.email}
+			          onChange={this.handleEmailChange}
+			          floatingLabelText="Notify to..."
+			          fullWidth={true}
+			        >
+			          {
+			          	this.props.users.map((user, i) => {
+			          		return (
+			          			<MenuItem key={i} value={user.email} primaryText={user.email} />
+			          		)
+			          	})
+			          }
+			        </SelectField>
+			        <br/>
 					    <RaisedButton
 					      label="Upload"
 					      primary={true}
 					      icon={<UploadIcon />}
 					      onClick={this.uploadCadets}
-					      disabled={!this.state.showSelFile}
+					      disabled={!(this.state.showSelFile && this.state.email)}
 					    />
 					    {
 					    	this.state.showSelFile &&

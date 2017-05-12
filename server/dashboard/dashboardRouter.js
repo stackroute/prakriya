@@ -1,9 +1,11 @@
 const router = require('express').Router();
 const formidable = require('formidable');
 const fs = require('fs');
+const logger = require('log4js').getLogger();
 var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
 const adminMongoController = require('../admin/adminMongoController.js');
+const email = require('./../email');
 var auth = require('../auth')();
 var CONFIG = require('../../config');
 
@@ -23,13 +25,11 @@ router.get("/user", function(req, res) {
           if(users.controls.indexOf(control.code) >= 0)
             accesscontrols.push(control.name)
         })
-        console.log('Permissions from role', users);
         userObj.name = req.user.name;
         userObj.role = req.user.role;
         userObj.username = req.user.username;
         userObj.email = req.user.email;
         userObj.actions = accesscontrols;
-        console.log('Converted User object ', userObj)
         res.status(201).json(userObj);
       }, function(err) {
         res.status(500).json({ error: 'Cannot get all controls from db...!' });
@@ -451,4 +451,31 @@ router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function(req,
 })
 
 
+/****************************************************
+*******               Email                  ********
+****************************************************/
+
+// Get all the users
+router.get('/users', auth.canAccess(CONFIG.ADMINISTRATOR), function(re,req) {
+  try{
+    adminMongoController.getUsers(function(users) {
+      res.status(201).json(users);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all users from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+// Send a new mail
+router.post('/sendmail', function(req, res) {
+  logger.debug('Email request', req.body)
+  email.sendEmail(req.body).then(function(result) {
+    logger.debug('Email status', result.msg);
+  });
+})
 module.exports = router;
