@@ -27,6 +27,8 @@ let sendEmail = function (emailObj) {
                         emailObj.content
                     +`</em></p>
                     <h4>Thank You!</h4>
+                    <strong>Note: </strong>
+                    This is an automated mail. Do not reply to this mail.
                 </div>`
         };
         return new Promise((resolve, reject) => {

@@ -15,13 +15,13 @@ export default class BulkUpload extends React.Component {
 		this.getFiles = this.getFiles.bind(this);
 		this.handleUpload = this.handleUpload.bind(this);
 		this.sendMail = this.sendMail.bind(this);
-		this.getUser = this.getUser.bind(this);
 		this.getUsers = this.getUsers.bind(this);
 	}
 	componentDidMount() {
-		console.log('User obj', this.props.user);
+		this.setState({
+			user: this.props.user
+		})
 		this.getFiles();
-		this.getUser();
 		this.getUsers();
 	}
 	getFiles() {
@@ -48,21 +48,6 @@ export default class BulkUpload extends React.Component {
 		    }
 		  })
 	}
-	getUser() {
-		let th = this;
-		Request
-			.get('/dashboard/user')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	th.setState({
-		    		user: res.body
-		    	})
-		    }
-		  })
-	}
 	getUsers() {
 		let th = this;
 		Request
@@ -72,8 +57,11 @@ export default class BulkUpload extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+		    	let users = res.body.filter(function(user) {
+		    		return user.email != th.state.user.email
+		    	})		    	
 		    	th.setState({
-		    		users: res.body
+		    		users: users
 		    	})
 		    }
 		  })
@@ -98,7 +86,7 @@ export default class BulkUpload extends React.Component {
 		let emailObj = {};
 		emailObj.email = email;
 		emailObj.subject = 'Cadets uploaded for Mentor Connect';
-		emailObj.content = this.props.user.name + ` have uploaded a list of cadets for Mentor Connect. 
+		emailObj.content = this.state.user.name + ` have uploaded a list of cadets for Mentor Connect. 
 			Please check and further connect.`
 		Request
 			.post('/dashboard/sendmail')
@@ -108,7 +96,7 @@ export default class BulkUpload extends React.Component {
 				if(err)
 					console.log(err)
 				else {
-					console.log('Mail sent...')
+					console.log(res.body.status)
 				}
 			})
 	}

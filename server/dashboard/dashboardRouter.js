@@ -493,6 +493,7 @@ router.post('/sendmail', function(req, res) {
   logger.debug('Email request', req.body)
   email.sendEmail(req.body).then(function(result) {
     logger.debug('Email status', result.msg);
+    res.send({'status': result.msg})
   });
 })
 module.exports = router;
