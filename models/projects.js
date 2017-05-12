@@ -9,6 +9,7 @@ var projects = new Schema({
     skills: [String],
     addedBy: String,
     addedOn: {type: Date, default: Date.now() },
+    updated: {type: Boolean, default: false }
 });
 
 module.exports = mongoose.model('Projects', projects);

@@ -95,6 +95,45 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   }
 })
 
+//update a project
+router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    let projectObj = req.body;
+    projectObj.addedBy = req.user.name;
+    projectObj.updatedBy = true;
+    dashboardMongoController.updateProject(projectObj, function(project) {
+      res.status(201).json(project);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update the project...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//update a project
+router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    let projectObj = req.body;
+    projectObj.addedBy = req.user.name;
+    projectObj.updatedBy = true;
+    dashboardMongoController.deleteProject(projectObj, function(project) {
+      res.status(201).json(project);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update the project...!' });
+    })
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 // Get cadet profile
 router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try {

@@ -72,11 +72,25 @@ export default class AddProject extends React.Component {
 		this.onChangeAddSkill = this.onChangeAddSkill.bind(this);
 		this.onChangeSkill = this.onChangeSkill.bind(this);
 		this.handleSkillDelete = this.handleSkillDelete.bind(this);
+		this.handleUpdate = this.handleUpdate.bind(this);
 	}
 
 	componentWillMount() {
 		if(localStorage.getItem('token')) {
 			this.getWaveIDs()
+		}
+		if(this.props.openDialog)
+		{
+			this.setState({
+				projectName: this.props.project.name,
+				projectDesc: this.props.project.description,
+				candidateList:this.props.project.members,
+				wave: this.props.project.wave,
+				skills: this.props.project.skills,
+				showDialog: this.props.openDialog
+			})
+			console.log(this.props.project.wave+'here');
+			this.getCandidates(this.props.project.wave);
 		}
 	}
 
@@ -96,7 +110,8 @@ export default class AddProject extends React.Component {
 	onWaveChange(e) {
 		let th = this
 		th.setState({
-			wave: e.target.outerText
+			wave: e.target.outerText,
+			candidateList: []
 		})
 		th.getCandidates(e.target.outerText);
 	}
@@ -174,6 +189,10 @@ export default class AddProject extends React.Component {
 		this.setState({
 			showDialog: false
 		})
+		if(this.props.openDialog)
+		{
+			this.props.handleClose();
+		}
 	}
 	handleNameChange(e) {
 		this.setState({
@@ -226,9 +245,28 @@ export default class AddProject extends React.Component {
 		})
 	}
 
+	handleUpdate() {
+		console.log('called');
+		let project = {}
+		project.name = this.state.projectName;
+		project.description = this.state.projectDesc;
+		project.wave = this.state.wave;
+		project.members = this.state.candidateList;
+		project.skills = this.state.skills;
+		this.setState({
+			projectName: '',
+			projectDesc: '',
+			candidatesName:[],
+			wave: '',
+			skills: []
+		})
+		this.props.handleUpdate(project);
+		this.props.handleClose();
+	}
+
 	render() {
 		let th = this;
-		const projectDialogActions = [
+		const	projectDialogActions = [
       <FlatButton
         label="Cancel"
         primary={true}
@@ -241,6 +279,128 @@ export default class AddProject extends React.Component {
         onClick={this.handleAdd}
       />,
     ];
+
+    const	projectDialogActions1 = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onTouchTap={this.handleClose}
+      />,
+      <FlatButton
+        label="Update"
+        primary={true}
+        onClick={this.handleUpdate}
+      />,
+    ];
+		
+		if(this.props.openDialog)
+		{
+			return(
+			<div>
+				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen}>
+		      <ContentAdd />
+		    </FloatingActionButton>
+		    <Dialog
+		    	style={styles.dialog}
+          title="Add a new Project"
+          actions={projectDialogActions1}
+          open={this.state.showDialog}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleClose}
+        >
+        	<TextField
+			      floatingLabelText="Name"
+			      value={this.state.projectName}
+			      onChange={this.handleNameChange}
+			      fullWidth={true}
+			    />
+        	<TextField
+			      floatingLabelText="Description"
+			      value={this.state.projectDesc}
+			      onChange={this.handleDescChange}
+			      multiLine={true}
+			      rows={3}
+			      rowsMax={3}
+			      fullWidth={true}
+			    />
+			    <SelectField
+							onChange={th.onWaveChange}
+							floatingLabelText="Select Wave"
+							value={th.state.wave}
+						>
+							{
+								th.state.waves.map(function(val, key) {
+									return <MenuItem key={key} value={val} primaryText={val} />
+								})
+							}
+						</SelectField>
+						<br/>
+						{
+										th.state.candidatesName.map(function(cand, index) {
+											return (
+												<div>{cand.EmployeeName}</div>
+												);
+										})
+									}
+							<AutoComplete
+							      floatingLabelText="Select candidates..."
+							      filter={AutoComplete.fuzzyFilter}
+							      searchText={this.state.searchPerm}
+					          onUpdateInput={this.handleUpdateInputPerm}
+					          onNewRequest={this.handleAddNewPerm}
+							      dataSource={this.state.candidatesName}
+							      maxSearchResults={5}
+							    />
+						    	<Paper style={styles.paper} zDepth={1} >
+										<div style={styles.wrapper}>
+											{
+												th.state.candidateList.map(function (candidate, index) {
+													return(
+														<Chip
+															onRequestDelete={() => th.handleControlDelete(candidate)}
+										          style={styles.chip}
+										          key={index}
+										        >
+										          <span style={styles.chipName}>{candidate}</span>
+										        </Chip>
+									        )
+												})
+											}
+										</div>
+									</Paper>
+
+									<TextField
+							    		hintText="Skills"
+							    		floatingLabelText="Skills"
+							    		value={this.state.skillName}
+							    		onChange={this.onChangeSkill}
+							    	/>
+							    	<IconButton tooltip="Add skill" onClick={this.onChangeAddSkill}
+							    		>
+								      <AddIcon/>
+								    </IconButton>
+										<Paper style={styles.paper} zDepth={1} >
+													<div style={styles.wrapper}>
+														{
+															this.state.skills.map(function (skill, index) {
+																return(
+																	<Chip
+																		onRequestDelete={() => th.handleSkillDelete(skill)}
+													          style={styles.chip}
+													          key={index}
+													        >
+													          <span style={styles.chipName}>{skill}</span>
+													        </Chip>
+												        )
+															})
+														}
+													</div>
+										</Paper>
+        </Dialog>
+			</div>
+			)
+		}
+		else {
 		return(
 			<div>
 				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen}>
@@ -345,5 +505,6 @@ export default class AddProject extends React.Component {
         </Dialog>
 			</div>
 		)
+	}
 	}
 }

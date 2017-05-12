@@ -25,6 +25,8 @@ export default class Projects extends React.Component {
 		}
 		this.getProjects = this.getProjects.bind(this);
 		this.addProject = this.addProject.bind(this);
+		this.handleUpdate = this.handleUpdate.bind(this);
+		this.handleDelete = this.handleDelete.bind(this);
 	}
 	componentDidMount() {
 		this.getProjects();
@@ -65,6 +67,39 @@ export default class Projects extends React.Component {
 			})
 	}
 
+	handleUpdate(project) {
+		let th = this;
+		Request
+			.post('/dashboard/updateproject')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(project)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Successfully updated a project', res.body)
+		    	th.getProjects();
+		    	}
+			})
+	}
+
+	handleDelete(project)
+	{
+		let th = this;
+		Request
+			.post('/dashboard/deleteproject')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(project)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Successfully deleted a project', res.body)
+		    	th.getProjects();
+		    	}
+			})
+	}
+
 	render() {
 		let th = this;
 		return(
@@ -78,7 +113,7 @@ export default class Projects extends React.Component {
           	{
 							this.state.projects.map(function (project, key) {
 								return (
-									<ProjectCard key={key} project={project}/>
+									<ProjectCard key={key} project={project} handleUpdate={th.handleUpdate} handleDelete={th.handleDelete}/>
 								)
 							})
 						}
