@@ -34,6 +34,7 @@ var candidates = new Schema({
 		Date: String,
 		ProjectName: String,
 		ProjectDescription: String,
+		ProjectSkills: [String],
 		AssetID: String,		
 		AssessmentTrack: [String],
 		Attendance: attendance

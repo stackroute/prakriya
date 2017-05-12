@@ -49,7 +49,6 @@ export default class AddProject extends React.Component {
 			waves: [],
 			projectName: '',
 			projectDesc: '',
-			disableSave: false,
 			candidatesName:[],
 			wave: '',
 			searchPerm: '',
@@ -125,8 +124,7 @@ export default class AddProject extends React.Component {
 			return perm != control
 		})
 		this.setState({
-			candidateList: candidatesLists,
-			disableSave: false
+			candidateList: candidatesLists
 		})
 	}
 
@@ -145,8 +143,7 @@ export default class AddProject extends React.Component {
 				perms.push(this.state.searchPerm);
 				this.setState({
 					candidateList: perms,
-					searchPerm: '',
-					disableSave: false
+					searchPerm: ''
 				})
 		}
 		else
@@ -210,15 +207,13 @@ export default class AddProject extends React.Component {
 		skill.push(this.state.skillName);
 		this.setState({
 			skills: skill,
-			skillName: '',
-			disableSave: true
+			skillName: ''
 		})
 	}
 
 	onChangeSkill(e) {
 		this.setState({
-			skillName: e.target.value,
-			disableSave: false
+			skillName: e.target.value
 		})
 	}
 
@@ -227,8 +222,7 @@ export default class AddProject extends React.Component {
 			return perm != control
 		})
 		this.setState({
-			skills: skill,
-			disableSave: false
+			skills: skill
 		})
 	}
 
@@ -245,7 +239,6 @@ export default class AddProject extends React.Component {
         primary={true}
         onTouchTap={this.handleClose}
         onClick={this.handleAdd}
-        disabled={this.state.disableSave}
       />,
     ];
 		return(

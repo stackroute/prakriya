@@ -69,6 +69,7 @@ export default class ProfileView extends React.Component {
 			showAssetDialog: false,
 			projectName: '',
 			projectDesc: '',
+			projectSkills: '',
 			disableSave: true,
 			disableSavePic: true,
 			defaultProfilePic: '../../assets/images/avt-default.jpg',
@@ -145,6 +146,7 @@ export default class ProfileView extends React.Component {
 				let cadet = th.state.cadet;
 				cadet.ProjectName = project.name;
 				cadet.ProjectDescription = project.description;
+				cadet.ProjectSkills = project.skills;
 				th.setState({
 					disableSave: false,
 					cadet: cadet
@@ -341,7 +343,11 @@ export default class ProfileView extends React.Component {
 									</h4>
 									<p style={styles.details}>
 										Project Name: {this.state.cadet.ProjectName}<br/>
-										Project Description: {this.state.cadet.ProjectDescription}
+										Project Description: {this.state.cadet.ProjectDescription}<br/>
+										Skills: <ul>{
+											this.state.cadet.ProjectSkills.map(function(skill) {
+												return <li>{skill}</li>
+											})}</ul>
 									</p>
 								</div>
 							}
@@ -437,6 +443,15 @@ export default class ProfileView extends React.Component {
 	        <TextField
 			      floatingLabelText="Description"
 			      value={this.state.cadet.ProjectDescription}
+			      multiLine={true}
+			      rows={3}
+			      rowsMax={3}
+			      disabled={true}
+			      fullWidth={true}
+			    />
+			    <TextField
+			      floatingLabelText="Skills"
+			      value={this.state.cadet.ProjectSkills}
 			      multiLine={true}
 			      rows={3}
 			      rowsMax={3}

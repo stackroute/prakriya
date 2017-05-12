@@ -3,6 +3,9 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import Avatar from 'material-ui/Avatar';
 import Moment from 'moment';
 import Dialog from 'material-ui/Dialog';
+import IconButton from 'material-ui/IconButton';
+import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 const styles = {
     text: {
@@ -54,7 +57,13 @@ export default class ProjectCard extends React.Component {
 			      		{this.props.project.name.charAt(0).toUpperCase()}
 			      	</Avatar>
 			      }/>
-			    <CardText style={styles.text}>
+			    	<IconButton tooltip="Edit Course" onClick={this.handleEditCourse} style={{display:this.state.hide,marginLeft:'10px'}}>
+				      <EditIcon/>
+				    </IconButton>
+				    <IconButton tooltip="Delete Course" style={{display:this.state.hide}} onClick={this.openDeleteDialog}>
+				      <DeleteIcon/>
+				    </IconButton>
+				    <CardText style={styles.text}>
 			    	<h3>Description:</h3>{this.props.project.description}
 			    	<h3>Tech Skills:</h3><ul>{this.props.project.skills.map(function(skill){
         		return <li>{skill}</li>
@@ -62,6 +71,7 @@ export default class ProjectCard extends React.Component {
 			    	<h3>Developed By:</h3>{this.props.project.wave}
 			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>View members</span>
 			    	</CardText>
+			    	
 				</Card>
 				 <Dialog
 		    	style={styles.dialog}
