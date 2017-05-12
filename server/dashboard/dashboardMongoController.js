@@ -7,7 +7,16 @@ const FeedbackModel = require('../../models/feedback.js');
 const EvaluationModel = require('../../models/evaluation.js');
 const AssessmentTrackModel = require('../../models/assessmenttracks.js');
 const adminMongoController = require('../admin/adminMongoController.js');
+const UserModel = require('../../models/users.js');
 
+let changePassword = function(user, successCB, errorCB) {
+	UserModel.findOneAndUpdate({username: user.username}, {$set: {password: user.password}}, function(err, result){
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	})
+}
 let getPermissions =  function(role, successCB, errorCB) {
 	RoleModel.findOne({"name": role},function(err, result) {
 		if (err) {
@@ -274,5 +283,6 @@ module.exports = {
 	getCoursesForWave,
 	getCandidates,
 	getAssesmentTrack,
-	getWaveObject
+	getWaveObject,
+	changePassword
 }

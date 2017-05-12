@@ -8,7 +8,14 @@ import MenuItem from 'material-ui/MenuItem';
 import Drawer from 'material-ui/Drawer';
 import {Card, CardHeader, CardMedia, CardTitle} from 'material-ui/Card';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import Badge from 'material-ui/Badge';
+import Dialog from 'material-ui/Dialog';
+import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
+import LogoutIcon from 'material-ui/svg-icons/action/exit-to-app';
+import ChangePasswordIcon from 'material-ui/svg-icons/action/lock';
+import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
+import ChangePassword from '../components/changePassword/index.jsx';
+import {List, ListItem} from 'material-ui/List';
 import {Link} from 'react-router';
 import Request from 'superagent';
 
@@ -26,7 +33,31 @@ const styles = {
 			top: 0,
 	    height: '40px',
 	    width: '100%',
-		}
+		},
+    userMenu: {
+      backgroundColor: 'rgba(0, 188, 212, 0.10)',
+      width: '100%'
+    },
+    badge: {
+      width: '20px',
+      height: '20px',
+      backgroundColor: '#990000',
+      color: '#ffffff',
+      top: '5px',
+      right: '5px'
+    },
+    brief: {
+  		marginTop: '70px',
+  		fontSize: '16px'
+  	},
+  	body: {
+  		textAlign: 'center',
+  		fontFamily: 'sans-serif'
+  	},
+  	customContent: {
+  	  width: '400px',
+  	  maxWidth: 'none'
+  	}
 };
 
 export default class Header extends React.Component {
@@ -34,6 +65,7 @@ export default class Header extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+      openDialog: false,
 			openDrawer: false,
 			actionMenu: '',
 			actions: [],
@@ -44,6 +76,7 @@ export default class Header extends React.Component {
       }
 		}
 		this.logout = this.logout.bind(this);
+    this.toggleChangePasswordDialog = this.toggleChangePasswordDialog.bind(this)
 		this.getActions = this.getActions.bind(this);
 		this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
 		this.handleDrawerClose = this.handleDrawerClose.bind(this);
@@ -55,6 +88,7 @@ export default class Header extends React.Component {
 			this.getActions()
 		}
 	}
+
 	getActions() {
 		let th = this
 		Request
@@ -76,23 +110,35 @@ export default class Header extends React.Component {
 				})
 			});
 	}
+
 	logout() {
 		localStorage.removeItem('token')
 		this.context.router.push('/')
 	}
+
 	handleDrawerToggle() {
 		this.setState({
 			openDrawer: !this.state.openDrawer
 		})
 	}
+
 	handleDrawerClose() {
 		this.setState({
 			openDrawer: false
 		})
 	}
+
 	openDashboard() {
 		this.context.router.push('/app')
 	}
+
+  toggleChangePasswordDialog() {
+    console.log('toggle changePassword: ', this.state.openDialog)
+    this.setState({
+      openDialog: !this.state.openDialog
+    })
+  }
+
 	render() {
 		let th = this
 		return(
@@ -132,19 +178,42 @@ export default class Header extends React.Component {
 	      </Drawer>
 				<AppBar
 	        title={<span style={styles.title}>Prakriya</span>}
-	        onTitleTouchTap={this.openDashboard}
-	        onLeftIconButtonTouchTap={this.handleDrawerToggle}
+	        onTitleTouchTap={th.openDashboard}
+	        onLeftIconButtonTouchTap={th.handleDrawerToggle}
 	        iconElementRight={
-	        	<IconMenu
-					    iconButtonElement={
-					      <IconButton><MoreVertIcon /></IconButton>
-					    }
-					    targetOrigin={{horizontal: 'right', vertical: 'top'}}
-					    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-					  >
-					    <MenuItem primaryText="LOG OUT" onClick={this.logout} />
-					  </IconMenu>}
+            <div>
+              <Badge
+                 badgeContent={4}
+                 badgeStyle={styles.badge}
+                 className='badgeParent'
+              >
+                 <IconButton>
+                   <NotificationsIcon />
+                 </IconButton>
+              </Badge>
+  	        	<IconMenu
+                menuStyle={styles.userMenu}
+  					    iconButtonElement={
+  					      <IconButton><ActionAccountCircle /></IconButton>
+  					    }
+  					    anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
+  					  >
+                <List>
+    					    <ListItem primaryText="Log Out" onClick={th.logout} leftIcon={<LogoutIcon />}/>
+                  <ListItem primaryText="Change Password" onClick={th.toggleChangePasswordDialog}  leftIcon={<ChangePasswordIcon />}/>
+                </List>
+  					  </IconMenu>
+            </div>
+          }
 	      />
+
+        <Dialog
+          contentStyle={styles.customContent}
+          open={th.state.openDialog}
+          onRequestClose={th.toggleChangePasswordDialog}
+        >
+          <ChangePassword username={this.props.username}/>
+        </Dialog>
       </div>
 		)
 	}

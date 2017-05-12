@@ -9,6 +9,22 @@ const email = require('./../email');
 var auth = require('../auth')();
 var CONFIG = require('../../config');
 
+router.post('/changepassword', function(req, res) {
+  try {
+    dashboardMongoController.changePassword(req.user, function(status) {
+      res.status(200).json(status);
+    },
+    function(err) {
+      res.status(500).json({ error: 'Cannot change password...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 router.get("/user", function(req, res) {
   // res.json(users[req.user.id]);
   console.log("req from user!!!")
