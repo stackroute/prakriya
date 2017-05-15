@@ -3,6 +3,7 @@ import Request from 'superagent';
 import FileList from './FileList.jsx';
 import FileDrop from './FileDrop.jsx';
 import {Grid, Row, Col} from 'react-flexbox-grid';
+import Snackbar from 'material-ui/Snackbar';
 
 export default class BulkUpload extends React.Component {
 	constructor(props) {
@@ -10,7 +11,9 @@ export default class BulkUpload extends React.Component {
 		this.state = {
 			files: [],
 			user: {},
-			users: []
+			users: [],
+			open: false,
+			msg: ''
 		}
 		this.getFiles = this.getFiles.bind(this);
 		this.handleUpload = this.handleUpload.bind(this);
@@ -83,6 +86,7 @@ export default class BulkUpload extends React.Component {
 			})
 	}
 	sendMail(email) {
+		let th = this;
 		let emailObj = {};
 		emailObj.email = email;
 		emailObj.subject = 'Cadets uploaded for Mentor Connect';
@@ -96,7 +100,10 @@ export default class BulkUpload extends React.Component {
 				if(err)
 					console.log(err)
 				else {
-					console.log(res.body.status)
+					th.setState({
+						open: true,
+						msg: res.body.status
+					})
 				}
 			})
 	}
@@ -114,6 +121,11 @@ export default class BulkUpload extends React.Component {
 		    	this.state.files.length > 0 &&
 		    	<FileList files={this.state.files}/>
 		    }
+		    <Snackbar
+          open={this.state.open}
+          message={this.state.msg}
+          autoHideDuration={4000}
+        />
 			</div>
 		)
 	}

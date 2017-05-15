@@ -13,7 +13,13 @@ const styles = {
 		marginBottom: 20
 	}
 }
-var masonryOptions = {
+const backgroundColors = [
+	'#F5DEBF',
+	'#DDDBF1',
+	'#CAF5B3',
+	'#C6D8D3'
+]
+const masonryOptions = {
     transitionDuration: 0
 };
  
@@ -107,13 +113,21 @@ export default class Projects extends React.Component {
 				<h2 style={styles.heading}>Projects</h2>
 				<AddProject addProject={this.addProject}/>
 				<Masonry
-                className={'my-class'} 
-                elementType={'ul'} 
-                options={masonryOptions}>
+          className={'my-class'} 
+          elementType={'ul'} 
+          options={masonryOptions}
+          style={{margin: 'auto'}}
+        >
           	{
 							this.state.projects.map(function (project, key) {
 								return (
-									<ProjectCard key={key} project={project} handleUpdate={th.handleUpdate} handleDelete={th.handleDelete}/>
+									<ProjectCard 
+										key={key} 
+										project={project} 
+										handleUpdate={th.handleUpdate} 
+										handleDelete={th.handleDelete}
+										bgColor={backgroundColors[key%4]}
+									/>
 								)
 							})
 						}

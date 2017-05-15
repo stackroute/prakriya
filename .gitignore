@@ -1,5 +1,10 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+# Logs
+logs
+*.log
+npm-debug.log*
+
 # dependencies
 node_modules
 bundle.js

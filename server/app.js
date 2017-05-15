@@ -1,5 +1,5 @@
 const path = require('path');
-const logger = require('log4js').getLogger();
+const logger = require('./../applogger');
 
 var auth = require('./auth')();
 const loginRoutes = require('./login');

@@ -1,13 +1,12 @@
 const express = require('express');
 const path = require('path');
-// const morgan = require('morgan');
+const morgan = require('morgan');
 const mongoose = require('mongoose');
 const flash = require('connect-flash');
 const auth = require("./auth")();
 const CONFIG = require('../config')
 
-// const logger = require('../applogger');
-const logger = require('log4js').getLogger();
+const logger = require('./../applogger');
 
 function createApp() {
   const app = express();
@@ -43,7 +42,7 @@ function setupRestRoutes(app) {
 
 function setupMiddlewares(app) {
   //  For logging each requests
-  // app.use(morgan('dev'));
+  app.use(morgan('dev'));
   const bodyParser = require('body-parser');
   const expressSession = require('express-session');
   const compression = require('compression');
@@ -80,7 +79,7 @@ function setupMiddlewares(app) {
 }
 
 function setupWebpack(app) {
-  // if (config.NODE_ENV !== 'production') {
+  if (config.NODE_ENV !== 'production') {
     const webpack = require('webpack');
     const webpackDevMiddleware = require('webpack-dev-middleware');
     const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -93,15 +92,15 @@ function setupWebpack(app) {
       noInfo: true,
       publicPath: webpackConfig.output.publicPath
     }));
-  // }
+  }
   return app;
 }
 
 function setupMongooseConnections() {
-  mongoose.connect('mongodb://localhost:27017/prakriya');
+  mongoose.connect(CONFIG.MONGO.mongoURL);
 
   mongoose.connection.on('connected', function() {
-    logger.debug('Mongoose is now connected to ', 'mongodb://localhost:27017/prakriya');
+    logger.debug('Mongoose is now connected to ', CONFIG.MONGO.mongoURL);
     const ControlsModel = require('../models/accesscontrols.js');
     const RoleModel = require('../models/roles.js');
     const UserModel = require('../models/users.js');

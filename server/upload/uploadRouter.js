@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const formidable = require('formidable');
 const fs = require('fs');
-const logger = require('log4js').getLogger();
+const logger = require('./../../applogger');
 const client = require('redis').createClient();
 // const client = require('redis').createClient(6379,'redis');
 const uploadMongoController = require('./uploadMongoController');
