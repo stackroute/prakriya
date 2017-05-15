@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const smtpTransport = require('nodemailer-smtp-transport');
-const logger = require('log4js').getLogger();
+const logger = require('./../../applogger');
 const CONFIG = require('../../config');
 
 const transporter = nodemailer.createTransport(smtpTransport({
@@ -37,7 +37,11 @@ let sendEmail = function (emailObj) {
                     logger.error('response not found',err);
                     reject(err);
                 } else {
-                    resolve({ success: true, response: response, msg: 'Mail sent Successfully' });
+                    resolve({ 
+                        success: true, 
+                        response: response, 
+                        msg: 'Mail sent successfully to ' + emailObj.email
+                    });
                 }
             });
         });

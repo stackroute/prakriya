@@ -106,9 +106,18 @@ export default class ProjectCard extends React.Component {
         onClick={this.handleDeleteProject}
       />,
     ];
+    	let bgColor = this.props.bgColor;
+			console.log('Bg Color', bgColor);
 		return (
 			<div>
-				<Card style = {{width:'300px', marginRight:'20px', marginBottom:'20px'}}>
+				<Card 
+					style={{
+						width:'300px', 
+						marginRight:'20px', 
+						marginBottom:'20px',
+						background: bgColor
+					}}
+				>
 					<CardHeader
 			      title={this.props.project.name}
 			      subtitle={detail}

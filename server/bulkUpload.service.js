@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const logger = require('log4js').getLogger();
+const logger = require('./../applogger');
 const uploadCandidates = require('./upload/uploadCandidates');
 
 let setupMongooseConnections = function() {

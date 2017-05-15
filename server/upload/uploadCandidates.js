@@ -1,6 +1,6 @@
 const client = require('redis').createClient();
 // const client = require('redis').createClient(6379,'redis');
-const logger = require('log4js').getLogger();
+const logger = require('./../../applogger');
 const async = require('async');
 const uploadMongoController = require('./uploadMongoController');
 
@@ -35,11 +35,9 @@ let registerCandidates = function () {
 				  function(cadetObj, callback){
 				    uploadMongoController.addCadet(cadetObj, function (cadet) {
 			  			importedCadets.push(cadet);
-			  			console.log('Pushed')
 			  			callback();
 			  		}, function (err) {
 			  			failedCadets.push(cadetObj);
-			  			console.log('error')
 			  			callback();
 			  		})
 				  },
