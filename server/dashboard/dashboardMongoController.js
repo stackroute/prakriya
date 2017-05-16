@@ -25,6 +25,18 @@ let addNotification = function(email, message, successCB, errorCB) {
 	})
 }
 
+// Deleting a new notification
+let deleteNotification = function(email, message, successCB, errorCB) {
+	console.log('Deleting notification: ', email, ' -- ', message)
+	UserModel.update({email: email}, {$pull: {notifications: message}}, function(err, result){
+		if(err) {
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	})
+}
+
 // Getting all notifications
 let getNotifications = function(username, successCB, errorCB) {
 	UserModel.findOne({username: username}, 'notifications', function(err, result){
@@ -314,5 +326,6 @@ module.exports = {
 	getWaveObject,
 	changePassword,
 	addNotification,
+	deleteNotification,
 	getNotifications
 }

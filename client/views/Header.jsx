@@ -100,18 +100,21 @@ export default class Header extends React.Component {
 
     let socket = io()
 		socket.on('show notification', function(data) {
-      let notifications = th.state.notifications
-      notifications.push(`You have a mail from  ${data.sender}`)
-			th.setState({
-        notifications: notifications
-      })
-      Request
-        .post('/dashboard/addnotification')
-        .set({'Authorization': localStorage.getItem('token')})
-        .send({to: data.to, message: `You have a mail from  ${data.sender}`})
-        .end(function(err, res){
-          console.log('Notification pushed to server', res)
+      if(data.to === th.props.useremail) {
+        let notifications = th.state.notifications
+        let timestamp = new Date()
+        notifications.push(`You have a mail from  ${data.sender}|${timestamp}`)
+  			th.setState({
+          notifications: notifications
         })
+        Request
+          .post('/dashboard/addnotification')
+          .set({'Authorization': localStorage.getItem('token')})
+          .send({to: data.to, message: `You have a mail from  ${data.sender}|${timestamp}`})
+          .end(function(err, res){
+            console.log('Notification pushed to server', res)
+          })
+      }
 		})
 	}
 
@@ -132,8 +135,14 @@ export default class Header extends React.Component {
     let th = this
     console.log('dropNotification: ', index)
     let notifications = th.state.notifications
+    Request
+      .post('/dashboard/deletenotification')
+      .set({'Authorization': localStorage.getItem('token')})
+      .send({to: th.props.useremail, message: notifications[index]})
+      .end(function(err, res){
+        console.log('Notification pushed to server', res)
+      })
     notifications.splice(index, 1)
-    // yet to complete: delete in db
     th.setState({
       notifications: notifications
     })
@@ -255,7 +264,7 @@ export default class Header extends React.Component {
                         th.state.notifications.map(function(message, index) {
                           return (
                             <ListItem
-                              primaryText={message}
+                              primaryText={message.split('|')[0]}
                               key={index}
                               rightIcon={
                                 <div onClick={(event)=>{th.dropNotification(index)}}>

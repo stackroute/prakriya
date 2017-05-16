@@ -19,7 +19,7 @@ export default class App extends React.Component {
   render() {
 		return (
 			<div style={styles.container} >
-				<Header username={this.props.user.username}/>
+				<Header username={this.props.user.username} useremail={this.props.user.email}/>
 				<div style={styles.body} >
 					{this.props.children}
 				</div>
