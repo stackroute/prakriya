@@ -50,6 +50,7 @@
     "react-tap-event-plugin": "^2.0.1",
     "redis": "^2.7.1",
     "serve-favicon": "^2.4.2",
+    "socket.io": "^2.0.1",
     "style-loader": "^0.13.2",
     "superagent": "^3.5.0",
     "util": "^0.10.3"

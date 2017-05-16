@@ -9,8 +9,46 @@ const AssessmentTrackModel = require('../../models/assessmenttracks.js');
 const adminMongoController = require('../admin/adminMongoController.js');
 const UserModel = require('../../models/users.js');
 
+
+/****************************************************
+*******          Notification System         ********
+****************************************************/
+
+// Adding a new notification
+let addNotification = function(email, message, successCB, errorCB) {
+	UserModel.update({email: email}, {$push: {notifications: message}}, function(err, result){
+		if(err) {
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	})
+}
+
+// Deleting a new notification
+let deleteNotification = function(email, message, successCB, errorCB) {
+	console.log('Deleting notification: ', email, ' -- ', message)
+	UserModel.update({email: email}, {$pull: {notifications: message}}, function(err, result){
+		if(err) {
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	})
+}
+
+// Getting all notifications
+let getNotifications = function(username, successCB, errorCB) {
+	UserModel.findOne({username: username}, 'notifications', function(err, result){
+		if(err) {
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	})
+}
+
 let changePassword = function(user, successCB, errorCB) {
-	console.log(user);
 	UserModel.update({username: user.username}, {$set: {password: user.password}}, function(err, result){
 		if(err) {
 			errorCB(err);
@@ -286,5 +324,8 @@ module.exports = {
 	getCandidates,
 	getAssesmentTrack,
 	getWaveObject,
-	changePassword
+	changePassword,
+	addNotification,
+	deleteNotification,
+	getNotifications
 }
