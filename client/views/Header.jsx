@@ -73,7 +73,8 @@ export default class Header extends React.Component {
       user: {
         name: '',
         username: ''
-      }
+      },
+      notificationCount: 0
 		}
 		this.logout = this.logout.bind(this);
     this.toggleChangePasswordDialog = this.toggleChangePasswordDialog.bind(this)
@@ -84,10 +85,22 @@ export default class Header extends React.Component {
 		this.handleClose = this.handleClose.bind(this);
 	}
 
-	componentDidMount() {
+  componentWillMount() {
 		if(localStorage.getItem('token')) {
 			this.getActions()
 		}
+	}
+
+  componentDidMount() {
+    let th = this
+
+    let socket = io()
+		socket.on('show notification', function(data) {
+			console.log('show notification event triggered: ', JSON.stringify(data))
+			th.setState({
+        notificationCount: th.state.notificationCount + 1
+      })
+		})
 	}
 
 	getActions() {
@@ -190,9 +203,9 @@ export default class Header extends React.Component {
 	        iconElementRight={
             <div>
               <Badge
-                 badgeContent={4}
-                 badgeStyle={styles.badge}
-                 className='badgeParent'
+                badgeContent={th.state.notificationCount}
+                badgeStyle={styles.badge}
+                className={'badgeParentVisible'}
               >
                  <IconButton>
                    <NotificationsIcon />

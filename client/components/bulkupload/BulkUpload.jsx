@@ -62,7 +62,7 @@ export default class BulkUpload extends React.Component {
 		    else {
 		    	let users = res.body.filter(function(user) {
 		    		return user.email != th.state.user.email
-		    	})		    	
+		    	})
 		    	th.setState({
 		    		users: users
 		    	})
@@ -82,6 +82,8 @@ export default class BulkUpload extends React.Component {
 		    	console.log('File uploaded:', res.body.fileName)
 		    	th.sendMail(email);
 		    	th.getFiles();
+					let socket = io()
+					socket.emit('mail sent', {sender: th.props.user.name})
 		    }
 			})
 	}
@@ -90,7 +92,7 @@ export default class BulkUpload extends React.Component {
 		let emailObj = {};
 		emailObj.email = email;
 		emailObj.subject = 'Cadets uploaded for Mentor Connect';
-		emailObj.content = this.state.user.name + ` have uploaded a list of cadets for Mentor Connect. 
+		emailObj.content = this.state.user.name + ` have uploaded a list of cadets for Mentor Connect.
 			Please check and further connect.`
 		Request
 			.post('/dashboard/sendmail')
@@ -112,7 +114,7 @@ export default class BulkUpload extends React.Component {
 		let th = this;
 		return(
 			<div>
-	   	 	<FileDrop 
+	   	 	<FileDrop
 	   	 		uploadCadets={this.handleUpload}
 	   	 		user={this.state.user}
 	   	 		users={this.state.users}
