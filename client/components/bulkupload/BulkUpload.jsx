@@ -83,7 +83,7 @@ export default class BulkUpload extends React.Component {
 		    	th.sendMail(email);
 		    	th.getFiles();
 					let socket = io()
-					socket.emit('mail sent', {sender: th.props.user.name})
+					socket.emit('mail sent', {sender: th.props.user.name, to: email})
 		    }
 			})
 	}

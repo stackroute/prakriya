@@ -12,6 +12,7 @@ import Badge from 'material-ui/Badge';
 import Dialog from 'material-ui/Dialog';
 import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
 import LogoutIcon from 'material-ui/svg-icons/action/exit-to-app';
+import CancelIcon from 'material-ui/svg-icons/navigation/cancel';
 import ChangePasswordIcon from 'material-ui/svg-icons/action/lock';
 import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import ChangePassword from '../components/changePassword/index.jsx';
@@ -74,7 +75,7 @@ export default class Header extends React.Component {
         name: '',
         username: ''
       },
-      notificationCount: 0
+      notifications: []
 		}
 		this.logout = this.logout.bind(this);
     this.toggleChangePasswordDialog = this.toggleChangePasswordDialog.bind(this)
@@ -83,11 +84,14 @@ export default class Header extends React.Component {
 		this.handleDrawerClose = this.handleDrawerClose.bind(this);
 		this.openDashboard = this.openDashboard.bind(this);
 		this.handleClose = this.handleClose.bind(this);
+    this.getNotifications = this.getNotifications.bind(this);
+    this.dropNotification = this.dropNotification.bind(this);
 	}
 
   componentWillMount() {
 		if(localStorage.getItem('token')) {
 			this.getActions()
+      this.getNotifications(this.props.username)
 		}
 	}
 
@@ -96,12 +100,44 @@ export default class Header extends React.Component {
 
     let socket = io()
 		socket.on('show notification', function(data) {
-			console.log('show notification event triggered: ', JSON.stringify(data))
+      let notifications = th.state.notifications
+      notifications.push(`You have a mail from  ${data.sender}`)
 			th.setState({
-        notificationCount: th.state.notificationCount + 1
+        notifications: notifications
       })
+      Request
+        .post('/dashboard/addnotification')
+        .set({'Authorization': localStorage.getItem('token')})
+        .send({to: data.to, message: `You have a mail from  ${data.sender}`})
+        .end(function(err, res){
+          console.log('Notification pushed to server', res)
+        })
 		})
 	}
+
+  getNotifications(username) {
+    let th = this
+    Request
+      .get(`/dashboard/notifications?username=${username}`)
+      .set({'Authorization': localStorage.getItem('token')})
+      .end(function(err, res){
+        console.log('Notifications recieved from server: ', res.body.notifications)
+        th.setState({
+          notifications: res.body.notifications
+        })
+      })
+  }
+
+  dropNotification(index) {
+    let th = this
+    console.log('dropNotification: ', index)
+    let notifications = th.state.notifications
+    notifications.splice(index, 1)
+    // yet to complete: delete in db
+    th.setState({
+      notifications: notifications
+    })
+  }
 
 	getActions() {
 		let th = this
@@ -203,13 +239,36 @@ export default class Header extends React.Component {
 	        iconElementRight={
             <div>
               <Badge
-                badgeContent={th.state.notificationCount}
+                badgeContent={th.state.notifications.length}
                 badgeStyle={styles.badge}
                 className={'badgeParentVisible'}
               >
-                 <IconButton>
-                   <NotificationsIcon />
-                 </IconButton>
+    	        	<IconMenu
+                  menuStyle={styles.userMenu}
+    					    iconButtonElement={<IconButton><NotificationsIcon /></IconButton>}
+    					    anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+    					  >
+                  {
+                    th.state.notifications.length < 1 ? '' :
+                    <List>
+                      {
+                        th.state.notifications.map(function(message, index) {
+                          return (
+                            <ListItem
+                              primaryText={message}
+                              key={index}
+                              rightIcon={
+                                <div onClick={(event)=>{th.dropNotification(index)}}>
+                                  <CancelIcon />
+                                </div>
+                              }
+                            />
+                          )
+                        })
+                      }
+                    </List>
+                  }
+    					  </IconMenu>
               </Badge>
   	        	<IconMenu
                 menuStyle={styles.userMenu}
