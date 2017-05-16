@@ -128,7 +128,7 @@ router.get('/courses', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -146,7 +146,7 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -164,7 +164,7 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 // Delete a course
@@ -181,7 +181,7 @@ router.delete('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res)
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
@@ -199,7 +199,7 @@ router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) 
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
-    }); 
+    });
   }
 })
 
