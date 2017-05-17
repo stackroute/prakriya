@@ -20,7 +20,7 @@ describe("Make GET requests to domain ", function() {
       });
 
     //login route
-      describe("Testing POST route", function(err){
+      describe("Testing MENTOR-POST route", function(err){
         it("should check mentor login", function(done){
           url
             .post('/login')

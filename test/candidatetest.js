@@ -10,7 +10,8 @@ var url=supertest("http://localhost:8080");
 var token= '';
 //login route
   describe("Testing POST route", function(err){
-    it("should check candidate login", function(done){
+    this.timeout(50000);
+        it("should check candidate login", function(done){
       url
         .post('/login')
         .send({"username": "jothipriya.shekhar", "password":"digital@123"})
@@ -21,6 +22,9 @@ var token= '';
           done();
         });
         });
+  /****************************************************
+  ******testing-get (candidate dashboardroutes) ********
+  ****************************************************/
         it("get the logged user",function(done){
            url
               .get('/dashboard/user')
@@ -33,3 +37,28 @@ var token= '';
               done();
            });
             });
+            it("get all the cadets",function(done){
+               url
+                  .get('/dashboard/cadet')
+                  .set({"Authorization":token})
+                  .expect('Content-Type', /json/)
+                  .expect(201)
+                  .end(function(err, res){
+                    console.log(res.body);
+                  if (err) throw err;
+                  done();
+               });
+                });
+                // it("get image",function(done){
+                //    url
+                //       .get('/dashboard/getimage')
+                //       .set({"Authorization":token})
+                //       .expect('Content-Type', /image/jpeg)
+                //       .expect(201)
+                //       .end(function(err, res){
+                //         console.log(res.body);
+                //       if (err) throw err;
+                //       done();
+                //    });
+                //     });
+              });

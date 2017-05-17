@@ -9,7 +9,8 @@ request = request(app);
 var url=supertest("http://localhost:8080");
 var token= '';
 //login route
-  describe("Testing POST route", function(err){
+  describe("Testing ADMIN-POST route", function(err){
+    this.timeout(50000);
     it("should check admin login", function(done){
       url
         .post('/login')

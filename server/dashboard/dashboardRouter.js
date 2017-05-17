@@ -527,9 +527,10 @@ router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function(req,
 ****************************************************/
 
 // Get all the users
-router.get('/users', auth.canAccess(CONFIG.ADMINISTRATOR), function(re,req) {
+router.get('/users', auth.canAccess(CONFIG.ADMINISTRATOR), function(req,res) {
   try{
     adminMongoController.getUsers(function(users) {
+      console.log("users email",res)
       res.status(201).json(users);
     }, function(err) {
       res.status(500).json({ error: 'Cannot get all users from db...!' });

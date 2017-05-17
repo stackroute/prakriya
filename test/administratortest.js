@@ -10,6 +10,8 @@ var url=supertest("http://localhost:8080");
 var token= '';
 //login route
   describe("Testing POST route", function(err){
+    this.timeout(50000);
+
     it("should check administrator login", function(done){
       url
         .post('/login')
@@ -33,3 +35,32 @@ var token= '';
               done();
            });
             });
+/****************************************************
+  ******testing-get (administrator dashboardroutes) ********
+  ****************************************************/
+            it("get files",function(done){
+               url
+                  .get('/dashboard/files')
+                  .set({"Authorization":token})
+                  .expect('Content-Type', /json/)
+                  .expect(201)
+                  .end(function(err, res){
+                    console.log(res.body);
+                  if (err) throw err;
+                  done();
+               });
+                });
+                it("get all users",function(done){
+                   url
+                      .get('/dashboard/users')
+                      .set({"Authorization":token})
+                      .expect('Content-Type', /json/)
+                      .expect(201)
+                      .end(function(err, res){
+                        console.log(res.body);
+                      if (err) throw err;
+                      done();
+                   });
+                    });
+
+          });
