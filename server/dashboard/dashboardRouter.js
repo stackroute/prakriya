@@ -9,6 +9,60 @@ const email = require('./../email');
 var auth = require('../auth')();
 var CONFIG = require('../../config');
 
+/****************************************************
+*******          Notification System         ********
+****************************************************/
+
+router.post('/addnotification', auth.canAccess(CONFIG.ALL), function(req, res) {
+   console.log('API HIT ==> ADD NOTIFICATION');
+   try {
+    dashboardMongoController.addNotification(req.body.to, req.body.message, function(status) {
+      res.status(200).json(status);
+    },
+    function(err) {
+      res.status(500).json({ error: 'Cannot add notification...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+router.post('/deletenotification', auth.canAccess(CONFIG.ALL), function(req, res) {
+   console.log('API HIT ==> DELETE NOTIFICATION');
+   try {
+    dashboardMongoController.deleteNotification(req.body.to, req.body.message, function(status) {
+      res.status(200).json(status);
+    },
+    function(err) {
+      res.status(500).json({ error: 'Cannot delete notification...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+router.get('/notifications', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try{
+    console.log('Route: : : ', req.query.username)
+    dashboardMongoController.getNotifications(req.query.username, function(notifications) {
+      res.status(201).json(notifications);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all notifications from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 router.post('/changepassword', auth.canAccess(CONFIG.ALL), function(req, res) {
    console.log('came to change password');
    try {
