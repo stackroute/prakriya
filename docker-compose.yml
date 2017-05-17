@@ -1,23 +1,46 @@
-# create a docker-compose.yml file
 version: "2"
 services:
   web:
-    build: .
+    image: prakriya/prakriya-platform:v1.0.0
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    network_mode: host
+    restart: always
     volumes:
       - ./:/usr/src/app/
       - /usr/src/app/node_modules
     ports:
       - 8080:8080
-    links:
-      - mongo
-      - redis
     depends_on:
       - mongo
       - redis  
+    env_file:
+      - ./prakriya.env
+    entrypoint:
+      - /bin/sh
+      - -c
+      - 'npm run serve --production'
+  upload:
+    image: prakriya/prakriya-platform:v1.0.0
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    network_mode: host
+    restart: always
+    depends_on:
+      - mongo
+      - redis
+    env_file:
+      - ./prakriya.env
+    entrypoint:
+      - /bin/sh
+      - -c
+      - 'npm run upload --production'
   mongo:
     image: mongo:latest
-    ports:
-      - 27017:27017
+    network_mode: host
+    restart: always
     volumes:
      - $HOME/mongo/data:/data  
     expose:
@@ -26,8 +49,8 @@ services:
       - "27017:27017"
   redis:
     image: redis:latest
-    links:
-      -  mongo
+    network_mode: host
+    restart: always
     expose:
       - 6379
     ports:
