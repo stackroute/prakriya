@@ -9,6 +9,7 @@ request = request(app);
 var url=supertest("http://localhost:8080");
 var token= '';
 describe("Make GET requests to domain ", function() {
+    this.timeout(15000);
     it('Simple GET Request to root url', function(done) {
         request.get('/').expect(200, done);
     });
@@ -20,7 +21,7 @@ describe("Make GET requests to domain ", function() {
 
     //login route
       describe("Testing POST route", function(err){
-        it("should check login", function(done){
+        it("should check mentor login", function(done){
           url
             .post('/login')
             .send({"username": "simanta", "password":"simanta"})
