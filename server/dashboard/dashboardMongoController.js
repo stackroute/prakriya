@@ -5,7 +5,7 @@ const CandidateModel = require('../../models/candidates.js');
 const FileModel = require('../../models/files.js');
 const FeedbackModel = require('../../models/feedback.js');
 const EvaluationModel = require('../../models/evaluation.js');
-const AssessmentTrackModel = require('../../models/assessmenttracks.js');
+const CourseModel = require('../../models/courses.js');
 const adminMongoController = require('../admin/adminMongoController.js');
 const UserModel = require('../../models/users.js');
 
@@ -269,9 +269,8 @@ let getCandidates = function(waveID, courseName, successCB, errorCB) {
 	});
 }
 
-let getAssesmentTrack = function(waveID, courseName, successCB, errorCB) {
-	console.log('getAssesmentTrack: ', + waveID + ' - ' + courseName)
-	AssessmentTrackModel.findOne({Wave: waveID, CourseName: courseName}, function(err, result) {
+let getAssesmentTrack = function(courseName, successCB, errorCB) {
+	CourseModel.findOne({CourseName: courseName}, 'AssessmentCategories', function(err, result) {
 		if(err) {
 			errorCB(err);
 		}

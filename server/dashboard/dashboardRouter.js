@@ -430,13 +430,13 @@ router.get("/candidatesandtracks/:waveID/:courseName", auth.canAccess(CONFIG.MEN
   try{
     dashboardMongoController.getCandidates(req.params.waveID, req.params.courseName,
        function(candidates) {
-         console.log('Candidates Fetched: ', JSON.stringify(candidates))
-         dashboardMongoController.getAssesmentTrack(req.params.waveID, req.params.courseName,
+         console.log('Candidates Fetched -- ', JSON.stringify(candidates))
+         dashboardMongoController.getAssesmentTrack(req.params.courseName,
            function(assessmentTrack) {
-             console.log('AssessmentTrack Fetched: ', JSON.stringify(assessmentTrack))
+             console.log('AssessmentTrack Fetched -- ', JSON.stringify(assessmentTrack))
               res.status(201).json({
                 candidates: candidates,
-                assessmentTrack: assessmentTrack
+                assessmentTrack: assessmentTrack.AssessmentCategories
               });
            },
            function(err) {
