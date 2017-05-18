@@ -19,6 +19,7 @@ export default class BulkUpload extends React.Component {
 		this.handleUpload = this.handleUpload.bind(this);
 		this.sendMail = this.sendMail.bind(this);
 		this.getUsers = this.getUsers.bind(this);
+		this.pushNotification = this.pushNotification.bind(this);
 	}
 	componentDidMount() {
 		this.setState({
@@ -80,14 +81,14 @@ export default class BulkUpload extends React.Component {
 		    	console.log(err);
 		    else {
 		    	console.log('File uploaded:', res.body.fileName)
-		    	th.sendMail(email);
-		    	th.getFiles();
-					let socket = io()
-					socket.emit('mail sent', {sender: th.props.user.name, to: email})
+					let timestamp = new Date()
+					let notification = `You have a mail from  ${th.props.user.name}|${timestamp}`
+		    	th.sendMail(email, notification)
+		    	th.getFiles()
 		    }
 			})
 	}
-	sendMail(email) {
+	sendMail(email, notification) {
 		let th = this;
 		let emailObj = {};
 		emailObj.email = email;
@@ -106,10 +107,23 @@ export default class BulkUpload extends React.Component {
 						open: true,
 						msg: res.body.status
 					})
+					th.pushNotification(email, notification)
+					let socket = io()
+					socket.emit('mail sent', {notification: notification, to: email})
 				}
 			})
 	}
-
+	pushNotification(to, message) {
+		console.log('push notification called: ', to , ' -- ', message)
+		let th = this
+		Request
+			.post('/dashboard/addnotification')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({to: to, message: message})
+			.end(function(err, res){
+				console.log('Notification pushed to server', res)
+			})
+	}
 	render() {
 		let th = this;
 		return(

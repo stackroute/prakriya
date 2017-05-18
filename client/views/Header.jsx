@@ -102,18 +102,10 @@ export default class Header extends React.Component {
 		socket.on('show notification', function(data) {
       if(data.to === th.props.useremail) {
         let notifications = th.state.notifications
-        let timestamp = new Date()
-        notifications.push(`You have a mail from  ${data.sender}|${timestamp}`)
+        notifications.push(data.notification)
   			th.setState({
           notifications: notifications
         })
-        Request
-          .post('/dashboard/addnotification')
-          .set({'Authorization': localStorage.getItem('token')})
-          .send({to: data.to, message: `You have a mail from  ${data.sender}|${timestamp}`})
-          .end(function(err, res){
-            console.log('Notification pushed to server', res)
-          })
       }
 		})
 	}
@@ -258,9 +250,14 @@ export default class Header extends React.Component {
     					    anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
     					  >
                   {
-                    th.state.notifications.length < 1 ? '' :
                     <List>
                       {
+                        th.state.notifications.length < 1 ?
+                        <ListItem
+                          primaryText='No new notifications found'
+                          key='-1'
+                          style={{textAlign: 'center'}}
+                        /> :
                         th.state.notifications.map(function(message, index) {
                           return (
                             <ListItem

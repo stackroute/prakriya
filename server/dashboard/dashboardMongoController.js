@@ -16,11 +16,12 @@ const UserModel = require('../../models/users.js');
 
 // Adding a new notification
 let addNotification = function(email, message, successCB, errorCB) {
+	console.log('adding notification: ', email, ' -- ', message)
 	UserModel.update({email: email}, {$push: {notifications: message}}, function(err, result){
 		if(err) {
 			errorCB(err);
 		}
-		console.log(result);
+		console.log('add results: ', result);
 		successCB(result);
 	})
 }
