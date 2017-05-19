@@ -23,7 +23,7 @@ var token= '';
         });
         });
   });
-  describe.skip("Testing ADMIN routes", function(err){
+  describe("Testing ADMIN routes", function(err){
         it("get the logged user",function(done){
            url
               .get('/dashboard/user')
@@ -94,7 +94,7 @@ var token= '';
  /****************************************************
   ******testing-post (admin adminroutes) ********
   ****************************************************/
- describe.skip("Testing ADMIN-POST route for user", function(err){
+ describe("Testing ADMIN-POST route for user", function(err){
     it("add users",function(done){
       let user = {}
       user.name = 'joe'
@@ -164,7 +164,7 @@ var token= '';
     });
   })
  describe("Testing ADMIN-POST route for user", function(err){
-    it.skip("add roles",function(done){
+    it("add roles",function(done){
       let roles = {};
       roles.name = 'test';
       roles.controls = ['TEST','CONTROL'];
