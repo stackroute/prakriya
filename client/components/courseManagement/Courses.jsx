@@ -115,7 +115,7 @@ export default class Courses extends React.Component {
 		let th = this
 		console.log(course)
 		Request
-			.delete('/mentor/deletecourse')
+			.post('/mentor/deletecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(course)
 			.end(function(err, res){

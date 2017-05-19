@@ -168,7 +168,7 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   }
 })
 // Delete a course
-router.delete('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+router.post('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {
     let courseObj = req.body;
     courseObj.History = courseObj.History + " deleted by "+ req.user.name + " on " + new Date() + "\n";
