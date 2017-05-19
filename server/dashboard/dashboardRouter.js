@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const formidable = require('formidable');
 const fs = require('fs');
+const mkdirp = require('mkdirp');
 const logger = require('./../../applogger');
 var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
@@ -327,10 +328,16 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
         let buffer = new Buffer(data, 'binary')
         let cadet = JSON.parse(fields.cadet);
         let img = {};
+        let dir = './public/profilePics/'
         img.data = buffer;
         img.contentType = files.file.type;
         cadet.ProfilePic = img;
-        let imagePath = 'public/profilePics/' + cadet.EmployeeID + '.jpeg'
+        if (!fs.existsSync(dir)){
+          logger.debug('Directory not present')
+          mkdirp(dir);
+        }
+        let imagePath = dir + cadet.EmployeeID + '.jpeg'
+        logger.debug('Image Path', imagePath)
         fs.writeFile(imagePath, data, 'binary', function(err){
             if (err) throw err
             console.log('File saved.')
@@ -338,6 +345,7 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
         res.send(data);
       }
       catch(err) {
+        logger.error(err)
         res.status(500).json({
           error: 'Internal error occurred, please report...!'
         });

@@ -20,6 +20,7 @@ export default class MyProfile extends React.Component {
 		this.getCadet = this.getCadet.bind(this);
 		this.updateProfile = this.updateProfile.bind(this);
 		this.saveProfilePic = this.saveProfilePic.bind(this);
+		this.getProfilePic = this.getProfilePic.bind(this);
 	}
 	componentDidMount() {
 		this.getCadet();
