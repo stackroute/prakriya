@@ -56,11 +56,11 @@ export default class TrackItem extends React.Component {
 	}
 
   componentDidMount() {
-		console.log('Length: ', this.props.track.comments.length)
-		if(this.props.track.comments.length == 0)
-			this.props.track.comments = new Array(this.props.track.categories.length)
-    this.setState({
-      track: this.props.track
+		let th = this
+		if(th.props.track.comments.length == undefined)
+			th.props.track.comments = new Array(th.props.track.categories.length)
+    th.setState({
+      track: th.props.track
     })
   }
 

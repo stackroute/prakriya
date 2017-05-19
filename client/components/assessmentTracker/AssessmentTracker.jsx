@@ -66,11 +66,11 @@ export default class AssessmentTracker extends React.Component {
 			.get(`/dashboard/candidatesandtracks/${waveID}/${courseName}`)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
+				console.log('getCandidates Object: ', res.body)
 				th.setState({
 					candidates: res.body.candidates,
-					assessmentCategories: res.body.assessmentTrack.Categories
+					assessmentCategories: res.body.assessmentTrack
 				})
-				console.log('getCandidates Object: ', res.body)
 			})
 	}
 
@@ -154,8 +154,7 @@ export default class AssessmentTracker extends React.Component {
 					{
 						th.state.candidates.map(function(candidate, index) {
 							let categories = th.state.assessmentCategories
-							return <Col md={6}><TrackItem
-								key={index}
+							return (<Col md={6} key={index}><TrackItem
 								track={
 									{
 										candidateID: candidate.EmployeeID,
@@ -166,7 +165,7 @@ export default class AssessmentTracker extends React.Component {
 									}
 								}
 								onUpdateComments={(comments)=>{th.updateComments(index, comments)}}
-								onSaveComments={()=>{th.saveAssessmentTrack(index)}} /></Col>
+								onSaveComments={()=>{th.saveAssessmentTrack(index)}} /></Col>)
 						})
 					}
 				</Row></Grid>

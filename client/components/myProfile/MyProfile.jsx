@@ -20,10 +20,11 @@ export default class MyProfile extends React.Component {
 		this.getCadet = this.getCadet.bind(this);
 		this.updateProfile = this.updateProfile.bind(this);
 		this.saveProfilePic = this.saveProfilePic.bind(this);
+		this.getProfilePic = this.getProfilePic.bind(this);
 	}
 	componentDidMount() {
 		this.getCadet();
-		this.getProfilePic();
+		// this.getProfilePic();
 		this.getProjects();
 	}
 	getProjects() {
@@ -54,6 +55,7 @@ export default class MyProfile extends React.Component {
 		    	th.setState({
 		    		cadet: res.body
 		    	})
+		    	th.getProfilePic(res.body.EmployeeID);
 		    }
 		  })
 	}
@@ -94,11 +96,12 @@ export default class MyProfile extends React.Component {
 		    }
 			})
 	}
-	getProfilePic() {
+	getProfilePic(eid) {
 		let th = this;
 		Request
-			.get('/dashboard/getimage')
+			.get(`/dashboard/getimage?eid=${eid}`)
 			.set({'Authorization': localStorage.getItem('token')})
+			.query({q: eid})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);

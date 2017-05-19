@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 const logger = require('./../applogger');
 const uploadCandidates = require('./upload/uploadCandidates');
+const CONFIG = require('../config')
 
 let setupMongooseConnections = function() {
-  mongoose.connect('mongodb://localhost:27017/prakriya');
+  mongoose.connect(CONFIG.MONGO.mongoURL);
 
   mongoose.connection.on('connected', function() {
-    logger.debug('Mongoose is now connected to ', 'mongodb://localhost:27017/prakriya');
+    logger.debug('Mongoose is now connected to ', CONFIG.MONGO.mongoURL);
   });
 
   mongoose.connection.on('error', function(err) {

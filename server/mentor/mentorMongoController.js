@@ -1,57 +1,10 @@
 const CandidateModel = require('../../models/candidates.js');
-const AssessmentTrackModel = require('../../models/assessmenttracks.js');
 const CourseModel = require('../../models/courses.js');
 const WaveModel = require('../../models/waves.js');
 
 /**************************************************
 *******          AssessmentTrack           ********
 ***************************************************/
-
-let getTrainingTracks = function(successCB, errorCB) {
-	CandidateModel.find().distinct('TrainingTrack', function(err, result) {
-		if(err) {
-			errorCB(err);
-		}
-		successCB(result);
-	});
-}
-
-let getWaves = function(trainingTrack, successCB, errorCB) {
-	CandidateModel.find({TrainingTrack: trainingTrack}).distinct('Wave', function(err, result) {
-		if(err) {
-			errorCB(err);
-		}
-		successCB(result);
-	});
-}
-
-let getCoursesFrom = function(wave, successCB, errorCB) {
-	CandidateModel.find({Wave: wave}).distinct('CourseName', function(err, result) {
-		if(err) {
-			errorCB(err);
-		}
-		successCB(result);
-	});
-}
-
-let getCandidates = function(trainingTrack, wave, course, successCB, errorCB) {
-	CandidateModel.find({TrainingTrack: trainingTrack, Wave: wave, CourseName: course}, function(err, result) {
-		if(err) {
-			errorCB(err);
-		}
-		successCB(result);
-	});
-}
-
-let getAssesmentTrack = function(trainingTrack, wave, course, successCB, errorCB) {
-	console.log('getAssesmentTrack: ', trainingTrack + ' - ' + wave + ' - ' + course)
-	AssessmentTrackModel.findOne({TrainingTrack: trainingTrack, Wave: wave, CourseName: course}, function(err, result) {
-		if(err) {
-			errorCB(err);
-		}
-		successCB(result);
-	});
-}
 
 let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 	console.log('candidate obj from client side', candidateObj)
@@ -69,7 +22,7 @@ let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 
 let getCourses = function(successCB, errorCB) {
 	CourseModel.find({},function(err, result) {
-		if (err) 
+		if (err)
 				errorCB(err);
 		successCB(result);
 	});
@@ -187,11 +140,6 @@ let updateSession = function(object, successCB, errorCB) {
 }
 
 module.exports = {
-	getWaves,
-	getTrainingTracks,
-	getCoursesFrom,
-	getCandidates,
-	getAssesmentTrack,
 	updateCandidateAssessment,
 	getCourses,
 	updateCourse,

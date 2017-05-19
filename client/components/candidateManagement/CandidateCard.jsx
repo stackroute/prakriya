@@ -5,6 +5,7 @@ import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import {lightBlack} from 'material-ui/styles/colors'; 
+import Request from 'superagent';
 
 const styles = {
 	actions: {
@@ -23,12 +24,41 @@ export default class CandidateCard extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			showDeleteDialog: false
+			showDeleteDialog: false,
+			imageURL: '../../assets/images/avt-default.jpg'
 		}
+		this.getProfilePic = this.getProfilePic.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleCardClick = this.handleCardClick.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
+	}
+	componentDidMount() {
+		this.getProfilePic(this.props.cadet.EmployeeID)
+	}
+	getProfilePic(eid) {
+		let th = this;
+		Request
+			.get(`/dashboard/getimage?eid=${eid}`)
+			.set({'Authorization': localStorage.getItem('token')})
+			.query({q: eid})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	if(res.text) {
+		    		let array = new Uint8Array(res.text.length);
+		        for (var i = 0; i < res.text.length; i++){
+		            array[i] = res.text.charCodeAt(i);
+		        }
+		        var blob = new Blob([array], {type: 'image/jpeg'});
+			    	let blobUrl = URL.createObjectURL(blob);
+			    	th.setState({
+			    		imageURL: blobUrl
+			    	})
+		    	}
+		    }
+			})
 	}
 	handleCardClick() {
 		this.props.handleCardClick(this.props.candidate);
@@ -74,7 +104,7 @@ export default class CandidateCard extends React.Component {
 			      	/>
 			      }
 			    >
-			      <img src="../../assets/images/avt-default.jpg" />
+			      <img src={this.state.imageURL} />
 			    </CardMedia>
 			    <CardTitle 
 			    	title={this.props.candidate.EmployeeID}
