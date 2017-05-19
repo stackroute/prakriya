@@ -179,7 +179,7 @@ it("GET waveobj for particular waveids",function(done){
   *******   testing-post (mentor mentor-routes) ********
   ***************************************************/
  describe("Testing POST route for course", function(err){
-        it.skip("mentor course addition", function(done){
+        it("mentor course addition", function(done){
           url
             .post('/mentor/addcourse')
             .set({"Authorization":token})
@@ -191,7 +191,7 @@ it("GET waveobj for particular waveids",function(done){
             });
             });
 
-        it.skip("should update course", function(done){
+        it("should update course", function(done){
           url
             .post('/mentor/updatecourse')
             .set({"Authorization":token})
@@ -202,7 +202,7 @@ it("GET waveobj for particular waveids",function(done){
               done();
             });
             });
-        it.skip("should delete a course", function(done){
+        it("should delete a course", function(done){
           url
             .delete('/mentor/deletecourse')
             .set({"Authorization":token})
@@ -214,7 +214,7 @@ it("GET waveobj for particular waveids",function(done){
               done();
           });
       });
-        it.skip("should restore a course", function(done){
+        it("should restore a course", function(done){
           url
             .post('/mentor/restorecourse')
             .set({"Authorization":token})
@@ -225,7 +225,7 @@ it("GET waveobj for particular waveids",function(done){
               done();
           });
       });
-        it.skip("should add a new category", function(done){
+        it("should add a new category", function(done){
           let category = {'Name':'Java','Mentor':'Simanta','Duration':'1 week','Videos':'www.google.com','Blogs':'www.google.com','Docs':'www.google.com'}
           url
             .post('/mentor/addcategory')
@@ -238,7 +238,7 @@ it("GET waveobj for particular waveids",function(done){
               done();
           });
       });
-        it.skip("should delete a category", function(done){
+        it("should delete a category", function(done){
           let category = {'Name':'Java','Mentor':'Simanta','Duration':'1 week','Videos':'www.google.com','Blogs':'www.google.com','Docs':'www.google.com'}
           url
             .post('/mentor/deletecategory')
@@ -254,7 +254,7 @@ it("GET waveobj for particular waveids",function(done){
   }); 
 
  describe("Testing POST route for program flow", function(err){
-  it.skip("add a new session", function(done){
+  it("add a new session", function(done){
     let session = {
         SessionID: 1,
         CourseName: 'MERN',
@@ -276,7 +276,7 @@ it("GET waveobj for particular waveids",function(done){
               done();
             });
             });
-  it.skip("update session", function(done){
+  it("update session", function(done){
     let session = {
         SessionID: 1495109231079,
         CourseName: 'MERN',
