@@ -354,14 +354,15 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   })
 })
 
-router.get('/getimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+router.get('/getimage', auth.canAccess(CONFIG.ADMCAN), function(req, res) {
   try {
-    dashboardMongoController.getCadet(req.user.email, function(cadet) {
-      fs.readFile('public/profilePics/' + cadet.EmployeeID + '.jpeg', 'binary', (err, data) => {
+    logger.debug('Req in getImage', req.query.eid);
+    fs.readFile('public/profilePics/' + req.query.eid + '.jpeg', 'binary', (err, data) => {
+      if(err) {
+        res.status(500).json({ error: 'No image is available...!' });
+      }
+      else
         res.send(data);
-      });
-    }, function(err) {
-      res.status(500).json({ error: 'Cannot get the cadet from db...!' });
     });
   }
   catch(err) {

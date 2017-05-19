@@ -60,7 +60,7 @@ let registerCandidates = function () {
 			console.log(err);
 		}
 	})
-  setTimeout(registerCandidates, 2000);
+  setTimeout(registerCandidates, 1000);
 }
 
 module.exports = {

@@ -44,7 +44,6 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
 	form.parse(req, function(err, fields, files) {
 		fs.readFile(files.file.path, 'utf8', (err, data) => {
 			try {
-				console.log('Data', data)
 				let lines = data.split('\n');
 			  let headers = lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 			  let cadetColln = [];
