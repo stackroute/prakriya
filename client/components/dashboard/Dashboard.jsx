@@ -3,8 +3,16 @@ import Request from 'superagent';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
+import Paper from 'material-ui/Paper';
+import Moment from 'moment';
 
 const styles = {
+	lastLogin: {
+		height: 50,
+		padding: 15,
+		textAlign: 'center',
+		background: '#C6D8D3'
+	},	
 	heading: {
 		textAlign: 'center'
 	},
@@ -21,6 +29,7 @@ export default class Dashboard extends React.Component {
 			user: {}
 		}
 		this.getUser = this.getUser.bind(this);
+		this.formatDate = this.formatDate.bind(this); 
 	}
 	componentDidMount() {
 		this.getUser()
@@ -40,6 +49,13 @@ export default class Dashboard extends React.Component {
 				}
 			})
 	}
+	formatDate(date) {
+		if(date) {
+			return Moment(date).fromNow();
+		}
+		else 
+			return '-' 
+	}
 
 	render() {
 		return(
@@ -47,7 +63,7 @@ export default class Dashboard extends React.Component {
 				<h1 style={styles.heading}>This is {this.state.user.name} dashboard</h1>
 				<Grid>
 					<Row>
-						<Col md={6} mdOffset={3} >
+						<Col md={6} mdOffset={1} >
 							<Card style={styles.card} >
 						    <CardHeader
 						      title={this.state.user.name}
@@ -60,6 +76,14 @@ export default class Dashboard extends React.Component {
 						      <img src="../assets/images/avt-default.jpg" />
 						    </CardMedia>
 						  </Card>
+					  </Col>
+					  <Col md={3} mdOffset={1} >
+					  	<Paper style={styles.lastLogin} zDepth={1} >
+					  		<strong>Last Login: </strong> 
+					  		{
+					  			this.formatDate(this.props.user.lastLogin)
+					  		}
+					  	</Paper>
 					  </Col>
 				  </Row>
 			  </Grid>

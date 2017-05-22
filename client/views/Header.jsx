@@ -163,8 +163,7 @@ export default class Header extends React.Component {
 	}
 
 	logout() {
-		localStorage.removeItem('token')
-		this.context.router.push('/')
+          localStorage.removeItem('token')
 	}
 
 	handleDrawerToggle() {

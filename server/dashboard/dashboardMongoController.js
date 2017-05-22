@@ -49,6 +49,16 @@ let getNotifications = function(username, successCB, errorCB) {
 	})
 }
 
+let updateLastLogin = function(user, successCB, errorCB) {
+	UserModel.update({username: user.username}, {$set: {lastLogin: user.lastLogin}}, function(err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	})
+}
+
 let changePassword = function(user, successCB, errorCB) {
 	UserModel.update({username: user.username}, {$set: {password: user.password}}, function(err, result){
 		if(err) {
@@ -303,6 +313,7 @@ let getWaveObject = function(waveID, successCB, errorCB) {
 }
 
 module.exports = {
+	updateLastLogin,
 	getPermissions,
 	addWave,
 	getCadet,

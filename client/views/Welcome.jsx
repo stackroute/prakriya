@@ -29,7 +29,6 @@ export default class Welcome extends React.Component {
 		this.state = {
 			open: false
 		}
-		// this.openLoginPage = this.openLoginPage.bind(this);
 		this.handleOpen = this.handleOpen.bind(this);
 		this.handleClose = this.handleClose.bind(this);
 	}
@@ -41,9 +40,6 @@ export default class Welcome extends React.Component {
   handleClose() {
     this.setState({open: false});
   };
-	// openLoginPage() {
-	// 	this.context.router.push('/login')
-	// }
 	render() {
 		const actions = [
       <FlatButton

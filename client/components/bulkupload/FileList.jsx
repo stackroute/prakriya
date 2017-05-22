@@ -6,7 +6,6 @@ import Avatar from 'material-ui/Avatar';
 import ActionAssignment from 'material-ui/svg-icons/action/assignment';
 import Download from 'material-ui/svg-icons/file/file-download';
 import Warning from 'material-ui/svg-icons/action/info';
-import Humanize from 'humanize';
 import Moment from 'moment';
 import CheckIcon from 'material-ui/svg-icons/action/check-circle';
 import {Grid, Row, Col} from 'react-flexbox-grid';
@@ -38,7 +37,6 @@ export default class FileList extends React.Component {
 	formatDate(date) {
 		if(date) {
 			return Moment(date).fromNow();
-			// return Humanize.naturalDay(newdate,'H:i:s dS M, Y')
 		}
 		else 
 			return '-' 
