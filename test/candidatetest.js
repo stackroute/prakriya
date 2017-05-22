@@ -51,18 +51,17 @@ var token= '';
                 });
                 it("get image",function(done){
                    url
-                      .get('/dashboard/getimage?eid=`351611`')
+                      .get(`/dashboard/getimage?eid=353743`)
                       .set({"Authorization":token})
-                      .expect(201)
+                      .expect(200)
                       .end(function(err, res){
-                        console.log(res.body);
-                      if (err) throw err;
+                        if (err) throw err;
                       done();
                    });
                     });
               });
-  describe.skip("Testing POST route", function(err){
-    it("should check candidate save feedback", function(done){
+  describe("Testing POST route", function(err){
+    it.skip("should check candidate save feedback", function(done){
       this.timeout(50000);
       let feedbackObj = {
                 cadetID: '351611',
