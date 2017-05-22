@@ -8,6 +8,8 @@ var sinon = require('sinon');
 request = request(app);
 var url=supertest("http://localhost:8080");
 var token= '';
+const CourseModel = require('./../models/courses.js');
+
 describe("Make GET requests to domain ", function() {
     this.timeout(15000);
     it('Simple GET Request to root url', function(done) {
@@ -21,7 +23,7 @@ describe("Make GET requests to domain ", function() {
 
     //login route
       describe("Testing MENTOR-POST route", function(err){
-        it("should check mentor login", function(done){
+        it.only("should check mentor login", function(done){
           url
             .post('/login')
             .send({"username": "simanta", "password":"simanta"})
@@ -178,7 +180,8 @@ it("GET waveobj for particular waveids",function(done){
   /**************************************************
   *******   testing-post (mentor mentor-routes) ********
   ***************************************************/
- describe("Testing POST route for course", function(err){
+ describe.only("Testing POST route for course", function(err){
+        this.timeout(25000);
         it("mentor course addition", function(done){
           url
             .post('/mentor/addcourse')
@@ -204,17 +207,16 @@ it("GET waveobj for particular waveids",function(done){
             });
         it("should delete a course", function(done){
           url
-            .delete('/mentor/deletecourse')
+            .post('/mentor/deletecourse')
             .set({"Authorization":token})
             .send({"CourseID":100})
             .expect(200)
             .end(function(err,res){
-              console.log(err)
               should.not.exist(err);
               done();
           });
       });
-        it("should restore a course", function(done){
+      it("should restore a course", function(done){
           url
             .post('/mentor/restorecourse')
             .set({"Authorization":token})
@@ -233,7 +235,6 @@ it("GET waveobj for particular waveids",function(done){
             .send({'CourseID':100,'History':'Simanta','Categories':category})
             .expect(200)
             .end(function(err,res){
-              console.log(err)
               should.not.exist(err);
               done();
           });
@@ -246,11 +247,17 @@ it("GET waveobj for particular waveids",function(done){
             .send({'CourseID':100,'History':'Simanta','Categories':category})
             .expect(200)
             .end(function(err,res){
-              console.log(err)
               should.not.exist(err);
               done();
           });
       });
+      after(()=>{
+        CourseModel.remove({'CourseID':100},function (err, result) {
+        if(err)
+          errorCB(err);
+        successCB(result)
+      })
+    })
   }); 
 
  describe("Testing POST route for program flow", function(err){
