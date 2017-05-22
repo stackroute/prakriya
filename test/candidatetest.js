@@ -9,7 +9,7 @@ request = request(app);
 var url=supertest("http://localhost:8080");
 var token= '';
 //login route
-  describe("Testing POST route", function(err){
+  describe("Testing GET route", function(err){
     this.timeout(50000);
         it("should check candidate login", function(done){
       url
@@ -49,16 +49,74 @@ var token= '';
                   done();
                });
                 });
-                // it("get image",function(done){
-                //    url
-                //       .get('/dashboard/getimage')
-                //       .set({"Authorization":token})
-                //       .expect('Content-Type', /image/jpeg)
-                //       .expect(201)
-                //       .end(function(err, res){
-                //         console.log(res.body);
-                //       if (err) throw err;
-                //       done();
-                //    });
-                //     });
+                it("get image",function(done){
+                   url
+                      .get('/dashboard/getimage?eid=`351611`')
+                      .set({"Authorization":token})
+                      .expect(201)
+                      .end(function(err, res){
+                        console.log(res.body);
+                      if (err) throw err;
+                      done();
+                   });
+                    });
               });
+  describe.skip("Testing POST route", function(err){
+    it("should check candidate save feedback", function(done){
+      this.timeout(50000);
+      let feedbackObj = {
+                cadetID: '351611',
+                cadetName: 'Yuvashree S',
+                relevance: {
+                  1: 5,
+                  2: 3,
+                  3: 5,
+                  4: 4,
+                  5: 5
+                },
+                training: {
+                  1: 5,
+                  2: 5,
+                  3: 2,
+                  4: 5
+                },
+                confidence: {
+                  1: 5,
+                  2: 5,
+                  3: 3,
+                  4: 5,
+                  5: 4,
+                  6: 5
+                },
+                mentors: {
+                  1: 5,
+                  2: 3,
+                  3: 5,
+                  4: 2,
+                  5: 5
+                },
+                facilities: {
+                  1: 5,
+                  2: 3,
+                  3: 5,
+                  4: 2
+                },
+                overall: {
+                  1: 5,
+                  2: 4,
+                  3: 5
+                },
+                mostLiked: 'assessments',
+                leastLiked: 'stand ups'
+              }
+              url
+                .post('/dashboard/savefeedback')
+                .set({"Authorization":token})
+                .send(feedbackObj)
+                .expect(200)
+                .end(function(err,res){
+                  should.not.exist(err);
+                  done();
+              });
+        });
+  });
