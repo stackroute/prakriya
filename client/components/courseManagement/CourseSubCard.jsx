@@ -357,7 +357,7 @@ export default class CourseCard extends React.Component {
 					/>
 					<br/>
 					{th.state.AssessmentVideos.map(function(video,index){
-						text = "Videos #"+index;
+						text = "Videos #"+(index + 1);
 						return (
 						<div>
 						<TextField
@@ -380,7 +380,7 @@ export default class CourseCard extends React.Component {
 
 					<br/>
 					{th.state.AssessmentBlogs.map(function(blog,index){
-						text = "Blogs #"+index;
+						text = "Blogs #"+(index + 1);
 						return (
 						<div>
 						<TextField
@@ -402,7 +402,7 @@ export default class CourseCard extends React.Component {
 			    </IconButton>
 					<br/>
 					{th.state.AssessmentDocs.map(function(doc,index){
-						text = "Document #"+index;
+						text = "Document #"+(index + 1);
 						return (
 						<div>
 						<TextField
