@@ -6,7 +6,8 @@ import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import Dialog from 'material-ui/Dialog';
 import DatePicker from 'material-ui/DatePicker';
-import {grey50} from 'material-ui/styles/colors'; 
+import {grey50} from 'material-ui/styles/colors';
+import Request from 'superagent'; 
 import CandidateEdit from './CandidateEdit.jsx';
 import PerformanceMatrix from './PerformanceMatrix.jsx';
 
@@ -51,9 +52,11 @@ export default class CandidateHome extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			imageURL: '../../assets/images/avt-default.jpg',
 			showDeleteDialog: false,
 			showEditDialog: false
 		}
+		this.getProfilePic = this.getProfilePic.bind(this);
 		this.handleBack = this.handleBack.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleUpdate = this.handleUpdate.bind(this);
@@ -61,6 +64,33 @@ export default class CandidateHome extends React.Component {
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 		this.openEditDialog = this.openEditDialog.bind(this);
 		this.closeEditDialog = this.closeEditDialog.bind(this);
+	}
+	componentDidMount() {
+		this.getProfilePic(this.props.candidate.EmployeeID)
+	}
+	getProfilePic(eid) {
+		let th = this;
+		Request
+			.get(`/dashboard/getimage?eid=${eid}`)
+			.set({'Authorization': localStorage.getItem('token')})
+			.query({q: eid})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	if(res.text) {
+		    		let array = new Uint8Array(res.text.length);
+		        for (var i = 0; i < res.text.length; i++){
+		            array[i] = res.text.charCodeAt(i);
+		        }
+		        var blob = new Blob([array], {type: 'image/jpeg'});
+			    	let blobUrl = URL.createObjectURL(blob);
+			    	th.setState({
+			    		imageURL: blobUrl
+			    	})
+		    	}
+		    }
+			})
 	}
 	handleBack() {
 		this.props.handleBack();
@@ -148,7 +178,7 @@ export default class CandidateHome extends React.Component {
 								<Row>
 									<Col md={2} mdOffset={2} style={styles.pic}>
 										<CardMedia>
-											<img src='../../assets/images/avt-default.jpg'/>
+											<img src={this.state.imageURL}/>
 										</CardMedia>
 										<p style={styles.basicDetails}>
 											Employee Id: {this.props.candidate.EmployeeID}<br/>
