@@ -8,6 +8,10 @@ import {lightBlack} from 'material-ui/styles/colors';
 import Request from 'superagent';
 
 const styles = {
+	profilePic: {
+		height: 300,
+		width: 300
+	},
 	actions: {
 		textAlign: 'right'
 	},
@@ -34,7 +38,7 @@ export default class CandidateCard extends React.Component {
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 	}
 	componentDidMount() {
-		this.getProfilePic(this.props.cadet.EmployeeID)
+		this.getProfilePic(this.props.candidate.EmployeeID)
 	}
 	getProfilePic(eid) {
 		let th = this;
@@ -104,7 +108,7 @@ export default class CandidateCard extends React.Component {
 			      	/>
 			      }
 			    >
-			      <img src={this.state.imageURL} />
+			      <img style={styles.profilePic} src={this.state.imageURL} />
 			    </CardMedia>
 			    <CardTitle 
 			    	title={this.props.candidate.EmployeeID}
