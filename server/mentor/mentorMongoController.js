@@ -139,6 +139,25 @@ let updateSession = function(object, successCB, errorCB) {
 	})
 }
 
+let deleteSession = function(object, successCB, errorCB) {
+	console.log('deleteSession: ', JSON.stringify(object))
+	WaveModel.update(
+		{
+			'WaveID': object.waveID,
+			'Sessions.SessionID': object.session.SessionID
+		},
+		{
+			'$pull': {
+				'Sessions': object.session
+			}
+		}, function(err, result) {
+		if(err) {
+			errorCB(err)
+		}
+		successCB(result)
+	})
+}
+
 module.exports = {
 	updateCandidateAssessment,
 	getCourses,
@@ -150,5 +169,6 @@ module.exports = {
 	addCourse,
 	getWaveObject,
 	addNewSession,
-	updateSession
+	updateSession,
+	deleteSession
 }

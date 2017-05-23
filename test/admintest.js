@@ -38,7 +38,7 @@ var token= '';
 /****************************************************
 ******testing-get (admin dashboardroutes) ********
 ****************************************************/
-            it.skip("get the notification",function(done){
+            it("get the notification",function(done){
                url
                   .get(`/dashboard/notifications?username=${'simanta'}`)
                   .set({"Authorization":token})

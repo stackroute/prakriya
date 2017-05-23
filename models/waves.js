@@ -9,7 +9,7 @@ var subSchema = new Schema({
   Status: String,
   ContextSetSession: String,
   SessionBy: String,
-  SessionOn: String,
+  SessionOn: Date,
   Remarks: String
 })
 

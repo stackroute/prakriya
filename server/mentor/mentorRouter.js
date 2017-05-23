@@ -279,6 +279,24 @@ router.post('/addnewsession', auth.canAccess(CONFIG.MENTOR), function(req, res) 
   }
 })
 
+//delete session
+router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    mentorMongoController.deleteSession(req.body, function(status) {
+      console.log('Status: ', status)
+      res.status(201).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot add new session...!' });
+    })
+  }
+  catch(err) {
+    console.log(err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 //Update session
 router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
