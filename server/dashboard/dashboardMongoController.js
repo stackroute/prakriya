@@ -1,3 +1,4 @@
+const async = require('async');
 const RoleModel = require('../../models/roles.js');
 const WaveModel = require('../../models/waves.js');
 const ProjectModel = require('../../models/projects.js');
@@ -8,6 +9,8 @@ const EvaluationModel = require('../../models/evaluation.js');
 const CourseModel = require('../../models/courses.js');
 const adminMongoController = require('../admin/adminMongoController.js');
 const UserModel = require('../../models/users.js');
+const CONFIG = require('../../config');
+const logger = require('./../../applogger');
 
 
 /****************************************************
@@ -49,6 +52,16 @@ let getNotifications = function(username, successCB, errorCB) {
 	})
 }
 
+let updateLastLogin = function(user, successCB, errorCB) {
+	UserModel.update({username: user.username}, {$set: {lastLogin: user.lastLogin}}, function(err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	})
+}
+
 let changePassword = function(user, successCB, errorCB) {
 	UserModel.update({username: user.username}, {$set: {password: user.password}}, function(err, result){
 		if(err) {
@@ -68,34 +81,39 @@ let getPermissions =  function(role, successCB, errorCB) {
 }
 
 let addWave = function (waveObj, successCB, errorCB) {
-	console.log('WaveObj', waveObj)
-	let user = {};
+	let userObj = {};
 	let saveWave = new WaveModel(waveObj);
 	saveWave.save(function (err, result) {
 		if(err)
 			errorCB(err);
-		console.log(result);
-		result.Cadets.map(function(cadetID) {
-			CandidateModel.findOneAndUpdate({"EmployeeID": cadetID}, {$set: {"Wave": result.WaveID}}, function(err, status) {
-				if(err)
-					errorCB(err);
-				else
-				{
-					console.log(status.EmployeeName);
-					user.name = status.EmployeeName;
-					user.email = status.EmailID;
-					user.username = status.EmailID.split('@')[0];
-					user.password = 'digital@123';
-					user.role = 'candidate';
-					adminMongoController.addUser(user, function (user) {
-						console.log('SuccessCB')
-					}, function (err) {
-						console.log('ErrorCB')
+		else {
+			async.each(result.Cadets,
+			  function(cadetID, callback){
+			    CandidateModel.findOneAndUpdate({"EmployeeID": cadetID}, {$set: {"Wave": result.WaveID}}, function(err, user) {
+						if(err)
+							errorCB(err);
+						else
+						{
+							console.log(user.EmployeeName);
+							userObj.name = user.EmployeeName;
+							userObj.email = user.EmailID;
+							userObj.username = user.EmailID.split('@')[0];
+							userObj.password = CONFIG.DEFAULT_PASS;
+							userObj.role = 'candidate';
+							adminMongoController.addUser(userObj, function (savedUser) {
+								logger.info('User created', user.EmployeeName);
+								callback();
+							}, function (err) {
+								logger.error('Error in creating user', err)
+							})
+						}
 					})
-				}
-			})
-		})
-		successCB(result);
+			  },
+			  function(err){
+			  	successCB(result);
+			  }
+			);
+		}
 	})
 }
 
@@ -303,6 +321,7 @@ let getWaveObject = function(waveID, successCB, errorCB) {
 }
 
 module.exports = {
+	updateLastLogin,
 	getPermissions,
 	addWave,
 	getCadet,

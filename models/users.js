@@ -7,6 +7,7 @@ var users = new Schema({
     username: {type: String, unique: true},
     password: String,
     role: String,
+    lastLogin: Date,
     actions: [String],
 		notifications: [String]
 });

@@ -163,8 +163,22 @@ export default class Header extends React.Component {
 	}
 
 	logout() {
-		localStorage.removeItem('token')
-		this.context.router.push('/')
+    let th = this
+    Request
+      .post('/dashboard/lastlogin')
+      .set({'Authorization': localStorage.getItem('token')})
+      .send({'lastLogin': localStorage.getItem('lastLogin')})
+      .end(function(err, res){
+        if(err) {
+          console.log('Error in lastLogin', err)
+          throw err;
+        }
+        else {
+          localStorage.removeItem('token')
+          localStorage.removeItem('lastLogin')
+          th.context.router.push('/')
+        }
+      });
 	}
 
 	handleDrawerToggle() {

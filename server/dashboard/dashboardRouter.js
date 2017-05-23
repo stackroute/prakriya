@@ -81,16 +81,29 @@ router.post('/changepassword', auth.canAccess(CONFIG.ALL), function(req, res) {
   }
 })
 
+//update last login
+router.post('/lastlogin', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try {
+    let user = req.user;
+    user.lastLogin = req.body.lastLogin;
+    logger.debug('Last Login', user)
+    dashboardMongoController.updateLastLogin(user, function(user) {
+      res.status(201).json(user);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update the last login...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 router.get("/user", function(req, res) {
-  // res.json(users[req.user.id]);
-  console.log("req from user!!!")
-  console.log('User object sent ', req.user);
   let userObj = {};
   try{
     dashboardMongoController.getPermissions(req.user.role, function(users) {
-      // userObj.actions = req.user.actions.filter(function(action) {
-      //   return action != "Login";
-      // });
       adminMongoController.getAccessControls(function(controls) {
         let accesscontrols = [];
         controls.map(function (control, key) {
@@ -102,6 +115,8 @@ router.get("/user", function(req, res) {
         userObj.username = req.user.username;
         userObj.email = req.user.email;
         userObj.actions = accesscontrols;
+        if(req.user.lastLogin != undefined)
+          userObj.lastLogin = req.user.lastLogin;
         res.status(201).json(userObj);
       }, function(err) {
         res.status(500).json({ error: 'Cannot get all controls from db...!' });

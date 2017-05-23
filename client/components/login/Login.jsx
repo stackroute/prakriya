@@ -77,6 +77,7 @@ export default class Login extends React.Component {
 			    }
 			    else {
 			    	localStorage.setItem('token', res.body.token);
+			    	localStorage.setItem('lastLogin', Date.now());
 			    	th.context.router.push('/app')
 			    }
 			  })

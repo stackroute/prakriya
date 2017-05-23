@@ -124,7 +124,8 @@ let config = {
   CANDIDATE: ['candidate'],
   ADMCAN: ['wiproadmin', 'sradmin', 'candidate'],
   MENCAN: ['mentor', 'candidate'],
-  ADMMEN: ['wiproadmin', 'sradmin', 'mentor']
+  ADMMEN: ['wiproadmin', 'sradmin', 'mentor'],
+  DEFAULT_PASS: 'digital@123'
 };
 
 module.exports = config;
