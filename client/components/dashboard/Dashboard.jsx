@@ -54,7 +54,7 @@ export default class Dashboard extends React.Component {
 			return Moment(date).fromNow();
 		}
 		else 
-			return '-' 
+			return 'First time login' 
 	}
 
 	render() {
@@ -80,9 +80,7 @@ export default class Dashboard extends React.Component {
 					  <Col md={3} mdOffset={1} >
 					  	<Paper style={styles.lastLogin} zDepth={1} >
 					  		<strong>Last Login: </strong> 
-					  		{
-					  			this.formatDate(this.props.user.lastLogin)
-					  		}
+					  		{this.formatDate(this.props.user.lastLogin)}
 					  	</Paper>
 					  </Col>
 				  </Row>
