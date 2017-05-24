@@ -83,7 +83,6 @@ export default class ProjectCard extends React.Component {
 		this.closeDeleteDialog();
 	}
 
-
 	render() {
 		let detail = '';
 		if(this.props.project.updated)

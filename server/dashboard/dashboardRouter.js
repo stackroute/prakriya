@@ -191,7 +191,7 @@ router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
     dashboardMongoController.updateProject(projectObj, function(project) {
       res.status(201).json(project);
     }, function (err) {
-      res.status(500).json({ error: 'Cannot update the project...!' });
+      res.status(500).json({ error: 'Cannot delete the project...!' });
     })
   }
   catch(err) {
@@ -201,7 +201,7 @@ router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
   }
 })
 
-//update a project
+//delete a project
 router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
     let projectObj = req.body;
@@ -575,4 +575,55 @@ router.post('/sendmail', function(req, res) {
     res.send({'status': result.msg})
   });
 })
+
+
+// Get all waves
+router.get('/waves', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try{
+    dashboardMongoController.getWaves(function(waves) {
+      res.status(201).json(waves);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all waves from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+// Get all cadets of a particular wave
+router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try{
+    dashboardMongoController.getCadetsOfWave(req.body.cadets, function(cadets) {
+      res.status(201).json(cadets);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all waves from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//delete a wave
+router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try {
+    dashboardMongoController.deleteWave(req.body.wave, function(wave) {
+      res.status(201).json(wave);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot delete the wave...!' });
+    })
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 module.exports = router;

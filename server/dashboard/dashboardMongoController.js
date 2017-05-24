@@ -320,6 +320,39 @@ let getWaveObject = function(waveID, successCB, errorCB) {
 	});
 }
 
+let getWaves = function(successCB, errorCB) {
+	WaveModel.find({},function(err, result) {
+		if (err)
+				errorCB(err);
+			console.log(result);
+		successCB(result);
+	});
+}
+
+let getCadetsOfWave = function(cadets, successCB, errorCB) {
+	CandidateModel.find({EmployeeID:{$in: cadets}},function(err, result) {
+		if (err)
+				errorCB(err);
+			console.log(result);
+		successCB(result);
+	});
+}
+
+let deleteWave = function (waveObj, successCB, errorCB) {
+	WaveModel.remove({WaveID:waveObj.WaveID},function (err, result) {
+		if(err)
+			errorCB(err);
+		else
+		{
+			CandidateModel.update({EmployeeID:{$in:waveObj.Cadets}},{$set:{Wave:undefined}},function (err, result) {
+				if(err)
+					errorCB(err);
+				successCB(result);
+			})
+		}
+	})
+}
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -346,5 +379,8 @@ module.exports = {
 	changePassword,
 	addNotification,
 	deleteNotification,
-	getNotifications
+	getNotifications,
+	getWaves,
+	getCadetsOfWave,
+	deleteWave
 }
