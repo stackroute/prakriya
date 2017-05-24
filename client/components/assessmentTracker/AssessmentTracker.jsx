@@ -4,6 +4,7 @@ import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
 import {Grid, Row, Col} from 'react-flexbox-grid'
 import TrackItem from './TrackItem.jsx'
+import FlatButton from 'material-ui/FlatButton'
 
 export default class AssessmentTracker extends React.Component {
 	constructor(props) {
@@ -15,17 +16,20 @@ export default class AssessmentTracker extends React.Component {
 			candidates: [],
 			wave: '',
 			course: '',
-			assessmentCategories: []
+			assessmentCategories: [],
+			filteredCandidate: '',
+			filteredCandidates: []
 		}
 
 		this.getCourses = this.getCourses.bind(this)
 		this.getWaveIDs = this.getWaveIDs.bind(this)
-
 		this.getCandidates = this.getCandidates.bind(this)
 		this.onWaveChange = this.onWaveChange.bind(this)
 		this.onCourseChange = this.onCourseChange.bind(this)
 		this.updateComments = this.updateComments.bind(this)
 		this.saveAssessmentTrack = this.saveAssessmentTrack.bind(this)
+		this.onCandidateChange = this.onCandidateChange.bind(this)
+		this.clearFilter = this.clearFilter.bind(this)
 	}
 
 	componentWillMount() {
@@ -114,6 +118,22 @@ export default class AssessmentTracker extends React.Component {
 		})
 	}
 
+	onCandidateChange(candidate) {
+		let th = this
+		th.setState({
+			filteredCandidates: [candidate],
+			filteredCandidate: candidate.EmployeeName
+		})
+	}
+
+	clearFilter() {
+		let th = this
+		th.setState({
+			filteredCandidates: [],
+			filteredCandidate: ''
+		})
+	}
+
 	render() {
 		let th = this
 		return(
@@ -147,12 +167,47 @@ export default class AssessmentTracker extends React.Component {
 							}
 						</SelectField>
 						</Col>
+						<Col md={6}>
+						<SelectField
+							floatingLabelText="Select Candidate"
+							value={th.state.filteredCandidate}
+						>
+							{
+								th.state.candidates.map(function(candidate, key) {
+									return <MenuItem key={key} value={candidate.EmployeeName} primaryText={candidate.EmployeeName} onClick={(e)=>{e.persist(); th.onCandidateChange(candidate);}} />
+								})
+							}
+						</SelectField>
+						<FlatButton
+							label="Clear Filter"
+							onClick={this.clearFilter}
+							style={{backgroundColor: 'teal'}}
+						/>
+						</Col>
 					</Row>
 				</Grid>
 
-				<Grid><Row>
+				<Grid>
 					{
-						th.state.candidates.map(function(candidate, index) {
+						th.state.filteredCandidates.length > 0 ?
+						th.state.filteredCandidates.map(function(candidate, index) {
+							let categories = th.state.assessmentCategories
+							return (<Row key={candidate.EmployeeID}><Col md={10}><TrackItem
+								track={
+									{
+										candidateID: candidate.EmployeeID,
+										candidateName: candidate.EmployeeName,
+										candidateEmail: candidate.EmailID,
+										comments: candidate.AssessmentTrack,
+										categories: categories
+									}
+								}
+								onUpdateComments={(comments)=>{th.updateComments(index, comments)}}
+								onSaveComments={()=>{th.saveAssessmentTrack(index)}} /></Col></Row>)
+						}):
+						<Row>
+						{
+							th.state.candidates.map(function(candidate, index) {
 							let categories = th.state.assessmentCategories
 							return (<Col md={6} key={index}><TrackItem
 								track={
@@ -168,7 +223,9 @@ export default class AssessmentTracker extends React.Component {
 								onSaveComments={()=>{th.saveAssessmentTrack(index)}} /></Col>)
 						})
 					}
-				</Row></Grid>
+						</Row>
+					}
+				</Grid>
 
 			</div>
 		)
