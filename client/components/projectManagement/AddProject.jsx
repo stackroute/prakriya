@@ -292,7 +292,7 @@ export default class AddProject extends React.Component {
         onClick={this.handleUpdate}
       />,
     ];
-		
+
 		if(this.props.openDialog)
 		{
 			return(
@@ -408,7 +408,7 @@ export default class AddProject extends React.Component {
 		    </FloatingActionButton>
 		    <Dialog
 		    	style={styles.dialog}
-          title="Add a new Project"
+          title={this.props.dialogTitle}
           actions={projectDialogActions}
           open={this.state.showDialog}
           autoScrollBodyContent={true}

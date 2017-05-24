@@ -12,7 +12,8 @@ import FlatButton from 'material-ui/FlatButton';
 
 const styles = {
     text: {
-      wordWrap: 'break-word'
+      wordWrap: 'break-word',
+      textAlign: 'justify'
     },
     view: {
     	cursor: 'pointer',
@@ -36,8 +37,12 @@ export default class ProjectCard extends React.Component {
 		this.handleUpdateProject = this.handleUpdateProject.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-		this.handleDeleteProject = this.handleDeleteProject.bind(this);	
+		this.handleDeleteProject = this.handleDeleteProject.bind(this);
 	}
+
+  componentDidMount() {
+    console.log('Team Members: ', this.props.project.members)
+  }
 
 	formatDate(date) {
 		return Moment(date).fromNow();
@@ -86,12 +91,9 @@ export default class ProjectCard extends React.Component {
 
 	render() {
 		let detail = '';
-		if(this.props.project.updated)
-		{
+		if(this.props.project.updated) {
 			detail = this.props.project.addedBy + ' updated ' + this.formatDate(this.props.project.addedOn)
-		}
-		else
-		{
+		} else {
 			detail = this.props.project.addedBy + ' added ' + this.formatDate(this.props.project.addedOn)
 		}
 		const deleteDialogActions = [
@@ -106,14 +108,13 @@ export default class ProjectCard extends React.Component {
         onClick={this.handleDeleteProject}
       />,
     ];
-    	let bgColor = this.props.bgColor;
-			console.log('Bg Color', bgColor);
+    let bgColor = this.props.bgColor;
 		return (
 			<div>
-				<Card 
+				<Card
 					style={{
-						width:'300px', 
-						marginRight:'20px', 
+						width:'370px',
+						marginRight:'20px',
 						marginBottom:'20px',
 						background: bgColor
 					}}
@@ -132,7 +133,7 @@ export default class ProjectCard extends React.Component {
         		return <li>{skill}</li>
         		})}</ul>
 			    	<h3>Developed By:</h3>{this.props.project.wave}
-			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>View members</span>
+			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>view members</span>
 			    	</CardText>
 			    	<IconButton tooltip="Edit Course" onClick={this.handleEditProject}>
 				      <EditIcon/>
@@ -143,20 +144,22 @@ export default class ProjectCard extends React.Component {
 				  	</Card>
 				 <Dialog
 		    	style={styles.dialog}
-          title="Team Members"
+          title='TEAM MEMBERS'
           open={this.state.dialog}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
         >
         {
+          this.props.project.members.length > 0 ?
         	this.props.project.members.map(function(member){
         		return <h5>{member}</h5>
-        	})
+        	}) :
+          <div><br/>Team list has not been updated yet. Sorry for the inconvenience caused.</div>
         }
         </Dialog>
         {
 							this.state.openDialog &&
-							<AddProject project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose}/>
+							<AddProject project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PROJECT'}/>
 				}
 				<Dialog
           actions={deleteDialogActions}

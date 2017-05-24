@@ -117,6 +117,26 @@ let addWave = function (waveObj, successCB, errorCB) {
 	})
 }
 
+/****************************************************
+*******          Project Management         ********
+****************************************************/
+
+let getActiveWaves = function(successCB, errorCB) {
+	let today = new Date()
+	WaveModel.aggregate(
+		{$match: {$and: [{'StartDate': {$lte: today}}, {'EndDate': {$gte: today}}]}},
+		{ $project: { _id: 0, 'WaveID': 1 }},
+		function(err, result) {
+			if (err) {
+					console.log('Date Error: ', err)
+					errorCB(err);
+			}
+			// change successCB for an empty result array -- !to_be_done
+			successCB(result.map(function(obj) {return obj.WaveID}));
+		}
+	);
+}
+
 let getProjects = function(successCB, errorCB) {
 	ProjectModel.find({},function(err, result) {
 		if (err)
@@ -382,5 +402,6 @@ module.exports = {
 	getNotifications,
 	getWaves,
 	getCadetsOfWave,
-	deleteWave
+	deleteWave,
+	getActiveWaves
 }

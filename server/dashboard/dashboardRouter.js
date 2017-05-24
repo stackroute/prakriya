@@ -148,6 +148,25 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
   }
 })
 
+/****************************************************
+*******          Project Management         ********
+****************************************************/
+
+router.get('/activewaves', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+  try{
+    dashboardMongoController.getActiveWaves(function(waves) {
+      res.status(201).json(waves);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all active waves from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 // Get all projects
 router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try{
