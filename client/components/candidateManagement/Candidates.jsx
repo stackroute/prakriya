@@ -33,37 +33,30 @@ export default class Candidates extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			candidates: [],
 			showCandidate: false,
-			displayCandidate: {}
+			displayCandidate: {},
+			WaveIds:[],
+			WaveId:'',
+			candidatesName:[]
 		}
-		this.getCandidates = this.getCandidates.bind(this);
+		this.onWaveIdChange = this.onWaveIdChange.bind(this);
+		this.getWaveId = this.getWaveId.bind(this);
 		this.candidateView = this.candidateView.bind(this);
 		this.handleBack = this.handleBack.bind(this);
 		this.deleteCandidate = this.deleteCandidate.bind(this);
 		this.updateCandidate = this.updateCandidate.bind(this);
 		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.addCandidate = this.addCandidate.bind(this);
+		this.getWaveSpecificCandidates=this.getWaveSpecificCandidates.bind(this);
 	}
-	componentDidMount() {
-		this.getCandidates();
+	componentWillMount() {
+		if(localStorage.getItem('token')) {
+			this.getWaveId()
+		}
+
 	}
-	getCandidates() {
-		let th = this;
-		Request
-			.get('/dashboard/cadets')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	console.log('Response came from the server', res.body)
-		    	th.setState({
-		    		candidates: res.body
-		    	})
-		    }
-		  })
-	}
+
+	
 	candidateView(candidate) {
 		this.setState({
 			showCandidate: true,
@@ -85,7 +78,7 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.getCandidates();
+		    	th.getWaveSpecificCandidates();
 		    }
 		  })
 	}
@@ -99,7 +92,7 @@ export default class Candidates extends React.Component {
 		    if(err)
 		    	console.log(err);
 		    else {
-		    	th.getCandidates();
+		    	th.getWaveSpecificCandidates();
 		    }
 			});
 	}
@@ -120,15 +113,50 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.getCandidates();
+		    	th.getWaveSpecificCandidates();
 		    	console.log('Success');
 		    }
 			})
 	}
+	getWaveId() {
+		let th = this
+		Request
+			.get('/dashboard/waveids')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res){
+			th.setState({
+				WaveIds: res.body.waveids
+			})
+			})
+		}
+		getWaveSpecificCandidates(waveId){
+
+		let th = this;
+		console.log("yuva",waveId)
+
+		Request
+			.get('/dashboard/wavespecificcandidates?waveID='+waveId)
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res){
+         console.log(res.body,"wspcc")
+			th.setState({
+					candidatesName:res.body.data
+			})
 
 
+			})
+		}
+		onWaveIdChange(e) {
+			this.setState({
+				WaveId: e.target.textContent,
+
+			})
+this.getWaveSpecificCandidates(e.target.textContent);
+
+		}
 	render() {
 		let th = this;
+		console.log(th.state.candidatesName,"am jjoe")
 		// let filter = Filter:
 		// 			<SelectField
 	 //          floatingLabelText="Select Wave"
@@ -144,10 +172,21 @@ export default class Candidates extends React.Component {
 				!this.state.showCandidate ?
 				<div>
 					<h1 style={styles.heading}>Candidate Management</h1>
+					<SelectField
+						onChange={th.onWaveIdChange}
+						floatingLabelText="Select WaveID"
+						value={th.state.WaveId}
+					>
+						{
+							th.state.WaveIds.map(function(val, key) {
+								return <MenuItem key={key} value={val} primaryText={val} />
+							})
+						}
+					</SelectField>
 					<Grid>
 						<Row>
 							{
-								this.state.candidates.map(function(candidate, key) {
+								th.state.candidatesName.map(function(candidate, key) {
 									return (
 										candidate.Wave != undefined &&
 										<Col md={3} key={key}>

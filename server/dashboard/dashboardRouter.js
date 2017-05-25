@@ -645,4 +645,21 @@ router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, r
   }
 })
 
+//update a wave
+router.post('/updatewave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try {
+    dashboardMongoController.updateWave(req.body.wave, function(wave) {
+      res.status(201).json(wave);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot delete the wave...!' });
+    })
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 module.exports = router;

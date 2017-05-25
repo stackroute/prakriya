@@ -159,7 +159,7 @@ export default class ProjectCard extends React.Component {
         </Dialog>
         {
 							this.state.openDialog &&
-							<AddProject project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PROJECT'}/>
+							<EditProject project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PROJECT'}/>
 				}
 				<Dialog
           actions={deleteDialogActions}

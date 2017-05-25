@@ -117,7 +117,7 @@ router.post("/updatecandidateassessment", auth.canAccess(CONFIG.MENTOR), functio
 ****************************************************/
 
 // Get all courses
-router.get('/courses', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   try{
     mentorMongoController.getCourses(function(course) {
       res.status(201).json(course);

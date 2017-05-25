@@ -373,6 +373,15 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 	})
 }
 
+let updateWave = function (waveObj, successCB, errorCB) {
+	console.log(waveObj);
+	WaveModel.update({WaveID:waveObj.WaveID},waveObj,function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result)
+	})
+}
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -403,5 +412,6 @@ module.exports = {
 	getWaves,
 	getCadetsOfWave,
 	deleteWave,
-	getActiveWaves
+	getActiveWaves,
+	updateWave
 }
