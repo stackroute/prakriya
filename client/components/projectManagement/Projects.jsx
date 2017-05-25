@@ -1,7 +1,7 @@
 import React from 'react'
 import Request from 'superagent'
 import {Grid, Row, Col} from 'react-flexbox-grid'
-import AddProject from './AddProject.jsx'
+import ProjectDialog from './ProjectDialog.jsx'
 import ProjectCard from './ProjectCard.jsx'
 import Masonry from 'react-masonry-component'
 import {Tabs, Tab} from 'material-ui/Tabs'
@@ -149,13 +149,13 @@ export default class Projects extends React.Component {
 		let th = this;
 		return(
 			<div>
-				<h2 style={styles.heading}>Project Management</h2>
-				<AddProject addProject={this.addProject} dialogTitle={'ADD PROJECT'}/>
+				<h2 style={styles.heading}>Product Management</h2>
+				<ProjectDialog addProject={this.addProject} dialogTitle={'ADD PRODUCT'}/>
 				<Grid><Row md={10}><Tabs
 					style={styles.tabs}
 					tabItemContainerStyle={styles.tabItemContainer}
 					inkBarStyle={styles.inkBar}>
-					<Tab label='Ongoing Projects' style={styles.tab}>
+					<Tab label='Ongoing Products' style={styles.tab}>
 						<Masonry
 							className={'my-class'}
 							elementType={'ul'}
@@ -179,7 +179,7 @@ export default class Projects extends React.Component {
 								}
 						</Masonry>
 					</Tab>
-					<Tab label='Completed Projects' style={styles.tab}>
+					<Tab label='Completed Products' style={styles.tab}>
 						<Masonry
 							className={'my-class'}
 							elementType={'ul'}
@@ -203,7 +203,7 @@ export default class Projects extends React.Component {
 								}
 						</Masonry>
 					</Tab>
-					<Tab label='All Projects' style={styles.tab}>
+					<Tab label='All Products' style={styles.tab}>
 						<Masonry
 							className={'my-class'}
 							elementType={'ul'}
