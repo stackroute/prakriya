@@ -7,7 +7,7 @@ import Dialog from 'material-ui/Dialog';
 import IconButton from 'material-ui/IconButton';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import AddProject from './AddProject.jsx';
+import ProjectDialog from './ProjectDialog.jsx';
 import FlatButton from 'material-ui/FlatButton';
 
 const styles = {
@@ -159,7 +159,7 @@ export default class ProjectCard extends React.Component {
         </Dialog>
         {
 							this.state.openDialog &&
-							<EditProject project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PROJECT'}/>
+							<ProjectDialog project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PRODUCT'}/>
 				}
 				<Dialog
           actions={deleteDialogActions}

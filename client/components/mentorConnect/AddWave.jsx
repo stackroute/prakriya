@@ -148,13 +148,13 @@ export default class AddWave extends React.Component {
 			      onChange={this.handleLocationChange}
 			      fullWidth={true}
 			    />
-			    <DatePicker 
-			    	hintText="Start Date" 
+			    <DatePicker
+			    	hintText="Start Date"
 			    	value={this.state.StartDate}
 			    	onChange={this.handleStartDateChange}
 			    />
-			    <DatePicker 
-			    	hintText="End Date" 
+			    <DatePicker
+			    	hintText="End Date"
 			    	value={this.state.EndDate}
 			    	onChange={this.handleEndDateChange}
 			    />
@@ -168,12 +168,13 @@ export default class AddWave extends React.Component {
 		        	this.state.cadets.map(function(cadet, i) {
 		        		return (
 		        			cadet.Selected != undefined &&
-		        			cadet.Selected == 'Yes' &&
+		        			(cadet.Selected == 'Yes' ||
+									cadet.Selected == 'DS') &&
 		        			<MenuItem
 						        key={i}
 						        insetChildren={true}
 						        checked={
-						        	th.state.selectedCadets && 
+						        	th.state.selectedCadets &&
 						        	th.state.selectedCadets.includes(cadet.EmployeeID)
 						       	}
 						        value={cadet.EmployeeID}

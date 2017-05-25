@@ -46,7 +46,7 @@ export default class CadetItem extends React.Component {
 		this.setState({
 			cadet: cadet
 		})
-	}	
+	}
 	handleSelectedChange(event, value) {
 		let cadet = this.state.cadet;
 		cadet.Selected = value;
@@ -73,6 +73,12 @@ export default class CadetItem extends React.Component {
 
 	render() {
 		let color = this.state.cadet.Selected == 'Yes' ? '#9effa6' : '#ffd1d1'
+		if(this.state.cadet.Selected == 'Yes')
+			color = '#f0ff93'
+		else if(this.state.cadet.Selected == 'DS')
+			color = '#9effa6'
+		else
+			color = '#ffd1d1'
 		return(
 			<div style={styles.container}>
 				<Row style={{display: 'flex', alignItems: 'center', backgroundColor: color}} >
@@ -80,8 +86,8 @@ export default class CadetItem extends React.Component {
 						{this.state.cadet.EmployeeID}
 					</Col>
 					<Col md={2}>
-						<span 
-							style={{cursor: 'pointer'}} 
+						<span
+							style={{cursor: 'pointer'}}
 							onClick={this.handleShowDetail}
 						>
 							{this.state.cadet.EmployeeName}
@@ -99,9 +105,9 @@ export default class CadetItem extends React.Component {
 				    />
 					</Col>
 					<Col md={2}>
-						<RadioButtonGroup 
-							name="selected" 
-							onChange={this.handleSelectedChange} 
+						<RadioButtonGroup
+							name="selected"
+							onChange={this.handleSelectedChange}
 							valueSelected={this.state.cadet.Selected}
 						>
 							<RadioButton
@@ -112,10 +118,14 @@ export default class CadetItem extends React.Component {
 				        value="No"
 				        label="No"
 				      />
+							<RadioButton
+				        value="DS"
+				        label="DS"
+				      />
 						</RadioButtonGroup>
 					</Col>
 					<Col md={1}>
-						<IconButton 
+						<IconButton
 							disabled={this.state.disableSave}
 							onClick={this.handleRemarksUpdate}
 						>
