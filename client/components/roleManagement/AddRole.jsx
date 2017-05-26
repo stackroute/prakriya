@@ -13,6 +13,36 @@ const styles = {
 	  bottom: '60px',
 	  right: '15px',
 	  zIndex: 1
+	},
+	dialog: {
+		backgroundColor: '#DDDBF1',
+		borderBottom: '3px solid teal',
+		borderRight: '10px solid teal',
+		borderLeft: '10px solid teal'
+	},
+	dialogTitle: {
+		fontWeight: 'bold',
+		backgroundColor: 'teal',
+		color: '#DDDBF1',
+		textAlign: 'center'
+	},
+	actionsContainer: {
+		backgroundColor: 'teal',
+		borderTop: '0px',
+		marginTop: '0px'
+	},
+	actionButton: {
+		backgroundColor: '#DDDBF1',
+		width: '50%',
+		color: 'teal',
+		border: '1px solid teal',
+		height: '100%'
+	},
+	accessControlsNoError: {
+
+	},
+	accessControlsError: {
+		color: 'red'
 	}
 };
 
@@ -22,7 +52,10 @@ export default class AddRole extends React.Component {
 		this.state = {
 	    open: false,
 	    role:'',
-	    actions: []
+			roleErrorText: '',
+	    actions: [],
+			accessControlsText: 'Access Controls',
+			accessControlsStyle: styles.accessControlsNoError
 	  }
 	  this.handleOpen = this.handleOpen.bind(this);
 	  this.handleClose = this.handleClose.bind(this);
@@ -30,35 +63,66 @@ export default class AddRole extends React.Component {
 	  this.onChangeActions = this.onChangeActions.bind(this);
 	  this.handleSubmit = this.handleSubmit.bind(this);
 	}
+
 	handleOpen() {
     this.setState({open: true});
-  };
+  }
 
-  handleClose() {
-    this.setState({open: false});
-  };
+  handleClose(e, action) {
+		if(action == 'CANCEL') {
+				this.setState({
+					open: false,
+					role: '',
+					roleErrorText: '',
+					accessControlsText: 'Access Controls',
+					accessControlsStyle: styles.accessControlsNoError
+				})
+		} else if(action == 'ADD') {
+			if(this.validationSuccess()) {
+				this.handleSubmit()
+				this.setState({
+					open: false,
+					roleErrorText: '',
+					accessControlsText: 'Access Controls',
+					accessControlsStyle: styles.accessControlsNoError
+				})
+			}
+		}
+  }
+
   onChangeRole(e) {
   	this.setState({
-  		role: e.target.value
+  		role: e.target.value,
+			roleErrorText: ''
   	})
   }
+
   onChangeActions(event, isChecked) {
 		let actionList = this.state.actions
 		if(isChecked) {
 			actionList.push(event.target.value)
-			this.setState({actions: actionList})
+			this.setState({
+				actions: actionList,
+				accessControlsText: 'Access Controls',
+				accessControlsStyle: styles.accessControlsNoError
+			})
 		}
 		else {
 			actionList = this.state.actions.filter(function(item) {
 				return item != event.target.value;
 			})
-			this.setState({actions: actionList})
+			this.setState({
+				actions: actionList,
+				accessControlsText: 'Access Controls',
+				accessControlsStyle: styles.accessControlsNoError
+			})
 		}
 	}
+
 	handleSubmit() {
-		let th = this;
-		let roleObj = {};
-		let controlsCode = [];
+		let th = this
+		let roleObj = {}
+		let controlsCode = []
 		this.props.controls.map(function (control, key) {
 			if(th.state.actions.indexOf(control.name) >= 0)
 				controlsCode.push(control.code)
@@ -70,41 +134,64 @@ export default class AddRole extends React.Component {
 		})
 		this.props.addRole(roleObj)
 	}
+
+	validationSuccess() {
+		if(this.state.role.trim().length == 0) {
+			this.setState({
+				roleErrorText: 'This field cannot be empty'
+			})
+		} else if(this.state.actions.length == 0) {
+			this.setState({
+				accessControlsStyle: styles.accessControlsError,
+				accessControlsText: 'Choose atleast one access control'
+			})
+		} else {
+			return true
+		}
+		return false
+	}
+
 	render() {
 		let th = this
+
 		const dialogActions = [
       <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleClose}
+        label='Cancel'
+        onTouchTap={(e)=>{this.handleClose(e, 'CANCEL')}}
+				style={styles.actionButton}
       />,
       <FlatButton
-        label="Add"
-        primary={true}
-        keyboardFocused={true}
-        onTouchTap={this.handleClose}
-        onClick={this.handleSubmit}
+        label='Add'
+        onTouchTap={(e)=>{this.handleClose(e, 'ADD')}}
+				style={styles.actionButton}
       />,
-    ];
+    ]
+
 		return (
 			<div>
 				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
 		    <Dialog
-          title="Add a new Role"
+					bodyStyle={styles.dialog}
+          title='ADD A NEW ROLE'
+					titleStyle={styles.dialogTitle}
           actions={dialogActions}
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
+					actionsContainerStyle={styles.actionsContainer}
         >
           <TextField
-          	floatingLabelText="Role"
-          	hintText="Name a new role"
+          	floatingLabelText='Role'
+          	hintText='Name a new role'
+						errorText={this.state.roleErrorText}
           	onChange={this.onChangeRole}
+						style={{width: '100%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
           />
-          should have following selected controls<br/>
+					<div style={{border: '2px solid white', padding: '5px', textAlign: 'justify', boxSizing: 'border-box'}}>
+          <p style={this.state.accessControlsStyle}>{this.state.accessControlsText}</p>
           {
           	this.props.controls.map(function(control, index) {
           		return(
@@ -113,10 +200,12 @@ export default class AddRole extends React.Component {
 									value={control.name}
 									onCheck={th.onChangeActions}
 									key={index}
+									style={{width: '30%', display: 'inline-block'}}
 								/>
 							)
           	})
 					}
+					</div>
         </Dialog>
 			</div>
 		);
