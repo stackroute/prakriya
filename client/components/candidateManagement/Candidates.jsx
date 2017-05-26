@@ -35,20 +35,27 @@ export default class Candidates extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			candidates: [],
 			showCandidate: false,
 			displayCandidate: {},
+
 			cadets: [],
 			filterCadetName: '',
 			filterCadetWave: ''
+
+			WaveIds:[],
+			WaveId:'',
+			candidatesName:[]
+
 		}
-		this.getCandidates = this.getCandidates.bind(this);
+		this.onWaveIdChange = this.onWaveIdChange.bind(this);
+		this.getWaveId = this.getWaveId.bind(this);
 		this.candidateView = this.candidateView.bind(this);
 		this.handleBack = this.handleBack.bind(this);
 		this.deleteCandidate = this.deleteCandidate.bind(this);
 		this.updateCandidate = this.updateCandidate.bind(this);
 		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.addCandidate = this.addCandidate.bind(this);
+<<<<<<< HEAD
 		this.handleFilterName = this.handleFilterName.bind(this);
 		this.handleFilterWave = this.handleFilterWave.bind(this);
 		this.handleClearFilter = this.handleClearFilter.bind(this);
@@ -97,6 +104,18 @@ export default class Candidates extends React.Component {
 		  })
 	}
 
+=======
+		this.getWaveSpecificCandidates=this.getWaveSpecificCandidates.bind(this);
+	}
+	componentWillMount() {
+		if(localStorage.getItem('token')) {
+			this.getWaveId()
+		}
+
+	}
+
+
+>>>>>>> d9d307441f6aca50a62ad810606e0906be50e728
 	candidateView(candidate) {
 		this.setState({
 			showCandidate: true,
@@ -118,7 +137,7 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.getCandidates();
+		    	th.getWaveSpecificCandidates();
 		    }
 		  })
 	}
@@ -132,7 +151,7 @@ export default class Candidates extends React.Component {
 		    if(err)
 		    	console.log(err);
 		    else {
-		    	th.getCandidates();
+		    	th.getWaveSpecificCandidates();
 		    }
 			});
 	}
@@ -153,15 +172,50 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.getCandidates();
+		    	th.getWaveSpecificCandidates();
 		    	console.log('Success');
 		    }
 			})
 	}
+	getWaveId() {
+		let th = this
+		Request
+			.get('/dashboard/waveids')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res){
+			th.setState({
+				WaveIds: res.body.waveids
+			})
+			})
+		}
+		getWaveSpecificCandidates(waveId){
+
+		let th = this;
+		console.log("yuva",waveId)
+
+		Request
+			.get('/dashboard/wavespecificcandidates?waveID='+waveId)
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res){
+         console.log(res.body,"wspcc")
+			th.setState({
+					candidatesName:res.body.data
+			})
 
 
+			})
+		}
+		onWaveIdChange(e) {
+			this.setState({
+				WaveId: e.target.textContent,
+
+			})
+this.getWaveSpecificCandidates(e.target.textContent);
+
+		}
 	render() {
 		let th = this;
+<<<<<<< HEAD
 
 		let cadetsName = [];
 		let cadetsWave=[];
@@ -177,6 +231,9 @@ export default class Candidates extends React.Component {
 });
 
 
+=======
+		console.log(th.state.candidatesName,"am jjoe")
+>>>>>>> d9d307441f6aca50a62ad810606e0906be50e728
 		// let filter = Filter:
 		// 			<SelectField
 	 //          floatingLabelText="Select Wave"
@@ -192,6 +249,7 @@ export default class Candidates extends React.Component {
 				!this.state.showCandidate ?
 				<div>
 					<h1 style={styles.heading}>Candidate Management</h1>
+<<<<<<< HEAD
 					<AutoComplete
 						hintText="Search Candidate"
 						filter={AutoComplete.fuzzyFilter}
@@ -235,6 +293,24 @@ onClick={this.handleClearFilter}
 									else if((th.state.filterCadetName === '') && (th.state.filterCadetWave === '')) {
 
 										return(
+=======
+					<SelectField
+						onChange={th.onWaveIdChange}
+						floatingLabelText="Select WaveID"
+						value={th.state.WaveId}
+					>
+						{
+							th.state.WaveIds.map(function(val, key) {
+								return <MenuItem key={key} value={val} primaryText={val} />
+							})
+						}
+					</SelectField>
+					<Grid>
+						<Row>
+							{
+								th.state.candidatesName.map(function(candidate, key) {
+									return (
+>>>>>>> d9d307441f6aca50a62ad810606e0906be50e728
 										candidate.Wave != undefined &&
 										<Col md={3} key={key}>
 											<CandidateCard

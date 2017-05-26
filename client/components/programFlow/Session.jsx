@@ -295,11 +295,8 @@ export default class Session extends React.Component {
 		)}
 		else
 		{ 
-			let date = new Date('2016-12-01');
 			let z = new Date(th.state.session.SessionOn);
-			console.log(new Date(z.getFullYear()+'-'+(z.getMonth()+1)+'-'+z.getDate()));
-			date = new Date(z.getFullYear()+'-'+(z.getMonth()+1)+'-'+z.getDate())
-			console.log(th.state.session.SessionOn);
+			let date = new Date(z.getFullYear()+'-'+(z.getMonth()+1)+'-'+z.getDate())
 			return (
 				<div>
 				<Card  style={styles.card.box}>

@@ -11,6 +11,12 @@ const styles = {
 const masonryOptions = {
     transitionDuration: 0
 };
+const backgroundColors = [
+	'#F5DEBF',
+	'#DDDBF1',
+	'#CAF5B3',
+	'#C6D8D3'
+]
 
 export default class Waves extends React.Component {
 
@@ -21,6 +27,7 @@ export default class Waves extends React.Component {
 		}
 		this.getWaves = this.getWaves.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
+		this.handleUpdate = this.handleUpdate.bind(this);
 		}
 
 	componentDidMount() {
@@ -44,20 +51,20 @@ export default class Waves extends React.Component {
 			})
 	}
 
-	handleUpdate(project) {
-		// let th = this;
-		// Request
-		// 	.post('/dashboard/updateproject')
-		// 	.set({'Authorization': localStorage.getItem('token')})
-		// 	.send(project)
-		// 	.end(function(err, res) {
-		// 		if(err)
-		//     	console.log(err);
-		//     else {
-		//     	console.log('Successfully updated a project', res.body)
-		//     	th.getProjects();
-		//     	}
-		// 	})
+	handleUpdate(wave) {
+		let th = this;
+		Request
+			.post('/dashboard/updatewave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({wave:wave})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Successfully updated a project', res.body)
+		    	th.getWaves();
+		    	}
+			})
 		console.log('handle update');
 	}
 
@@ -100,6 +107,7 @@ export default class Waves extends React.Component {
 										wave={wave} 
 										handleUpdate={th.handleUpdate} 
 										handleDelete={th.handleDelete}
+										bgColor={backgroundColors[key%4]}
 									/>
 								)
 							})
