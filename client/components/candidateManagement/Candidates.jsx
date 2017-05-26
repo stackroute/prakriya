@@ -1,6 +1,8 @@
 import React from 'react';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import AutoComplete from 'material-ui/AutoComplete';
+import FlatButton from 'material-ui/FlatButton';
 import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import CandidateCard from './CandidateCard.jsx';
@@ -35,7 +37,11 @@ export default class Candidates extends React.Component {
 		this.state = {
 			candidates: [],
 			showCandidate: false,
-			displayCandidate: {}
+			displayCandidate: {},
+			cadets: [],
+			filterCadetName: '',
+			filterCadetWave: ''
+			candidatesName:[]
 		}
 		this.getCandidates = this.getCandidates.bind(this);
 		this.candidateView = this.candidateView.bind(this);
@@ -44,9 +50,32 @@ export default class Candidates extends React.Component {
 		this.updateCandidate = this.updateCandidate.bind(this);
 		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.addCandidate = this.addCandidate.bind(this);
+		this.handleFilterName = this.handleFilterName.bind(this);
+		this.handleFilterWave = this.handleFilterWave.bind(this);
+		this.handleClearFilter = this.handleClearFilter.bind(this);
 	}
 	componentDidMount() {
 		this.getCandidates();
+	}
+	handleFilterName(val) {
+		console.log("value",val)
+		this.setState({
+			filterCadetName: val,
+			filterCadetWave: ''
+		})
+	}
+	handleFilterWave(val) {
+		console.log("value",val)
+		this.setState({
+			filterCadetWave: val,
+			filterCadetName: ''
+		})
+	}
+	handleClearFilter() {
+		this.setState({
+			filterCadetWave: '',
+			filterCadetName: ''
+		})
 	}
 	getCandidates() {
 		let th = this;
@@ -57,13 +86,17 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Response came from the server', res.body)
+				let cadets = res.body.filter(function(cadet) {
+					if(!(cadet.Wave == undefined))
+						return cadet;
+				})
 		    	th.setState({
-		    		candidates: res.body
+		    		candidates: cadets
 		    	})
 		    }
 		  })
 	}
+
 	candidateView(candidate) {
 		this.setState({
 			showCandidate: true,
@@ -103,13 +136,6 @@ export default class Candidates extends React.Component {
 		    }
 			});
 	}
-	handleWaveChange(event, key, value) {
-		this.setState({
-			wave: value
-		})
-	}
-
-
 	addCandidate(candidate) {
 		let th = this;
 		Request
@@ -120,23 +146,24 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.getCandidates();
 		    	console.log('Success');
 		    }
 			})
 	}
-
-
 	render() {
 		let th = this;
-		// let filter = Filter:
-		// 			<SelectField
-	 //          floatingLabelText="Select Wave"
-	 //          value={this.state.wave}
-	 //          onChange={this.handleWaveChange}
-	 //        >
-	 //          {items}
-	 //        </SelectField>
+		let cadetsName = [];
+		let cadetsWave=[];
+		let cadetsDistinctWave=[];
+		this.state.candidates.map(function (cadet, i) {
+			cadetsName.push(cadet.EmployeeName);
+		})
+		this.state.candidates.map(function (cadet, i) {
+			cadetsWave.push(cadet.Wave);
+			})
+		cadetsDistinctWave=cadetsWave.filter(function (cadet, i, cadetsWave) {
+	    return cadetsWave.indexOf(cadet) == i;
+		});
 		return(
 			<div>
 			<AddCandidate addCandidate={this.addCandidate}/>
@@ -144,19 +171,55 @@ export default class Candidates extends React.Component {
 				!this.state.showCandidate ?
 				<div>
 					<h1 style={styles.heading}>Candidate Management</h1>
+					<AutoComplete
+						hintText="Search Candidate"
+						filter={AutoComplete.fuzzyFilter}
+						searchText={this.state.filterCadetName}
+						dataSource={cadetsName}
+						onNewRequest={this.handleFilterName}
+					/>
+					<AutoComplete
+						hintText="SortBy Wave"
+						filter={AutoComplete.fuzzyFilter}
+						searchText={this.state.filterCadetWave}
+						dataSource={cadetsDistinctWave}
+						onNewRequest={this.handleFilterWave}
+					/>
+
+					<FlatButton
+						label="Clear Filter"
+						primary={true}
+						onClick={this.handleClearFilter}
+					/>
+
 					<Grid>
 						<Row>
 							{
 								this.state.candidates.map(function(candidate, key) {
-									return (
-										<Col md={3} key={key}>
-											<CandidateCard
-												candidate={candidate}
-												handleCardClick={th.candidateView}
-												handleDelete={th.deleteCandidate}
-											/>
-										</Col>
-									)
+									if((th.state.filterCadetWave === candidate.Wave)||(th.state.filterCadetName === candidate.EmployeeName)) {
+										return (
+											candidate.Wave != undefined &&
+											<Col md={3} key={key}>
+												<CandidateCard
+													candidate={candidate}
+													handleCardClick={th.candidateView}
+													handleDelete={th.deleteCandidate}
+												/>
+											</Col>
+										)
+									}
+									else if((th.state.filterCadetName === '') && (th.state.filterCadetWave === '')) {
+
+										return(
+											<Col md={3} key={key}>
+												<CandidateCard
+													candidate={candidate}
+													handleCardClick={th.candidateView}
+													handleDelete={th.deleteCandidate}
+												/>
+											</Col>
+										)
+									}
 								})
 							}
 						</Row>

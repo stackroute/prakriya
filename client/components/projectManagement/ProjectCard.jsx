@@ -7,18 +7,31 @@ import Dialog from 'material-ui/Dialog';
 import IconButton from 'material-ui/IconButton';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import AddProject from './AddProject.jsx';
+import ProjectDialog from './ProjectDialog.jsx';
 import FlatButton from 'material-ui/FlatButton';
 
 const styles = {
     text: {
-      wordWrap: 'break-word'
+      wordWrap: 'break-word',
+      textAlign: 'justify'
     },
     view: {
     	cursor: 'pointer',
     	textDecoration: 'underline',
     	color: 'blue'
-    }
+    },
+    dialog: {
+      backgroundColor: '#DDDBF1',
+  		borderBottom: '10px solid teal',
+  		borderRight: '10px solid teal',
+  		borderLeft: '10px solid teal'
+    },
+    dialogTitle: {
+  		fontWeight: 'bold',
+  		backgroundColor: 'teal',
+  		color: '#DDDBF1',
+  		textAlign: 'center'
+  	}
 };
 
 export default class ProjectCard extends React.Component {
@@ -36,7 +49,7 @@ export default class ProjectCard extends React.Component {
 		this.handleUpdateProject = this.handleUpdateProject.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-		this.handleDeleteProject = this.handleDeleteProject.bind(this);	
+		this.handleDeleteProject = this.handleDeleteProject.bind(this);
 	}
 
 	formatDate(date) {
@@ -86,34 +99,30 @@ export default class ProjectCard extends React.Component {
 
 	render() {
 		let detail = '';
-		if(this.props.project.updated)
-		{
+		if(this.props.project.updated) {
 			detail = this.props.project.addedBy + ' updated ' + this.formatDate(this.props.project.addedOn)
-		}
-		else
-		{
+		} else {
 			detail = this.props.project.addedBy + ' added ' + this.formatDate(this.props.project.addedOn)
 		}
 		const deleteDialogActions = [
       <FlatButton
-        label="Cancel"
+        label='Cancel'
         primary={true}
         onTouchTap={this.closeDeleteDialog}
       />,
       <FlatButton
-        label="Delete"
+        label='Delete'
         primary={true}
         onClick={this.handleDeleteProject}
       />,
     ];
-    	let bgColor = this.props.bgColor;
-			console.log('Bg Color', bgColor);
+    let bgColor = this.props.bgColor;
 		return (
 			<div>
-				<Card 
+				<Card
 					style={{
-						width:'300px', 
-						marginRight:'20px', 
+						width:'370px',
+						marginRight:'20px',
 						marginBottom:'20px',
 						background: bgColor
 					}}
@@ -128,11 +137,11 @@ export default class ProjectCard extends React.Component {
 			      }/>
 			    	<CardText style={styles.text}>
 			    	<h3>Description:</h3>{this.props.project.description}
-			    	<h3>Tech Skills:</h3><ul>{this.props.project.skills.map(function(skill){
-        		return <li>{skill}</li>
+			    	<h3>Tech Skills:</h3><ul>{this.props.project.skills.map(function(skill, index){
+        		return <li key={index}>{skill}</li>
         		})}</ul>
 			    	<h3>Developed By:</h3>{this.props.project.wave}
-			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>View members</span>
+			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>view members</span>
 			    	</CardText>
 			    	<IconButton tooltip="Edit Course" onClick={this.handleEditProject}>
 				      <EditIcon/>
@@ -142,21 +151,24 @@ export default class ProjectCard extends React.Component {
 				    </IconButton>
 				  	</Card>
 				 <Dialog
-		    	style={styles.dialog}
-          title="Team Members"
+		    	bodyStyle={styles.dialog}
+          title='TEAM MEMBERS'
+          titleStyle={styles.dialogTitle}
           open={this.state.dialog}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
         >
         {
+          this.props.project.members.length > 0 ?
         	this.props.project.members.map(function(member){
         		return <h5>{member}</h5>
-        	})
+        	}) :
+          <div><br/>Team list has not been updated yet. Sorry for the inconvenience caused.</div>
         }
         </Dialog>
         {
 							this.state.openDialog &&
-							<AddProject project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose}/>
+							<ProjectDialog project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PRODUCT'}/>
 				}
 				<Dialog
           actions={deleteDialogActions}

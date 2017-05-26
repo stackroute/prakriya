@@ -117,7 +117,7 @@ router.post("/updatecandidateassessment", auth.canAccess(CONFIG.MENTOR), functio
 ****************************************************/
 
 // Get all courses
-router.get('/courses', auth.canAccess(CONFIG.MENCAN), function(req, res) {
+router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   try{
     mentorMongoController.getCourses(function(course) {
       res.status(201).json(course);
@@ -265,6 +265,24 @@ router.get("/waveobject/:trainingTrack/:waveNumber", auth.canAccess(CONFIG.MENTO
 router.post('/addnewsession', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
     mentorMongoController.addNewSession(req.body, function(status) {
+      console.log('Status: ', status)
+      res.status(201).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot add new session...!' });
+    })
+  }
+  catch(err) {
+    console.log(err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//delete session
+router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    mentorMongoController.deleteSession(req.body, function(status) {
       console.log('Status: ', status)
       res.status(201).json(status)
     }, function (err) {

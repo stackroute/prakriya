@@ -1,9 +1,10 @@
-import React from 'react';
-import Request from 'superagent';
-import {Grid, Row, Col} from 'react-flexbox-grid';
-import AddProject from './AddProject.jsx';
-import ProjectCard from './ProjectCard.jsx';
-import Masonry from 'react-masonry-component';
+import React from 'react'
+import Request from 'superagent'
+import {Grid, Row, Col} from 'react-flexbox-grid'
+import ProjectDialog from './ProjectDialog.jsx'
+import ProjectCard from './ProjectCard.jsx'
+import Masonry from 'react-masonry-component'
+import {Tabs, Tab} from 'material-ui/Tabs'
 
 const styles = {
 	heading: {
@@ -11,6 +12,24 @@ const styles = {
 	},
 	col: {
 		marginBottom: 20
+	},
+	tabs: {
+		border: '2px solid teal'
+	},
+	tab: {
+		color: '#DDDBF1',
+		fontWeight: 'bold'
+	},
+	inkBar: {
+		backgroundColor: '#DDDBF1',
+		height: '5px',
+		bottom: '5px'
+	},
+	tabItemContainer: {
+		backgroundColor: 'teal'
+	},
+	masonry: {
+		width: '1200px'
 	}
 }
 const backgroundColors = [
@@ -21,24 +40,45 @@ const backgroundColors = [
 ]
 const masonryOptions = {
     transitionDuration: 0
-};
- 
+}
+
 export default class Projects extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			projects: []
+			projects: [],
+			activeWaves: []
 		}
-		this.getProjects = this.getProjects.bind(this);
-		this.addProject = this.addProject.bind(this);
-		this.handleUpdate = this.handleUpdate.bind(this);
-		this.handleDelete = this.handleDelete.bind(this);
+		this.getProjects = this.getProjects.bind(this)
+		this.getActiveWaves = this.getActiveWaves.bind(this)
+		this.addProject = this.addProject.bind(this)
+		this.handleUpdate = this.handleUpdate.bind(this)
+		this.handleDelete = this.handleDelete.bind(this)
+	}
+	componentWillMount() {
+		this.getActiveWaves()
 	}
 	componentDidMount() {
-		this.getProjects();
+		this.getProjects()
+	}
+	getActiveWaves() {
+		let th = this
+		Request
+			.get('/dashboard/activewaves')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Successfully fetched all active waves', res.body)
+		    	th.setState({
+		    		activeWaves: res.body
+		    	})
+		    }
+			})
 	}
 	getProjects() {
-		let th = this;
+		let th = this
 		Request
 			.get('/dashboard/projects')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -46,7 +86,6 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully fetched all projects', res.body)
 		    	th.setState({
 		    		projects: res.body
 		    	})
@@ -110,28 +149,89 @@ export default class Projects extends React.Component {
 		let th = this;
 		return(
 			<div>
-				<h2 style={styles.heading}>Projects</h2>
-				<AddProject addProject={this.addProject}/>
-				<Masonry
-          className={'my-class'} 
-          elementType={'ul'} 
-          options={masonryOptions}
-          style={{margin: 'auto'}}
-        >
-          	{
-							this.state.projects.map(function (project, key) {
-								return (
-									<ProjectCard 
-										key={key} 
-										project={project} 
-										handleUpdate={th.handleUpdate} 
-										handleDelete={th.handleDelete}
-										bgColor={backgroundColors[key%4]}
-									/>
-								)
-							})
-						}
-				</Masonry>
+				<h2 style={styles.heading}>Product Management</h2>
+				<ProjectDialog addProject={this.addProject} dialogTitle={'ADD PRODUCT'}/>
+				<Grid><Row md={10}><Tabs
+					style={styles.tabs}
+					tabItemContainerStyle={styles.tabItemContainer}
+					inkBarStyle={styles.inkBar}>
+					<Tab label='Ongoing Products' style={styles.tab}>
+						<Masonry
+							className={'my-class'}
+							elementType={'ul'}
+							options={masonryOptions}
+							style={styles.masonry}
+						>
+								{
+									this.state.projects.length > 0 ?
+									th.state.projects.map(function (project, key) {
+										if(th.state.activeWaves.indexOf(project.wave) >= 0) {
+											return (
+												<ProjectCard
+													key={key}
+													project={project}
+													handleUpdate={th.handleUpdate}
+													handleDelete={th.handleDelete}
+													bgColor={backgroundColors[key%4]}
+												/>
+											)
+										}
+									}):
+									<span>No projects to display</span>
+								}
+						</Masonry>
+					</Tab>
+					<Tab label='Completed Products' style={styles.tab}>
+						<Masonry
+							className={'my-class'}
+							elementType={'ul'}
+							options={masonryOptions}
+							style={styles.masonry}
+						>
+								{
+									this.state.projects.length > 0 ?
+									this.state.projects.map(function (project, key) {
+										if(th.state.activeWaves.indexOf(project.wave) < 0) {
+											return (
+												<ProjectCard
+													key={key}
+													project={project}
+													handleUpdate={th.handleUpdate}
+													handleDelete={th.handleDelete}
+													bgColor={backgroundColors[key%4]}
+												/>
+											)
+										}
+									}):
+									<span>No projects to display</span>
+								}
+						</Masonry>
+					</Tab>
+					<Tab label='All Products' style={styles.tab}>
+						<Masonry
+							className={'my-class'}
+							elementType={'ul'}
+							options={masonryOptions}
+							style={styles.masonry}
+						>
+								{
+									this.state.projects.length > 0 ?
+									this.state.projects.map(function (project, key) {
+										return (
+											<ProjectCard
+												key={key}
+												project={project}
+												handleUpdate={th.handleUpdate}
+												handleDelete={th.handleDelete}
+												bgColor={backgroundColors[key%4]}
+											/>
+										)
+									}):
+									<span>No projects to display</span>
+								}
+						</Masonry>
+					</Tab>
+				</Tabs></Row></Grid>
 			</div>
 		)
 	}

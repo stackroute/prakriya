@@ -23,6 +23,7 @@ import Projects from './components/projectManagement/index.jsx';
 import Feedback from './components/feedback/index.jsx';
 import EvaluationForms from './components/evaluationForms/index.jsx';
 import Attendance from './components/attendance/index.jsx';
+import Wave from './components/waveManagement/index.jsx';
 
 injectTapEventPlugin();
 
@@ -85,6 +86,7 @@ ReactDOM.render(
 				<Route path="/feedback" component={Feedback} />
 				<Route path="/evaluationforms" component={EvaluationForms} />
 				<Route path="/attendance" component={Attendance} />
+				<Route path="/waves" component={Wave} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

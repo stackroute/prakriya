@@ -125,6 +125,26 @@ let getWave = function (waveID, successCB, errorCB) {
 		successCB(result);
 	})
 }
+let getActiveWaves = function(successCB, errorCB) {
+	let today = new Date()
+	WaveModel.aggregate(
+		{$match: {$and: [{'StartDate': {$lte: today}}, {'EndDate': {$gte: today}}]}},
+		{ $project: { _id: 0, 'WaveID': 1 }},
+		function(err, result) {
+			if (err) {
+					console.log('Date Error: ', err)
+					errorCB(err);
+			}
+			// change successCB for an empty result array -- !to_be_done
+			successCB(result.map(function(obj) {return obj.WaveID}));
+		}
+	);
+}
+
+
+/****************************************************
+*******              Projects                ********
+****************************************************/
 
 let getProjects = function(successCB, errorCB) {
 	ProjectModel.find({},function(err, result) {
@@ -264,6 +284,7 @@ let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
 	});
 }
 
+
 /****************************************************
 *******          Candidates                 ********
 ****************************************************/
@@ -305,6 +326,7 @@ let getAssesmentTrack = function(courseName, successCB, errorCB) {
 	});
 }
 
+
 /****************************************************
 *******             Common Functions         ********
 ****************************************************/
@@ -327,6 +349,48 @@ let getWaveObject = function(waveID, successCB, errorCB) {
 		}
 		successCB(result);
 	});
+}
+
+let getWaves = function(successCB, errorCB) {
+	WaveModel.find({},function(err, result) {
+		if (err)
+				errorCB(err);
+			console.log(result);
+		successCB(result);
+	});
+}
+
+let getCadetsOfWave = function(cadets, successCB, errorCB) {
+	CandidateModel.find({EmployeeID:{$in: cadets}},function(err, result) {
+		if (err)
+				errorCB(err);
+			console.log(result);
+		successCB(result);
+	});
+}
+
+let deleteWave = function (waveObj, successCB, errorCB) {
+	WaveModel.remove({WaveID:waveObj.WaveID},function (err, result) {
+		if(err)
+			errorCB(err);
+		else
+		{
+			CandidateModel.update({EmployeeID:{$in:waveObj.Cadets}},{$set:{Wave:undefined}},function (err, result) {
+				if(err)
+					errorCB(err);
+				successCB(result);
+			})
+		}
+	})
+}
+
+let updateWave = function (waveObj, successCB, errorCB) {
+	console.log(waveObj);
+	WaveModel.update({WaveID:waveObj.WaveID},waveObj,function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result)
+	})
 }
 
 module.exports = {
@@ -356,5 +420,10 @@ module.exports = {
 	changePassword,
 	addNotification,
 	deleteNotification,
-	getNotifications
+	getNotifications,
+	getWaves,
+	getCadetsOfWave,
+	deleteWave,
+	getActiveWaves,
+	updateWave
 }

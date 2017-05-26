@@ -6,6 +6,9 @@ import DatePicker from 'material-ui/DatePicker'
 import IconButton from 'material-ui/IconButton'
 import SaveIcon from 'material-ui/svg-icons/content/save'
 import {lightBlack} from 'material-ui/styles/colors'
+import Dialog from 'material-ui/Dialog';
+import RaisedButton from 'material-ui/RaisedButton';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 const styles = {
 	card: {
@@ -34,6 +37,11 @@ const styles = {
 			position: 'absolute',
 			right: '10%',
 			bottom: '15px'
+		},
+		delete: {
+			position: 'absolute',
+			right: '2%',
+			bottom: '15px'
 		}
 	}
 }
@@ -50,8 +58,9 @@ export default class Session extends React.Component {
 				Status: '',
 				ContextSetSession: '',
 				SessionBy: '',
-				SessionOn: {},
-				Remarks: ''
+				SessionOn: new Date(),
+				Remarks: '',
+				showDialog: false
 			},
 			saveDisabled: true
 		}
@@ -66,12 +75,23 @@ export default class Session extends React.Component {
 		this.addNewSession = this.addNewSession.bind(this)
 		this.updateSession = this.updateSession.bind(this)
 		this.enableSave = this.enableSave.bind(this)
+		this.handleClose = this.handleClose.bind(this)
+		this.deleteSession = this.deleteSession.bind(this);
 	}
 
-	componentDidMount() {
-		this.setState({
-			session: this.props.session
-		})
+	componentWillMount() {
+		if(this.props.openDialog)
+		{
+			this.setState({
+				showDialog: this.props.openDialog
+			})
+		}
+		else
+		{
+			this.setState({
+				session: this.props.session,
+			})	
+		}
 	}
 
 	handleActivities(event) {
@@ -173,70 +193,170 @@ export default class Session extends React.Component {
 			})
 	}
 
+	deleteSession() {
+			let session = this.state.session
+			let th = this;
+		Request
+			.post('/mentor/deletesession')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({session: session, waveID: th.props.waveID})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err)
+		    else{
+		    	console.log('Deleted session and Server responded', res.body)
+					th.setState({
+						saveDisabled: true
+					})
+					th.props.onSessionDeletion()
+				}
+			})
+	}
+
 	enableSave() {
 		this.setState({
 			saveDisabled: false
 		})
 	}
 
-	render() {
-		let th = this
-		return(
-			<div>
-			<Card  style={styles.card.box}>
-				<CardHeader
-					style={styles.card.header}
-				>
-					<TextField
-						floatingLabelText='Week Number'
-						value={th.state.session.Week}
-						onChange={th.handleWeek}
-						onBlur={th.enableSave}
-					/>
-					<IconButton tooltip="Save Session" style={styles.action.save} onClick={th.state.session.SessionID === '' ? th.addNewSession : th.updateSession} disabled={this.state.saveDisabled}>
-						<SaveIcon color={lightBlack} />
-					</IconButton>
-				</CardHeader>
-				<CardText>
-					<TextField
-						floatingLabelText='Activities'
-						value={th.state.session.Activities}
-						onChange={th.handleActivities}
-						onBlur={th.enableSave}
-					/>
-					<TextField
-						floatingLabelText='Status'
-						value={th.state.session.Status}
-						onChange={th.handleStatus}
-						onBlur={th.enableSave}
-					/>
-					<TextField
-						floatingLabelText='ContextSetSession'
-						value={th.state.session.ContextSetSession}
-						onChange={th.handleContextSetSession}
-						onBlur={th.enableSave}
-					/>
-					<TextField
-						floatingLabelText='SessionBy'
-						value={th.state.session.SessionBy}
-						onChange={th.handleSessionBy}
-						onBlur={th.enableSave}
-					/>
-					<DatePicker
-						floatingLabelText='SessionOn'
-						value={th.state.session.SessionOn}
-						onChange={th.handleSessionOn}
-						onBlur={th.enableSave}
-					/>
-					<TextField
-						floatingLabelText='Remarks'
-						value={th.state.session.Remarks}
-						onChange={th.handleRemarks}
-						onBlur={th.enableSave}
-					/>
-				</CardText>
-			</Card>
-			</div>
-		)
+	handleClose() {
+		this.setState({
+			showDialog: false
+		})
+		this.props.handleClose();
 	}
-}
+
+	render() {
+		let th = this;
+		if(this.props.openDialog)
+		{
+			return(
+			<Dialog
+			    	style={styles.dialog}
+	          title="Add New Session"
+	          open={this.state.showDialog}
+	          autoScrollBodyContent={true}
+	          onRequestClose={this.handleClose}
+      >
+      <TextField
+							floatingLabelText='Week Number'
+							value={th.state.session.Week}
+							onChange={th.handleWeek}
+							onBlur={th.enableSave}
+			/><br/>
+			<TextField
+							floatingLabelText='Activities'
+							value={th.state.session.Activities}
+							onChange={th.handleActivities}
+							onBlur={th.enableSave}
+			/><br/>
+			<TextField
+							floatingLabelText='Status'
+							value={th.state.session.Status}
+							onChange={th.handleStatus}
+							onBlur={th.enableSave}
+			/><br/>
+			<TextField
+							floatingLabelText='ContextSetSession'
+							value={th.state.session.ContextSetSession}
+							onChange={th.handleContextSetSession}
+							onBlur={th.enableSave}
+				/><br/>
+				<TextField
+							floatingLabelText='SessionBy'
+							value={th.state.session.SessionBy}
+							onChange={th.handleSessionBy}
+							onBlur={th.enableSave}
+				/><br/>
+				<DatePicker
+							floatingLabelText='SessionOn'
+							defaultDate={new Date()}
+							onChange={th.handleSessionOn}
+							onBlur={th.enableSave}
+				/><br/>
+				<TextField
+							floatingLabelText='Remarks'
+							value={th.state.session.Remarks}
+							onChange={th.handleRemarks}
+							onBlur={th.enableSave}
+				/><br/>
+				<RaisedButton
+    	 		label="Add Session"
+    	   	primary={true}
+    			onClick={th.state.session.SessionID === '' ? th.addNewSession : th.updateSession}
+				/>
+				&emsp;
+  			<RaisedButton
+    	 		label="Cancel"
+    	   	primary={true}
+    			onTouchTap={this.handleClose}
+		    	 	/>
+				</Dialog>
+		)}
+		else
+		{ 
+			let z = new Date(th.state.session.SessionOn);
+			let date = new Date(z.getFullYear()+'-'+(z.getMonth()+1)+'-'+z.getDate())
+			return (
+				<div>
+				<Card  style={styles.card.box}>
+					<CardHeader
+						style={styles.card.header}
+					>
+						<TextField
+							floatingLabelText='Week Number'
+							value={th.state.session.Week}
+							onChange={th.handleWeek}
+							onBlur={th.enableSave}
+						/>
+						<IconButton tooltip="Save Session" style={styles.action.save} onClick={th.state.session.SessionID === '' ? th.addNewSession : th.updateSession} disabled={this.state.saveDisabled}>
+							<SaveIcon color={lightBlack} />
+						</IconButton>
+						<IconButton tooltip="Delete Session" style={styles.action.delete} onClick={th.deleteSession}>
+							<DeleteIcon color={lightBlack} />
+						</IconButton>
+					</CardHeader>
+					<CardText>
+						<TextField
+							floatingLabelText='Activities'
+							value={th.state.session.Activities}
+							onChange={th.handleActivities}
+							onBlur={th.enableSave}
+						/>
+						<TextField
+							floatingLabelText='Status'
+							value={th.state.session.Status}
+							onChange={th.handleStatus}
+							onBlur={th.enableSave}
+						/>
+						<TextField
+							floatingLabelText='ContextSetSession'
+							value={th.state.session.ContextSetSession}
+							onChange={th.handleContextSetSession}
+							onBlur={th.enableSave}
+						/>
+						<TextField
+							floatingLabelText='SessionBy'
+							value={th.state.session.SessionBy}
+							onChange={th.handleSessionBy}
+							onBlur={th.enableSave}
+						/>
+						<DatePicker
+							floatingLabelText='SessionOn'
+							value={date}
+							onChange={th.handleSessionOn}
+							onBlur={th.enableSave}
+						/>
+						<TextField
+							floatingLabelText='Remarks'
+							value={th.state.session.Remarks}
+							onChange={th.handleRemarks}
+							onBlur={th.enableSave}
+						/>
+					</CardText>
+				</Card>
+				</div>
+			)
+		}
+	}
+}			

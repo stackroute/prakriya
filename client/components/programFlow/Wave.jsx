@@ -39,7 +39,8 @@ export default class Wave extends React.Component {
 			waveString: '',
 			waveObject: {},
 			course: '',
-			canCreateSession: true
+			canCreateSession: true,
+			addSessionDialog: false
 		}
 
 		this.getWaveIDs = this.getWaveIDs.bind(this)
@@ -48,6 +49,8 @@ export default class Wave extends React.Component {
 		this.onCourseChange = this.onCourseChange.bind(this)
 		this.addSession = this.addSession.bind(this)
 		this.onSessionAddition = this.onSessionAddition.bind(this)
+		this.handleClose = this.handleClose.bind(this)
+		this.onSessionDeletion = this.onSessionDeletion.bind(this)
 	}
 
 	componentWillMount() {
@@ -85,7 +88,8 @@ export default class Wave extends React.Component {
 	onWaveChange(e) {
 		let th = this
 		th.setState({
-			waveString: e.target.outerText
+			waveString: e.target.outerText,
+			waveObject: {}
 		})
 		th.getWaveObject(e.target.outerText)
 	}
@@ -98,37 +102,31 @@ export default class Wave extends React.Component {
 	}
 
 	addSession() {
-		let th = this
-		console.log('into addSession: ', th.state)
-		if(th.state.canCreateSession
-			&& th.state.waveString.length !== 0
-			&& th.state.course.length !== 0) {
-			console.log('if')
-			let waveObject = th.state.waveObject
-			waveObject.Sessions.push({
-				SessionID: '',
-				CourseName: th.state.course,
-				Week: '',
-				Activities: '',
-				Status: '',
-				ContextSetSession: '',
-				SessionBy: '',
-				SessionOn: {},
-				Remarks: ''
-			})
-			this.setState({
-				waveObject: waveObject,
-				canCreateSession: false
-			})
-		} else {
-			console.log('else')
-		}
+		this.setState({
+			addSessionDialog: true
+		})
+	}
+
+	handleClose() {
+		this.setState({
+			addSessionDialog: false
+		})
+		this.getWaveObject(this.state.waveString)
 	}
 
 	onSessionAddition() {
 		this.setState({
-			canCreateSession: true
+			canCreateSession: true,
+			addSessionDialog: false
 		})
+		this.getWaveObject(this.state.waveString)
+	}
+
+	onSessionDeletion() {
+		this.setState({
+			waveObject:{}
+		})
+		this.getWaveObject(this.state.waveString)
 	}
 
 	render() {
@@ -170,7 +168,7 @@ export default class Wave extends React.Component {
 					{
 						th.state.waveObject.Sessions === undefined ? '' :
 						th.state.waveObject.Sessions.map(function(session, index) {
-							return <Col md={6}><Session key={index} session={session} waveID={th.state.waveObject.WaveID} onSessionAddition={th.onSessionAddition} /></Col>
+							return <Col md={6}><Session key={index} session={session} waveID={th.state.waveObject.WaveID} onSessionAddition={th.onSessionAddition} onSessionDeletion={th.onSessionDeletion}/></Col>
 						})
 					}
 					</Row>
@@ -178,6 +176,8 @@ export default class Wave extends React.Component {
 					<FloatingActionButton style={styles.addButton} mini={true} onTouchTap={this.addSession}>
 						<AddIcon />
 					</FloatingActionButton>
+					{this.state.addSessionDialog &&
+							<Session waveID={th.state.waveObject.WaveID} openDialog={this.state.addSessionDialog} handleClose={this.handleClose} onSessionAddition={th.onSessionAddition}/>}
 			</div>
 		)
 	}

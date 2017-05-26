@@ -23,7 +23,7 @@ describe("Make GET requests to domain ", function() {
 
     //login route
       describe("Testing MENTOR-POST route", function(err){
-        it.only("should check mentor login", function(done){
+        it("should check mentor login", function(done){
           url
             .post('/login')
             .send({"username": "simanta", "password":"simanta"})
@@ -180,7 +180,7 @@ it("GET waveobj for particular waveids",function(done){
   /**************************************************
   *******   testing-post (mentor mentor-routes) ********
   ***************************************************/
- describe.only("Testing POST route for course", function(err){
+ describe("Testing POST route for course", function(err){
         this.timeout(25000);
         it("mentor course addition", function(done){
           url

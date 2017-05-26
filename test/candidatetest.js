@@ -61,7 +61,7 @@ var token= '';
                     });
               });
   describe("Testing POST route", function(err){
-    it.skip("should check candidate save feedback", function(done){
+    it("should check candidate save feedback", function(done){
       this.timeout(50000);
       let feedbackObj = {
                 cadetID: '351611',
