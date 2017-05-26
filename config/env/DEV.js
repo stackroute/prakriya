@@ -82,6 +82,10 @@ let basedata = {
     {
       name: "Attendance",
       code: "ATTENDANCE"
+    },
+    {
+      name: "Waves",
+      code: "WAVES"
     }
   ],
   ADMIN_ROLE: {

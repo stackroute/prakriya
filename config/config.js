@@ -53,8 +53,8 @@ let BASEDATA = {
 			code: "ATTENDANCE"
 		},
 		{
-			name: "Wave",
-			code: "WAVE"
+			name: "Waves",
+			code: "WAVES"
 		}
 	],
 	ADMIN_ROLE: {

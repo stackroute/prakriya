@@ -16,8 +16,14 @@ const backgroundColors = [
 	'#DDDBF1',
 	'#CAF5B3',
 	'#C6D8D3'
-]
+	]
 
+const backgroundIcons = [
+	'#847662',
+	'#666682',
+	'#4e5f46',
+	'#535f5b'
+	]
 export default class Waves extends React.Component {
 
 	constructor(props) {
@@ -44,6 +50,14 @@ export default class Waves extends React.Component {
 		    	console.log(err);
 		    else {
 		    	console.log('Successfully fetched all waves', res.body)
+		    	function compare(a,b) {
+					  if (a.StartDate < b.StartDate)
+					    return -1;
+					  if (a.StartDate > b.StartDate)
+					    return 1;
+					  return 0;
+					}
+					res.body.sort(compare);
 		    	th.setState({
 		    		waves: res.body
 		    	})
@@ -108,6 +122,7 @@ export default class Waves extends React.Component {
 										handleUpdate={th.handleUpdate} 
 										handleDelete={th.handleDelete}
 										bgColor={backgroundColors[key%4]}
+										bgIcon={backgroundIcons[key%4]}
 									/>
 								)
 							})
