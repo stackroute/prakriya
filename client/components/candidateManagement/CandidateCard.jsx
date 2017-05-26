@@ -39,7 +39,6 @@ export default class CandidateCard extends React.Component {
 	}
 	componentDidMount() {
 		this.getProfilePic(this.props.candidate.EmployeeID);
-		this.getWave(this.props.candidate.Wave);
 	}
 	getProfilePic(eid) {
 		let th = this;
