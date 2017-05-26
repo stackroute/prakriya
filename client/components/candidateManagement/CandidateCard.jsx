@@ -4,7 +4,7 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import {lightBlack} from 'material-ui/styles/colors'; 
+import {lightBlack} from 'material-ui/styles/colors';
 import Request from 'superagent';
 
 const styles = {
@@ -82,6 +82,7 @@ export default class CandidateCard extends React.Component {
 	}
 
 	render() {
+	console.log('here');
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
@@ -102,15 +103,15 @@ export default class CandidateCard extends React.Component {
 			    	style={styles.cardClick}
 			    	onClick={this.handleCardClick}
 			      overlay={
-			      	<CardTitle 
+			      	<CardTitle
 			      		title={this.props.candidate.EmployeeName}
-			      		subtitle={this.props.candidate.EmailID} 
+			      		subtitle={this.props.candidate.EmailID}
 			      	/>
 			      }
 			    >
 			      <img style={styles.profilePic} src={this.state.imageURL} />
 			    </CardMedia>
-			    <CardTitle 
+			    <CardTitle
 			    	title={this.props.candidate.EmployeeID}
 			    	subtitle={this.props.candidate.CareerBand}
 			    	style={styles.cardTitle}
