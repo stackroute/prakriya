@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom'
 import Request from 'superagent';
 import IconButton from 'material-ui/IconButton';
-import {grey400, darkBlack, lightBlack, red500} from 'material-ui/styles/colors'; 
+import {grey400, darkBlack, lightBlack, red500} from 'material-ui/styles/colors';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
@@ -14,6 +14,22 @@ import AddUser from './AddUser.jsx';
 const styles = {
 	cardActions: {
 		textAlign: 'right'
+	},
+	dialog: {
+		backgroundColor: '#DDDBF1',
+		border: '10px solid teal'
+	},
+	actionsContainer: {
+		backgroundColor: 'teal',
+		borderTop: '0px',
+		marginTop: '0px'
+	},
+	actionButton: {
+		backgroundColor: '#DDDBF1',
+		width: '50%',
+		color: 'teal',
+		border: '1px solid teal',
+		height: '100%'
 	}
 }
 
@@ -41,7 +57,7 @@ export default class UserList extends React.Component {
 	disabledUser = () => {
 		if(this.props.currUser.actions.indexOf('login') > -1)
 			return false
-		else 
+		else
 			return true
 	}
 
@@ -51,7 +67,7 @@ export default class UserList extends React.Component {
 
   handleClose = () => {
     this.setState({deleteConfirm: false});
-  }; 
+  };
 
   handleOpenLock = () => {
     this.setState({lockConfirm: true});
@@ -59,15 +75,14 @@ export default class UserList extends React.Component {
 
   handleCloseLock = () => {
     this.setState({lockConfirm: false});
-  }; 
+  };
 
   handleAccountSuspension() {
   	this.handleCloseLock();
   	if(this.props.currUser.actions.indexOf('login') > -1)
-			this.props.lockUser(this.props.currUser);
-		else 
-			this.props.unlockUser(this.props.currUser);
-		// console.log("yes!!!!!")
+			this.props.lockUser(this.props.currUser)
+		else
+			this.props.unlockUser(this.props.currUser)
 	}
 
 	handleRemoveUser() {
@@ -84,37 +99,31 @@ export default class UserList extends React.Component {
 		this.props.updateUser(updatedUser);
 	}
 
-	
-
-	
 	render() {
 		const deleteActions = [
 	      <FlatButton
-	        label="Not sure, maybe later!"
-	        primary={true}
+	        label="Not sure.  Maybe later."
 	        onTouchTap={this.handleClose}
+					style={styles.actionButton}
 	      />,
 	      <FlatButton
 	        label="Yes"
-	        primary={true}
 	        onClick={this.handleRemoveUser}
-	        
-	      />,
+	        style={styles.actionButton}
+	      />
 	  ];
 	  const lockActions = [
 	      <FlatButton
-	        label="Not sure, maybe later!"
-	        primary={true}
+	        label="Not sure. Maybe later."
 	        onTouchTap={this.handleCloseLock}
+					style={styles.actionButton}
 	      />,
 	      <FlatButton
 	        label="Yes"
-	        primary={true}
 	        onClick={this.handleAccountSuspension}
-	        
-	      />,
+					style={styles.actionButton}
+	      />
 	  ];
-		// console.log(this.props)
 		const color = this.disabledUser() ? red500 : lightBlack ;
 		const accountTooltip = this.disabledUser() ? 'Unlock Account' : 'Lock Account' ;
 		const disabled = this.disabledUser()
@@ -122,20 +131,19 @@ export default class UserList extends React.Component {
 		console.log(type);
 		return (
 			<div>
-				
 					<Card>
-
 						<CardMedia overlay={<CardTitle title={this.props.currUser.username} subtitle={this.props.currUser.role.toUpperCase()} />}>
 				      <img src="../../../assets/images/avt-default.jpg" />
 				    </CardMedia>
-				    <CardTitle title={this.props.currUser.name} subtitle={this.props.currUser.email} />							
+				    <CardTitle title={this.props.currUser.name} subtitle={this.props.currUser.email} />
 						<CardActions style={styles.cardActions}>
 							<IconButton tooltip={accountTooltip} onTouchTap={this.handleOpenLock} >
 					      <LockIcon color={color} />
 					    </IconButton>
 					    {(this.props.currUser.actions.indexOf('login') > -1)?(<Dialog
-					          title="Confirm user' account suspension?"
+										bodyStyle={styles.dialog}
 					          actions={lockActions}
+										actionsContainerStyle={styles.actionsContainer}
 					          modal={false}
 					          open={this.state.lockConfirm}
 					          onRequestClose={this.handleCloseLock}
@@ -144,8 +152,9 @@ export default class UserList extends React.Component {
 					        </Dialog>
 					      ):(
 					      	<Dialog
-					          title="Confirm user' account unsuspension?"
+										bodyStyle={styles.dialog}
 					          actions={lockActions}
+										actionsContainerStyle={styles.actionsContainer}
 					          modal={false}
 					          open={this.state.lockConfirm}
 					          onRequestClose={this.handleCloseLock}
@@ -160,8 +169,9 @@ export default class UserList extends React.Component {
 					      <DeleteIcon color={lightBlack} />
 					    </IconButton>
 					    <Dialog
-			          title="Confirm User Delete"
+								bodyStyle={styles.dialog}
 			          actions={deleteActions}
+								actionsContainerStyle={styles.actionsContainer}
 			          modal={false}
 			          open={this.state.deleteConfirm}
 			          onRequestClose={this.handleClose}
@@ -174,12 +184,7 @@ export default class UserList extends React.Component {
 							<AddUser user={this.props.currUser} roles={this.props.roles} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateUser} />
 						}
 				  </Card>
-			  
 			</div>
-			
-		);
+		)
 	}
 }
-
-// <FlatButton label="Edit" onClick={this.handleEditUser} />
-// <FlatButton label="Remove" onClick={this.handleRemoveUser} />

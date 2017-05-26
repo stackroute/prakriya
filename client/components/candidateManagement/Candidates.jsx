@@ -40,7 +40,7 @@ export default class Candidates extends React.Component {
 			displayCandidate: {},
 			cadets: [],
 			filterCadetName: '',
-			filterCadetWave: ''
+			filterCadetWave: '',
 			candidatesName:[]
 		}
 		this.getCandidates = this.getCandidates.bind(this);
