@@ -15,6 +15,7 @@ import MenuItem from 'material-ui/MenuItem';
 import CameraIcon from 'material-ui/svg-icons/image/camera-alt';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import Dropzone from 'react-dropzone';
+import Moment from 'moment';
 
 const styles = {
 	container: {
@@ -64,6 +65,7 @@ export default class ProfileView extends React.Component {
 		super(props);
 		this.state = {
 			cadet: {},
+			wave: {},
 			showPersonalDialog: false,
 			showProjectDialog: false,
 			showAssetDialog: false,
@@ -74,7 +76,10 @@ export default class ProfileView extends React.Component {
 			disableSavePic: true,
 			defaultProfilePic: '../../assets/images/avt-default.jpg',
 			picFile: {},
-			picPreview: ''
+			picPreview: '',
+			assetID: '',
+			email: '',
+			contact: ''
 		}
 		this.openProjectDialog = this.openProjectDialog.bind(this);
 		this.closeProjectDialog = this.closeProjectDialog.bind(this);
@@ -89,15 +94,23 @@ export default class ProfileView extends React.Component {
 		this.handleUpdate = this.handleUpdate.bind(this);
 		this.handleDrop = this.handleDrop.bind(this);
 		this.handlePicSave = this.handlePicSave.bind(this);
+		this.formatDate = this.formatDate.bind(this);
 	}
 	componentDidMount() {
 		let picPreview = this.state.defaultProfilePic;
 		this.setState({
 			cadet: this.props.cadet,
+			assetID: this.props.cadet.AssetID,
+			email: this.props.cadet.AltEmail,
+			contact: this.props.cadet.Contact,
+			projectName: this.props.cadet.ProjectName,
+			projectDesc: this.props.cadet.ProjectDescription,
+			projectSkills: this.props.cadet.ProjectSkills,
   		picPreview: this.state.defaultProfilePic
   	})
 	}
 	componentWillUpdate(nextProps, nextState) {
+		nextState.wave = nextProps.wave;
 		if(nextState.picPreview != this.state.picPreview)
 			nextState.picPreview = nextState.picPreview;
 		else if(nextProps.imageURL != '')
@@ -114,19 +127,15 @@ export default class ProfileView extends React.Component {
 		})
 	}
 	handleAltEmailChange(event) {
-		let cadet = this.state.cadet;
-		cadet.AltEmail = event.target.value;
 		this.setState({
 			disableSave: false,
-			cadet: cadet
+			email: event.target.value
 		})
 	}
 	handleContactChange(event) {
-		let cadet = this.state.cadet;
-		cadet.Contact = event.target.value;
 		this.setState({
 			disableSave: false,
-			cadet: cadet
+			contact: event.target.value
 		})
 	}
 	openProjectDialog() {
@@ -143,13 +152,11 @@ export default class ProfileView extends React.Component {
 		let th = this;
 		this.props.projects.map(function (project, index) {
 			if(index == key) {
-				let cadet = th.state.cadet;
-				cadet.ProjectName = project.name;
-				cadet.ProjectDescription = project.description;
-				cadet.ProjectSkills = project.skills;
 				th.setState({
 					disableSave: false,
-					cadet: cadet
+					projectName: project.name,
+					projectDesc: project.description,
+					projectSkills: project.skills
 				})
 			}
 		})
@@ -165,18 +172,29 @@ export default class ProfileView extends React.Component {
 		})
 	}
 	handleAssetChange(event) {
-		let cadet = this.state.cadet;
-		cadet.AssetID = event.target.value;
 		this.setState({
 			disableSave: false,
-			cadet: cadet
+			assetID: event.target.value
 		})
 	}
 	handleUpdate() {
+		let cadet = this.state.cadet;
+		cadet.AltEmail = this.state.email;
+		cadet.Contact = this.state.contact;
+		cadet.AssetID = this.state.assetID;
+		cadet.ProjectName = this.state.projectName;
+		cadet.ProjectDescription = this.state.projectDesc;
+		cadet.ProjectSkills = this.state.projectSkills;
 		this.setState({
-			disableSave: false
+			disableSave: false,
+			assetID: '',
+			email: '',
+			contact: '',
+			projectName: '',
+			projectDesc: '',
+			projectSkills: ''
 		})
-		this.props.handleUpdate(this.state.cadet)
+		this.props.handleUpdate(cadet)
 	}
 	handlePicSave() {
 		this.setState({
@@ -194,6 +212,9 @@ export default class ProfileView extends React.Component {
 		})
 		console.log('Accepted Files', acceptedFiles);
 		console.log('New pic', this.state.picPreview);
+	}
+	formatDate(date) {
+		return Moment(date).format("MMM Do YYYY");
 	}
 
 	render() {
@@ -276,13 +297,13 @@ export default class ProfileView extends React.Component {
 									<SaveIcon />
 								</IconButton>
 								<br/>
-								Employee Id: {this.state.cadet.EmployeeID}<br/>
-								Career Band: {this.state.cadet.CareerBand}<br/>
-								Email: {this.state.cadet.EmailID}<br/>
-								Wave: {this.state.cadet.Wave}
+								<strong>Employee Id:</strong> {this.state.cadet.EmployeeID}<br/>
+								<strong>Career Band:</strong> {this.state.cadet.CareerBand}<br/>
+								<strong>Email:</strong> {this.state.cadet.EmailID}<br/>
+								<strong>Wave:</strong> {this.state.cadet.Wave}
 							</p>
 						</Col>
-						<Col md={6} mdOffset={1}>
+						<Col md={5} mdOffset={1}>
 
 							<h4>
 								Personal
@@ -294,27 +315,27 @@ export default class ProfileView extends React.Component {
 								</span>
 							</h4>
  							<p style={styles.details}>
-								Alternate Email: {this.state.cadet.AltEmail}<br/>
-								Contact: {this.state.cadet.Contact}
+								<strong>Alternate Email:</strong> {this.state.cadet.AltEmail}<br/>
+								<strong>Contact:</strong> {this.state.cadet.Contact}
 							</p>
 
 							<h4>Experience</h4>
  							<p style={styles.details}>
-								Work Experience: {this.state.cadet.WorkExperience}
+								<strong>Work Experience:</strong> {this.state.cadet.WorkExperience}
 							</p>
 
 							<h4>Digi-Thon</h4>
 							<p style={styles.details}>
-								Digi-Thon Phase: {this.state.cadet.DigiThonPhase}<br/>
-								Digi-Thon Score: {this.state.cadet.DigiThonScore}
+								<strong>Digi-Thon Phase:</strong> {this.state.cadet.DigiThonPhase}<br/>
+								<strong>Digi-Thon Score:</strong> {this.state.cadet.DigiThonScore}
 							</p>
 
 							<h4>Training Details</h4>
 							<p style={styles.details}>
-								Training Track: {this.state.cadet.TrainingTrack}<br/>
-								Wave: {this.state.cadet.Wave}<br/>
-								Start Date: {this.state.cadet.StartDate}<br/>
-								End Date: {this.state.cadet.EndDate}
+								<strong>Training Track:</strong> {this.state.cadet.TrainingTrack}<br/>
+								<strong>Wave:</strong> {this.state.cadet.Wave}<br/>
+								<strong>Start Date:</strong> {this.formatDate(this.state.wave.StartDate)}<br/>
+								<strong>End Date:</strong> {this.formatDate(this.state.wave.EndDate)}
 							</p>
 
 							{
@@ -323,7 +344,7 @@ export default class ProfileView extends React.Component {
 								<div>
 									<h4>Academy Training Skills</h4>
 									<p style={styles.details}>
-										Skills: {this.state.cadet.AcademyTrainingSkills}
+										<strong>Skills:</strong> {this.state.cadet.AcademyTrainingSkills}
 									</p>
 								</div>
 							}
@@ -342,9 +363,9 @@ export default class ProfileView extends React.Component {
 										</span>
 									</h4>
 									<p style={styles.details}>
-										Project Name: {this.state.cadet.ProjectName}<br/>
-										Project Description: {this.state.cadet.ProjectDescription}<br/>
-										Skills: <ul>{
+										<strong>Project Name:</strong> {this.state.cadet.ProjectName}<br/>
+										<strong>Project Description:</strong> {this.state.cadet.ProjectDescription}<br/>
+										<strong>Skills:</strong> <ul>{
 											this.state.cadet.ProjectSkills.map(function(skill) {
 												return <li>{skill}</li>
 											})}</ul>
@@ -366,15 +387,15 @@ export default class ProfileView extends React.Component {
 										</span>
 									</h4>
 									<p style={styles.details}>
-										Asset Id: {this.state.cadet.AssetID}
+										<strong>Asset Id:</strong> {this.state.cadet.AssetID}
 									</p>
 								</div>
 							}
 
 							<h4>Manager Details</h4>
 							<p style={styles.details}>
-								Primary Supervisor: {this.state.cadet.PrimarySupervisor}<br/>
-								Project Supervisor: {this.state.cadet.ProjectSupervisor}
+								<strong>Primary Supervisor:</strong> {this.state.cadet.PrimarySupervisor}<br/>
+								<strong>Project Supervisor:</strong> {this.state.cadet.ProjectSupervisor}
 							</p>
 
 							{
@@ -414,12 +435,12 @@ export default class ProfileView extends React.Component {
         >
         	<TextField
 			      floatingLabelText="Alternate Email"
-			      value={this.state.cadet.AltEmail}
+			      value={this.state.email}
 			      onChange={this.handleAltEmailChange}
 			    />
 			    <TextField
 			      floatingLabelText="Contact"
-			      value={this.state.cadet.Contact}
+			      value={this.state.contact}
 			      onChange={this.handleContactChange}
 			    />
         </Dialog>
@@ -430,7 +451,7 @@ export default class ProfileView extends React.Component {
           onRequestClose={this.closeProjectDialog}
         >
         	<SelectField
-	          value={this.state.cadet.ProjectName}
+	          value={this.state.projectName}
 	          onChange={this.handleProjectChange}
 	          floatingLabelText="Select your project"
 	        >
@@ -442,7 +463,7 @@ export default class ProfileView extends React.Component {
 	        </SelectField><br/>
 	        <TextField
 			      floatingLabelText="Description"
-			      value={this.state.cadet.ProjectDescription}
+			      value={this.state.projectDesc}
 			      multiLine={true}
 			      rows={3}
 			      rowsMax={3}
@@ -451,7 +472,7 @@ export default class ProfileView extends React.Component {
 			    />
 			    <TextField
 			      floatingLabelText="Skills"
-			      value={this.state.cadet.ProjectSkills}
+			      value={this.state.projectSkills}
 			      multiLine={true}
 			      rows={3}
 			      rowsMax={3}
@@ -467,7 +488,7 @@ export default class ProfileView extends React.Component {
         >
         	<TextField
 			      floatingLabelText="Asset Id"
-			      value={this.state.cadet.AssetID}
+			      value={this.state.assetID}
 			      onChange={this.handleAssetChange}
 			    />
         </Dialog>

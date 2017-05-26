@@ -149,7 +149,6 @@ export default class Candidates extends React.Component {
 							{
 								this.state.candidates.map(function(candidate, key) {
 									return (
-										candidate.Wave != undefined &&
 										<Col md={3} key={key}>
 											<CandidateCard
 												candidate={candidate}

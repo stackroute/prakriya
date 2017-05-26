@@ -117,10 +117,19 @@ let addWave = function (waveObj, successCB, errorCB) {
 	})
 }
 
+let getWave = function (waveID, successCB, errorCB) {
+	logger.debug('In get Wave', waveID)
+	WaveModel.findOne({WaveID: waveID}, function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result);
+	})
+}
+
 let getProjects = function(successCB, errorCB) {
 	ProjectModel.find({},function(err, result) {
 		if (err)
-				errorCB(err);
+			errorCB(err);
 		successCB(result);
 	});
 }
@@ -324,6 +333,7 @@ module.exports = {
 	updateLastLogin,
 	getPermissions,
 	addWave,
+	getWave,
 	getCadet,
 	getCadets,
 	getProjects,

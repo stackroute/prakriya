@@ -29,7 +29,7 @@ export default class CandidateCard extends React.Component {
 		super(props);
 		this.state = {
 			showDeleteDialog: false,
-			imageURL: '../../assets/images/avt-default.jpg'
+			imageURL: '../../assets/images/avt-default.jpg',
 		}
 		this.getProfilePic = this.getProfilePic.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
@@ -38,7 +38,8 @@ export default class CandidateCard extends React.Component {
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 	}
 	componentDidMount() {
-		this.getProfilePic(this.props.candidate.EmployeeID)
+		this.getProfilePic(this.props.candidate.EmployeeID);
+		this.getWave(this.props.candidate.Wave);
 	}
 	getProfilePic(eid) {
 		let th = this;

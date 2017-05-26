@@ -132,6 +132,11 @@ router.get("/user", function(req, res) {
   }
 });
 
+
+/****************************************************
+*******                 Wave                 ********
+****************************************************/
+
 // Add a new Wave
 router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try {
@@ -147,6 +152,28 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
     });
   }
 })
+
+router.get('/wave', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try{
+    dashboardMongoController.getWave(req.query.waveid, function(wave) {
+      res.status(201).json(wave);
+    }, function(err) {
+      logger.error('Error 1', err);
+      res.status(500).json({ error: 'Cannot get wave from db...!' });
+    });
+  }
+  catch(err) {
+    logger.error('Error 2', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+
+/****************************************************
+*******               Projects               ********
+****************************************************/
 
 // Get all projects
 router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {

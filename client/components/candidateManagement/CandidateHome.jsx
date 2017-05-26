@@ -8,6 +8,7 @@ import Dialog from 'material-ui/Dialog';
 import DatePicker from 'material-ui/DatePicker';
 import {grey50} from 'material-ui/styles/colors';
 import Request from 'superagent'; 
+import Moment from 'moment';
 import CandidateEdit from './CandidateEdit.jsx';
 import PerformanceMatrix from './PerformanceMatrix.jsx';
 
@@ -53,10 +54,12 @@ export default class CandidateHome extends React.Component {
 		super(props);
 		this.state = {
 			imageURL: '../../assets/images/avt-default.jpg',
+			wave: null,
 			showDeleteDialog: false,
 			showEditDialog: false
 		}
 		this.getProfilePic = this.getProfilePic.bind(this);
+		this.getWave = this.getWave.bind(this);
 		this.handleBack = this.handleBack.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleUpdate = this.handleUpdate.bind(this);
@@ -64,9 +67,11 @@ export default class CandidateHome extends React.Component {
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 		this.openEditDialog = this.openEditDialog.bind(this);
 		this.closeEditDialog = this.closeEditDialog.bind(this);
+		this.formatDate = this.formatDate.bind(this);
 	}
 	componentDidMount() {
 		this.getProfilePic(this.props.candidate.EmployeeID)
+		this.getWave(this.props.candidate.Wave)
 	}
 	getProfilePic(eid) {
 		let th = this;
@@ -91,6 +96,21 @@ export default class CandidateHome extends React.Component {
 		    	}
 		    }
 			})
+	}
+	getWave(waveid) {
+		let th = this;
+		Request
+			.get(`/dashboard/wave?waveid=${waveid}`)
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	th.setState({
+		    		wave: res.body
+		    	})
+		    }
+		  })
 	}
 	handleBack() {
 		this.props.handleBack();
@@ -123,6 +143,9 @@ export default class CandidateHome extends React.Component {
 			showEditDialog: false
 		})
 		this.props.handleUpdate(candidate);
+	}
+	formatDate(date) {
+		return Moment(date).format("MMM Do YYYY");
 	}
 
 	render() {
@@ -215,9 +238,9 @@ export default class CandidateHome extends React.Component {
 										<h4>Training Details</h4>
 										<p style={styles.details}>
 											Training Track: {this.props.candidate.TrainingTrack}<br/>
-											Wave: {this.props.candidate.Wave}<br/>
-											Start Date: {this.props.candidate.StartDate}<br/>
-											End Date: {this.props.candidate.EndDate}
+											Wave: {this.state.cadet.Wave}<br/>
+											Start Date: {this.formatDate(this.state.wave.StartDate)}<br/>
+											End Date: {this.formatDate(this.state.wave.EndDate)}
 										</p>
 
 										{
