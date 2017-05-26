@@ -57,10 +57,10 @@ export default class RoleManagement extends React.Component {
 		    	th.setState({
 		    		controls: res.body
 		    	})
-		    	console.log('Got all controls', th.state.controls)
 		    }
 			})
 	}
+
 	addRole(role) {
 		let th = this
 		Request
@@ -143,6 +143,6 @@ export default class RoleManagement extends React.Component {
 					</Row>
 				</Grid>
 			</div>
-		);
+		)
 	}
 }

@@ -65,6 +65,9 @@ export default class WaveCard extends React.Component {
 		this.closeUpdateDialog = this.closeUpdateDialog.bind(this);
 		this.getCourses = this.getCourses.bind(this);
 		this.handleCoursesChange = this.handleCoursesChange.bind(this);
+		this.handleLocationChange = this.handleLocationChange.bind(this);
+		this.handleStartDateChange = this.handleStartDateChange.bind(this);
+		this.handleEndDateChange = this.handleEndDateChange.bind(this);
 	}
 
 	handleEditProject() {
@@ -227,6 +230,7 @@ export default class WaveCard extends React.Component {
       />,
     ];
     let bgColor = this.props.bgColor;
+		let bgIcon = this.props.bgIcon;
 		return (
 			<div>
 		<Card 
@@ -240,7 +244,7 @@ export default class WaveCard extends React.Component {
 					<CardHeader
 			      title={<span style={{fontSize:'20px', position: 'absolute',top: '32%'}}><b>{this.props.wave.WaveNumber}</b></span>}
 			      avatar={
-			      	<Avatar>
+			      	<Avatar backgroundColor={bgIcon}>
 			      		{this.props.wave.WaveID.charAt(0).toUpperCase()}
 			      	</Avatar>
 			      }/>
@@ -310,7 +314,6 @@ export default class WaveCard extends React.Component {
 			    		<TextField
 						      floatingLabelText="Wave Name"
 						      value={this.state.wave.WaveNumber}
-						      onChange={this.handleWaveNumberChange}
 						      fullWidth={true}
 						      disabled={true}
 						    /><br />
