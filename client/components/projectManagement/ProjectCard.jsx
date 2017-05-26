@@ -19,7 +19,19 @@ const styles = {
     	cursor: 'pointer',
     	textDecoration: 'underline',
     	color: 'blue'
-    }
+    },
+    dialog: {
+      backgroundColor: '#DDDBF1',
+  		borderBottom: '10px solid teal',
+  		borderRight: '10px solid teal',
+  		borderLeft: '10px solid teal'
+    },
+    dialogTitle: {
+  		fontWeight: 'bold',
+  		backgroundColor: 'teal',
+  		color: '#DDDBF1',
+  		textAlign: 'center'
+  	}
 };
 
 export default class ProjectCard extends React.Component {
@@ -39,10 +51,6 @@ export default class ProjectCard extends React.Component {
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 		this.handleDeleteProject = this.handleDeleteProject.bind(this);
 	}
-
-  componentDidMount() {
-    console.log('Team Members: ', this.props.project.members)
-  }
 
 	formatDate(date) {
 		return Moment(date).fromNow();
@@ -98,12 +106,12 @@ export default class ProjectCard extends React.Component {
 		}
 		const deleteDialogActions = [
       <FlatButton
-        label="Cancel"
+        label='Cancel'
         primary={true}
         onTouchTap={this.closeDeleteDialog}
       />,
       <FlatButton
-        label="Delete"
+        label='Delete'
         primary={true}
         onClick={this.handleDeleteProject}
       />,
@@ -129,8 +137,8 @@ export default class ProjectCard extends React.Component {
 			      }/>
 			    	<CardText style={styles.text}>
 			    	<h3>Description:</h3>{this.props.project.description}
-			    	<h3>Tech Skills:</h3><ul>{this.props.project.skills.map(function(skill){
-        		return <li>{skill}</li>
+			    	<h3>Tech Skills:</h3><ul>{this.props.project.skills.map(function(skill, index){
+        		return <li key={index}>{skill}</li>
         		})}</ul>
 			    	<h3>Developed By:</h3>{this.props.project.wave}
 			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>view members</span>
@@ -143,8 +151,9 @@ export default class ProjectCard extends React.Component {
 				    </IconButton>
 				  	</Card>
 				 <Dialog
-		    	style={styles.dialog}
+		    	bodyStyle={styles.dialog}
           title='TEAM MEMBERS'
+          titleStyle={styles.dialogTitle}
           open={this.state.dialog}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}

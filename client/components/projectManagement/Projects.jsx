@@ -163,6 +163,7 @@ export default class Projects extends React.Component {
 							style={styles.masonry}
 						>
 								{
+									this.state.projects.length > 0 ?
 									th.state.projects.map(function (project, key) {
 										if(th.state.activeWaves.indexOf(project.wave) >= 0) {
 											return (
@@ -175,7 +176,8 @@ export default class Projects extends React.Component {
 												/>
 											)
 										}
-									})
+									}):
+									<span>No projects to display</span>
 								}
 						</Masonry>
 					</Tab>
@@ -187,6 +189,7 @@ export default class Projects extends React.Component {
 							style={styles.masonry}
 						>
 								{
+									this.state.projects.length > 0 ?
 									this.state.projects.map(function (project, key) {
 										if(th.state.activeWaves.indexOf(project.wave) < 0) {
 											return (
@@ -199,7 +202,8 @@ export default class Projects extends React.Component {
 												/>
 											)
 										}
-									})
+									}):
+									<span>No projects to display</span>
 								}
 						</Masonry>
 					</Tab>
@@ -211,6 +215,7 @@ export default class Projects extends React.Component {
 							style={styles.masonry}
 						>
 								{
+									this.state.projects.length > 0 ?
 									this.state.projects.map(function (project, key) {
 										return (
 											<ProjectCard
@@ -221,7 +226,8 @@ export default class Projects extends React.Component {
 												bgColor={backgroundColors[key%4]}
 											/>
 										)
-									})
+									}):
+									<span>No projects to display</span>
 								}
 						</Masonry>
 					</Tab>
