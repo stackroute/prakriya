@@ -117,10 +117,14 @@ let addWave = function (waveObj, successCB, errorCB) {
 	})
 }
 
-/****************************************************
-*******          Project Management         ********
-****************************************************/
-
+let getWave = function (waveID, successCB, errorCB) {
+	logger.debug('In get Wave', waveID)
+	WaveModel.findOne({WaveID: waveID}, function (err, result) {
+		if(err)
+			errorCB(err);
+		successCB(result);
+	})
+}
 let getActiveWaves = function(successCB, errorCB) {
 	let today = new Date()
 	WaveModel.aggregate(
@@ -137,10 +141,15 @@ let getActiveWaves = function(successCB, errorCB) {
 	);
 }
 
+
+/****************************************************
+*******              Projects                ********
+****************************************************/
+
 let getProjects = function(successCB, errorCB) {
 	ProjectModel.find({},function(err, result) {
 		if (err)
-				errorCB(err);
+			errorCB(err);
 		successCB(result);
 	});
 }
@@ -275,6 +284,7 @@ let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
 	});
 }
 
+
 /****************************************************
 *******          Candidates                 ********
 ****************************************************/
@@ -315,6 +325,7 @@ let getAssesmentTrack = function(courseName, successCB, errorCB) {
 		successCB(result);
 	});
 }
+
 
 /****************************************************
 *******             Common Functions         ********
@@ -386,6 +397,7 @@ module.exports = {
 	updateLastLogin,
 	getPermissions,
 	addWave,
+	getWave,
 	getCadet,
 	getCadets,
 	getProjects,

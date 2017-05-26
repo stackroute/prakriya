@@ -1,6 +1,8 @@
 import React from 'react';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import AutoComplete from 'material-ui/AutoComplete';
+import FlatButton from 'material-ui/FlatButton';
 import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import CandidateCard from './CandidateCard.jsx';
@@ -33,30 +35,68 @@ export default class Candidates extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			candidates: [],
 			showCandidate: false,
 			displayCandidate: {},
-			WaveIds:[],
-			WaveId:'',
+			cadets: [],
+			filterCadetName: '',
+			filterCadetWave: '',
 			candidatesName:[]
 		}
-		this.onWaveIdChange = this.onWaveIdChange.bind(this);
-		this.getWaveId = this.getWaveId.bind(this);
+		this.getCandidates = this.getCandidates.bind(this);
 		this.candidateView = this.candidateView.bind(this);
 		this.handleBack = this.handleBack.bind(this);
 		this.deleteCandidate = this.deleteCandidate.bind(this);
 		this.updateCandidate = this.updateCandidate.bind(this);
 		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.addCandidate = this.addCandidate.bind(this);
-		this.getWaveSpecificCandidates=this.getWaveSpecificCandidates.bind(this);
+		this.handleFilterName = this.handleFilterName.bind(this);
+		this.handleFilterWave = this.handleFilterWave.bind(this);
+		this.handleClearFilter = this.handleClearFilter.bind(this);
 	}
-	componentWillMount() {
-		if(localStorage.getItem('token')) {
-			this.getWaveId()
-		}
-
+	componentDidMount() {
+		this.getCandidates();
+	}
+	handleFilterName(val) {
+		console.log("value",val)
+		this.setState({
+			filterCadetName: val,
+			filterCadetWave: ''
+		})
+	}
+	handleFilterWave(val) {
+		console.log("value",val)
+		this.setState({
+			filterCadetWave: val,
+			filterCadetName: ''
+		})
+	}
+	handleClearFilter() {
+		this.setState({
+			filterCadetWave: '',
+			filterCadetName: ''
+		})
+	}
+	getCandidates() {
+		let th = this;
+		Request
+			.get('/dashboard/cadets')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+				let cadets = res.body.filter(function(cadet) {
+					if(!(cadet.Wave == undefined))
+						return cadet;
+				})
+		    	th.setState({
+		    		candidates: cadets
+		    	})
+		    }
+		  })
 	}
 
-	
 	candidateView(candidate) {
 		this.setState({
 			showCandidate: true,
@@ -78,7 +118,7 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.getWaveSpecificCandidates();
+		    	th.getCandidates();
 		    }
 		  })
 	}
@@ -92,17 +132,10 @@ export default class Candidates extends React.Component {
 		    if(err)
 		    	console.log(err);
 		    else {
-		    	th.getWaveSpecificCandidates();
+		    	th.getCandidates();
 		    }
 			});
 	}
-	handleWaveChange(event, key, value) {
-		this.setState({
-			wave: value
-		})
-	}
-
-
 	addCandidate(candidate) {
 		let th = this;
 		Request
@@ -113,58 +146,24 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.getWaveSpecificCandidates();
 		    	console.log('Success');
 		    }
 			})
 	}
-	getWaveId() {
-		let th = this
-		Request
-			.get('/dashboard/waveids')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res){
-			th.setState({
-				WaveIds: res.body.waveids
-			})
-			})
-		}
-		getWaveSpecificCandidates(waveId){
-
-		let th = this;
-		console.log("yuva",waveId)
-
-		Request
-			.get('/dashboard/wavespecificcandidates?waveID='+waveId)
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res){
-         console.log(res.body,"wspcc")
-			th.setState({
-					candidatesName:res.body.data
-			})
-
-
-			})
-		}
-		onWaveIdChange(e) {
-			this.setState({
-				WaveId: e.target.textContent,
-
-			})
-this.getWaveSpecificCandidates(e.target.textContent);
-
-		}
 	render() {
 		let th = this;
-		console.log(th.state.candidatesName,"am jjoe")
-		// let filter = Filter:
-		// 			<SelectField
-	 //          floatingLabelText="Select Wave"
-	 //          value={this.state.wave}
-	 //          onChange={this.handleWaveChange}
-	 //        >
-	 //          {items}
-	 //        </SelectField>
+		let cadetsName = [];
+		let cadetsWave=[];
+		let cadetsDistinctWave=[];
+		this.state.candidates.map(function (cadet, i) {
+			cadetsName.push(cadet.EmployeeName);
+		})
+		this.state.candidates.map(function (cadet, i) {
+			cadetsWave.push(cadet.Wave);
+			})
+		cadetsDistinctWave=cadetsWave.filter(function (cadet, i, cadetsWave) {
+	    return cadetsWave.indexOf(cadet) == i;
+		});
 		return(
 			<div>
 			<AddCandidate addCandidate={this.addCandidate}/>
@@ -172,31 +171,55 @@ this.getWaveSpecificCandidates(e.target.textContent);
 				!this.state.showCandidate ?
 				<div>
 					<h1 style={styles.heading}>Candidate Management</h1>
-					<SelectField
-						onChange={th.onWaveIdChange}
-						floatingLabelText="Select WaveID"
-						value={th.state.WaveId}
-					>
-						{
-							th.state.WaveIds.map(function(val, key) {
-								return <MenuItem key={key} value={val} primaryText={val} />
-							})
-						}
-					</SelectField>
+					<AutoComplete
+						hintText="Search Candidate"
+						filter={AutoComplete.fuzzyFilter}
+						searchText={this.state.filterCadetName}
+						dataSource={cadetsName}
+						onNewRequest={this.handleFilterName}
+					/>
+					<AutoComplete
+						hintText="SortBy Wave"
+						filter={AutoComplete.fuzzyFilter}
+						searchText={this.state.filterCadetWave}
+						dataSource={cadetsDistinctWave}
+						onNewRequest={this.handleFilterWave}
+					/>
+
+					<FlatButton
+						label="Clear Filter"
+						primary={true}
+						onClick={this.handleClearFilter}
+					/>
+
 					<Grid>
 						<Row>
 							{
-								th.state.candidatesName.map(function(candidate, key) {
-									return (
-										candidate.Wave != undefined &&
-										<Col md={3} key={key}>
-											<CandidateCard
-												candidate={candidate}
-												handleCardClick={th.candidateView}
-												handleDelete={th.deleteCandidate}
-											/>
-										</Col>
-									)
+								this.state.candidates.map(function(candidate, key) {
+									if((th.state.filterCadetWave === candidate.Wave)||(th.state.filterCadetName === candidate.EmployeeName)) {
+										return (
+											candidate.Wave != undefined &&
+											<Col md={3} key={key}>
+												<CandidateCard
+													candidate={candidate}
+													handleCardClick={th.candidateView}
+													handleDelete={th.deleteCandidate}
+												/>
+											</Col>
+										)
+									}
+									else if((th.state.filterCadetName === '') && (th.state.filterCadetWave === '')) {
+
+										return(
+											<Col md={3} key={key}>
+												<CandidateCard
+													candidate={candidate}
+													handleCardClick={th.candidateView}
+													handleDelete={th.deleteCandidate}
+												/>
+											</Col>
+										)
+									}
 								})
 							}
 						</Row>

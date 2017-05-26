@@ -14,17 +14,18 @@ export default class MyProfile extends React.Component {
 		this.state = {
 			cadet: null,
 			projects: [],
-			imageURL: ''
+			imageURL: '',
+			wave: null
 		}
 		this.getProjects = this.getProjects.bind(this);
 		this.getCadet = this.getCadet.bind(this);
 		this.updateProfile = this.updateProfile.bind(this);
 		this.saveProfilePic = this.saveProfilePic.bind(this);
 		this.getProfilePic = this.getProfilePic.bind(this);
+		this.getWave = this.getWave.bind(this);
 	}
 	componentDidMount() {
 		this.getCadet();
-		// this.getProfilePic();
 		this.getProjects();
 	}
 	getProjects() {
@@ -56,6 +57,7 @@ export default class MyProfile extends React.Component {
 		    		cadet: res.body
 		    	})
 		    	th.getProfilePic(res.body.EmployeeID);
+		    	th.getWave(res.body.Wave);
 		    }
 		  })
 	}
@@ -101,7 +103,6 @@ export default class MyProfile extends React.Component {
 		Request
 			.get(`/dashboard/getimage?eid=${eid}`)
 			.set({'Authorization': localStorage.getItem('token')})
-			.query({q: eid})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
@@ -120,14 +121,31 @@ export default class MyProfile extends React.Component {
 		    }
 			})
 	}
+	getWave(waveid) {
+		let th = this;
+		Request
+			.get(`/dashboard/wave?waveid=${waveid}`)
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	th.setState({
+		    		wave: res.body
+		    	})
+		    }
+		  })
+	}
 
 	render() {
 		return(
 			<div>
 				{
 					this.state.cadet != null &&
+					this.state.wave != null &&
 					<ProfileView
 						cadet={this.state.cadet}
+						wave={this.state.wave}
 						projects={this.state.projects}
 						imageURL={this.state.imageURL}
 						handleUpdate={this.updateProfile}

@@ -132,6 +132,11 @@ router.get("/user", function(req, res) {
   }
 });
 
+
+/****************************************************
+*******                 Wave                 ********
+****************************************************/
+
 // Add a new Wave
 router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try {
@@ -148,9 +153,22 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
   }
 })
 
-/****************************************************
-*******          Project Management         ********
-****************************************************/
+router.get('/wave', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try{
+    dashboardMongoController.getWave(req.query.waveid, function(wave) {
+      res.status(201).json(wave);
+    }, function(err) {
+      logger.error('Error 1', err);
+      res.status(500).json({ error: 'Cannot get wave from db...!' });
+    });
+  }
+  catch(err) {
+    logger.error('Error 2', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
 
 router.get('/activewaves', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try{
@@ -166,6 +184,11 @@ router.get('/activewaves', auth.canAccess(CONFIG.MENCAN), function(req, res) {
     });
   }
 })
+
+
+/****************************************************
+*******               Projects               ********
+****************************************************/
 
 // Get all projects
 router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
@@ -210,7 +233,7 @@ router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
     dashboardMongoController.updateProject(projectObj, function(project) {
       res.status(201).json(project);
     }, function (err) {
-      res.status(500).json({ error: 'Cannot delete the project...!' });
+      res.status(500).json({ error: 'Cannot update the project...!' });
     })
   }
   catch(err) {
@@ -229,7 +252,7 @@ router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
     dashboardMongoController.deleteProject(projectObj, function(project) {
       res.status(201).json(project);
     }, function (err) {
-      res.status(500).json({ error: 'Cannot update the project...!' });
+      res.status(500).json({ error: 'Cannot delete the project...!' });
     })
   }
   catch(err) {
