@@ -13,13 +13,38 @@ import AddIcon from 'material-ui/svg-icons/content/add';
 import RemoveIcon from 'material-ui/svg-icons/content/remove';
 
 const styles = {
-    dialog: {
-      textAlign: 'center'
-    },
-    link: {
+  dialog: {
+    backgroundColor: '#DDDBF1',
+    borderBottom: '10px solid teal',
+    borderRight: '10px solid teal',
+    borderLeft: '10px solid teal'
+  },
+  deleteDialog: {
+    backgroundColor: '#DDDBF1',
+    border: '10px solid teal'
+  },
+  dialogTitle: {
+    fontWeight: 'bold',
+    backgroundColor: 'teal',
+    color: '#DDDBF1',
+    textAlign: 'center'
+  },
+  actionsContainer: {
+    backgroundColor: 'teal',
+    borderTop: '0px',
+    marginTop: '0px'
+  },
+  actionButton: {
+    backgroundColor: '#DDDBF1',
+    width: '50%',
+    color: 'teal',
+    border: '1px solid teal',
+    height: '100%'
+  },
+  link: {
       wordWrap: 'break-word'
-    }
-};
+  }
+}
 
 export default class CourseCard extends React.Component {
 	constructor(props) {
@@ -68,10 +93,10 @@ export default class CourseCard extends React.Component {
 				})
 		}
 	}
-	
+
 	handleOpen() {
     this.setState({open: true});
-  };
+  }
 
   handleClose() {
     this.setState({open: false});
@@ -266,7 +291,7 @@ export default class CourseCard extends React.Component {
       AssessmentVideos: a
     })
 	}
-	
+
 	onChangeRemoveBlog(id) {
 		let value = this.state.AssessmentBlogs[id];
 		let th = this;
@@ -277,7 +302,7 @@ export default class CourseCard extends React.Component {
       AssessmentBlogs: a
     })
 	}
-		
+
 	onChangeRemoveDoc(id) {
 		let value = this.state.AssessmentDocs[id];
 		let th = this;
@@ -288,23 +313,23 @@ export default class CourseCard extends React.Component {
       AssessmentDocs: a
     })
 	}
-			
+
 	render() {
 		let text = '';
 		let th = this;
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
-        primary={true}
         onTouchTap={this.closeDeleteDialog}
+        style={styles.actionButton}
       />,
       <FlatButton
         label="Delete"
-        primary={true}
         onTouchTap={this.closeDeleteDialog}
         onClick={this.handleDeleteCategory}
-      />,
-    ];
+        style={styles.actionButton}
+      />
+    ]
 		const style = {
 			fontFamily: 'sans-serif',
 			margin: 'auto',
@@ -328,12 +353,15 @@ export default class CourseCard extends React.Component {
 		if(this.props.openDialog)
 		{
 			return(
-				<Dialog style={styles.dialog}
+				<Dialog
+          bodyStyle={styles.dialog}
           title={dialogTitle}
+          titleStyle={styles.dialogTitle}
           modal={false}
           open={this.state.open}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
+          actionsContainerStyle={styles.actionsContainer}
         >
         	<TextField
 						    		hintText="Category Name"
@@ -365,14 +393,14 @@ export default class CourseCard extends React.Component {
 						    		floatingLabelText= {text}
 						    		value={video}
 						    		onChange={(event) => th.onChangeAssessmentVideos(
-						    				event, 
+						    				event,
 						    				video
 						    			)}
 						/>
 						<IconButton tooltip="Remove video" onClick={th.onChangeRemoveVideo.bind(th,index)}>
 			      <RemoveIcon/>
 			    </IconButton>
-						</div>)				  	
+						</div>)
 					})}
 					<IconButton tooltip="Add video" onClick={this.onChangeAddVideo} disabled={this.state.disableSave}>
 			      <AddIcon/>
@@ -388,14 +416,14 @@ export default class CourseCard extends React.Component {
 						    		floatingLabelText= {text}
 						    		value={blog}
 						    		onChange={(event) => th.onChangeAssessmentBlogs(
-						    				event, 
+						    				event,
 						    				blog
 						    			)}
 						/>
 						<IconButton tooltip="Remove blog" onClick={th.onChangeRemoveBlog.bind(th,index)}>
 			      <RemoveIcon/>
 			    </IconButton>
-						</div>)				  	
+						</div>)
 					})}
 					<IconButton tooltip="Add blog" onClick={this.onChangeAddBlog} disabled={this.state.disableSave}>
 			      <AddIcon/>
@@ -410,14 +438,14 @@ export default class CourseCard extends React.Component {
 						    		floatingLabelText= {text}
 						    		value={doc}
 						    		onChange={(event) => th.onChangeAssessmentDocs(
-						    				event, 
+						    				event,
 						    				doc
 						    			)}
 						/>
 						<IconButton tooltip="Add assessment" onClick={th.onChangeRemoveDoc.bind(th,index)}>
 			      <RemoveIcon/>
 			    </IconButton>
-						</div>)				  	
+						</div>)
 					})}
 					<IconButton tooltip="Add assessment" onClick={this.onChangeAddDoc} disabled={this.state.disableSave}>
 			      <AddIcon/>
@@ -494,11 +522,13 @@ export default class CourseCard extends React.Component {
 					    {
 					    	this.props.category.Mentor.map(function(mentors,index) {
 					    	return (<p>{mentors}</p>)
-					    })	
+					    })
 					    	}
 			    </CardText>
 				</Card>
 				<Dialog
+          bodyStyle={styles.deleteDialogue}
+          actionsContainerStyle={styles.actionsContainer}
           actions={deleteDialogActions}
           modal={false}
           open={this.state.showDeleteDialog}

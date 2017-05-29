@@ -35,10 +35,35 @@ const styles = {
 	grid: {
 		width: '100%'
 	},
-	dialog: {
-	  textAlign: 'center'
+  dialog: {
+    backgroundColor: '#DDDBF1',
+    borderBottom: '10px solid teal',
+    borderRight: '10px solid teal',
+    borderLeft: '10px solid teal'
+  },
+  deleteDialog: {
+    backgroundColor: '#DDDBF1',
+    border: '10px solid teal'
+  },
+  dialogTitle: {
+    fontWeight: 'bold',
+    backgroundColor: 'teal',
+    color: '#DDDBF1',
+    textAlign: 'center'
+  },
+	actionsContainer: {
+		backgroundColor: 'teal',
+		borderTop: '0px',
+		marginTop: '0px'
+	},
+	actionButton: {
+		backgroundColor: '#DDDBF1',
+		width: '50%',
+		color: 'teal',
+		border: '1px solid teal',
+		height: '100%'
 	}
-};
+}
 
 export default class WaveCard extends React.Component {
 	constructor(props) {
@@ -60,7 +85,7 @@ export default class WaveCard extends React.Component {
 		this.getCadets = this.getCadets.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-		this.handleDeleteProject = this.handleDeleteProject.bind(this);	
+		this.handleDeleteProject = this.handleDeleteProject.bind(this);
 		this.handleUpdateProject = this.handleUpdateProject.bind(this);
 		this.closeUpdateDialog = this.closeUpdateDialog.bind(this);
 		this.getCourses = this.getCourses.bind(this);
@@ -165,7 +190,7 @@ export default class WaveCard extends React.Component {
 		let wave = this.state.wave;
 		wave.Location = event.target.value
 		this.setState({
-			wave: wave 
+			wave: wave
 		})
 	}
 	handleStartDateChange(event, date) {
@@ -205,38 +230,45 @@ export default class WaveCard extends React.Component {
 		end = end[2]+' '+end[1]+' '+end[3];
 		let date = start + ' - ' + end;
 		let th = this
+
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
         primary={true}
         onTouchTap={this.closeDeleteDialog}
+        style={styles.actionButton}
       />,
       <FlatButton
         label="Delete"
         primary={true}
         onClick={this.handleDeleteProject}
+        style={styles.actionButton}
       />,
-    ];
+    ]
+
     const editWave = [
       <FlatButton
         label="Cancel"
         primary={true}
         onTouchTap={this.closeUpdateDialog}
+        style={styles.actionButton}
       />,
       <FlatButton
         label="Update"
         primary={true}
         onClick={this.handleUpdateProject}
-      />,
-    ];
+        style={styles.actionButton}
+      />
+    ]
+
     let bgColor = this.props.bgColor;
 		let bgIcon = this.props.bgIcon;
 		return (
 			<div>
-		<Card 
+		<Card
 					style={{
-						width:'300px', 
-						marginRight:'20px', 
+						width:'300px',
+						marginRight:'20px',
 						marginBottom:'20px',
 						background: bgColor
 					}}
@@ -282,10 +314,13 @@ export default class WaveCard extends React.Component {
 		        	th.getCadets(this.props.wave.Cadets)}
 		        	<Dialog
 					    	style={styles.dialog}
-			          title="Cadets"
+			          title='CADETS'
 			          open={this.state.dialog}
 			          autoScrollBodyContent={true}
 			          onRequestClose={this.handleClose}
+                actionsContainerStyle={styles.actionsContainer}
+                bodyStyle={styles.dialog}
+                titleStyle={styles.dialogTitle}
 			        >
 			        <Grid style={styles.grid}><Row>
 			        {
@@ -301,44 +336,68 @@ export default class WaveCard extends React.Component {
 			          modal={false}
 			          open={this.state.showDeleteDialog}
 			          onRequestClose={this.closeDeleteDialog}
+                actionsContainerStyle={styles.actionsContainer}
+                bodyStyle={styles.deleteDialog}
 			        >
         			Are you sure you want to delete this Wave?
         			</Dialog>
         			<Dialog
 			          actions={editWave}
 			          modal={false}
-			          title='Edit Wave'
+			          title='EDIT WAVE'
 			          open={this.state.openDialog}
 			          onRequestClose={this.closeDeleteDialog}
+                titleStyle={styles.dialogTitle}
+                bodyStyle={styles.dialog}
+                actionsContainerStyle={styles.actionsContainer}
 			        >
-			    		<TextField
-						      floatingLabelText="Wave Name"
-						      value={this.state.wave.WaveNumber}
-						      fullWidth={true}
-						      disabled={true}
-						    /><br />
-						    <TextField
-						      hintText="Provide the base location"
-						      floatingLabelText="Location"
-						      value={this.state.wave.Location}
-						      onChange={this.handleLocationChange}
-						      fullWidth={true}
-						    />
-						    <DatePicker 
-						    	hintText="Start Date" 
+              <div>
+                <div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+	    		        <TextField
+  						      floatingLabelText="Wave Name"
+  						      value={this.state.wave.WaveNumber}
+  						      fullWidth={true}
+  						      disabled={true}
+                    underlineDisabledStyle={{display: 'none'}}
+				          />
+                </div>
+                <div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+  						    <TextField
+  						      hintText="Provide the base location"
+  						      floatingLabelText="Location"
+  						      value={this.state.wave.Location}
+  						      onChange={this.handleLocationChange}
+  						      fullWidth={true}
+  						    />
+                </div>
+              </div>
+              <div>
+                <div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						    <DatePicker
+						    	hintText='Start Date'
+                  floatingLabelText='Start Date'
 						    	value={new Date(startdate)}
 						    	onChange={this.handleStartDateChange}
 						    />
-						    <DatePicker 
-						    	hintText="End Date" 
+                </div>
+                <div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						    <DatePicker
+						    	hintText='End Date'
+                  floatingLabelText='End Date'
 						    	value={new Date(enddate)}
 						    	onChange={this.handleEndDateChange}
 						    />
+                </div>
+              </div>
+              <div style={{border: '2px solid white', width: '100%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 						    <SelectField
 					        multiple={true}
-					        hintText="Select courses"
+					        hintText="Select Courses"
+                  floatingLabelText='Courses'
 					        value={this.state.selectedCourse}
 					        onChange={this.handleCoursesChange}
+                  menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
+                  listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
 					      >
 					        {
 					        	this.state.courses.map(function(course, i) {
@@ -348,14 +407,16 @@ export default class WaveCard extends React.Component {
 									        insetChildren={true}
 									        checked={
 									        	th.state.selectedCourse && th.state.selectedCourse.includes(course.CourseName)
-									       	} 
+									       	}
 									        value={course.CourseName}
 									        primaryText={course.CourseName}
+
 									      />
 					        		)
 					        	})
 					        }
 					      </SelectField>
+              </div>
 			        </Dialog>
         </div>
 		)

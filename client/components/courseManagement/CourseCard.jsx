@@ -18,6 +18,22 @@ const styles = {
 	},
 	col: {
 		marginBottom: 20
+	},
+  deleteDialog: {
+    backgroundColor: '#DDDBF1',
+    border: '10px solid teal'
+  },
+	actionsContainer: {
+		backgroundColor: 'teal',
+		borderTop: '0px',
+		marginTop: '0px'
+	},
+	actionButton: {
+		backgroundColor: '#DDDBF1',
+		width: '50%',
+		color: 'teal',
+		border: '1px solid teal',
+		height: '100%'
 	}
 }
 
@@ -36,7 +52,7 @@ export default class CourseCard extends React.Component {
 			this.handleEditCourse = this.handleEditCourse.bind(this);
 			this.handleUpdateCourse = this.handleUpdateCourse.bind(this);
 			this.handleClose = this.handleClose.bind(this);
-			this.handleDeleteCourse = this.handleDeleteCourse.bind(this);		
+			this.handleDeleteCourse = this.handleDeleteCourse.bind(this);
 			this.openDeleteDialog = this.openDeleteDialog.bind(this);
 			this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 			this.handleAddCategory = this.handleAddCategory.bind(this);
@@ -111,25 +127,25 @@ export default class CourseCard extends React.Component {
 			return Moment(date).fromNow();
 			// return Humanize.naturalDay(newdate,'H:i:s dS M, Y')
 		}
-		else 
-			return '-' 
+		else
+			return '-'
 	}
 
 	render() {
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
-        primary={true}
         onTouchTap={this.closeDeleteDialog}
+				style={styles.actionButton}
       />,
       <FlatButton
         label="Delete"
-        primary={true}
         onTouchTap={this.closeDeleteDialog}
         onClick={this.handleDeleteCourse}
-      />,
-    ];
-    let th = this;
+				style={styles.actionButton}
+      />
+    ]
+    let th = this
     let history = this.props.course.History.split('\n');
     history = history[history.length-2].split(' on ');
     if(history[1].includes(':'))
@@ -156,7 +172,7 @@ export default class CourseCard extends React.Component {
 			    			return (<CourseSubCard category={category} key={key} deleteCategory={th.handleDeleteCategory} courseID={th.props.course.CourseID}/>)
 			    		})
 			    	}
-			    	
+
 			    </CardText>
 			    <h4 style={{display:this.state.hide,marginLeft:'20px'}}>{history[0]}</h4><br/>
 					<h5 style={{display:this.state.hide,marginLeft:'20px',color:'grey'}}>{th.formatDate(history[1])}</h5><br/>
@@ -179,6 +195,8 @@ export default class CourseCard extends React.Component {
 						}
 				</Card>
 				<Dialog
+					bodyStyle={styles.deleteDialog}
+					actionsContainerStyle={styles.actionsContainer}
           actions={deleteDialogActions}
           modal={false}
           open={this.state.showDeleteDialog}
