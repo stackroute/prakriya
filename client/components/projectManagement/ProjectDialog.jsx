@@ -74,7 +74,7 @@ export default class ProjectDialog extends React.Component {
 			waves: [],
 			projectName: '',
 			projectDesc: '',
-			candidatesName:[],
+			candidates:[],
 			wave: '',
 			searchPerm: '',
 			openSnackBar: false,
@@ -86,7 +86,10 @@ export default class ProjectDialog extends React.Component {
 			projectNameErrorText: '',
 			projectDescErrorText: '',
 			waveErrorText: '',
-			skillsErrorText: ''
+			skillsErrorText: '',
+			candidatesName: [] ,
+			candidateIDList: [] ,
+			candidateDelList: []
 		}
 		this.getWaveIDs = this.getWaveIDs.bind(this)
 		this.handleOpen = this.handleOpen.bind(this);
@@ -110,10 +113,17 @@ export default class ProjectDialog extends React.Component {
 			this.getWaveIDs()
 		}
 		if(this.props.dialogTitle == 'EDIT PRODUCT') {
+			let candidateList = [];
+			let candidateIDList = [];
+			this.props.project.members.map(function(member) {
+				candidateList.push(member.EmployeeName)
+				candidateIDList.push(member.EmployeeID)
+			})
 			this.setState({
 				projectName: this.props.project.name,
 				projectDesc: this.props.project.description,
-				candidateList:this.props.project.members,
+				candidateList:candidateList,
+				candidateIDList:candidateIDList,
 				wave: this.props.project.wave,
 				skills: this.props.project.skills,
 				showDialog: this.props.openDialog
@@ -146,6 +156,7 @@ export default class ProjectDialog extends React.Component {
 
 	getCandidates(waveID) {
 			let th = this
+			let candidateList = []
 			let candidateName = []
 			let candidateID = []
 			Request
@@ -153,9 +164,12 @@ export default class ProjectDialog extends React.Component {
 				.set({'Authorization': localStorage.getItem('token')})
 				.end(function(err, res){
 				res.body.data.map(function(candidate,index) {
+					candidateList.push(candidate)
 					candidateName.push(candidate.EmployeeName)
+					candidateID.push(candidate.EmployeeID)
 				})
 				th.setState({
+					candidates: candidateList,
 					candidatesName: candidateName
 				})
 			})
@@ -163,11 +177,19 @@ export default class ProjectDialog extends React.Component {
 
 
 	handleControlDelete(perm) {
+		let index = this.state.candidateList.indexOf(perm);
+		let candidatesID = this.state.candidateIDList.filter(function(id,key){
+			return index!=key
+		})
 		let candidatesLists = this.state.candidateList.filter(function(control) {
 			return perm != control
 		})
+		let candidateDelPerm = this.state.candidateDelList;
+		candidateDelPerm.push(this.state.candidateIDList[index]);
 		this.setState({
-			candidateList: candidatesLists
+			candidateList: candidatesLists,
+			candidateIDList: candidatesID,
+			candidateDelList: candidateDelPerm
 		})
 	}
 
@@ -183,10 +205,18 @@ export default class ProjectDialog extends React.Component {
 		if(this.state.candidatesName.indexOf(this.state.searchPerm)> -1
 			 && this.state.candidateList.indexOf(this.state.searchPerm) === -1) {
 				perms = this.state.candidateList;
+				let index = this.state.candidatesName.indexOf(this.state.searchPerm);
+				let candidateID = this.state.candidateIDList;
+				candidateID.push(this.state.candidates[index].EmployeeID);
 				perms.push(this.state.searchPerm);
+				let candidateDelList = this.state.candidateDelList.filter(function(control) {
+					return th.state.candidates[index].EmployeeID != control
+				})
 				this.setState({
 					candidateList: perms,
-					searchPerm: ''
+					searchPerm: '',
+					candidateIDList: candidateID,
+					candidateDelList: candidateDelList
 				})
 		} else {
 			if(this.state.candidateList.indexOf(this.state.searchPerm) >= 0) {
@@ -261,15 +291,19 @@ export default class ProjectDialog extends React.Component {
 
 	handleAdd() {
 			let project = {}
+			let th = this
+			project.members = []
+			this.state.candidateList.map(function(name, index){
+				project.members.push({EmployeeID:th.state.candidateIDList[index],EmployeeName:name})
+			})
 			project.name = this.state.projectName;
 			project.description = this.state.projectDesc;
 			project.wave = this.state.wave;
-			project.members = this.state.candidateList;
 			project.skills = this.state.skills;
 			this.setState({
 				projectName: '',
 				projectDesc: '',
-				candidatesName:[],
+				candidates:[],
 				wave: '',
 				skills: []
 			})
@@ -309,19 +343,27 @@ export default class ProjectDialog extends React.Component {
 
 	handleUpdate() {
 		let project = {}
+		let th = this
+		project.members = []
+			this.state.candidateList.map(function(name, index){
+				project.members.push({EmployeeName:name,EmployeeID:th.state.candidateIDList[index]})
+			})
 		project.name = this.state.projectName;
 		project.description = this.state.projectDesc;
 		project.wave = this.state.wave;
-		project.members = this.state.candidateList;
 		project.skills = this.state.skills;
 		this.setState({
 			projectName: '',
 			projectDesc: '',
-			candidatesName:[],
+			candidates:[],
 			wave: '',
 			skills: []
 		})
-		this.props.handleUpdate(project);
+		let projObj = {
+			project: project,
+			delList: this.state.candidateDelList
+		}
+		this.props.handleUpdate(projObj);
 		this.props.handleClose();
 	}
 

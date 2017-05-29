@@ -112,12 +112,13 @@ export default class Projects extends React.Component {
 			})
 	}
 
-	handleUpdate(project) {
+	handleUpdate(projObj) {
+		console.log(projObj.delList);
 		let th = this;
 		Request
 			.post('/dashboard/updateproject')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send(project)
+			.send(projObj)
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);

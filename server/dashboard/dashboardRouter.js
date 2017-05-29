@@ -218,6 +218,7 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
     })
   }
   catch(err) {
+    console.log(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -227,10 +228,10 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
 //update a project
 router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
-    let projectObj = req.body;
+    let projectObj = req.body.project;
     projectObj.addedBy = req.user.name;
     projectObj.updatedBy = true;
-    dashboardMongoController.updateProject(projectObj, function(project) {
+    dashboardMongoController.updateProject(projectObj, req.body.delList, function(project) {
       res.status(201).json(project);
     }, function (err) {
       res.status(500).json({ error: 'Cannot update the project...!' });
@@ -411,7 +412,7 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   })
 })
 
-router.get('/getimage', auth.canAccess(CONFIG.ADMCAN), function(req, res) {
+router.get('/getimage', auth.canAccess(CONFIG.ALL), function(req, res) {
   try {
     logger.debug('Req in getImage', req.query.eid);
     fs.readFile('public/profilePics/' + req.query.eid + '.jpeg', 'binary', (err, data) => {
@@ -650,6 +651,23 @@ router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req,
     });
   }
 })
+
+// Get all cadets of a particular project
+router.post('/cadetsofproj', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try{
+    dashboardMongoController.getCadetsOfProj(req.body.name, function(cadets) {
+      res.status(201).json(cadets);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all waves from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 
 //delete a wave
 router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {

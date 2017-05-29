@@ -5,7 +5,7 @@ var projects = new Schema({
     name: {type: String, unique: true},
     description: String,
     wave: String,
-    members: [String],
+    members: [{EmployeeID:Number,EmployeeName:String}],
     skills: [String],
     addedBy: String,
     addedOn: {type: Date, default: Date.now() },

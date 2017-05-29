@@ -159,16 +159,40 @@ let addProject = function (projectObj, successCB, errorCB) {
 	saveProject.save(function (err, result) {
 		if(err)
 			errorCB(err);
-		successCB(result)
+		else
+		{
+			projectObj.members.map(function(member) {
+				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.name,ProjectDescription: projectObj.description,ProjectSkills: projectObj.skills}},function(err,result){
+					if(err)
+						errorCB(err)
+					console.log(result);
+				})
+			},
+					successCB(result))
+		}
 	})
 }
 
-let updateProject = function (projectObj, successCB, errorCB) {
+let updateProject = function (projectObj,delList, successCB, errorCB) {
+	console.log(delList)
 	ProjectModel.update({name:projectObj.name},projectObj,function (err, result) {
 		if(err)
 			errorCB(err);
-		successCB(result)
-	})
+		else
+		{
+			projectObj.members.map(function(member) {
+				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.name,ProjectDescription: projectObj.description,ProjectSkills: projectObj.skills}},function(err,result){
+					if(err)
+						errorCB(err)
+					console.log(result);
+				})
+			},
+				CandidateModel.update({EmployeeID:{$in:delList}},{$set:{ProjectName: '',ProjectDescription: '',ProjectSkills: []}},function(err,result){
+					successCB(result)
+				})
+			)
+		}
+	});
 }
 
 let deleteProject = function (projectObj, successCB, errorCB) {
@@ -177,6 +201,14 @@ let deleteProject = function (projectObj, successCB, errorCB) {
 			errorCB(err);
 		successCB(result)
 	})
+}
+
+let getCadetsOfProj = function(name, successCB, errorCB) {
+	CandidateModel.find({ProjectName:name},function(err, result) {
+		if (err)
+				errorCB(err);
+		successCB(result);
+	});
 }
 
 let getCadet = function(email, successCB, errorCB) {
@@ -261,7 +293,7 @@ let saveEvaluation = function(evaluationObj, successCB, errorCB) {
 //get all candidates of specific wave
 let getWaveSpecificCandidates = function(waveID,successCB, errorCB) {
 	console.log("insidemongo controller"+waveID)
-	CandidateModel.find({Wave: waveID},['EmployeeID','EmployeeName'], function(err, result) {
+	CandidateModel.find({Wave: waveID}, function(err, result) {
 		if(err) {
 			console.log("error")
 			errorCB(err);
@@ -425,5 +457,6 @@ module.exports = {
 	getCadetsOfWave,
 	deleteWave,
 	getActiveWaves,
-	updateWave
+	updateWave,
+	getCadetsOfProj
 }

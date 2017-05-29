@@ -162,6 +162,7 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
     });
   }
   catch(err) {
+    console.log(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });

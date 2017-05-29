@@ -9,6 +9,8 @@ import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import ProjectDialog from './ProjectDialog.jsx';
 import FlatButton from 'material-ui/FlatButton';
+import Cadets from './Cadets.jsx';
+import {Grid, Row, Col} from 'react-flexbox-grid';
 
 const styles = {
     text: {
@@ -31,7 +33,15 @@ const styles = {
   		backgroundColor: 'teal',
   		color: '#DDDBF1',
   		textAlign: 'center'
-  	}
+  	},
+		col: {
+			marginBottom: 20,
+			marginRight: -20,
+			width:150
+		},
+		grid: {
+			width: '100%'
+		}
 };
 
 export default class ProjectCard extends React.Component {
@@ -40,7 +50,9 @@ export default class ProjectCard extends React.Component {
 		this.state = {
 			dialog: false,
 			openDialog: false,
-			showDeleteDialog: false
+			dialogOpen: false,
+			showDeleteDialog: false,
+			cadets: []
 		}
 		this.formatDate = this.formatDate.bind(this);
 		this.handleClose = this.handleClose.bind(this);
@@ -49,8 +61,30 @@ export default class ProjectCard extends React.Component {
 		this.handleUpdateProject = this.handleUpdateProject.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
+		this.getCadets = this.getCadets.bind(this);
 		this.handleDeleteProject = this.handleDeleteProject.bind(this);
 	}
+
+	getCadets(name) {
+		let th = this;
+		Request
+			.post('/dashboard/cadetsofproj')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({name:name})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Successfully fetched all cadets', res.body)
+		    	th.setState({
+		    		cadets: res.body,
+		    		dialog: false,
+		    		dialogOpen: true
+		    	})
+		    }
+			})
+	}
+
 
 	formatDate(date) {
 		return Moment(date).fromNow();
@@ -58,7 +92,7 @@ export default class ProjectCard extends React.Component {
 
 	handleClose() {
 		this.setState({
-			dialog: false,
+			dialogOpen: false,
 			openDialog: false
 		})
 	}
@@ -117,6 +151,7 @@ export default class ProjectCard extends React.Component {
       />,
     ];
     let bgColor = this.props.bgColor;
+    let th = this
 		return (
 			<div>
 				<Card
@@ -150,22 +185,29 @@ export default class ProjectCard extends React.Component {
 				      <DeleteIcon/>
 				    </IconButton>
 				  	</Card>
-				 <Dialog
-		    	bodyStyle={styles.dialog}
-          title='TEAM MEMBERS'
-          titleStyle={styles.dialogTitle}
-          open={this.state.dialog}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleClose}
-        >
-        {
-          this.props.project.members.length > 0 ?
-        	this.props.project.members.map(function(member){
-        		return <h5>{member}</h5>
-        	}) :
-          <div><br/>Team list has not been updated yet. Sorry for the inconvenience caused.</div>
-        }
-        </Dialog>
+				 {
+				 		this.state.dialog && 
+				 		th.getCadets(this.props.project.name)}
+				 		<Dialog
+                bodyStyle={styles.dialog}
+			          title='TEAM MEMBERS'
+			          titleStyle={styles.dialogTitle}
+			          open={this.state.dialogOpen}
+			          autoScrollBodyContent={true}
+			          onRequestClose={this.handleClose}
+        		>
+		        <Grid style={styles.grid}><Row>
+			       {
+		          this.state.cadets.length > 0 ?
+		            this.state.cadets.map(function(cadet, index){
+		                return <Col xs={3} key={index} style={styles.col}><Cadets cadet={cadet}/></Col>
+		            }) :
+		          <div><br/>Team list has not been updated yet. Sorry for the inconvenience caused.</div>
+		        }
+		        </Row>
+			      </Grid>
+		        </Dialog>
+          
         {
 							this.state.openDialog &&
 							<ProjectDialog project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PRODUCT'}/>

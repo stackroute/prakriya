@@ -48,7 +48,6 @@ export default class Candidates extends React.Component {
 		this.handleBack = this.handleBack.bind(this);
 		this.deleteCandidate = this.deleteCandidate.bind(this);
 		this.updateCandidate = this.updateCandidate.bind(this);
-		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.addCandidate = this.addCandidate.bind(this);
 		this.handleFilterName = this.handleFilterName.bind(this);
 		this.handleFilterWave = this.handleFilterWave.bind(this);
