@@ -41,6 +41,22 @@ const styles = {
 		},
 		grid: {
 			width: '100%'
+		},
+		deleteDialog: {
+	    backgroundColor: '#DDDBF1',
+	    border: '10px solid teal'
+	  },
+		actionsContainer: {
+			backgroundColor: 'teal',
+			borderTop: '0px',
+			marginTop: '0px'
+		},
+		actionButton: {
+			backgroundColor: '#DDDBF1',
+			width: '50%',
+			color: 'teal',
+			border: '1px solid teal',
+			height: '100%'
 		}
 };
 
@@ -141,15 +157,15 @@ export default class ProjectCard extends React.Component {
 		const deleteDialogActions = [
       <FlatButton
         label='Cancel'
-        primary={true}
+        style={styles.actionButton}
         onTouchTap={this.closeDeleteDialog}
       />,
       <FlatButton
         label='Delete'
-        primary={true}
+        style={styles.actionButton}
         onClick={this.handleDeleteProject}
-      />,
-    ];
+      />
+    ]
     let bgColor = this.props.bgColor;
     let th = this
 		return (
@@ -213,8 +229,10 @@ export default class ProjectCard extends React.Component {
 							<ProjectDialog project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PRODUCT'}/>
 				}
 				<Dialog
+					bodyStyle={styles.deleteDialog}
           actions={deleteDialogActions}
           modal={false}
+          actionsContainerStyle={styles.actionsContainer}
           open={this.state.showDeleteDialog}
           onRequestClose={this.closeDeleteDialog}
         >
