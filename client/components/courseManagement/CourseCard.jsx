@@ -4,7 +4,7 @@ import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
 import Moment from 'moment';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
-import AddIcon from 'material-ui/svg-icons/content/add';
+import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import HistoryIcon from 'material-ui/svg-icons/action/history';
 import CourseSubCard from './CourseSubCard.jsx';
@@ -168,7 +168,7 @@ export default class CourseCard extends React.Component {
       			showExpandableButton={true}/>
 			    <CardText expandable={true}>
 			    	{
-			    		this.props.course.Categories.map(function(category,key) {
+			    		this.props.course.Categories.map(function(category, key) {
 			    			return (<CourseSubCard category={category} key={key} deleteCategory={th.handleDeleteCategory} courseID={th.props.course.CourseID}/>)
 			    		})
 			    	}
