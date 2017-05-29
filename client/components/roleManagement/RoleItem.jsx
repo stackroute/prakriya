@@ -54,7 +54,29 @@ const styles = {
   },
   cardText: {
   	paddingTop: 0
-  }
+  },
+	dialog: {
+		backgroundColor: '#DDDBF1',
+		border: '10px solid teal'
+	},
+	dialogTitle: {
+		fontWeight: 'bold',
+		backgroundColor: 'teal',
+		color: '#DDDBF1',
+		textAlign: 'center'
+	},
+	actionsContainer: {
+		backgroundColor: 'teal',
+		borderTop: '0px',
+		marginTop: '0px'
+	},
+	actionButton: {
+		backgroundColor: '#DDDBF1',
+		width: '50%',
+		color: 'teal',
+		border: '1px solid teal',
+		height: '100%'
+	}
 }
 
 export default class RoleItem extends React.Component {
@@ -182,15 +204,15 @@ export default class RoleItem extends React.Component {
 		let role = this.props.roleperm.name.charAt(0).toUpperCase() + this.props.roleperm.name.slice(1)
 		const deleteDialogActions = [
       <FlatButton
-        label="Cancel"
-        primary={true}
+        label='Cancel'
         onTouchTap={this.closeDeleteDialog}
+				style={styles.actionButton}
       />,
       <FlatButton
-        label="Delete"
-        primary={true}
+        label='Delete'
         onTouchTap={this.closeDeleteDialog}
         onClick={this.handleDeleteRole}
+				style={styles.actionButton}
       />,
     ];
 		return (
@@ -252,6 +274,8 @@ export default class RoleItem extends React.Component {
           onRequestClose={this.handleSnackBarClose}
         />
 			  <Dialog
+					bodyStyle={styles.dialog}
+					actionsContainerStyle={styles.actionsContainer}
           actions={deleteDialogActions}
           modal={false}
           open={this.state.showDeleteDialog}

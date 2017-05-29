@@ -8,9 +8,11 @@ const styles = {
 		textAlign: 'center'
 	}
 }
+
 const masonryOptions = {
     transitionDuration: 0
-};
+}
+
 const backgroundColors = [
 	'#F5DEBF',
 	'#DDDBF1',
@@ -24,6 +26,7 @@ const backgroundIcons = [
 	'#4e5f46',
 	'#535f5b'
 	]
+
 export default class Waves extends React.Component {
 
 	constructor(props) {
@@ -108,18 +111,18 @@ export default class Waves extends React.Component {
 				<div>
 					<h2 style={styles.heading}>Wave Management</h2>
 					<Masonry
-          className={'my-class'} 
-          elementType={'ul'} 
+          className={'my-class'}
+          elementType={'ul'}
           options={masonryOptions}
           style={{margin: 'auto'}}
         	>
           	{
 							this.state.waves.map(function (wave, key) {
 								return (
-									<WaveCard 
-										key={key} 
-										wave={wave} 
-										handleUpdate={th.handleUpdate} 
+									<WaveCard
+										key={key}
+										wave={wave}
+										handleUpdate={th.handleUpdate}
 										handleDelete={th.handleDelete}
 										bgColor={backgroundColors[key%4]}
 										bgIcon={backgroundIcons[key%4]}

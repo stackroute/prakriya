@@ -5,21 +5,45 @@ import IconButton from 'material-ui/IconButton';
 import Moment from 'moment';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
-import AddIcon from 'material-ui/svg-icons/content/add';
-import RemoveIcon from 'material-ui/svg-icons/content/remove';
+import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
+import RemoveIcon from 'material-ui/svg-icons/content/remove-circle-outline';
 
 const styles = {
-    dialog: {
-      textAlign: 'center'
-    },
-    link: {
+  dialog: {
+    backgroundColor: '#DDDBF1',
+    borderBottom: '10px solid teal',
+    borderRight: '10px solid teal',
+    borderLeft: '10px solid teal'
+  },
+  deleteDialog: {
+    backgroundColor: '#DDDBF1',
+    border: '10px solid teal'
+  },
+  dialogTitle: {
+    fontWeight: 'bold',
+    backgroundColor: 'teal',
+    color: '#DDDBF1',
+    textAlign: 'center'
+  },
+  actionsContainer: {
+    backgroundColor: 'teal',
+    borderTop: '0px',
+    marginTop: '0px'
+  },
+  actionButton: {
+    backgroundColor: '#DDDBF1',
+    width: '50%',
+    color: 'teal',
+    border: '1px solid teal',
+    height: '100%'
+  },
+  link: {
       wordWrap: 'break-word'
-    }
-};
+  }
+}
 
 export default class CourseCard extends React.Component {
 	constructor(props) {
@@ -61,6 +85,7 @@ export default class CourseCard extends React.Component {
 		this.pushDoc = this.pushDoc.bind(this);
 
 	}
+
 	componentDidMount() {
 		if(this.props.openDialog) {
 			this.setState({
@@ -68,15 +93,16 @@ export default class CourseCard extends React.Component {
 				})
 		}
 	}
-	
+
 	handleOpen() {
     this.setState({open: true});
-  };
+  }
 
   handleClose() {
     this.setState({open: false});
     this.props.handleClose();
-  };
+  }
+
   resetFields() {
 		this.setState({name: '',
 			username: '',
@@ -84,7 +110,7 @@ export default class CourseCard extends React.Component {
 			password: '',
 			cpassword: '',
 			role: ''
-		});
+		})
 	}
 
 	handleSubmit() {
@@ -266,7 +292,7 @@ export default class CourseCard extends React.Component {
       AssessmentVideos: a
     })
 	}
-	
+
 	onChangeRemoveBlog(id) {
 		let value = this.state.AssessmentBlogs[id];
 		let th = this;
@@ -277,7 +303,7 @@ export default class CourseCard extends React.Component {
       AssessmentBlogs: a
     })
 	}
-		
+
 	onChangeRemoveDoc(id) {
 		let value = this.state.AssessmentDocs[id];
 		let th = this;
@@ -288,151 +314,190 @@ export default class CourseCard extends React.Component {
       AssessmentDocs: a
     })
 	}
-			
+
 	render() {
 		let text = '';
 		let th = this;
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
-        primary={true}
         onTouchTap={this.closeDeleteDialog}
+        style={styles.actionButton}
       />,
       <FlatButton
         label="Delete"
-        primary={true}
         onTouchTap={this.closeDeleteDialog}
         onClick={this.handleDeleteCategory}
-      />,
-    ];
+        style={styles.actionButton}
+      />
+    ]
 		const style = {
 			fontFamily: 'sans-serif',
 			margin: 'auto',
 			width: '500px'
 		}
-		let dialogTitle
-		if(this.props.openDialog) {
-			dialogTitle = "Add Category"
-		}
-		else {
-			dialogTitle = "Edit Category"
-		}
-		let submitButton
-		if(this.props.openDialog) {
-			submitButton = <RaisedButton
-						    	 		label="Add Category"
-						    	   	primary={true}
-						    			onClick={this.handleSubmit}
-						    	 	/>
-		}
-		if(this.props.openDialog)
-		{
+    if(this.props.openDialog) {
+      let title = "ADD CATEGORY"
+  		let actions = [
+        <FlatButton
+          label="Cancel"
+          style={styles.actionButton}
+          onTouchTap={this.handleClose}
+        />,
+        <FlatButton
+          label="Add Category"
+          onClick={this.handleSubmit}
+          style={styles.actionButton}
+        />
+      ]
 			return(
-				<Dialog style={styles.dialog}
-          title={dialogTitle}
+				<Dialog
+          bodyStyle={styles.dialog}
+          title={title}
+          titleStyle={styles.dialogTitle}
           modal={false}
           open={this.state.open}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
+          actionsContainerStyle={styles.actionsContainer}
+          actions={actions}
         >
-        	<TextField
-						    		hintText="Category Name"
-						    		floatingLabelText="Category Name"
-						    		value={this.state.AssessmentName}
-						    		onChange={this.onChangeAssessmentName}
-					/>
-					<br/>
-		    	<TextField
-		    		hintText="Mentor Name"
-		    		floatingLabelText="Mentor"
-		    		value={this.state.AssessmentMentor}
-		    		onChange={this.onChangeAssessmentMentor}
-		    	/>
-					<br/>
-		    	<TextField
-						    		hintText="Duration"
-						    		floatingLabelText="Duration"
-						    		value={this.state.AssessmentDuration}
-						    		onChange={this.onChangeAssessmentDuration}
-					/>
-					<br/>
-					{th.state.AssessmentVideos.map(function(video,index){
-						text = "Videos #"+(index + 1);
-						return (
-						<div>
-						<TextField
-						    		hintText="videos"
-						    		floatingLabelText= {text}
-						    		value={video}
-						    		onChange={(event) => th.onChangeAssessmentVideos(
-						    				event, 
-						    				video
-						    			)}
-						/>
-						<IconButton tooltip="Remove video" onClick={th.onChangeRemoveVideo.bind(th,index)}>
-			      <RemoveIcon/>
-			    </IconButton>
-						</div>)				  	
-					})}
-					<IconButton tooltip="Add video" onClick={this.onChangeAddVideo} disabled={this.state.disableSave}>
-			      <AddIcon/>
-			    </IconButton>
-
-					<br/>
-					{th.state.AssessmentBlogs.map(function(blog,index){
-						text = "Blogs #"+(index + 1);
-						return (
-						<div>
-						<TextField
-						    		hintText="blogs"
-						    		floatingLabelText= {text}
-						    		value={blog}
-						    		onChange={(event) => th.onChangeAssessmentBlogs(
-						    				event, 
-						    				blog
-						    			)}
-						/>
-						<IconButton tooltip="Remove blog" onClick={th.onChangeRemoveBlog.bind(th,index)}>
-			      <RemoveIcon/>
-			    </IconButton>
-						</div>)				  	
-					})}
-					<IconButton tooltip="Add blog" onClick={this.onChangeAddBlog} disabled={this.state.disableSave}>
-			      <AddIcon/>
-			    </IconButton>
-					<br/>
-					{th.state.AssessmentDocs.map(function(doc,index){
-						text = "Document #"+(index + 1);
-						return (
-						<div>
-						<TextField
-						    		hintText="document"
-						    		floatingLabelText= {text}
-						    		value={doc}
-						    		onChange={(event) => th.onChangeAssessmentDocs(
-						    				event, 
-						    				doc
-						    			)}
-						/>
-						<IconButton tooltip="Add assessment" onClick={th.onChangeRemoveDoc.bind(th,index)}>
-			      <RemoveIcon/>
-			    </IconButton>
-						</div>)				  	
-					})}
-					<IconButton tooltip="Add assessment" onClick={this.onChangeAddDoc} disabled={this.state.disableSave}>
-			      <AddIcon/>
-			    </IconButton>
-					<br/>
-				    			<div>
-				    				{submitButton}
-				    				&emsp;
-					    			<RaisedButton
-						    	 		label="Cancel"
-						    	   	primary={true}
-						    			onTouchTap={this.handleClose}
-						    	 	/>
-				    			</div>
-
+          <div>
+            <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+            	<TextField
+    						    		hintText="Category Name"
+    						    		floatingLabelText="Category Name"
+    						    		value={this.state.AssessmentName}
+    						    		onChange={this.onChangeAssessmentName}
+    					/>
+					  </div>
+            <div style={{border: '2px solid white', width: '34%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+              <TextField
+    						    		hintText="Duration"
+    						    		floatingLabelText="Duration"
+    						    		value={this.state.AssessmentDuration}
+    						    		onChange={this.onChangeAssessmentDuration}
+    					/>
+            </div>
+            <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+              <TextField
+    		    		hintText="Mentor Name"
+    		    		floatingLabelText="Mentor"
+    		    		value={this.state.AssessmentMentor}
+    		    		onChange={this.onChangeAssessmentMentor}
+    		    	/>
+            </div>
+          </div>
+          <div>
+            <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+              <div style={{backgroundColor: '#49AAAA', textAlign: 'center'}}>
+                  <span>Videos</span>
+                  <IconButton
+                    tooltip="Add Video"
+                    onClick={this.onChangeAddVideo}
+                    disabled={this.state.disableSave}
+                    >
+                    <AddIcon/>
+                  </IconButton>
+              </div>
+              <div>
+              {
+                th.state.AssessmentVideos.map(function(video,index){
+                  text = "Video #"+(index + 1);
+                  return (
+                    <div style={{backgroundColor: '#DDDBF1', border: '2px solid #49AAAA', textAlign: 'center'}}>
+                      <TextField
+                        hintText="videos"
+                        floatingLabelText= {text}
+                        value={video}
+                        onChange={(event) => th.onChangeAssessmentVideos(event, video)}
+                        style={{display: 'inline-block', width: '80%'}}
+                        />
+                     <IconButton
+                        tooltip="Remove Video"
+                        onClick={th.onChangeRemoveVideo.bind(th,index)}
+                        style={{display: 'inline-block', width: '20%'}}>
+                        <RemoveIcon/>
+                     </IconButton>
+                   </div>
+                  )}
+                )
+              }
+              </div>
+            </div>
+            <div style={{border: '2px solid white', width: '34%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+              <div style={{backgroundColor: '#49AAAA', textAlign: 'center'}}>
+                <span>Blogs</span>
+                <IconButton
+                  tooltip="Add Blog"
+                  onClick={this.onChangeAddBlog}
+                  disabled={this.state.disableSave}
+                  >
+      			      <AddIcon/>
+      			    </IconButton>
+              </div>
+              <div>
+                {
+                  th.state.AssessmentBlogs.map(function(blog,index){
+                    text = "Blogs #"+(index + 1);
+                    return (
+                      <div style={{backgroundColor: '#DDDBF1', border: '2px solid #49AAAA', textAlign: 'center'}}>
+                        <TextField
+                          hintText="blogs"
+                          floatingLabelText= {text}
+                          value={blog}
+                          onChange={(event) => th.onChangeAssessmentBlogs(event, blog)}
+                          style={{display: 'inline-block', width: '80%'}}
+                          />
+                        <IconButton
+                          tooltip="Remove blog"
+                          onClick={th.onChangeRemoveBlog.bind(th,index)}
+                          style={{display: 'inline-block', width: '20%'}}>
+                          <RemoveIcon/>
+                        </IconButton>
+                     </div>
+                   )
+                 })
+               }
+              </div>
+            </div>
+            <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+              <div  style={{backgroundColor: '#49AAAA', textAlign: 'center'}}>
+                <span>Documents</span>
+                <IconButton
+                  tooltip="Add Assessment"
+                  onClick={this.onChangeAddDoc}
+                  disabled={this.state.disableSave}
+                  >
+      			      <AddIcon/>
+      			    </IconButton>
+              </div>
+              <div>
+                {
+                  th.state.AssessmentDocs.map(function(doc,index){
+                    text = "Document #"+(index + 1);
+                    return (
+                      <div style={{backgroundColor: '#DDDBF1', border: '2px solid #49AAAA', textAlign: 'center'}}>
+                        <TextField
+                          hintText="document"
+                          floatingLabelText= {text}
+                          value={doc}
+                          onChange={(event) => th.onChangeAssessmentDocs(event, doc)}
+                          style={{display: 'inline-block', width: '80%'}}
+                          />
+                        <IconButton
+                          tooltip="Add Assessment"
+                          onClick={th.onChangeRemoveDoc.bind(th,index)}
+                          style={{display: 'inline-block', width: '20%'}}>
+                          <RemoveIcon/>
+                        </IconButton>
+                      </div>
+                    )
+                  })
+                }
+              </div>
+            </div>
+          </div>
         </Dialog>
         )
 		}
@@ -494,11 +559,13 @@ export default class CourseCard extends React.Component {
 					    {
 					    	this.props.category.Mentor.map(function(mentors,index) {
 					    	return (<p>{mentors}</p>)
-					    })	
+					    })
 					    	}
 			    </CardText>
 				</Card>
 				<Dialog
+          bodyStyle={styles.deleteDialog}
+          actionsContainerStyle={styles.actionsContainer}
           actions={deleteDialogActions}
           modal={false}
           open={this.state.showDeleteDialog}

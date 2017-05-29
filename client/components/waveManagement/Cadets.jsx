@@ -6,6 +6,7 @@ const styles = {
 	profilePic: {
 		height: 100,
 		width: 100,
+		border: '5px solid teal',
 		borderRadius: 75
 	}
 }

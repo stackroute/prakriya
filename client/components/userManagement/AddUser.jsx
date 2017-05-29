@@ -26,9 +26,30 @@ const styles = {
       right: '15px',
       zIndex: 1
     },
-    dialog: {
-      textAlign: 'center'
-    }
+  	dialog: {
+  		backgroundColor: '#DDDBF1',
+  		borderLeft: '10px solid teal',
+      borderRight: '10px solid teal',
+      borderBottom: '3px solid teal'
+  	},
+  	dialogTitle: {
+  		fontWeight: 'bold',
+  		backgroundColor: 'teal',
+  		color: '#DDDBF1',
+  		textAlign: 'center'
+  	},
+  	actionsContainer: {
+  		backgroundColor: 'teal',
+  		borderTop: '0px',
+  		marginTop: '0px'
+  	},
+  	actionButton: {
+  		backgroundColor: '#DDDBF1',
+  		width: '50%',
+  		color: 'teal',
+  		border: '1px solid teal',
+  		height: '100%'
+  	}
 };
 
 export default class AddUser extends React.Component {
@@ -144,15 +165,15 @@ export default class AddUser extends React.Component {
 		}
 		let dialogTitle
 		if(this.props.openDialog) {
-			dialogTitle = "Edit user"
+			dialogTitle = 'EDIT USER'
 		}
 		else {
-			dialogTitle = "Add new user"
+			dialogTitle = 'ADD A NEW USER'
 		}
 		let submitButton
 		if(this.props.openDialog) {
 			submitButton = <RaisedButton
-						    	 		label="Update User"
+						    	 		label='Update User'
 						    	   	primary={true}
 						    			onClick={this.handleUpdate}
 						    			onTouchTap={this.handleClose}
@@ -168,57 +189,66 @@ export default class AddUser extends React.Component {
 		}
 		return(
 			<div>
-
 					<FloatingActionButton style={styles.addButton} mini={true} onTouchTap={this.handleOpen} >
 			      <ContentAdd />
 			    </FloatingActionButton>
-
-
-		    <Dialog style={styles.dialog}
+		    <Dialog
+          bodyStyle={styles.dialog}
           title={dialogTitle}
+          titleStyle={styles.dialogTitle}
           modal={false}
           open={this.state.open}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
         >
-
-      						<TextField
-						    		hintText="Display name"
-						    		floatingLabelText="Name"
-						    		value={this.state.name}
-						    		onChange={this.onChangeName}
-						    	/><br/>
-						    	<TextField
-						    		hintText="Should not be your name"
-						    		floatingLabelText="Username"
-						    		value={this.state.username}
-						    		onChange={this.onChangeUsername}
-						    		disabled={this.props.openDialog}
-						    	/><br/>
+          <div>
+						<TextField
+			    		hintText='Display name'
+			    		floatingLabelText='Name'
+			    		value={this.state.name}
+			    		onChange={this.onChangeName}
+              style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
+			    	/>
+			    	<TextField
+			    		hintText='Should not be your name'
+			    		floatingLabelText='Username'
+			    		value={this.state.username}
+			    		onChange={this.onChangeUsername}
+			    		disabled={this.props.openDialog}
+              style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
+			    	/>
+          </div>
+          <div>
+            <TextField
+              floatingLabelText="Password"
+              hintText="Secure your account"
+              type="password"
+              value={this.state.password}
+              onChange={this.onChangePassword}
+              style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
+            />
+            <TextField
+              floatingLabelText="Confirm Password"
+              hintText="Confirm password"
+              type="password"
+              value={this.state.cpassword}
+              onChange={this.onChangeConfirmPassword}
+              style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
+            />
+          </div>
+          <div>
 						    	<TextField
 						    		hintText="This will be unique"
 						    		floatingLabelText="Email"
 						    		value={this.state.email}
 						    		onChange={this.onChangeEmail}
-						    	/><br/>
-						    	<TextField
-						    		floatingLabelText="Password"
-						    		hintText="Secure your account"
-						    		type="password"
-						    		value={this.state.password}
-						    		onChange={this.onChangePassword}
-						    	/><br/>
-						    	<TextField
-						    		floatingLabelText="Confirm Password"
-						    		hintText="Confirm password"
-						    		type="password"
-						    		value={this.state.cpassword}
-						    		onChange={this.onChangeConfirmPassword}
-						    	/><br/>
+                    style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', top: '-22px'}}
+						    	/>
 						    	<SelectField
 						        onChange={this.onChangeRole}
 						        floatingLabelText="Select Role"
 						        value={this.state.role}
+                    style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
 						      >
 						        {
 						        	this.state.roles.map(function(val, key) {
@@ -226,8 +256,7 @@ export default class AddUser extends React.Component {
 						        	})
 						        }
 						      </SelectField><br/><br/><br/>
-
-
+            </div>
 				    			<div>
 				    				{submitButton}
 				    				&emsp;
@@ -237,8 +266,6 @@ export default class AddUser extends React.Component {
 						    			onTouchTap={this.handleClose}
 						    	 	/>
 				    			</div>
-
-
         </Dialog>
 			</div>
 		)
