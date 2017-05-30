@@ -186,11 +186,13 @@ let updateProject = function (projectObj,delList, successCB, errorCB) {
 						errorCB(err)
 					console.log(result);
 				})
-			},
-				CandidateModel.update({EmployeeID:{$in:delList}},{$set:{ProjectName: '',ProjectDescription: '',ProjectSkills: []}},function(err,result){
+			})
+			CandidateModel.updateMany({EmployeeID:{$in:delList}},{$set:{ProjectName: '',ProjectDescription: '',ProjectSkills: []}},function(err,result){
+					if(err)
+						errorCB(err)
+					console.log(result)
 					successCB(result)
 				})
-			)
 		}
 	});
 }
@@ -306,7 +308,7 @@ let getWaveSpecificCandidates = function(waveID,successCB, errorCB) {
 //update absentees
 let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
 	console.log("absentees"+AbsenteesID.absentees);
-	CandidateModel.update({EmployeeID:{$in:AbsenteesID.absentees}},{$push:{'Attendance.DaysAbsent':AbsenteesID.date}}, function(err, result) {
+	CandidateModel.updateMany({EmployeeID:{$in:AbsenteesID.absentees}},{$push:{'Attendance.DaysAbsent':AbsenteesID.date}}, function(err, result) {
 		if(err) {
 			console.log("error"+err)
 			errorCB(err);
@@ -407,7 +409,7 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 			errorCB(err);
 		else
 		{
-			CandidateModel.update({EmployeeID:{$in:waveObj.Cadets}},{$set:{Wave:undefined}},function (err, result) {
+			CandidateModel.updateMany({EmployeeID:{$in:waveObj.Cadets}},{$set:{Wave:undefined}},function (err, result) {
 				if(err)
 					errorCB(err);
 				successCB(result);
