@@ -173,8 +173,8 @@ let addProject = function (projectObj, successCB, errorCB) {
 	})
 }
 
-let updateProject = function (projectObj,delList, successCB, errorCB) {
-	console.log(delList)
+let updateProject = function (projectObj,delList, prevWave, successCB, errorCB) {
+	console.log(prevWave)
 	ProjectModel.update({name:projectObj.name},projectObj,function (err, result) {
 		if(err)
 			errorCB(err);
@@ -186,13 +186,18 @@ let updateProject = function (projectObj,delList, successCB, errorCB) {
 						errorCB(err)
 					console.log(result);
 				})
-			})
+			},
 			CandidateModel.updateMany({EmployeeID:{$in:delList}},{$set:{ProjectName: '',ProjectDescription: '',ProjectSkills: []}},function(err,result){
 					if(err)
 						errorCB(err)
 					console.log(result)
+				},CandidateModel.updateMany({$and:[{ProjectName:projectObj.name},{Wave:prevWave}]},{$set:{ProjectName: '',ProjectDescription: '',ProjectSkills: []}},function(err,result){
+					if(err)
+						errorCB(err)
 					successCB(result)
 				})
+				)
+			)
 		}
 	});
 }
@@ -201,7 +206,15 @@ let deleteProject = function (projectObj, successCB, errorCB) {
 	ProjectModel.remove({name:projectObj.name},function (err, result) {
 		if(err)
 			errorCB(err);
-		successCB(result)
+		else
+		{
+			CandidateModel.updateMany({ProjectName:projectObj.name},{$set:{ProjectName: '',ProjectDescription: '',ProjectSkills: []}},function(err,result){
+					if(err)
+						errorCB(err)
+					console.log(result)
+					successCB(result)
+				})
+		}
 	})
 }
 

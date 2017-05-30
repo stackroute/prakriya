@@ -231,7 +231,7 @@ router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
     let projectObj = req.body.project;
     projectObj.addedBy = req.user.name;
     projectObj.updatedBy = true;
-    dashboardMongoController.updateProject(projectObj, req.body.delList, function(project) {
+    dashboardMongoController.updateProject(projectObj, req.body.delList, req.body.prevWave, function(project) {
       res.status(201).json(project);
     }, function (err) {
       res.status(500).json({ error: 'Cannot update the project...!' });

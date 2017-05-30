@@ -89,7 +89,8 @@ export default class ProjectDialog extends React.Component {
 			skillsErrorText: '',
 			candidatesName: [] ,
 			candidateIDList: [] ,
-			candidateDelList: []
+			candidateDelList: [],
+			prevWave: ''
 		}
 		this.getWaveIDs = this.getWaveIDs.bind(this)
 		this.handleOpen = this.handleOpen.bind(this);
@@ -125,6 +126,7 @@ export default class ProjectDialog extends React.Component {
 				candidateList:candidateList,
 				candidateIDList:candidateIDList,
 				wave: this.props.project.wave,
+				prevWave: this.props.project.wave,
 				skills: this.props.project.skills,
 				showDialog: this.props.openDialog
 			})
@@ -149,7 +151,8 @@ export default class ProjectDialog extends React.Component {
 		th.setState({
 			wave: e.target.outerText,
 			waveErrorText: '',
-			candidateList: []
+			candidateList: [],
+			candidateIDList: []
 		})
 		th.getCandidates(e.target.outerText)
 	}
@@ -342,12 +345,18 @@ export default class ProjectDialog extends React.Component {
 	}
 
 	handleUpdate() {
+		let prevWave = '';
+		if(this.state.prevWave !== this.state.wave)
+		{
+			prevWave = this.state.prevWave
+		}
 		let project = {}
 		let th = this
 		project.members = []
 			this.state.candidateList.map(function(name, index){
 				project.members.push({EmployeeName:name,EmployeeID:th.state.candidateIDList[index]})
 			})
+		console.log(project.members);
 		project.name = this.state.projectName;
 		project.description = this.state.projectDesc;
 		project.wave = this.state.wave;
@@ -361,7 +370,8 @@ export default class ProjectDialog extends React.Component {
 		})
 		let projObj = {
 			project: project,
-			delList: this.state.candidateDelList
+			delList: this.state.candidateDelList,
+			prevWave: prevWave
 		}
 		this.props.handleUpdate(projObj);
 		this.props.handleClose();
