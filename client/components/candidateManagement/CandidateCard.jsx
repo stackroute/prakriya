@@ -20,6 +20,28 @@ const styles = {
 	},
 	cardTitle: {
 		paddingBottom: 0
+	},
+	dialog: {
+		backgroundColor: '#DDDBF1',
+		border: '10px solid teal'
+	},
+	dialogTitle: {
+		fontWeight: 'bold',
+		backgroundColor: 'teal',
+		color: '#DDDBF1',
+		textAlign: 'center'
+	},
+	actionsContainer: {
+		backgroundColor: 'teal',
+		borderTop: '0px',
+		marginTop: '0px'
+	},
+	actionButton: {
+		backgroundColor: '#DDDBF1',
+		width: '50%',
+		color: 'teal',
+		border: '1px solid teal',
+		height: '100%'
 	}
 }
 
@@ -82,20 +104,19 @@ export default class CandidateCard extends React.Component {
 	}
 
 	render() {
-	console.log('here');
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
-        primary={true}
+        style={styles.actionButton}
         onTouchTap={this.closeDeleteDialog}
       />,
       <FlatButton
         label="Delete"
-        primary={true}
+        style={styles.actionButton}
         onTouchTap={this.closeDeleteDialog}
         onClick={this.handleDelete}
-      />,
-    ];
+      />
+    ]
 		return(
 			<div>
 				<Card>
@@ -124,6 +145,8 @@ export default class CandidateCard extends React.Component {
 			  </Card>
 			  <Dialog
           actions={deleteDialogActions}
+					actionsContainerStyle={styles.actionsContainer}
+					bodyStyle={styles.dialog}
           open={this.state.showDeleteDialog}
           onRequestClose={this.closeDeleteDialog}
         >
