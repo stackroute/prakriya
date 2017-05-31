@@ -399,7 +399,7 @@ export default class WaveCard extends React.Component {
                   menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
                   listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
                   selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
-                  maxHeight='600'
+                  maxHeight={600}
                   style={{width: '100%'}}
 					      >
 					        {
