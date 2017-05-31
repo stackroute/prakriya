@@ -264,7 +264,18 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
 				user.email = cadetObj.EmailID;
 				user.username = cadetObj.EmailID.split('@')[0];
 				adminMongoController.deleteUser(user, function (status) {
-		      successCB(status)
+		      WaveModel.update({Cadets:cadetObj.EmployeeID},{$pull:{Cadets:cadetObj.EmployeeID}},function (err, result) {
+		      	if(err)
+		      		errorCB(err)
+		      	else {
+		      		ProjectModel.update({members:{$elemMatch:{"EmployeeID" : cadetObj.EmployeeID}}},{$pull:{members:{"EmployeeID" : cadetObj.EmployeeID}}},function (err, result) {
+		      			if(err)
+				      		errorCB(err)
+					      	successCB(result)
+					      })
+
+		      	}
+		      })
 		    }, function (err) {
 		      errorCB(err);
 		    })

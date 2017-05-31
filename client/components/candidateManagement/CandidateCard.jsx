@@ -82,7 +82,6 @@ export default class CandidateCard extends React.Component {
 	}
 
 	render() {
-	console.log('here');
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"

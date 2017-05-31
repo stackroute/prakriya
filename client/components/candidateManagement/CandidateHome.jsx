@@ -54,7 +54,8 @@ export default class CandidateHome extends React.Component {
 		super(props);
 		this.state = {
 			imageURL: '../../assets/images/avt-default.jpg',
-			wave: null,
+			startDate: '',
+			endDate: '',
 			showDeleteDialog: false,
 			showEditDialog: false
 		}
@@ -69,9 +70,9 @@ export default class CandidateHome extends React.Component {
 		this.closeEditDialog = this.closeEditDialog.bind(this);
 		this.formatDate = this.formatDate.bind(this);
 	}
-	componentDidMount() {
-		this.getProfilePic(this.props.candidate.EmployeeID)
+	componentWillMount() {
 		this.getWave(this.props.candidate.Wave)
+		this.getProfilePic(this.props.candidate.EmployeeID)
 	}
 	getProfilePic(eid) {
 		let th = this;
@@ -106,9 +107,12 @@ export default class CandidateHome extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+		    	console.log(res.body);
 		    	th.setState({
-		    		wave: res.body
+		    		startDate: res.body.StartDate,
+		    		endDate: res.body.EndDate
 		    	})
+		    	console.log('done')
 		    }
 		  })
 	}
@@ -234,13 +238,12 @@ export default class CandidateHome extends React.Component {
 											</p>
 											</div>
 										}
-
 										<h4>Training Details</h4>
 										<p style={styles.details}>
 											Training Track: {this.props.candidate.TrainingTrack}<br/>
-											Wave: {this.state.cadet.Wave}<br/>
-											Start Date: {this.formatDate(this.state.wave.StartDate)}<br/>
-											End Date: {this.formatDate(this.state.wave.EndDate)}
+											Wave: {this.props.candidate.Wave}<br/>
+											Start Date: {this.formatDate(this.state.startDate)}<br/>
+											End Date: {this.formatDate(this.state.endDate)}
 										</p>
 
 										{
