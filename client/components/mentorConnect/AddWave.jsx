@@ -14,6 +14,30 @@ const styles = {
 	  bottom: 40,
 	  right: 20,
 	},
+	dialog: {
+		backgroundColor: '#DDDBF1',
+		borderBottom: '3px solid teal',
+		borderRight: '10px solid teal',
+		borderLeft: '10px solid teal'
+	},
+	dialogTitle: {
+		fontWeight: 'bold',
+		backgroundColor: 'teal',
+		color: '#DDDBF1',
+		textAlign: 'center'
+	},
+	actionsContainer: {
+		backgroundColor: 'teal',
+		borderTop: '0px',
+		marginTop: '0px'
+	},
+	actionButton: {
+		backgroundColor: '#DDDBF1',
+		width: '50%',
+		color: 'teal',
+		border: '1px solid teal',
+		height: '100%'
+	}
 }
 
 export default class AddWave extends React.Component {
@@ -106,41 +130,68 @@ export default class AddWave extends React.Component {
 		const dialogActions = [
       <FlatButton
         label="Cancel"
-        primary={true}
+        style={styles.actionButton}
         onTouchTap={this.handleClose}
       />,
       <FlatButton
         label="Add"
-        primary={true}
-        keyboardFocused={true}
+				style={styles.actionButton}
         onTouchTap={this.handleClose}
         onClick={this.handleSubmit}
-      />,
+      />
     ];
 		return(
 			<div>
 				<Dialog
-          title="Add a new Wave"
+					bodyStyle={styles.dialog}
+          title="ADD A NEW WAVE"
+					titleStyle={styles.dialogTitle}
           actions={dialogActions}
+					actionsContainerStyle={styles.actionsContainer}
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
+				<div>
+					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
         	<TextField
 			      hintText="It should be unique"
 			      floatingLabelText="Wave Id"
 			      value={this.state.WaveID}
 			      onChange={this.handleWaveIdChange}
 			      fullWidth={true}
-			    /><br />
+			    />
+					</div>
+					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    <TextField
 			      hintText="Provide some name to the wave"
 			      floatingLabelText="Wave Name"
 			      value={this.state.WaveNumber}
 			      onChange={this.handleWaveNumberChange}
 			      fullWidth={true}
-			    /><br />
+			    />
+					</div>
+				</div>
+				<div>
+					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+			    <DatePicker
+			    	hintText="Start Date"
+						floatingLabelText='Start Date'
+			    	value={this.state.StartDate}
+			    	onChange={this.handleStartDateChange}
+			    />
+					</div>
+					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+			    <DatePicker
+			    	hintText="End Date"
+						floatingLabelText='End Date'
+			    	value={this.state.EndDate}
+			    	onChange={this.handleEndDateChange}
+			    />
+					</div>
+				</div>
+					<div style={{border: '2px solid white', width: '100%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    <TextField
 			      hintText="Provide the base location"
 			      floatingLabelText="Location"
@@ -148,21 +199,19 @@ export default class AddWave extends React.Component {
 			      onChange={this.handleLocationChange}
 			      fullWidth={true}
 			    />
-			    <DatePicker
-			    	hintText="Start Date"
-			    	value={this.state.StartDate}
-			    	onChange={this.handleStartDateChange}
-			    />
-			    <DatePicker
-			    	hintText="End Date"
-			    	value={this.state.EndDate}
-			    	onChange={this.handleEndDateChange}
-			    />
+					</div>
+					<div style={{border: '2px solid white', width: '100%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    <SelectField
 		        multiple={true}
-		        hintText="Select cadets"
+		        hintText="Select Cadets"
+						floatingLabelText='Cadets'
 		        value={this.state.selectedCadets}
 		        onChange={this.handleCadetsChange}
+						menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
+						listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
+						style={{width: '100%'}}
+						selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
+						maxHeight='600'
 		      >
 		        {
 		        	this.state.cadets.map(function(cadet, i) {
@@ -178,12 +227,13 @@ export default class AddWave extends React.Component {
 						        	th.state.selectedCadets.includes(cadet.EmployeeID)
 						       	}
 						        value={cadet.EmployeeID}
-						        primaryText={cadet.EmployeeID + '-' + cadet.EmployeeName}
+						        primaryText={`${cadet.EmployeeName} (${cadet.EmployeeID})`}
 						      />
 		        		)
 		        	})
 		        }
 		      </SelectField>
+				</div>
         </Dialog>
 				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
 		      <ContentAdd />

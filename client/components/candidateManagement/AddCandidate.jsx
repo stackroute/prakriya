@@ -9,7 +9,6 @@ import Paper from 'material-ui/Paper';
 import Chip from 'material-ui/Chip';
 import FlatButton from 'material-ui/FlatButton';
 import SaveIcon from 'material-ui/svg-icons/content/save';
-import RaisedButton from 'material-ui/RaisedButton';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
 
@@ -21,7 +20,28 @@ const styles = {
 	  zIndex: 1
 	},
 	dialog: {
-	  textAlign: 'center'
+		backgroundColor: '#DDDBF1',
+		borderBottom: '3px solid teal',
+		borderRight: '10px solid teal',
+		borderLeft: '10px solid teal'
+	},
+	dialogTitle: {
+		fontWeight: 'bold',
+		backgroundColor: 'teal',
+		color: '#DDDBF1',
+		textAlign: 'center'
+	},
+	actionsContainer: {
+		backgroundColor: 'teal',
+		borderTop: '0px',
+		marginTop: '0px'
+	},
+	actionButton: {
+		backgroundColor: '#DDDBF1',
+		width: '50%',
+		color: 'teal',
+		border: '1px solid teal',
+		height: '100%'
 	}
 }
 
@@ -229,89 +249,138 @@ export default class AddCourse extends React.Component {
 	}
 
 	render() {
-		let th = this;
-					return(
+		let th = this
+		let actions = [
+			<FlatButton
+				label="CANCEL"
+				style={styles.actionButton}
+				onClick={this.handleClose}
+				/>,
+			<FlatButton
+				label="Add Candidate"
+				style={styles.actionButton}
+				onClick={this.handleAdd}
+				/>
+		]
+			return(
 				<div>
 				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
 					<Dialog
-			    	style={styles.dialog}
-	          title="Add Candidate"
+			    	bodyStyle={styles.dialog}
+	          title="ADD CANDIDATE"
 	          open={this.state.showDialog}
 	          autoScrollBodyContent={true}
+						actionsContainerStyle={styles.actionsContainer}
+						titleStyle={styles.dialogTitle}
+						actions={actions}
 	          onRequestClose={this.handleClose}
 	        >
+					<div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 	        	<TextField
 			    		hintText="ID"
 			    		floatingLabelText="Employee ID"
 			    		value={this.state.empID}
 			    		onChange={this.onChangeID}
 			    		type="number"
-			    	/><br/>
+			    	/>
+						</div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Name"
 			    		floatingLabelText="Name"
 			    		value={this.state.empName}
 			    		onChange={this.onChangeName}
-			    	/><br/>
+			    	/>
+						</div>
+					</div>
+					<div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Email"
 			    		floatingLabelText="Email"
 			    		value={this.state.email}
 			    		onChange={this.onChangeEmail}
-			    	/><br/>
+			    	/>
+						</div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Contact"
 			    		floatingLabelText="Contact"
 			    		value={this.state.contact}
 			    		onChange={this.onChangeContact}
 			    		type="number"
-			    	/><br/>
+			    	/>
+						</div>
+					</div>
+					<div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Band"
 			    		floatingLabelText="Career Band"
 			    		value={this.state.careerBand}
 			    		onChange={this.onChangeCareerBand}
-			    	/><br/>
+			    	/>
+						</div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="BU"
 			    		floatingLabelText="Revised BU"
 			    		value={this.state.revisedBU}
 			    		onChange={this.onChangeRevisedBU}
-			    	/><br/>
+			    	/>
+						</div>
+					</div>
+					<div>
+						<div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Digithon"
 			    		floatingLabelText="Digithon Qualified"
 			    		value={this.state.digithonQualified}
 			    		onChange={this.onChangeDigithonQualified}
-			    	/><br/>
+			    	/>
+						</div>
+						<div style={{border: '2px solid white', width: '34%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Phase"
 			    		floatingLabelText="Digithon Phase"
 			    		value={this.state.digithonPhase}
 			    		onChange={this.onChangeDigiThonPhase}
 			    		type="number"
-			    	/><br/>
+			    	/>
+						</div>
+						<div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Score"
 			    		floatingLabelText="Digithon Score"
 			    		value={this.state.digithonScore}
 			    		onChange={this.onChangeDigiThonScore}
 			    		type="number"
-			    	/><br/>
+			    	/>
+						</div>
+					</div>
+					<div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Status"
 			    		floatingLabelText="Training Status"
 			    		value={this.state.trainingStatus}
 			    		onChange={this.onChangeTrainingStatus}
-			    	/><br/>
+			    	/>
+						</div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Trainings Undergone"
 			    		floatingLabelText="Trainings Undergone"
 			    		value={this.state.trainingsUndergone}
 			    		onChange={this.onChangeTrainingsUndergone}
-			    	/><br/>
+			    	/>
+						</div>
+					</div>
+					<div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Experience"
 			    		floatingLabelText="Year"
@@ -320,6 +389,8 @@ export default class AddCourse extends React.Component {
 			    		type="number"
 			    		style = {{width:'50px'}}
 			    	/>Year(s)
+						</div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Experience"
 			    		floatingLabelText="Month"
@@ -328,39 +399,46 @@ export default class AddCourse extends React.Component {
 			    		type="number"
 			    		style = {{width:'50px'}}
 			    	/>Month(s)
-			    	<br/>
+						</div>
+					</div>
+					<div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Primary Supervisor"
 			    		floatingLabelText="Primary Supervisor"
 			    		value={this.state.primarySupervisor}
 			    		onChange={this.onChangePrimarySupervisor}
-			    	/><br/>
+			    	/>
+						</div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="Project Supervisor"
 			    		floatingLabelText="Project Supervisor"
 			    		value={this.state.projectSupervisor}
 			    		onChange={this.onChangeProjectSupervisor}
-			    	/><br/>
+			    	/>
+						</div>
+					</div>
+					<div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="College"
 			    		floatingLabelText="College"
 			    		value={this.state.college}
 			    		onChange={this.onChangeCollege}
-			    	/><br/>
+			    	/>
+						</div>
+						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
 			    	<TextField
 			    		hintText="CGPA"
 			    		floatingLabelText="CGPA"
 			    		value={this.state.CGPA}
 			    		onChange={this.onChangeCGPA}
-			    	/><br/>
-			    	<RaisedButton
-							    	 		label="Add Candidate"
-							    	   	primary={true}
-							    			onClick={this.handleAdd}
-							    	 	/>
-						</Dialog>
+			    	/>
+						</div>
 					</div>
-
-					)
+					</Dialog>
+					</div>
+				)
 	}
 }

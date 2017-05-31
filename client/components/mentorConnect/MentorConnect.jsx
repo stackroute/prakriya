@@ -13,7 +13,6 @@ const styles = {
 		textAlign: 'center'
 	},
 	rowHeaders: {
-		// textAlign: 'center',
 		height: 40,
 		fontWeight: 'bold',
 		color: '#eee',
@@ -76,6 +75,7 @@ export default class MentorConnect extends React.Component {
 		    	th.setState({
 		    		cadets: cadets
 		    	})
+		    	console.log('Cadets after adding the wave', th.state.cadets)
 		    }
 		  })
 	}
@@ -150,10 +150,6 @@ export default class MentorConnect extends React.Component {
 		})
 		return(
 			<div>
-				{
-					//<div style={{height: 200, width: 200, background: 'url(../../assets/images/drawer_top.jpg) -30px -50px'}}>
-					//</div>
-				}
 				<h1 style={styles.heading}>Mentor Connect</h1>
 				<FileDrop handleBulkUpdateRemarks={this.updateBulkRemarks}/>
 				<Grid>
@@ -161,8 +157,7 @@ export default class MentorConnect extends React.Component {
 						<Col md={4} mdOffset={4}>
 							<AutoComplete
 			          hintText="Search Candidate"
-				  filter={AutoComplete.fuzzyFilter}
-						
+				  			filter={AutoComplete.fuzzyFilter}
 			          style={styles.heading}
 			          dataSource={cadetsName}
 			          onNewRequest={this.handleFilter}
@@ -193,18 +188,16 @@ export default class MentorConnect extends React.Component {
 					</Row>
 					{
 						this.state.cadets.map(function (cadet, i) {
-							if(cadet.Wave == undefined) {
-								if(th.state.filterCadet != '') {
-									return (
-										cadet.EmployeeName.startsWith(th.state.filterCadet) &&
-										<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
-									)
-								}
-								else 
-									return (
-										<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
-									)
+							if(th.state.filterCadet != '') {
+								return (
+									cadet.EmployeeName.startsWith(th.state.filterCadet) &&
+									<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
+								)
 							}
+							else 
+								return (
+									<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
+								)
 						})
 					}
 				</Grid>
