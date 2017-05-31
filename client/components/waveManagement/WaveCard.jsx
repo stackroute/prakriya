@@ -350,11 +350,11 @@ export default class WaveCard extends React.Component {
 				    <IconButton  tooltip="Course">
 				      <CourseIcon/>
 				    </IconButton><span style={{position: 'absolute',top: '62%'}}>
-			    	{this.props.wave.CourseNames.map(function(course,index) {
+			    	{this.props.wave.CourseNames.map(function(course, index) {
 			    		if(course != '')
 			    			if(index != 0)
 			    				course = ', ' + course
-			    			return <span>{course}</span>
+			    			return <span key={index}>{course}</span>
 			    	})
 			    	}</span><br/>
 			    	<IconButton tooltip="Members" onClick={this.handleOpen}>
@@ -501,7 +501,7 @@ export default class WaveCard extends React.Component {
                   menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
                   listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
                   selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
-                  maxHeight='600'
+                  maxHeight={600}
                   style={{width: '100%'}}
 					      >
 					        {
