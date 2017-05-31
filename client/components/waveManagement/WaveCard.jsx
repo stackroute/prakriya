@@ -292,11 +292,11 @@ export default class WaveCard extends React.Component {
 				    <IconButton  tooltip="Course">
 				      <CourseIcon/>
 				    </IconButton><span style={{position: 'absolute',top: '62%'}}>
-			    	{this.props.wave.CourseNames.map(function(course,index) {
+			    	{this.props.wave.CourseNames.map(function(course, index) {
 			    		if(course != '')
 			    			if(index != 0)
 			    				course = ', ' + course
-			    			return <span>{course}</span>
+			    			return <span key={index}>{course}</span>
 			    	})
 			    	}</span><br/>
 			    	<IconButton tooltip="Members" onClick={this.handleOpen}>

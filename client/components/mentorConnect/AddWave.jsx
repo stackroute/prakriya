@@ -47,82 +47,158 @@ export default class AddWave extends React.Component {
 			open: false,
 			cadets: [],
 			WaveID: '',
+			WaveIDErrorText: '',
 			WaveNumber: '',
+			WaveNumberErrorText: '',
 			Location: '',
+			LocationText: '',
 			StartDate: null,
+			StartDateErrorText: '',
 			EndDate: null,
-			selectedCadets: []
+			EndDateErrorText: '',
+			selectedCadets: [],
+			CadetsErrorText: ''
 		}
-		this.handleOpen = this.handleOpen.bind(this);
-		this.handleClose = this.handleClose.bind(this);
-		this.handleWaveIdChange = this.handleWaveIdChange.bind(this);
-		this.handleWaveNumberChange = this.handleWaveNumberChange.bind(this);
-		this.handleLocationChange = this.handleLocationChange.bind(this);
-		this.handleStartDateChange = this.handleStartDateChange.bind(this);
-		this.handleEndDateChange = this.handleEndDateChange.bind(this);
-		this.handleCadetsChange = this.handleCadetsChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleOpen = this.handleOpen.bind(this)
+		this.handleClose = this.handleClose.bind(this)
+		this.handleWaveIdChange = this.handleWaveIdChange.bind(this)
+		this.handleWaveNumberChange = this.handleWaveNumberChange.bind(this)
+		this.handleLocationChange = this.handleLocationChange.bind(this)
+		this.handleStartDateChange = this.handleStartDateChange.bind(this)
+		this.handleEndDateChange = this.handleEndDateChange.bind(this)
+		this.handleCadetsChange = this.handleCadetsChange.bind(this)
+		this.handleSubmit = this.handleSubmit.bind(this)
+		this.validationSuccess = this.validationSuccess.bind(this)
+		this.resetFields = this.resetFields.bind(this)
 	}
+
 	componentDidMount() {
 		this.setState({
 			cadets: this.props.cadets
 		})
 	}
+
 	handleOpen() {
 		this.setState({
 			open: true
 		})
 	}
-	handleClose() {
-		this.setState({
-			open: false
-		})
+
+	handleClose(e, action) {
+		if(action == 'CLOSE') {
+			this.resetFields()
+		} else if(action == 'ADD'){
+			if(this.validationSuccess()) {
+				this.handleSubmit()
+			}
+		}
 	}
+
 	handleWaveIdChange(event) {
 		this.setState({
-			WaveID: event.target.value
+			WaveID: event.target.value,
+			WaveIDErrorText: ''
 		})
 	}
+
 	handleWaveNumberChange(event) {
 		this.setState({
-			WaveNumber: event.target.value
+			WaveNumber: event.target.value,
+			WaveNumberErrorText: ''
 		})
 	}
+
 	handleLocationChange(event) {
 		this.setState({
-			Location: event.target.value
+			Location: event.target.value,
+			LocationErrorText: ''
 		})
 	}
+
 	handleStartDateChange(event, date) {
 		let startDate = new Date(date);
 		let endDate = new Date(date.setDate(date.getDate() + 84));
 		this.setState({
 			StartDate: startDate,
-			EndDate: endDate
+			EndDate: endDate,
+			StartDateErrorText: ''
 		})
 	}
+
 	handleEndDateChange(event, date) {
 		this.setState({
-			EndDate: date
+			EndDate: date,
+			EndDateErrorText: ''
 		})
 	}
+
 	handleCadetsChange(event, key, val) {
 		this.setState({
-			selectedCadets: val
+			selectedCadets: val,
+			CadetsErrorText: ''
 		})
 	}
+
 	handleSubmit() {
 		let wave = {}
-		wave.WaveID = this.state.WaveID;
-		wave.WaveNumber = this.state.WaveNumber;
-		wave.Location = this.state.Location;
-		wave.StartDate = this.state.StartDate;
-		wave.EndDate = this.state.EndDate;
-		wave.Cadets = this.state.selectedCadets;
+		wave.WaveID = this.state.WaveID
+		wave.WaveNumber = this.state.WaveNumber
+		wave.Location = this.state.Location
+		wave.StartDate = this.state.StartDate
+		wave.EndDate = this.state.EndDate
+		wave.Cadets = this.state.selectedCadets
+		this.props.handleWaveAdd(wave)
+		this.resetFields()
+	}
+
+	resetFields() {
 		this.setState({
-			selectedCadets: []
+			open: false,
+			WaveID: '',
+			WaveIDErrorText: '',
+			WaveNumber: '',
+			WaveNumberErrorText: '',
+			Location: '',
+			LocationErrorText: '',
+			StartDate: null,
+			StartDateErrorText: '',
+			EndDate: null,
+			EndDateErrorText: '',
+			selectedCadets: [],
+			CadetsErrorText: ''
 		})
-		this.props.handleWaveAdd(wave);
+	}
+
+	validationSuccess() {
+		console.log('EndDate: ', this.state.EndDate)
+		if(this.state.WaveID.trim().length == 0) {
+			this.setState({
+				WaveIDErrorText: 'This field cannot be empty'
+			})
+		} else if(this.state.WaveNumber.trim().length == 0) {
+			this.setState({
+				WaveNumberErrorText: 'This field cannot be empty'
+			})
+		} else if(this.state.StartDate == null) {
+			this.setState({
+				StartDateErrorText: 'This field cannot be empty'
+			})
+		} else if(this.state.EndDate == null) {
+			this.setState({
+				EndDateErrorText: 'This field cannot be empty'
+			})
+		} else if(this.state.Location.trim().length == 0) {
+			this.setState({
+				LocationErrorText: 'This field cannot be empty'
+			})
+		} else if(this.state.selectedCadets.length == 0) {
+			this.setState({
+				CadetsErrorText: 'Select atleast one cadet'
+			})
+		} else {
+				return true
+		}
+		return false
 	}
 
 	render() {
@@ -131,13 +207,12 @@ export default class AddWave extends React.Component {
       <FlatButton
         label="Cancel"
         style={styles.actionButton}
-        onTouchTap={this.handleClose}
+        onTouchTap={(e) => this.handleClose(e, 'CLOSE')}
       />,
       <FlatButton
         label="Add"
 				style={styles.actionButton}
-        onTouchTap={this.handleClose}
-        onClick={this.handleSubmit}
+        onTouchTap={(e) => this.handleClose(e, 'ADD')}
       />
     ];
 		return(
@@ -150,17 +225,18 @@ export default class AddWave extends React.Component {
 					actionsContainerStyle={styles.actionsContainer}
           modal={false}
           open={this.state.open}
-          onRequestClose={this.handleClose}
+          onRequestClose={(e) => this.handleClose(e, 'CLOSE')}
           autoScrollBodyContent={true}
         >
 				<div>
 					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
         	<TextField
 			      hintText="It should be unique"
-			      floatingLabelText="Wave Id"
+			      floatingLabelText="Wave ID"
 			      value={this.state.WaveID}
 			      onChange={this.handleWaveIdChange}
 			      fullWidth={true}
+						errorText={this.state.WaveIDErrorText}
 			    />
 					</div>
 					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
@@ -170,6 +246,7 @@ export default class AddWave extends React.Component {
 			      value={this.state.WaveNumber}
 			      onChange={this.handleWaveNumberChange}
 			      fullWidth={true}
+						errorText={this.state.WaveNumberErrorText}
 			    />
 					</div>
 				</div>
@@ -178,6 +255,7 @@ export default class AddWave extends React.Component {
 			    <DatePicker
 			    	hintText="Start Date"
 						floatingLabelText='Start Date'
+						errorText={this.state.StartDateErrorText}
 			    	value={this.state.StartDate}
 			    	onChange={this.handleStartDateChange}
 			    />
@@ -186,6 +264,7 @@ export default class AddWave extends React.Component {
 			    <DatePicker
 			    	hintText="End Date"
 						floatingLabelText='End Date'
+						errorText={this.state.EndDateErrorText}
 			    	value={this.state.EndDate}
 			    	onChange={this.handleEndDateChange}
 			    />
@@ -198,6 +277,7 @@ export default class AddWave extends React.Component {
 			      value={this.state.Location}
 			      onChange={this.handleLocationChange}
 			      fullWidth={true}
+						errorText={this.state.LocationErrorText}
 			    />
 					</div>
 					<div style={{border: '2px solid white', width: '100%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
@@ -211,7 +291,8 @@ export default class AddWave extends React.Component {
 						listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
 						style={{width: '100%'}}
 						selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
-						maxHeight='600'
+						maxHeight={600}
+						errorText={this.state.CadetsErrorText}
 		      >
 		        {
 		        	this.state.cadets.map(function(cadet, i) {

@@ -7,7 +7,7 @@ import Snackbar from 'material-ui/Snackbar';
 import FileDrop from './FileDrop.jsx';
 import CadetItem from './CadetItem.jsx';
 import AddWave from './AddWave.jsx';
- 
+
 const styles = {
 	heading: {
 		textAlign: 'center'
@@ -75,7 +75,6 @@ export default class MentorConnect extends React.Component {
 		    	th.setState({
 		    		cadets: cadets
 		    	})
-		    	console.log('Cadets after adding the wave', th.state.cadets)
 		    }
 		  })
 	}
@@ -141,7 +140,7 @@ export default class MentorConnect extends React.Component {
 			open: false
 		})
 	}
-	
+
 	render() {
 		let th = this;
 		let cadetsName = [];
@@ -162,9 +161,9 @@ export default class MentorConnect extends React.Component {
 			          dataSource={cadetsName}
 			          onNewRequest={this.handleFilter}
 			        />
-			        <FlatButton 
-			        	label="Clear Filter" 
-			        	primary={true} 
+			        <FlatButton
+			        	label="Clear Filter"
+			        	primary={true}
 			        	onClick={this.handleClearFilter}
 			        />
 		        </Col>
@@ -194,7 +193,7 @@ export default class MentorConnect extends React.Component {
 									<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
 								)
 							}
-							else 
+							else
 								return (
 									<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
 								)
@@ -215,5 +214,5 @@ export default class MentorConnect extends React.Component {
         />
 			</div>
 		)
-	}	
+	}
 }
