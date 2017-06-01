@@ -50,10 +50,6 @@ export default class UserList extends React.Component {
 		this.disabledUser = this.disabledUser.bind(this);
 	}
 
-	componentDidMount() {
-		// this.disabledUser();
-	}
-
 	disabledUser = () => {
 		if(this.props.currUser.actions.indexOf('login') > -1)
 			return false

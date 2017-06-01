@@ -170,7 +170,7 @@ router.get('/wave', auth.canAccess(CONFIG.ALL), function(req, res) {
   }
 })
 
-router.get('/activewaves', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.get('/activewaves', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   try{
     dashboardMongoController.getActiveWaves(function(waves) {
       res.status(201).json(waves);

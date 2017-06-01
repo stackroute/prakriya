@@ -26,7 +26,7 @@ const style = {
   margin: 20,
   textAlign: 'center',
   display: 'inline-block',
-};
+}
 
 
 
@@ -45,8 +45,8 @@ export default class Users extends React.Component {
 	}
 
 	componentDidMount() {
-		this.getRoles();
-		this.getUsers();
+		this.getRoles()
+		this.getUsers()
 	}
 
 	getRoles() {
@@ -75,14 +75,12 @@ export default class Users extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 		    if(err)
-		    	console.log(err);
+		    	console.log(err)
 		    else
 		    	th.setState({
 		    		users: res.body
 		    	})
-		    	console.log("Users");
-		    	console.log(th.state.users);
-		  });
+		  })
 	}
 
 	addUser(user) {
@@ -102,7 +100,6 @@ export default class Users extends React.Component {
 
 	updateUser(user) {
 		let th = this
-		console.log(user)
 		Request
 			.post('/admin/updateuser')
 			.set({'Authorization': localStorage.getItem('token')})

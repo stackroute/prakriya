@@ -69,7 +69,7 @@ export default class AddRole extends React.Component {
   }
 
   handleClose(e, action) {
-		if(action == 'CANCEL') {
+		if(action == 'CLOSE') {
 				this.setState({
 					open: false,
 					role: '',
@@ -157,7 +157,7 @@ export default class AddRole extends React.Component {
 		const dialogActions = [
       <FlatButton
         label='Cancel'
-        onTouchTap={(e)=>{this.handleClose(e, 'CANCEL')}}
+        onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
 				style={styles.actionButton}
       />,
       <FlatButton
@@ -179,7 +179,7 @@ export default class AddRole extends React.Component {
           actions={dialogActions}
           modal={false}
           open={this.state.open}
-          onRequestClose={this.handleClose}
+          onRequestClose={(e)=>{this.handleClose(e, 'CLOSE')}}
           autoScrollBodyContent={true}
 					actionsContainerStyle={styles.actionsContainer}
         >
