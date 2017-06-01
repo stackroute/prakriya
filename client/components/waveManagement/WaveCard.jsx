@@ -83,7 +83,8 @@ export default class WaveCard extends React.Component {
 			addCadet: false,
 			newCadets: [],
 			selectedCadets: [],
-			disableSave: true
+			disableSave: true,
+			noCadets: false
 		}
 		this.handleOpen = this.handleOpen.bind(this);
 		this.handleClose = this.handleClose.bind(this);
@@ -143,9 +144,20 @@ export default class WaveCard extends React.Component {
 		    		if((cadet.Wave == undefined || cadet.Wave == '') && (cadet.Selected === 'Yes' || cadet.Selected === 'DS' ))
 		    			return cadet;
 		    	})
-		    	th.setState({
-		    		newCadets: cadets
-		    	})
+		    	if(cadets.length == 0)
+		    	{
+		    		th.setState({
+		    			noCadets: true,
+		    			newCadets: []
+		    		})
+		    	}
+		    	else
+		    	{
+		    		th.setState({
+		    			newCadets: cadets,
+		    			noCadets: false
+		    		})
+		    	}
 		    	console.log(th.state.newCadets);
 		    }
 			})
@@ -171,12 +183,11 @@ export default class WaveCard extends React.Component {
 	}
 
 	updateCadets(cadets) {
-		console.log('here')
 		let th = this;
 		Request
 			.post('/dashboard/updatecadetWave')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send({cadets:cadets,waveID:this.state.wave.WaveID})
+			.send({cadets:cadets,waveID:this.props.wave.WaveID})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
@@ -211,10 +222,19 @@ export default class WaveCard extends React.Component {
 	}
 
 	closeUpdateDialog() {
+		let cadet = [];
+		if(this.state.addCadet)
+		{
+			cadet = this.props.wave.Cadets
+		}
+		else
+		{
+			cadet = this.state.wave.Cadets
+		}
 		this.setState({
 			openDialog: false,
 			addCadet: false,
-			cadets: this.state.wave.Cadets
+			cadets: cadet
 		})
 	}
 
@@ -246,7 +266,9 @@ export default class WaveCard extends React.Component {
 
 	handleClose() {
 		this.setState({
-			dialog: false
+			dialog: false,
+			noCadets: false,
+			addCadet: false
 		})
 	}
 
@@ -416,7 +438,7 @@ export default class WaveCard extends React.Component {
 					      <AddIcon/>
 					    </IconButton>
 					    {
-					    	this.state.addCadet && <p><SelectField
+					    	this.state.addCadet && (!this.state.noCadets) && <p><SelectField
 		        		multiple={true}
 				        hintText="Select Cadets"
 								floatingLabelText='Cadets'
@@ -428,7 +450,7 @@ export default class WaveCard extends React.Component {
 								selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
 				      >
 				      {
-				        	this.state.newCadets.map(function(cadet, i) {
+				        	th.state.newCadets.map(function(cadet, i) {
 				        		return (
 				        			cadet.Selected != undefined &&
 				        			(cadet.Selected == 'Yes' ||
@@ -454,7 +476,10 @@ export default class WaveCard extends React.Component {
 						    	onClick={this.handleUpdateWave}
 						    />
 						    </p>
-							}
+						  	}
+						   { 
+						   	this.state.noCadets && <h3>No Cadets available</h3>
+								}
 			        </Dialog>
 			        <Dialog
 			          actions={deleteDialogActions}

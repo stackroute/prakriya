@@ -331,7 +331,6 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function(req, res) {
 
 // Delete a cadet
 router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
-  console.log('reached to server');
   try {
     dashboardMongoController.deleteCadet(req.body, function (status) {
       res.status(200).json(status)

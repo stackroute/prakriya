@@ -94,7 +94,6 @@ let addWave = function (waveObj, successCB, errorCB) {
 							errorCB(err);
 						else
 						{
-							console.log(user.EmployeeName);
 							userObj.name = user.EmployeeName;
 							userObj.email = user.EmailID;
 							userObj.username = user.EmailID.split('@')[0];
@@ -457,7 +456,6 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 }
 
 let updateWave = function (waveObj, successCB, errorCB) {
-	console.log(waveObj);
 	WaveModel.update({WaveID:waveObj.WaveID},waveObj,function (err, result) {
 		if(err)
 			errorCB(err);
