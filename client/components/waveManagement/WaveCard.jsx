@@ -152,16 +152,38 @@ export default class WaveCard extends React.Component {
 	}
 
 	handleUpdateWave() {
-		let wave = this.state.wave;
-		wave.CourseNames = this.state.selectedCourse;
-		this.props.handleUpdate(wave);
+		let wave = {};
 		if(this.state.addCadet)
-			this.updateCadet(this.state.selectedCadets);
+		{
+				wave = this.props.wave;
+				wave.Cadets = this.props.wave.Cadets.concat(this.state.selectedCadets);
+				this.updateCadets(this.state.selectedCadets);
+				this.handleClose();
+		}
+		if(this.state.openDialog)
+		{
+			wave = this.state.wave;
+			wave.CourseNames = this.state.selectedCourse;
+		}
+		console.log(wave);
+		this.props.handleUpdate(wave);
 		this.closeUpdateDialog();
 	}
 
-	updateCadets() {
-		
+	updateCadets(cadets) {
+		console.log('here')
+		let th = this;
+		Request
+			.post('/dashboard/updatecadetWave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({cadets:cadets,waveID:this.state.wave.WaveID})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Successfully updated')
+		    }
+			})
 	}
 
 	handleDeleteWave() {
@@ -176,13 +198,8 @@ export default class WaveCard extends React.Component {
 	}
 
 	handleCadetsChange(event, key, val) {
-		let wave = this.props.wave;
-		val.map(function(cadet){
-			wave.Cadets.push(cadet);	
-		})
 		this.setState({
 			selectedCadets: val,
-			wave: wave,
 			disableSave: false
 		})
 	}
@@ -284,6 +301,13 @@ export default class WaveCard extends React.Component {
 		end = end[2]+' '+end[1]+' '+end[3];
 		let date = start + ' - ' + end;
 		let th = this
+		let viewMembers = 1
+		let pointer = 'pointer'
+		if(this.props.wave.CourseNames.length === 0)
+		{
+			viewMembers = 0,
+			pointer = 'auto'
+		}
 
 		const deleteDialogActions = [
       <FlatButton
@@ -357,7 +381,7 @@ export default class WaveCard extends React.Component {
 			    			return <span key={index}>{course}</span>
 			    	})
 			    	}</span><br/>
-			    	<IconButton tooltip="Members" onClick={this.handleOpen}>
+			    	<IconButton tooltip="Members" onClick={this.handleOpen} style={{opacity:viewMembers, cursor:pointer}}>
 				      <GroupIcon/>
 				    </IconButton>
 				  	<IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{float:'right'}}>
@@ -402,7 +426,6 @@ export default class WaveCard extends React.Component {
 								listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
 								style={{width: '100%'}}
 								selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
-								maxHeight='600'
 				      >
 				      {
 				        	this.state.newCadets.map(function(cadet, i) {
