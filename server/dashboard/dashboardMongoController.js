@@ -94,7 +94,6 @@ let addWave = function (waveObj, successCB, errorCB) {
 							errorCB(err);
 						else
 						{
-							console.log(user.EmployeeName);
 							userObj.name = user.EmployeeName;
 							userObj.email = user.EmailID;
 							userObj.username = user.EmailID.split('@')[0];
@@ -433,22 +432,58 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 			errorCB(err);
 		else
 		{
-			CandidateModel.updateMany({EmployeeID:{$in:waveObj.Cadets}},{$set:{Wave:undefined}},function (err, result) {
-				if(err)
-					errorCB(err);
-				successCB(result);
-			})
+			CandidateModel.find({EmployeeID:{$in:waveObj.Cadets}},function(err, cadets){
+				cadets.map(function(cadetObj){
+				let user = {};
+				user.name = cadetObj.EmployeeName;
+				user.email = cadetObj.EmailID;
+				user.username = cadetObj.EmailID.split('@')[0];
+				adminMongoController.deleteUser(user, function (status) {
+		 				if(err)
+		 					console.log(err)
+		 				console.log("..........."+status)
+		    })
+		    });
+			},
+				CandidateModel.updateMany({EmployeeID:{$in:waveObj.Cadets}},{$set:{Wave:undefined}},function(err,res){
+					if(err)
+						console.log(err)
+					successCB(result);
+				})
+			)
 		}
 	})
 }
 
 let updateWave = function (waveObj, successCB, errorCB) {
-	console.log(waveObj);
 	WaveModel.update({WaveID:waveObj.WaveID},waveObj,function (err, result) {
 		if(err)
 			errorCB(err);
 		successCB(result)
 	})
+}
+
+let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
+	let userObj = {};
+	cadets.map(function(cadet){
+	CandidateModel.findOneAndUpdate({"EmployeeID": cadet}, {$set: {"Wave": waveID}}, function(err, user) {
+						if(err)
+							errorCB(err);
+						else
+						{
+							userObj.name = user.EmployeeName;
+							userObj.email = user.EmailID;
+							userObj.username = user.EmailID.split('@')[0];
+							userObj.password = CONFIG.DEFAULT_PASS;
+							userObj.role = 'candidate';
+							adminMongoController.addUser(userObj, function (savedUser) {
+								logger.info('User created', user.EmployeeName);
+							}, function (err) {
+								logger.error('Error in creating user', err)
+							})
+						}
+					})
+				})
 }
 
 module.exports = {
@@ -484,5 +519,6 @@ module.exports = {
 	deleteWave,
 	getActiveWaves,
 	updateWave,
-	getCadetsOfProj
+	getCadetsOfProj,
+	updateCadetWave
 }

@@ -6,6 +6,7 @@ import IconButton from 'material-ui/IconButton';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import CourseIcon from 'material-ui/svg-icons/action/book';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import DateIcon from 'material-ui/svg-icons/action/date-range';
 import GroupIcon from 'material-ui/svg-icons/social/group';
 import LocationIcon from 'material-ui/svg-icons/communication/location-on';
@@ -17,6 +18,7 @@ import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import RaisedButton from 'material-ui/RaisedButton';
 
 const styles = {
     text: {
@@ -77,25 +79,33 @@ export default class WaveCard extends React.Component {
 			openDialog: false,
 			wave: {},
 			courses: [],
-			selectedCourse: []
+			selectedCourse: [],
+			addCadet: false,
+			newCadets: [],
+			selectedCadets: [],
+			disableSave: true,
+			noCadets: false
 		}
 		this.handleOpen = this.handleOpen.bind(this);
 		this.handleClose = this.handleClose.bind(this);
-		this.handleEditProject = this.handleEditProject.bind(this);
+		this.handleEditWave = this.handleEditWave.bind(this);
 		this.getCadets = this.getCadets.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-		this.handleDeleteProject = this.handleDeleteProject.bind(this);
-		this.handleUpdateProject = this.handleUpdateProject.bind(this);
+		this.handleDeleteWave = this.handleDeleteWave.bind(this);
+		this.handleUpdateWave = this.handleUpdateWave.bind(this);
 		this.closeUpdateDialog = this.closeUpdateDialog.bind(this);
 		this.getCourses = this.getCourses.bind(this);
 		this.handleCoursesChange = this.handleCoursesChange.bind(this);
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleStartDateChange = this.handleStartDateChange.bind(this);
 		this.handleEndDateChange = this.handleEndDateChange.bind(this);
+		this.openAddDialog = this.openAddDialog.bind(this);
+		this.handleCadetsChange = this.handleCadetsChange.bind(this);
+		this.getNewCadets = this.getNewCadets.bind(this);
 	}
 
-	handleEditProject() {
+	handleEditWave() {
 		this.setState({
 			openDialog: true,
 			wave: this.props.wave
@@ -104,7 +114,6 @@ export default class WaveCard extends React.Component {
 	}
 
 	getCourses() {
-		console.log('getting courses');
 		let th = this;
 		Request
 			.get('/mentor/courses')
@@ -122,16 +131,73 @@ export default class WaveCard extends React.Component {
 			})
 	}
 
-	handleUpdateProject() {
-		console.log('update project');
-		let wave = this.state.wave;
-		wave.CourseNames = this.state.selectedCourse;
+	getNewCadets() {
+		let th = this;
+		Request
+			.get('/dashboard/cadets')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	let cadets = res.body.filter(function(cadet) {
+		    		if((cadet.Wave == undefined || cadet.Wave == '') && (cadet.Selected === 'Yes' || cadet.Selected === 'DS' ))
+		    			return cadet;
+		    	})
+		    	if(cadets.length == 0)
+		    	{
+		    		th.setState({
+		    			noCadets: true,
+		    			newCadets: []
+		    		})
+		    	}
+		    	else
+		    	{
+		    		th.setState({
+		    			newCadets: cadets,
+		    			noCadets: false
+		    		})
+		    	}
+		    	console.log(th.state.newCadets);
+		    }
+			})
+	}
+
+	handleUpdateWave() {
+		let wave = {};
+		if(this.state.addCadet)
+		{
+				wave = this.props.wave;
+				wave.Cadets = this.props.wave.Cadets.concat(this.state.selectedCadets);
+				this.updateCadets(this.state.selectedCadets);
+				this.handleClose();
+		}
+		if(this.state.openDialog)
+		{
+			wave = this.state.wave;
+			wave.CourseNames = this.state.selectedCourse;
+		}
 		console.log(wave);
 		this.props.handleUpdate(wave);
 		this.closeUpdateDialog();
 	}
 
-	handleDeleteProject() {
+	updateCadets(cadets) {
+		let th = this;
+		Request
+			.post('/dashboard/updatecadetWave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({cadets:cadets,waveID:this.props.wave.WaveID})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Successfully updated')
+		    }
+			})
+	}
+
+	handleDeleteWave() {
 		this.props.handleDelete(this.props.wave);
 		this.closeDeleteDialog();
 	}
@@ -142,6 +208,13 @@ export default class WaveCard extends React.Component {
 		})
 	}
 
+	handleCadetsChange(event, key, val) {
+		this.setState({
+			selectedCadets: val,
+			disableSave: false
+		})
+	}
+
 	closeDeleteDialog() {
 		this.setState({
 			showDeleteDialog: false
@@ -149,8 +222,19 @@ export default class WaveCard extends React.Component {
 	}
 
 	closeUpdateDialog() {
+		let cadet = [];
+		if(this.state.addCadet)
+		{
+			cadet = this.props.wave.Cadets
+		}
+		else
+		{
+			cadet = this.state.wave.Cadets
+		}
 		this.setState({
-			openDialog: false
+			openDialog: false,
+			addCadet: false,
+			cadets: cadet
 		})
 	}
 
@@ -182,7 +266,9 @@ export default class WaveCard extends React.Component {
 
 	handleClose() {
 		this.setState({
-			dialog: false
+			dialog: false,
+			noCadets: false,
+			addCadet: false
 		})
 	}
 
@@ -215,6 +301,13 @@ export default class WaveCard extends React.Component {
 		})
 	}
 
+	openAddDialog() {
+		this.setState({
+			addCadet: true
+		})
+		this.getNewCadets();
+	}
+
 	render() {
 		let startdate = new Date(this.props.wave.StartDate);
 		startdate = startdate.getFullYear() + '/' + (startdate.getMonth()+1) + '/' + startdate.getDate();
@@ -230,6 +323,13 @@ export default class WaveCard extends React.Component {
 		end = end[2]+' '+end[1]+' '+end[3];
 		let date = start + ' - ' + end;
 		let th = this
+		let viewMembers = 1
+		let pointer = 'pointer'
+		if(this.props.wave.CourseNames.length === 0)
+		{
+			viewMembers = 0,
+			pointer = 'auto'
+		}
 
 		const deleteDialogActions = [
       <FlatButton
@@ -241,7 +341,7 @@ export default class WaveCard extends React.Component {
       <FlatButton
         label="Delete"
         primary={true}
-        onClick={this.handleDeleteProject}
+        onClick={this.handleDeleteWave}
         style={styles.actionButton}
       />,
     ]
@@ -256,11 +356,15 @@ export default class WaveCard extends React.Component {
       <FlatButton
         label="Update"
         primary={true}
-        onClick={this.handleUpdateProject}
+        onClick={this.handleUpdateWave}
         style={styles.actionButton}
       />
     ]
-
+    let view = 'inline'
+    if(this.state.addCadet)
+    {
+    	view = 'none'
+    }
     let bgColor = this.props.bgColor;
 		let bgIcon = this.props.bgIcon;
 		return (
@@ -299,13 +403,13 @@ export default class WaveCard extends React.Component {
 			    			return <span key={index}>{course}</span>
 			    	})
 			    	}</span><br/>
-			    	<IconButton tooltip="Members" onClick={this.handleOpen}>
+			    	<IconButton tooltip="Members" onClick={this.handleOpen} style={{opacity:viewMembers, cursor:pointer}}>
 				      <GroupIcon/>
 				    </IconButton>
 				  	<IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{float:'right'}}>
 				      <DeleteIcon/>
 				    </IconButton>
-				  	<IconButton tooltip="Edit Wave" onClick={this.handleEditProject} style={{float:'right'}}>
+				  	<IconButton tooltip="Edit Wave" onClick={this.handleEditWave} style={{float:'right'}}>
 				      <EditIcon/>
 				    </IconButton>
 				    </CardText>
@@ -330,6 +434,52 @@ export default class WaveCard extends React.Component {
 			        }
 			        </Row>
 			        </Grid>
+			        <IconButton tooltip="Add Cadet" style={{display:view,float: 'right'}} onClick={this.openAddDialog}>
+					      <AddIcon/>
+					    </IconButton>
+					    {
+					    	this.state.addCadet && (!this.state.noCadets) && <p><SelectField
+		        		multiple={true}
+				        hintText="Select Cadets"
+								floatingLabelText='Cadets'
+				        value={this.state.selectedCadets}
+				        onChange={this.handleCadetsChange}
+								menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
+								listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
+								style={{width: '100%'}}
+								selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
+				      >
+				      {
+				        	th.state.newCadets.map(function(cadet, i) {
+				        		return (
+				        			cadet.Selected != undefined &&
+				        			(cadet.Selected == 'Yes' ||
+											cadet.Selected == 'DS') &&
+				        			<MenuItem
+								        key={i}
+								        insetChildren={true}
+								        checked={
+								        	th.state.selectedCadets &&
+								        	th.state.selectedCadets.includes(cadet.EmployeeID)
+								       	}
+								        value={cadet.EmployeeID}
+								        primaryText={`${cadet.EmployeeName} (${cadet.EmployeeID})`}
+								      />
+								      )
+		        				})
+		        			}
+		      			</SelectField>
+		      			<RaisedButton 
+						    	label="Save Changes" 
+						    	disabled={this.state.disableSave} 
+						    	primary={true}
+						    	onClick={this.handleUpdateWave}
+						    />
+						    </p>
+						  	}
+						   { 
+						   	this.state.noCadets && <h3>No Cadets available</h3>
+								}
 			        </Dialog>
 			        <Dialog
 			          actions={deleteDialogActions}

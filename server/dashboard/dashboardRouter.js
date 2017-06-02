@@ -185,6 +185,23 @@ router.get('/activewaves', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   }
 })
 
+router.post('/updatecadetwave', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+  try{
+    dashboardMongoController.updateCadetWave(req.body.cadets, req.body.waveID, function(status) {
+      res.status(201);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get all active waves from db...!' });
+    });
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+
 
 /****************************************************
 *******               Projects               ********
@@ -314,7 +331,6 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function(req, res) {
 
 // Delete a cadet
 router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
-  console.log('reached to server');
   try {
     dashboardMongoController.deleteCadet(req.body, function (status) {
       res.status(200).json(status)
