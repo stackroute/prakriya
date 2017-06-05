@@ -202,7 +202,7 @@ export default class ProjectCard extends React.Component {
 				    </IconButton>
 				  	</Card>
 				 {
-				 		this.state.dialog && 
+				 		this.state.dialog &&
 				 		th.getCadets(this.props.project.name)}
 				 		<Dialog
                 bodyStyle={styles.dialog}
@@ -223,7 +223,7 @@ export default class ProjectCard extends React.Component {
 		        </Row>
 			      </Grid>
 		        </Dialog>
-          
+
         {
 							this.state.openDialog &&
 							<ProjectDialog project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PRODUCT'}/>
