@@ -1,0 +1,58 @@
+module.exports = {
+  'body': {
+    'backgroundColor': '#DDDBF1',
+    'borderBottom': '10px solid teal',
+    'borderRight': '10px solid teal',
+    'borderLeft': '10px solid teal'
+  },
+  'title': {
+    'fontWeight': 'bold',
+    'backgroundColor': 'teal',
+    'color': '#DDDBF1',
+    'textAlign': 'center'
+  },
+	'actionsContainer': {
+		'backgroundColor': 'teal',
+		'borderTop': '0px',
+		'marginTop': '0px'
+	},
+	'actionButton': {
+		'backgroundColor': '#DDDBF1',
+		'width': '50%',
+		'color': 'teal',
+		'border': '1px solid teal',
+		'height': '100%'
+	},
+  'box100' :{
+    'border': '2px solid white',
+    'width': '100%',
+    'display': 'inline-block',
+    'boxSizing': 'border-box',
+    'padding': '5px'
+  },
+  'box50' :{
+    'border': '2px solid white',
+    'width': '50%',
+    'display': 'inline-block',
+    'boxSizing': 'border-box',
+    'padding': '5px'
+  },
+  'box34' :{
+    'border': '2px solid white',
+    'width': '34%',
+    'display': 'inline-block',
+    'boxSizing': 'border-box',
+    'padding': '5px'
+  },
+  'box33' :{
+    'border': '2px solid white',
+    'width': '33%',
+    'display': 'inline-block',
+    'boxSizing': 'border-box',
+    'padding': '5px'
+  },
+  'confirmBox': {
+    'backgroundColor': '#DDDBF1',
+    'border': '10px solid teal'
+  }
+}

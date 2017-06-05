@@ -1,0 +1,16 @@
+module.exports = {
+  list: {
+    'backgroundColor': 'teal',
+    'borderLeft': '5px solid teal',
+    'borderRight': '5px solid teal'
+  },
+  'menu': {
+    'borderTop': '1px solid teal',
+    'borderBottom': '1px solid teal',
+    'backgroundColor': '#DDDBF1'
+  },
+  'selectedMenu':{
+    'color': 'black',
+    'fontWeight': 'bold'
+  }
+}
