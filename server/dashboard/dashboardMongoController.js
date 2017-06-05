@@ -486,6 +486,19 @@ let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 				})
 }
 
+/****************************************************
+**************          Filters         *************
+****************************************************/
+
+// get filter categories of a candidate model
+let getCandidateFilters = function(successCB, errorCB) {
+	try{
+		successCB({'filters': Object.keys(CandidateModel.schema.paths)})
+	} catch(err) {
+		errorCB(err)
+	}
+}
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -520,5 +533,6 @@ module.exports = {
 	getActiveWaves,
 	updateWave,
 	getCadetsOfProj,
-	updateCadetWave
+	updateCadetWave,
+	getCandidateFilters
 }

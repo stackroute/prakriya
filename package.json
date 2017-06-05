@@ -50,6 +50,7 @@
     "react-star-rating": "^1.4.2",
     "react-stars": "^2.1.0",
     "react-tap-event-plugin": "^2.0.1",
+    "react-treeview-mui": "^0.1.2",
     "redis": "^2.7.1",
     "serve-favicon": "^2.4.2",
     "socket.io": "^2.0.1",

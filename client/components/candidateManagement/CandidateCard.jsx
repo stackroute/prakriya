@@ -118,8 +118,8 @@ export default class CandidateCard extends React.Component {
       />
     ]
 		return(
-			<div>
-				<Card>
+			<div style={{width: '285px', display: 'inline-block', padding: '5px'}}>
+				<Card style={{border: '2px solid silver'}}>
 			    <CardMedia
 			    	style={styles.cardClick}
 			    	onClick={this.handleCardClick}

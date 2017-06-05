@@ -41,7 +41,11 @@ export default class Candidates extends React.Component {
 			cadets: [],
 			filterCadetName: '',
 			filterCadetWave: '',
-			candidatesName:[]
+			candidatesName:[],
+			filterCategories: [],
+			filterCategory: '',
+			filterValue: '',
+			appliedFilters: []
 		}
 		this.getCandidates = this.getCandidates.bind(this);
 		this.candidateView = this.candidateView.bind(this);
@@ -52,10 +56,17 @@ export default class Candidates extends React.Component {
 		this.handleFilterName = this.handleFilterName.bind(this);
 		this.handleFilterWave = this.handleFilterWave.bind(this);
 		this.handleClearFilter = this.handleClearFilter.bind(this);
+		this.getFilterCategories = this.getFilterCategories.bind(this);
 	}
+
+	componentWillMount() {
+		this.getFilterCategories();
+	}
+
 	componentDidMount() {
 		this.getCandidates();
 	}
+
 	handleFilterName(val) {
 		console.log("value",val)
 		this.setState({
@@ -76,6 +87,24 @@ export default class Candidates extends React.Component {
 			filterCadetName: ''
 		})
 	}
+
+	getFilterCategories() {
+		let th = this;
+		Request
+			.get('/dashboard/candidatefilters')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+					console.log('Filter Categories Recieved: ', res.body.filters);
+					th.setState({
+						filterCategories: res.body.filters
+					})
+		    }
+		  })
+	}
+
 	getCandidates() {
 		let th = this;
 		Request
@@ -170,57 +199,56 @@ export default class Candidates extends React.Component {
 				!this.state.showCandidate ?
 				<div>
 					<h1 style={styles.heading}>Candidate Management</h1>
-					<AutoComplete
-						hintText="Search Candidate"
-						filter={AutoComplete.fuzzyFilter}
-						searchText={this.state.filterCadetName}
-						dataSource={cadetsName}
-						onNewRequest={this.handleFilterName}
-					/>
-					<AutoComplete
-						hintText="SortBy Wave"
-						filter={AutoComplete.fuzzyFilter}
-						searchText={this.state.filterCadetWave}
-						dataSource={cadetsDistinctWave}
-						onNewRequest={this.handleFilterWave}
-					/>
-
-					<FlatButton
-						label="Clear Filter"
-						primary={true}
-						onClick={this.handleClearFilter}
-					/>
-
 					<Grid>
 						<Row>
-							{
-								this.state.candidates.map(function(candidate, key) {
-									if((th.state.filterCadetWave === candidate.Wave)||(th.state.filterCadetName === candidate.EmployeeName)) {
-										return (
-											candidate.Wave != undefined &&
-											<Col md={3} key={key}>
-												<CandidateCard
-													candidate={candidate}
-													handleCardClick={th.candidateView}
-													handleDelete={th.deleteCandidate}
-												/>
-											</Col>
-										)
-									}
-									else if((th.state.filterCadetName === '') && (th.state.filterCadetWave === '')) {
+							<Col md={3} style={{border: '1px solid teal'}}>
+								<h3 style={{textAlign: 'center'}}>...FILTERS...</h3>
 
-										return(
-											<Col md={3} key={key}>
-												<CandidateCard
-													candidate={candidate}
-													handleCardClick={th.candidateView}
-													handleDelete={th.deleteCandidate}
-												/>
-											</Col>
-										)
-									}
-								})
-							}
+								{/*<AutoComplete
+									hintText="Search By"
+									filter={AutoComplete.fuzzyFilter}
+									searchText={this.state.filterCadetName}
+									dataSource={this.state.filterCategories}
+									onNewRequest={this.handleFilterName}
+								/>
+								<AutoComplete
+									hintText="SortBy Wave"
+									filter={AutoComplete.fuzzyFilter}
+									searchText={this.state.filterCadetWave}
+									dataSource={cadetsDistinctWave}
+									onNewRequest={this.handleFilterWave}
+								/>
+								<FlatButton
+									label="Clear Filter"
+									primary={true}
+									onClick={this.handleClearFilter}
+								/>*/}
+							</Col>
+							<Col md={9} style={{border: '1px solid teal'}}>
+								{
+									this.state.candidates.map(function(candidate, key) {
+										if((th.state.filterCadetWave === candidate.Wave)||(th.state.filterCadetName === candidate.EmployeeName)) {
+											return (
+												candidate.Wave != undefined &&
+													<CandidateCard
+														candidate={candidate}
+														handleCardClick={th.candidateView}
+														handleDelete={th.deleteCandidate}
+													/>
+											)
+										}
+										else if((th.state.filterCadetName === '') && (th.state.filterCadetWave === '')) {
+											return(
+													<CandidateCard
+														candidate={candidate}
+														handleCardClick={th.candidateView}
+														handleDelete={th.deleteCandidate}
+													/>
+											)
+										}
+									})
+								}
+							</Col>
 						</Row>
 					</Grid>
 				</div>
