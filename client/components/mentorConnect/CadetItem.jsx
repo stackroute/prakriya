@@ -83,7 +83,7 @@ export default class CadetItem extends React.Component {
 			<div style={styles.container}>
 				<Row style={{display: 'flex', alignItems: 'center', backgroundColor: color}} >
 					<Col md={1} mdOffset={1}>
-						{this.state.cadet.EmployeeID}
+						{this.state.cadet.DigiThonScore}
 					</Col>
 					<Col md={2}>
 						<span
@@ -136,8 +136,8 @@ export default class CadetItem extends React.Component {
 						{
 							this.state.showDetail &&
 							<div style={{fontSize: 13, marginBottom: 10}}>
-								<strong>Digithon Score: </strong>
-								{this.state.cadet.DigiThonScore}
+								<strong>Cadet ID: </strong>
+								{this.state.cadet.EmployeeID}
 								<br/>
 								<strong>Work Exp: </strong>
 								{this.state.cadet.WorkExperience}

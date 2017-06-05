@@ -13,7 +13,7 @@ const styles = {
 		textAlign: 'center'
 	},
 	rowHeaders: {
-		height: 40,
+		height: 50,
 		fontWeight: 'bold',
 		color: '#eee',
 		background: '#555',
@@ -35,6 +35,7 @@ export default class MentorConnect extends React.Component {
 		this.saveRemarks = this.saveRemarks.bind(this);
 		this.addWave = this.addWave.bind(this);
 		this.handleFilter = this.handleFilter.bind(this);
+		this.handleSort = this.handleSort.bind(this);
 		this.handleClearFilter = this.handleClearFilter.bind(this);
 		this.handleRequestClose = this.handleRequestClose.bind(this);
 	}
@@ -130,6 +131,24 @@ export default class MentorConnect extends React.Component {
 			filterCadet: val
 		})
 	}
+	handleSort() {
+		let cadets = this.state.cadets;
+		this.setState({
+			cadets: []
+		})
+		function compare(a,b) {
+		  if (a.DigiThonScore < b.DigiThonScore)
+		    return 1;
+		  if (a.DigiThonScore > b.DigiThonScore)
+		    return -1;
+		  return 0;
+		}
+		cadets.sort(compare);
+		this.setState({
+			cadets: cadets
+		})
+		console.log('New cadets', cadets)
+	}
 	handleClearFilter() {
 		this.setState({
 			filterCadet: ''
@@ -153,7 +172,7 @@ export default class MentorConnect extends React.Component {
 				<FileDrop handleBulkUpdateRemarks={this.updateBulkRemarks}/>
 				<Grid>
 					<Row style={{textAlign: 'center'}}>
-						<Col md={4} mdOffset={4}>
+						<Col md={6} mdOffset={3}>
 							<AutoComplete
 			          hintText="Search Candidate"
 				  			filter={AutoComplete.fuzzyFilter}
@@ -166,11 +185,16 @@ export default class MentorConnect extends React.Component {
 			        	primary={true}
 			        	onClick={this.handleClearFilter}
 			        />
+			        <FlatButton
+			        	label="Sort"
+			        	primary={true}
+			        	onClick={this.handleSort}
+			        />
 		        </Col>
 					</Row>
 					<Row style={styles.rowHeaders}>
 						<Col md={1} mdOffset={1}>
-							Cadet ID
+							Digithon Score
 						</Col>
 						<Col md={2}>
 							Cadet Name

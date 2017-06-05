@@ -5,6 +5,10 @@ import UploadIcon from 'material-ui/svg-icons/file/file-upload';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import FlatButton from 'material-ui/FlatButton';
+import DownloadIcon from 'material-ui/svg-icons/file/file-download';
+import {CSVLink, CSVDownload} from 'react-csv';
+import Request from 'superagent';
 
 const styles = {
 	container: {
@@ -17,6 +21,9 @@ const styles = {
 		borderStyle: 'dashed',
 		paddingTop: '40px',
 		boxSizing: 'border-box'
+	},
+	downloadIcon: {
+		float: 'right'
 	}
 }
 
@@ -25,13 +32,35 @@ export default class FileDrop extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			template: [],
 			showSelFile: false,
 			selectedFile: {},
 			email: ''
 		}
+		this.getTemplate = this.getTemplate.bind(this);
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.uploadCadets = this.uploadCadets.bind(this);
 		this.handleDrop = this.handleDrop.bind(this);
+	}
+
+	componentDidMount() {
+		this.getTemplate();	
+	}
+
+	getTemplate() {
+		let th = this;
+		Request
+			.get('/dashboard/candidatetemplate')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	th.setState({
+		    		template: res.body
+		    	})
+		    }
+		  })
 	}
 	uploadCadets() {
 		this.props.uploadCadets(this.state.selectedFile, this.state.email)
@@ -58,10 +87,25 @@ export default class FileDrop extends React.Component {
 		return(
 			<div style={styles.container}>
 				<Grid>
+					<Row>
+						<Col md={2} mdOffset={7}>
+							<CSVLink 
+								data={this.state.template}
+								filename={"candidate_template.csv"} 
+							>
+								<FlatButton
+						      label="Template"
+						      secondary={true}
+						      icon={<DownloadIcon />}
+						      style={styles.downloadIcon}
+						    />
+						  </CSVLink>
+						</Col>
+					</Row>
 	    		<Row>
 	    			<Col md={6} mdOffset={3}>
 							<Dropzone style={styles.dropzone} onDrop={this.handleDrop}>
-			          <div>Drop or Click to upload csv files in required format</div>
+			          <div>Drop or Click to upload csv files using given template</div>
 			        </Dropzone>
 			        <SelectField
 			          value={this.state.email}

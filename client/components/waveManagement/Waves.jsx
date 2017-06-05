@@ -3,7 +3,8 @@ import Request from 'superagent'
 import WaveCard from './WaveCard.jsx'
 import Masonry from 'react-masonry-component'
 import {Tabs, Tab} from 'material-ui/Tabs'
-import {Grid, Row, Col} from 'react-flexbox-grid'
+import {Grid, Row, Col} from 'react-flexbox-grid';
+import AddWave from './AddWave.jsx';
 
 const styles = {
 	heading: {

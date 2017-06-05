@@ -281,6 +281,16 @@ router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
   }
 })
 
+// Get the candidate template
+router.get('/candidatetemplate', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  res.send(CONFIG.CANDIDATE_TEMPLATE);
+})
+
+// Get the remarks template
+router.get('/remarkstemplate', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  res.send(CONFIG.REMARKS_TEMPLATE);
+})
+
 // Get cadet profile
 router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try {

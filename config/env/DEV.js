@@ -104,6 +104,40 @@ let basedata = {
   }
 }
 
+let candidate_template = [[
+  "Sl. No.",
+  "EmployeeID", 
+  "EmployeeName", 
+  "EmailID", 
+  "DigiThonQualified",
+  "Selected", 
+  "Remarks", 
+  "CareerBand", 
+  "RevisedBU",
+  "DigiThonPhase", 
+  "DigiThonScore", 
+  "TrainingStatus", 
+  "TrainingsUndergone", 
+  "WorkExperience", 
+  "MentorTrack", 
+  "TrainingTrack", 
+  "Wave", 
+  "CourseName", 
+  "AcademyTrainingSkills", "StartDate", "EndDate", "CostCenter", "PrimarySupervisor", 
+  "ProjectSupervisor", 
+  "College", 
+  "CGPA", 
+  "Date"
+]]
+
+let remarks_template = [[
+  "Sl. No.",
+  "EmployeeID",
+  "EmployeeName",
+  "Remarks",
+  "Selected"
+]]
+
 let email = {
   USERNAME: 'srprakriya@gmail.com',
   PASSWORD: 'prakriya@123',
@@ -116,6 +150,8 @@ let config = {
   NEO4J: neo4j,
   REDIS: redis,
   BASEDATA: basedata,
+  CANDIDATE_TEMPLATE: candidate_template,
+  REMARKS_TEMPLATE: remarks_template,
   EMAIL: email,
   jwtSecret: "MyS3cr3tK3Y",
   jwtSession: {
