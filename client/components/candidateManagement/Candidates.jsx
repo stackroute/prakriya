@@ -8,6 +8,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 import CandidateCard from './CandidateCard.jsx';
 import CandidateHome from './CandidateHome.jsx';
 import AddCandidate from './AddCandidate.jsx';
+import FilterItem from './FilterItem.jsx';
 
 const styles = {
 	heading: {
@@ -57,6 +58,7 @@ export default class Candidates extends React.Component {
 		this.handleFilterWave = this.handleFilterWave.bind(this);
 		this.handleClearFilter = this.handleClearFilter.bind(this);
 		this.getFilterCategories = this.getFilterCategories.bind(this);
+		this.getAccordianValues = this.getAccordianValues.bind(this);
 	}
 
 	componentWillMount() {
@@ -164,6 +166,7 @@ export default class Candidates extends React.Component {
 		    }
 			});
 	}
+
 	addCandidate(candidate) {
 		let th = this;
 		Request
@@ -178,8 +181,19 @@ export default class Candidates extends React.Component {
 		    }
 			})
 	}
+
+	getAccordianValues(key) {
+		console.log('parent func called')
+		let valueArr = []
+		this.state.candidates.map(function(candidate) {
+			valueArr.push(candidate[key])
+		})
+		return valueArr
+	}
+
 	render() {
 		let th = this;
+		let listItems = [{title: 'Hello'}, {title: 'Hi'}];
 		let cadetsName = [];
 		let cadetsWave=[];
 		let cadetsDistinctWave=[];
@@ -203,7 +217,35 @@ export default class Candidates extends React.Component {
 						<Row>
 							<Col md={3} style={{border: '1px solid teal'}}>
 								<h3 style={{textAlign: 'center'}}>...FILTERS...</h3>
-
+								<FilterItem
+									title={'EmployeeID'}
+									type={'AutoComplete'}
+									onGetAccordianValues={this.getAccordianValues}
+								/>
+								<FilterItem
+									title={'EmployeeName'}
+									type={'AutoComplete'}
+								/>
+								<FilterItem
+									title={'DigithonQualified'}
+									type={'RadioButton'}
+								/>
+								<FilterItem
+									title={'DigithonPhase'}
+									type={'AutoComplete'}
+								/>
+								<FilterItem
+									title={'DigithonScore'}
+									type={'AutoComplete'}
+								/>
+								<FilterItem
+									title={'Skills'}
+									type={'CheckBox'}
+								/>
+								<FilterItem
+									title={'CGPA'}
+									type={'AutoComplete'}
+								/>
 								{/*<AutoComplete
 									hintText="Search By"
 									filter={AutoComplete.fuzzyFilter}

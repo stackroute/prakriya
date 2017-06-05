@@ -729,24 +729,4 @@ router.post('/updatewave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, r
   }
 })
 
-/****************************************************
-**************          Filters         *************
-****************************************************/
-
-// Get filter categories of a candidate model
-router.get('/candidatefilters', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
-  try{
-    dashboardMongoController.getCandidateFilters(function(filters) {
-      res.status(201).json(filters);
-    }, function(err) {
-      res.status(500).json({ error: 'Cannot get candidate filter categories...!'});
-    })
-  }
-  catch(err) {
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-})
-
 module.exports = router;
