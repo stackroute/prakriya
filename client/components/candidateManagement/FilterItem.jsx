@@ -1,5 +1,6 @@
-import React from 'react'
+import React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
+import Checkbox from 'material-ui/Checkbox';
 
 export default class FilterItem extends React.Component {
 
@@ -17,11 +18,12 @@ export default class FilterItem extends React.Component {
   }
 
 	componentDidMount() {
-		this.getAccordianValues(this.props.title)
+		// this.getAccordianValues()
 	}
 
   toggleAccordion() {
     if(this.state.accordion == 'none') {
+			this.getAccordianValues()
       this.setState({
         accordion: 'block'
       })
@@ -32,8 +34,10 @@ export default class FilterItem extends React.Component {
     }
   }
 
-  getAccordianValues(title) {
-    let values = this.props.onGetAccordianValues(title)
+  getAccordianValues() {
+		console.log('child func called')
+    let values = this.props.onGetAccordianValues()
+		console.log('values: ', values)
     this.setState({
       values: values
     })
@@ -42,15 +46,34 @@ export default class FilterItem extends React.Component {
   render() {
 		let content
 		if(this.props.type == 'AutoComplete') {
-				content = <div style={{display: this.state.accordion}}>Coming Soon...</div>
+				content = (
+					<div style={{display: this.state.accordion}}>
+						<AutoComplete
+							filter={AutoComplete.fuzzyFilter}
+							dataSource={this.state.values}
+							/>
+					</div>
+				)
 		} else if(this.props.type == 'CheckBox') {
-				content = <div style={{display: this.state.accordion}}>Coming Soon...</div>
+				content = (
+					<div style={{display: this.state.accordion}}>
+						{
+							this.state.values.map(function(value, key) {
+								<Checkbox
+									label={value}
+									value={value}
+									key={key}
+								/>
+							})
+						}
+					</div>
+				)
 		} else if(this.props.type == 'RadioButton') {
 			content = <div style={{display: this.state.accordion}}>Coming Soon...</div>
 		}
     return (
-      <div style={{padding: '2px'}}>
-        <div style={{border: '1px solid grey', backgroundColor: 'silver'}} onTouchTap={this.toggleAccordion}>{this.props.title}</div>
+      <div>
+        <div style={{border: '1px solid #eeeeee', backgroundColor: 'silver', padding: '5px', width: '100%'}} onTouchTap={this.toggleAccordion}>{this.props.title}</div>
 				{content}
       </div>
     )
