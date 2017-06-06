@@ -8,8 +8,9 @@
 	import Paper from 'material-ui/Paper';
 	import Chip from 'material-ui/Chip';
 	import Snackbar from 'material-ui/Snackbar';
-	import FlatButton from 'material-ui/FlatButton';
-	import SaveIcon from 'material-ui/svg-icons/content/save';
+	import RaisedButton from 'material-ui/RaisedButton';
+
+
 
 	const styles = {
 		heading: {
@@ -32,7 +33,17 @@
 		wrapper: {
 	    display: 'flex',
 	    flexWrap: 'wrap',
-	  }
+	  },
+		actionButton: {
+			textAlign:'center',
+			marginLeft:'380px',
+			marginBottom:'20px'
+		},
+		cancelButton: {
+			textAlign:'center',
+			marginLeft:'20px'
+
+		}
 	  }
 
 
@@ -61,6 +72,7 @@
 			this.savePerms = this.savePerms.bind(this);
 			this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
 			this.handleSessionOn = this.handleSessionOn.bind(this);
+			this.handleCancel = this.handleCancel.bind(this);
 		}
 		componentWillMount() {
 			if(localStorage.getItem('token')) {
@@ -90,6 +102,16 @@
 			this.setState({
 				searchPerm: searchPerm
 			})
+		}
+		handleCancel(){
+		this.setState({
+					 WaveId:'',
+					 candidatesName:[],
+					 candidatesID:[],
+					 absentList:[],
+					 absentListNames:[],
+					 sessionOn: {}
+		})
 		}
 
 		handleAddNewPerm() {
@@ -210,11 +232,9 @@
 		let th=this;
 			return(
 				<div>
+				<h1 style={styles.heading}> Attendance </h1>
 				<Card>
-					<CardHeader>
-						<h3 style={styles.heading}> Attendance </h3>
-						</CardHeader>
-						<CardText>
+					<CardText>
 						<SelectField
 							onChange={th.onWaveIdChange}
 							floatingLabelText="Select WaveID"
@@ -226,8 +246,9 @@
 								})
 							}
 						</SelectField>
-
-						      <DatePicker hintText="select Date" mode="landscape" value={this.state.sessionOn} onChange={this.handleSessionOn}/>
+						<br/>
+						<br/>
+						<DatePicker hintText="Select Date" mode="landscape" value={this.state.sessionOn} onChange={this.handleSessionOn}/>
 									{
 										th.state.candidatesName.map(function(cand, index) {
 											return (
@@ -264,18 +285,25 @@
 										</div>
 									</Paper>
 						    </CardText>
-								<FlatButton
+								<br/>
+								<RaisedButton
 					    		label="Save"
+									style={styles.actionButton}
 					    		primary={true}
 					    		disabled={this.state.disableSave}
-					    		icon={<SaveIcon />}
-									onClick = {this.savePerms}
+					    		onClick = {this.savePerms}
 					    	/>
+								<RaisedButton
+					    		label="Cancel"
+									style={styles.cancelButton}
+									primary={true}
+									onClick = {this.handleCancel}
+					    		/>
 				</Card>
 				<Snackbar
           open={this.state.openSnackBar}
           message={this.state.snackBarMsg}
-          autoHideDuration={4000}
+          autoHideDuration={2000}
           onRequestClose={this.handleSnackBarClose}
 					onClick={this.savePerms}
         />

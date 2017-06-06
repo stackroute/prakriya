@@ -170,7 +170,6 @@ export default class AddWave extends React.Component {
 	}
 
 	validationSuccess() {
-		console.log('EndDate: ', this.state.EndDate)
 		if(this.state.WaveID.trim().length == 0) {
 			this.setState({
 				WaveIDErrorText: 'This field cannot be empty'
