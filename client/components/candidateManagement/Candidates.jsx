@@ -27,8 +27,6 @@ export default class Candidates extends React.Component {
 			showCandidate: false,
 			displayCandidate: {},
 			cadets: [],
-			filterCadetName: '',
-			filterCadetWave: '',
 			candidatesName:[],
 			appliedFilters: []
 		}
@@ -39,46 +37,46 @@ export default class Candidates extends React.Component {
 		this.deleteCandidate = this.deleteCandidate.bind(this);
 		this.updateCandidate = this.updateCandidate.bind(this);
 		this.addCandidate = this.addCandidate.bind(this);
-		this.handleFilterName = this.handleFilterName.bind(this);
-		this.handleFilterWave = this.handleFilterWave.bind(this);
-		this.handleClearFilter = this.handleClearFilter.bind(this);
 		this.getAccordianValues = this.getAccordianValues.bind(this);
 		this.addFilter = this.addFilter.bind(this);
+		this.removeFilter = this.removeFilter.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.getCandidates();
 	}
 
-	handleFilterName(val) {
-		console.log("value",val)
-		this.setState({
-			filterCadetName: val,
-			filterCadetWave: ''
-		});
-	}
-
-	handleFilterWave(val) {
-		console.log("value",val)
-		this.setState({
-			filterCadetWave: val,
-			filterCadetName: ''
-		});
-	}
-
-	handleClearFilter() {
-		this.setState({
-			filterCadetWave: '',
-			filterCadetName: ''
-		});
-	}
-
-	addFilter(key, value) {
+	addFilter(filterType, key, value) {
 		let appliedFilters = this.state.appliedFilters;
-		appliedFilters.push({key: value});
+		if(filterType == 'AutoComplete') {
+			if(this.duplicateFilterFound(appliedFilters, key, value)) {
+				console.log('Duplicate Filter Found...');
+			} else {
+				appliedFilters.push({key: key, value: value});
+				this.setState({
+					appliedFilters: appliedFilters
+				});
+			}
+		} else if(filterType == 'RadioButton') {
+
+		} else if(filterType == 'CheckBox') {
+			
+		}
+	}
+
+	removeFilter(key, value) {
+		let appliedFilters = this.state.appliedFilters.filter(function(filter) {
+			return (filter.key != key && filter.value != value);
+		});
 		this.setState({
 			appliedFilters: appliedFilters
-		})
+		});
+	}
+
+	duplicateFilterFound(appliedFilters, key, value) {
+			return appliedFilters.some(function(filter) {
+				return (filter.key == key && filter.value == value)
+			});
 	}
 
 	getCandidates() {
@@ -107,11 +105,13 @@ export default class Candidates extends React.Component {
 			displayCandidate: candidate
 		})
 	}
+
 	handleBack() {
 		this.setState({
 			showCandidate: false
 		})
 	}
+
 	deleteCandidate(candidate) {
 		let th = this
 		Request
@@ -126,6 +126,7 @@ export default class Candidates extends React.Component {
 		    }
 		  })
 	}
+
 	updateCandidate(candidate) {
 		let th = this
 		Request
@@ -157,12 +158,11 @@ export default class Candidates extends React.Component {
 	}
 
 	getAccordianValues(key) {
-		console.log('parent func called')
-		let valueArr = []
+		let valueArr = [];
 		this.state.candidates.map(function(candidate) {
-			valueArr.push(candidate[key])
-		})
-		return valueArr
+			valueArr.push(candidate[key]);
+		});
+		return valueArr;
 	}
 
 	render() {
@@ -201,87 +201,65 @@ export default class Candidates extends React.Component {
 									padding: '3px',
 									color: 'teal'
 								}}>... FILTERS ...</h3>
-								<div>
-									{
-										this.state.appliedFilters.map(function(filter, index) {
-											return (
-												<Chip
-								          key={index}
-								        >
-								          <span>{filter.value}</span>
-								        </Chip>
-											)
-										})
-									}
-								</div>
+								{
+									this.state.appliedFilters.length > 0 ?
+									<div style={{border: '2px solid silver', width: ' 100%', padding: '3px'}}>
+										{
+											this.state.appliedFilters.map(function(filter, index) {
+												return (
+													<Chip
+									          key={index}
+														onRequestDelete={()=>th.removeFilter(filter.key, filter.value)}
+														style={{border: '2px solid teal'}}
+									        >
+									          <span>{filter.value}</span>
+									        </Chip>
+												)
+											})
+										}
+									</div> : ''
+								}
 								<FilterItem
 									title={'EmployeeID'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('EmployeeID')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('AutoComplete', 'EmployeeID', filterValue)}
 								/>
 								<FilterItem
 									title={'EmployeeName'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('EmployeeName')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('AutoComplete', 'EmployeeName', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonQualified'}
 									type={'RadioButton'}
-									onGetAccordianValues={()=>th.getAccordianValues('DigithonQualified')}
-									onAddFilter={th.addFilter}
+									onGetAccordianValues={()=>['Yes', 'No']}
+									onAddFilter={(filterValue)=>th.addFilter('RadioButton', 'DigithonQualified', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonPhase'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('DigithonPhase')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('AutoComplete', 'DigithonPhase', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonScore'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('DigithonScore')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('AutoComplete', 'DigithonScore', filterValue)}
 								/>
 								<FilterItem
 									title={'Skills'}
 									type={'CheckBox'}
 									onGetAccordianValues={()=>th.getAccordianValues('Skills')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('CheckBox', 'Skills', filterValue)}
 								/>
-								<FilterItem
-									title={'CGPA'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('CGPA')}
-									onAddFilter={th.addFilter}
-								/>
-								{/*<AutoComplete
-									hintText="Search By"
-									filter={AutoComplete.fuzzyFilter}
-									searchText={this.state.filterCadetName}
-									dataSource={this.state.filterCategories}
-									onNewRequest={this.handleFilterName}
-								/>
-								<AutoComplete
-									hintText="SortBy Wave"
-									filter={AutoComplete.fuzzyFilter}
-									searchText={this.state.filterCadetWave}
-									dataSource={cadetsDistinctWave}
-									onNewRequest={this.handleFilterWave}
-								/>
-								<FlatButton
-									label="Clear Filter"
-									primary={true}
-									onClick={this.handleClearFilter}
-								/>*/}
 							</Col>
 							<Col md={9}>
 								{
 									this.state.candidates.map(function(candidate, key) {
-										if((th.state.filterCadetWave === candidate.Wave)||(th.state.filterCadetName === candidate.EmployeeName)) {
-											return (
-												candidate.Wave != undefined &&
+										return (
 													<CandidateCard
 														candidate={candidate}
 														handleCardClick={th.candidateView}
@@ -289,17 +267,6 @@ export default class Candidates extends React.Component {
 														k={key}
 													/>
 											)
-										}
-										else if((th.state.filterCadetName === '') && (th.state.filterCadetWave === '')) {
-											return(
-													<CandidateCard
-														candidate={candidate}
-														handleCardClick={th.candidateView}
-														handleDelete={th.deleteCandidate}
-														k={key}
-													/>
-											)
-										}
 									})
 								}
 							</Col>
