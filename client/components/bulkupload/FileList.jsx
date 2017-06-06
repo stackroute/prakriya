@@ -4,6 +4,8 @@ import Paper from 'material-ui/Paper';
 import {green500, cyan500, yellow600} from 'material-ui/styles/colors';
 import Avatar from 'material-ui/Avatar'; 
 import ActionAssignment from 'material-ui/svg-icons/action/assignment';
+import Subheader from 'material-ui/Subheader';
+import Divider from 'material-ui/Divider';
 import Download from 'material-ui/svg-icons/file/file-download';
 import Warning from 'material-ui/svg-icons/action/info';
 import Moment from 'moment';
@@ -32,7 +34,7 @@ export default class FileList extends React.Component {
 		}
 		this.formatDate = this.formatDate.bind(this);
 		this.rightIcon = this.rightIcon.bind(this);
-		this.handleDownload = this.handleDownload.bind(this);
+		this.showFailed = this.showFailed.bind(this);
 	}
 	formatDate(date) {
 		if(date) {
@@ -47,8 +49,19 @@ export default class FileList extends React.Component {
 		else 
 			return <CheckIcon color={green500}/>
 	}
-	handleDownload(file) {
-		console.log('Download clicked', file);
+	showFailed(failedObj) {
+		let show = [];
+		show.push(<Divider />)
+		show.push(<Subheader inset={true}>Duplicate cadet error</Subheader>)
+		failedObj.map(function (data, key) {
+			show.push(
+				<ListItem
+					primaryText={data.eid}
+					key={key}
+				/>
+			)
+		})
+		return show;
 	}
 
 	render() {
@@ -68,14 +81,18 @@ export default class FileList extends React.Component {
 						    				primaryText={file.fileName}
 		        						rightIcon={th.rightIcon(file.status)}
 		        						secondaryTextLines={2}
+		        						primaryTogglesNestedList={true}
 		        						secondaryText={
 		        							<p>
 		        								{file.addedBy} added {th.formatDate(file.submittedOn)}<br/>
 		        								Import Completed {th.formatDate(file.completedOn)} with
 		        								Total: {file.totalCadets} &nbsp;
 		        								Imported: {file.importedCadets} &nbsp;
-					                	Failed: {file.failedCadets}
+					                	Failed: {file.failedCadets.length}
 		        							</p>
+		        						}
+		        						nestedItems={
+		        							th.showFailed(file.failedCadets)
 		        						}
 		        					/>
 						    		)
