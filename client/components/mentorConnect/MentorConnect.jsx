@@ -132,22 +132,14 @@ export default class MentorConnect extends React.Component {
 		})
 	}
 	handleSort() {
-		let cadets = this.state.cadets;
-		this.setState({
-			cadets: []
-		})
-		function compare(a,b) {
-		  if (a.DigiThonScore < b.DigiThonScore)
-		    return 1;
-		  if (a.DigiThonScore > b.DigiThonScore)
-		    return -1;
-		  return 0;
+		return function (a,b) {
+		  // if (a.DigiThonScore < b.DigiThonScore)
+		  //   return 1;
+		  // if (a.DigiThonScore > b.DigiThonScore)
+		  //   return -1;
+		  // return 0;
+		  return (a.DigiThonScore > b.DigiThonScore) ? -1 : (a.DigiThonScore < b.DigiThonScore) ? 1 : 0;
 		}
-		cadets.sort(compare);
-		this.setState({
-			cadets: cadets
-		})
-		console.log('New cadets', cadets)
 	}
 	handleClearFilter() {
 		this.setState({
@@ -166,6 +158,7 @@ export default class MentorConnect extends React.Component {
 		this.state.cadets.map(function (cadet, i) {
 			cadetsName.push(cadet.EmployeeName);
 		})
+		console.log('State cadets', this.state.cadets)
 		return(
 			<div>
 				<h1 style={styles.heading}>Mentor Connect</h1>
@@ -188,7 +181,7 @@ export default class MentorConnect extends React.Component {
 			        <FlatButton
 			        	label="Sort"
 			        	primary={true}
-			        	onClick={this.handleSort}
+			        	onClick={() => this.state.cadets.sort(this.handleSort())}
 			        />
 		        </Col>
 					</Row>
@@ -222,6 +215,10 @@ export default class MentorConnect extends React.Component {
 									<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
 								)
 						})
+					}
+					{
+						this.state.cadets.length == 0 &&
+						<h3 style={styles.heading}>No cadets available for Mentor Connect</h3>
 					}
 				</Grid>
 				{

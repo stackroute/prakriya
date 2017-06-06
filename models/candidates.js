@@ -7,7 +7,7 @@ var attendance = new Schema({
 });
 
 var candidates = new Schema({
-		EmployeeID: {type: Number, unique: true},
+		EmployeeID: {type: Number, unique: true, required: true},
 		EmployeeName: String,
 		EmailID: String,
 		AltEmail: String,

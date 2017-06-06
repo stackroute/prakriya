@@ -10,7 +10,10 @@ var files = new Schema({
   addedBy: String,
   totalCadets: Number,
   importedCadets: Number,
-  failedCadets: Number,
+  failedCadets: [{
+    eid: String,
+    errmsg: String
+  }],
   status: String
 });
 
