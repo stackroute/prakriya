@@ -7,8 +7,8 @@ const styles = {
 		paddingTop: '14px'
   },
 	footer: {
-		position: 'absolute',
-	  bottom: -60,
+		// position: 'absolute',
+	 //  bottom: 0,
 		width: '100%',
 		fontFamily: 'sans-serif',
 		backgroundColor: 'rgb(0, 188, 212)',

@@ -9,7 +9,7 @@ const styles = {
 	},
 	body: {
 		fontFamily: 'sans-serif',
-		marginTop: 100
+		marginTop: 100,
 	}
 };
 
@@ -22,7 +22,6 @@ export default class App extends React.Component {
 				<div style={styles.body} >
 					{this.props.children}
 				</div>
-				<Footer />
 			</div>
 		)
 	}

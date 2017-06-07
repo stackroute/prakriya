@@ -17,7 +17,6 @@ export default class FilterItem extends React.Component {
     };
 		this.toggleAccordion = this.toggleAccordion.bind(this);
 		this.addFilter = this.addFilter.bind(this);
-		this.removeFilter = this.removeFilter.bind(this);
     this.getAccordianValues = this.getAccordianValues.bind(this);
   }
 
