@@ -10,6 +10,7 @@ import CandidateHome from './CandidateHome.jsx';
 import AddCandidate from './AddCandidate.jsx';
 import FilterItem from './FilterItem.jsx';
 import Chip from 'material-ui/Chip';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
 	heading: {
@@ -23,14 +24,19 @@ export default class Candidates extends React.Component {
 		super(props)
 
 		this.state = {
+			snackbarOpen: false,
+			snackbarMessage: '',
 			candidates: [],
 			showCandidate: false,
 			displayCandidate: {},
 			cadets: [],
-			filterCadetName: '',
-			filterCadetWave: '',
 			candidatesName:[],
-			appliedFilters: []
+			appliedFilters: [
+				{EmployeeID: {$in: []}},
+				{EmployeeName: {$in: []}},
+				{DigithonQualified: ''},
+				{DigithonPhase: ''}
+			]
 		}
 
 		this.getCandidates = this.getCandidates.bind(this);
@@ -39,46 +45,67 @@ export default class Candidates extends React.Component {
 		this.deleteCandidate = this.deleteCandidate.bind(this);
 		this.updateCandidate = this.updateCandidate.bind(this);
 		this.addCandidate = this.addCandidate.bind(this);
-		this.handleFilterName = this.handleFilterName.bind(this);
-		this.handleFilterWave = this.handleFilterWave.bind(this);
-		this.handleClearFilter = this.handleClearFilter.bind(this);
 		this.getAccordianValues = this.getAccordianValues.bind(this);
 		this.addFilter = this.addFilter.bind(this);
+		this.removeFilter = this.removeFilter.bind(this);
+		this.hideSnackbar = this.hideSnackbar.bind(this);
+		this.getFilteredCandidates = this.getFilteredCandidates.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.getCandidates();
-	}
-
-	handleFilterName(val) {
-		console.log("value",val)
-		this.setState({
-			filterCadetName: val,
-			filterCadetWave: ''
-		});
-	}
-
-	handleFilterWave(val) {
-		console.log("value",val)
-		this.setState({
-			filterCadetWave: val,
-			filterCadetName: ''
-		});
-	}
-
-	handleClearFilter() {
-		this.setState({
-			filterCadetWave: '',
-			filterCadetName: ''
-		});
 	}
 
 	addFilter(key, value) {
 		let appliedFilters = this.state.appliedFilters;
-		appliedFilters.push({key: value});
+		switch(key) {
+			case 'EmployeeID':
+				if(!this.duplicateFilterFound(appliedFilters[0].EmployeeID.$in, value))
+					appliedFilters[0].EmployeeID.$in.push(value);
+				break;
+			case 'EmployeeName':
+				if(!this.duplicateFilterFound(appliedFilters[1].EmployeeName.$in, value))
+					appliedFilters[1].EmployeeName.$in.push(value);
+				break;
+			case 'DigithonQualified':
+				appliedFilters[2].DigithonQualified = value;
+				break;
+			case 'DigithonPhase':
+				appliedFilters[3].DigithonPhase = value;
+				break;
+			default:
+				break;
+		}
+
 		this.setState({
 			appliedFilters: appliedFilters
-		})
+		});
+
+		console.log('Add - AppliedFilters: ', appliedFilters)
+		// this.getFilteredCandidates()
+	}
+
+	removeFilter(index, key, value) {
+		let appliedFilters = this.state.appliedFilters
+		console.log('RemoveFilter: ', appliedFilters)
+		if(appliedFilters[index][key].$in == undefined) {
+			appliedFilters[index][key] = '';
+		} else {
+			let $in = appliedFilters[index][key].$in.filter(function(element) {
+				return element != value;
+			});
+			appliedFilters[index][key].$in = $in
+		}
+		this.setState({
+			appliedFilters: appliedFilters
+		});
+		console.log('Delete - AppliedFilters: ', appliedFilters)
+	}
+
+	duplicateFilterFound(arr, value) {
+			return arr.some(function(element) {
+				return element == value;
+			});
 	}
 
 	getCandidates() {
@@ -90,10 +117,10 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-				let cadets = res.body.filter(function(cadet) {
-					if(!(cadet.Wave == undefined))
-						return cadet;
-				})
+					let cadets = res.body.filter(function(cadet) {
+						if(!(cadet.Wave == undefined))
+							return cadet;
+					})
 		    	th.setState({
 		    		candidates: cadets
 		    	})
@@ -107,11 +134,13 @@ export default class Candidates extends React.Component {
 			displayCandidate: candidate
 		})
 	}
+
 	handleBack() {
 		this.setState({
 			showCandidate: false
 		})
 	}
+
 	deleteCandidate(candidate) {
 		let th = this
 		Request
@@ -126,6 +155,7 @@ export default class Candidates extends React.Component {
 		    }
 		  })
 	}
+
 	updateCandidate(candidate) {
 		let th = this
 		Request
@@ -157,12 +187,24 @@ export default class Candidates extends React.Component {
 	}
 
 	getAccordianValues(key) {
-		console.log('parent func called')
-		let valueArr = []
+		let valueArr = [];
 		this.state.candidates.map(function(candidate) {
-			valueArr.push(candidate[key])
+			if(candidate[key]) valueArr.push(candidate[key].toString());
+			else valueArr.push(candidate[key]);
+		});
+		return valueArr;
+	}
+
+	hideSnackbar() {
+		this.setState({
+			snackbarMessage: '',
+			snackbarOpen: false
 		})
-		return valueArr
+	}
+
+	// go to server and fetch filtered candidates
+	getFilteredCandidates() {
+
 	}
 
 	render() {
@@ -201,87 +243,82 @@ export default class Candidates extends React.Component {
 									padding: '3px',
 									color: 'teal'
 								}}>... FILTERS ...</h3>
-								<div>
+								{
+									<div style={{border: '2px solid silver', width: ' 100%', padding: '3px'}}>
 									{
-										this.state.appliedFilters.map(function(filter, index) {
-											return (
-												<Chip
-								          key={index}
-								        >
-								          <span>{filter.value}</span>
-								        </Chip>
-											)
+										th.state.appliedFilters.map(function(filter, index) {
+											let key = Object.keys(filter)[0];
+											if(filter[key].$in == undefined) {
+												let value = Object.values(filter)[0];
+												if(value != '') {
+													return (
+														<Chip
+															key={key}
+															style={{border: '2px solid grey'}}
+															onRequestDelete={()=>th.removeFilter(index, key, value)}
+														>
+															<span style={{color: 'teal'}}>{key}: {value}</span>
+														</Chip>
+													)
+												}
+											} else {
+													return filter[key].$in.map(function(value, innerIndex) {
+														return (
+															<Chip
+																key={key + innerIndex}
+																style={{border: '2px solid grey'}}
+																onRequestDelete={()=>th.removeFilter(index, key, value)}
+															>
+																<span style={{color: 'teal'}}>{value}</span>
+															</Chip>
+														)
+													})
+												}
 										})
 									}
-								</div>
+									</div>
+								}
 								<FilterItem
 									title={'EmployeeID'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('EmployeeID')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('EmployeeID', filterValue)}
 								/>
 								<FilterItem
 									title={'EmployeeName'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('EmployeeName')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('EmployeeName', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonQualified'}
 									type={'RadioButton'}
-									onGetAccordianValues={()=>th.getAccordianValues('DigithonQualified')}
-									onAddFilter={th.addFilter}
+									onGetAccordianValues={()=>['Yes', 'No']}
+									onAddFilter={(filterValue)=>th.addFilter('DigithonQualified', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonPhase'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('DigithonPhase')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('DigithonPhase', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonScore'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('DigithonScore')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('DigithonScore', filterValue)}
 								/>
 								<FilterItem
 									title={'Skills'}
 									type={'CheckBox'}
 									onGetAccordianValues={()=>th.getAccordianValues('Skills')}
-									onAddFilter={th.addFilter}
+									onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
 								/>
-								<FilterItem
-									title={'CGPA'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('CGPA')}
-									onAddFilter={th.addFilter}
-								/>
-								{/*<AutoComplete
-									hintText="Search By"
-									filter={AutoComplete.fuzzyFilter}
-									searchText={this.state.filterCadetName}
-									dataSource={this.state.filterCategories}
-									onNewRequest={this.handleFilterName}
-								/>
-								<AutoComplete
-									hintText="SortBy Wave"
-									filter={AutoComplete.fuzzyFilter}
-									searchText={this.state.filterCadetWave}
-									dataSource={cadetsDistinctWave}
-									onNewRequest={this.handleFilterWave}
-								/>
-								<FlatButton
-									label="Clear Filter"
-									primary={true}
-									onClick={this.handleClearFilter}
-								/>*/}
 							</Col>
 							<Col md={9}>
 								{
 									this.state.candidates.map(function(candidate, key) {
-										if((th.state.filterCadetWave === candidate.Wave)||(th.state.filterCadetName === candidate.EmployeeName)) {
-											return (
-												candidate.Wave != undefined &&
+										return (
 													<CandidateCard
 														candidate={candidate}
 														handleCardClick={th.candidateView}
@@ -289,17 +326,6 @@ export default class Candidates extends React.Component {
 														k={key}
 													/>
 											)
-										}
-										else if((th.state.filterCadetName === '') && (th.state.filterCadetWave === '')) {
-											return(
-													<CandidateCard
-														candidate={candidate}
-														handleCardClick={th.candidateView}
-														handleDelete={th.deleteCandidate}
-														k={key}
-													/>
-											)
-										}
 									})
 								}
 							</Col>
@@ -316,6 +342,12 @@ export default class Candidates extends React.Component {
 					/>
 				</div>
 			}
+			<Snackbar
+				open={this.state.snackbarOpen}
+				message={this.state.snackbarMessage}
+				autoHideDuration={4000}
+				onRequestClose={this.hideSnackbar}
+			/>
 			</div>
 		)
 	}

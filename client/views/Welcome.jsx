@@ -8,6 +8,10 @@ import Login from '../components/login/index.jsx';
 import {Card, CardMedia} from 'material-ui/Card';
 
 const styles = {
+	// container: {
+	// 	minHeight: '100%',
+	// 	position: 'relative'
+	// },
 	brief: {
 		marginTop: '70px',
 		fontSize: '16px'
@@ -54,7 +58,7 @@ export default class Welcome extends React.Component {
       />,
     ];
 		return(
-			<div>
+			<div style={styles.container}>
 				<AppBar
 	        title="Prakriya"
 	        showMenuIconButton={false}
@@ -78,7 +82,6 @@ export default class Welcome extends React.Component {
 						<em>It is a Wave Automation Tool</em>
 					</p>
 				</div>
-				<Footer />
 			</div>
 		)
 	}

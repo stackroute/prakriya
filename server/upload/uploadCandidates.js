@@ -37,7 +37,19 @@ let registerCandidates = function () {
 			  			importedCadets.push(cadet);
 			  			callback();
 			  		}, function (err) {
-			  			failedCadets.push(cadetObj);
+			  			let cadet = {};
+			  			if(err.name == 'MongoError') {
+			  				cadet.errmsg = 'Duplicate cadet error';
+			  				cadet.eid = cadetObj.EmployeeID;
+			  			}
+			  			else if(err.name == 'ValidationError') {
+			  				cadet.errmsg = 'Employee ID is required'
+			  				if(cadetObj.EmailID)
+			  					cadet.eid = cadetObj.EmailID;
+			  				else if(cadetObj.EmployeeName)
+			  					cadet.eid = cadetObj.EmployeeName;
+			  			}
+			  			failedCadets.push(cadet);
 			  			callback();
 			  		})
 				  },
@@ -45,8 +57,8 @@ let registerCandidates = function () {
 				  	logger.debug('Final function');
 					  fileObj.totalCadets = total;
 					  fileObj.importedCadets = importedCadets.length;
-					  fileObj.failedCadets = failedCadets.length;
-					  if(fileObj.totalCadets ==  fileObj.importedCadets+fileObj.failedCadets) {
+					  fileObj.failedCadets = failedCadets;
+					  if(fileObj.totalCadets ==  fileObj.importedCadets+fileObj.failedCadets.length) {
 					  	uploadMongoController.updateFileStatus(fileObj);
 					  }
 				  }

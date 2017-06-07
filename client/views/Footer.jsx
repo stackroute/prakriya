@@ -2,19 +2,19 @@ import React from 'react';
 
 const styles = {
   text: {
-		marginTop:'12px',
+		marginTop:'2px',
 		marginBottom: '0px',
 		paddingTop: '14px'
   },
 	footer: {
-		// position: 'relative',
+		// position: 'absolute',
+	 //  bottom: 0,
 		width: '100%',
-		// bottom: 0,
 		fontFamily: 'sans-serif',
 		backgroundColor: 'rgb(0, 188, 212)',
 		color: '#fff',
 		textAlign: 'center',
-		height: '50px'
+		height: 50
 	}
 };
 
