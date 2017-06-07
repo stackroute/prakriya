@@ -84,6 +84,7 @@ export default class FilterItem extends React.Component {
 			content = (
 				<div style={{display: this.state.accordion}}>
 					<RadioButtonGroup
+						name={this.props.title}
 						style={{width: '100%', border: '2px solid silver', padding: '3px'}}
 						onChange={(e)=>{e.persist(); th.addFilter(e.target.value);}}
 					>
