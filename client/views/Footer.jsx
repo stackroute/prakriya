@@ -8,7 +8,7 @@ const styles = {
   },
 	footer: {
 		position: 'absolute',
-	  bottom: 0,
+	  bottom: -60,
 		width: '100%',
 		fontFamily: 'sans-serif',
 		backgroundColor: 'rgb(0, 188, 212)',
