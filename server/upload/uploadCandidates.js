@@ -37,9 +37,7 @@ let registerCandidates = function () {
 			  			importedCadets.push(cadet);
 			  			callback();
 			  		}, function (err) {
-			  			logger.error('Error in addding', err)
 			  			let cadet = {};
-			  			
 			  			if(err.name == 'MongoError') {
 			  				cadet.errmsg = 'Duplicate cadet error';
 			  				cadet.eid = cadetObj.EmployeeID;

@@ -72,7 +72,7 @@ export default class WaveDetails extends React.Component {
 					this.state.activeWaves.map(function(wave, key) {
 						return (
 							<div>
-								{wave.WaveNumber} ({wave.WaveID})
+								{wave.WaveNumber} ({wave.WaveID}) at {wave.Location}
 								<LinearProgress 
 									mode="determinate" 
 									value={th.showProgress(wave)} 

@@ -78,7 +78,7 @@ export default class Welcome extends React.Component {
 						<em>It is a Wave Automation Tool</em>
 					</p>
 				</div>
-				<Footer />
+				<Footer/>
 			</div>
 		)
 	}
