@@ -87,7 +87,7 @@ export default class AddCourse extends React.Component {
 		this.validationSuccess = this.validationSuccess.bind(this)
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		if(this.props.openDialog) {
 			this.setState({
 				showDialog: true,

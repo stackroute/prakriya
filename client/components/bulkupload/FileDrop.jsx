@@ -43,7 +43,7 @@ export default class FileDrop extends React.Component {
 		this.handleDrop = this.handleDrop.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.getTemplate();	
 	}
 

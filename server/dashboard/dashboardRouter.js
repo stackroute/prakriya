@@ -356,6 +356,23 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function(req, res) {
   }
 })
 
+// Update many cadets
+router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try {
+    logger.debug('Update cadets', req.body)
+    dashboardMongoController.updateCadets(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update candidates in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 // Delete a cadet
 router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try {

@@ -66,11 +66,8 @@ export default class Waves extends React.Component {
 	}
 
 	componentWillMount() {
-		this.getActiveWaves()
-	}
-
-	componentDidMount() {
 		this.getWaves()
+		this.getActiveWaves()
 	}
 
 	getActiveWaves() {

@@ -104,7 +104,7 @@ export default class Feedback extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.saveFeedback = this.saveFeedback.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.getCadet();
 		this.setState({
 			relevance: {'1':1, '2':1, '3':1, '4':1, '5':1},

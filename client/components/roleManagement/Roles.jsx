@@ -26,7 +26,7 @@ export default class RoleManagement extends React.Component {
 		this.deleteRole = this.deleteRole.bind(this);
 		this.savePermissions = this.savePermissions.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.getRoles();
 		this.getAccessControls();
 	}

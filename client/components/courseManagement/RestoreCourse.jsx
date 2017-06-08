@@ -46,7 +46,7 @@ export default class AddCourse extends React.Component {
 		this.handleClose = this.handleClose.bind(this);
 		this.onChangeActions = this.onChangeActions.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		let totalRemoved = 0;
 		this.props.course.map(function(course,index) {
 			if(course.Removed === true)

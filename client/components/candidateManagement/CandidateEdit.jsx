@@ -46,7 +46,7 @@ export default class CandidateEdit extends React.Component {
 		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.handleSave = this.handleSave.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		console.log('Start Date: ',this.state.candidate.StartDate);
 		let candidate = this.props.candidate
 		if(candidate.Wave == undefined)
