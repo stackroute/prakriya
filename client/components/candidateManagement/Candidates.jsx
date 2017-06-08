@@ -35,7 +35,9 @@ export default class Candidates extends React.Component {
 				{EmployeeID: {$in: []}},
 				{EmployeeName: {$in: []}},
 				{DigiThonQualified: ''},
-				{DigiThonPhase: ''}
+				{DigiThonPhase: ''},
+				{Wave: ''},
+				{DigiThonScore: {$gte: 9999}}
 			]
 		}
 
@@ -73,6 +75,11 @@ export default class Candidates extends React.Component {
 			case 'DigiThonPhase':
 				appliedFilters[3].DigiThonPhase = value;
 				break;
+			case 'Wave':
+				appliedFilters[4].Wave = value;
+				break;
+			case 'DigiThonScore':
+				appliedFilters[5].DigiThonScore.$gte = value;
 			default:
 				break;
 		}
@@ -89,7 +96,8 @@ export default class Candidates extends React.Component {
 		let appliedFilters = this.state.appliedFilters
 		console.log('RemoveFilter: ', appliedFilters)
 		if(appliedFilters[index][key].$in == undefined) {
-			appliedFilters[index][key] = '';
+			if(appliedFilters[index][key].$gte == undefined) appliedFilters[index][key] = '';
+			else appliedFilters[index][key].$gte = 9999;
 		} else {
 			let $in = appliedFilters[index][key].$in.filter(function(element) {
 				return element != value;
@@ -193,7 +201,11 @@ export default class Candidates extends React.Component {
 			if(candidate[key]) valueArr.push(candidate[key].toString());
 			else valueArr.push(candidate[key]);
 		});
-		return valueArr;
+		return valueArr.filter(this.distinct);
+	}
+
+	distinct(value, index, self) {
+		return self.indexOf(value) === index;
 	}
 
 	hideSnackbar() {
@@ -265,8 +277,10 @@ export default class Candidates extends React.Component {
 										th.state.appliedFilters.map(function(filter, index) {
 											let key = Object.keys(filter)[0];
 											if(filter[key].$in == undefined) {
-												let value = Object.values(filter)[0];
-												if(value != '') {
+												let value = Object.values(filter)[0].$gte == undefined ?
+													Object.values(filter)[0] :
+													Object.values(filter)[0].$gte;
+												if(value != '' && value != 9999) {
 													return (
 														<Chip
 															key={key}
@@ -320,8 +334,8 @@ export default class Candidates extends React.Component {
 								/>
 								<FilterItem
 									title={'DigithonScore'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('DigiThonScore')}
+									type={'Slider'}
+									onGetAccordianValues={()=>[0, 200]}
 									onAddFilter={(filterValue)=>th.addFilter('DigiThonScore', filterValue)}
 								/>
 								<FilterItem
@@ -329,6 +343,12 @@ export default class Candidates extends React.Component {
 									type={'CheckBox'}
 									onGetAccordianValues={()=>th.getAccordianValues('Skills')}
 									onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
+								/>
+								<FilterItem
+									title={'Wave'}
+									type={'CheckBox'}
+									onGetAccordianValues={()=>th.getAccordianValues('Wave')}
+									onAddFilter={(filterValue)=>th.addFilter('Wave', filterValue)}
 								/>
 							</Col>
 							<Col md={9}>

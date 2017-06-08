@@ -4,6 +4,7 @@ import Checkbox from 'material-ui/Checkbox';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import ArrowDropDownIcon from 'material-ui/svg-icons/navigation/arrow-drop-down';
 import ArrowDropUpIcon from 'material-ui/svg-icons/navigation/arrow-drop-up';
+import Slider from 'material-ui/Slider';
 
 export default class FilterItem extends React.Component {
 
@@ -71,11 +72,16 @@ export default class FilterItem extends React.Component {
 					<div style={{display: this.state.accordion, width: '100%', border: '2px solid silver', padding: '3px'}}>
 						{
 							this.state.values.map(function(value, key) {
-								<Checkbox
-									label={value}
-									value={value}
-									key={key}
-								/>
+								return (
+									<Checkbox
+										label={value}
+										value={value}
+										key={key}
+										onCheck={(e, isChecked)=>{
+											if(isChecked) th.addFilter(value);
+										}}
+									/>
+								)
 							})
 						}
 					</div>
@@ -101,6 +107,19 @@ export default class FilterItem extends React.Component {
 							})
 						}
 					</RadioButtonGroup>
+				</div>
+			);
+		} else if(this.props.type == 'Slider') {
+			content = (
+				<div style={{display: this.state.accordion, width: '100%', border: '2px solid silver', padding: '3px'}}>
+					<Slider
+						min={this.state.values[0]}
+						max={this.state.values[1]}
+						step={1}
+						sliderStyle={{backgroundColor: 'silver'}}
+						onChange={(e, value)=>th.addFilter(value)}
+					/>
+					Above: {this.state.selectedValue}
 				</div>
 			);
 		}
