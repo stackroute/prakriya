@@ -55,7 +55,7 @@ export default class TrackItem extends React.Component {
 		this.saveComments = this.saveComments.bind(this)
 	}
 
-  componentDidMount() {
+  componentWillMount() {
 		let th = this
 		if(th.props.track.comments.length == undefined)
 			th.props.track.comments = new Array(th.props.track.categories.length)

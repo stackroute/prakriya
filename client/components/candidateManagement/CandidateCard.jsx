@@ -38,7 +38,7 @@ export default class CandidateCard extends React.Component {
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.getProfilePic(this.props.candidate.EmployeeID);
 	}
 	getProfilePic(eid) {

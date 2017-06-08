@@ -133,7 +133,7 @@ export default class EvaluationForms extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.saveEvaluation = this.saveEvaluation.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.getCadets();
 		this.setState({
 			programming: {'1':1, '2':1, '3':1, '4':1, '5':1},

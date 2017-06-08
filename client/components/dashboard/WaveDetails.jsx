@@ -27,7 +27,7 @@ export default class WaveDetails extends React.Component {
 		this.showProgress = this.showProgress.bind(this);
 		this.formatDate = this.formatDate.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.getWaves();
 	}
 	getWaves() {
@@ -71,7 +71,7 @@ export default class WaveDetails extends React.Component {
 				{
 					this.state.activeWaves.map(function(wave, key) {
 						return (
-							<div>
+							<div key={key}>
 								{wave.WaveNumber} ({wave.WaveID}) at {wave.Location}
 								<LinearProgress 
 									mode="determinate" 

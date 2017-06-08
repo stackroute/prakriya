@@ -27,7 +27,7 @@ export default class BulkUpload extends React.Component {
 		this.getUsers = this.getUsers.bind(this);
 		this.pushNotification = this.pushNotification.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.setState({
 			user: this.props.user
 		})

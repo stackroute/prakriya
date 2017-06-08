@@ -24,7 +24,7 @@ export default class MyProfile extends React.Component {
 		this.getProfilePic = this.getProfilePic.bind(this);
 		this.getWave = this.getWave.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.getCadet();
 		this.getProjects();
 	}

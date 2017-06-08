@@ -31,7 +31,7 @@ export default class Dashboard extends React.Component {
 		}
 		this.formatDate = this.formatDate.bind(this); 
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.setState({
 			user: this.props.user
 		})

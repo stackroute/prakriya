@@ -57,8 +57,6 @@ export default class Projects extends React.Component {
 	}
 	componentWillMount() {
 		this.getActiveWaves()
-	}
-	componentDidMount() {
 		this.getProjects()
 	}
 	getActiveWaves() {

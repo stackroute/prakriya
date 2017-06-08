@@ -10,8 +10,6 @@
 	import Snackbar from 'material-ui/Snackbar';
 	import RaisedButton from 'material-ui/RaisedButton';
 
-
-
 	const styles = {
 		heading: {
 			textAlign: 'center'
@@ -44,9 +42,7 @@
 			marginLeft:'20px'
 
 		}
-	  }
-
-
+	}
 
 	export default class Attendance extends React.Component {
 		constructor(props) {

@@ -72,7 +72,7 @@ export default class AddWave extends React.Component {
 		this.resetFields = this.resetFields.bind(this)
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.setState({
 			cadets: this.props.cadets
 		})
