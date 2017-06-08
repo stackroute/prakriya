@@ -22,11 +22,15 @@ export default class FilterItem extends React.Component {
   }
 
   toggleAccordion() {
+		let th = this;
     if(this.state.accordion == 'none') {
-			this.getAccordianValues()
-      this.setState({
-        accordion: 'block'
-      });
+			if(this.getAccordianValues() > 0) {
+	      this.setState({
+	        accordion: 'block'
+	      });
+			} else {
+				this.props.onOpenSnackbar(`Sorry! No values found against ${th.props.title} in the database.`);
+			}
     } else {
       this.setState({
         accordion: 'none',
@@ -41,6 +45,7 @@ export default class FilterItem extends React.Component {
     this.setState({
       values: values
     });
+		return values.length;
   }
 
 	addFilter(value) {
@@ -111,7 +116,8 @@ export default class FilterItem extends React.Component {
 			);
 		} else if(this.props.type == 'Slider') {
 			content = (
-				<div style={{display: this.state.accordion, width: '100%', border: '2px solid silver', padding: '3px'}}>
+				<div style={{display: this.state.accordion, width: '100%', border: '2px solid silver', padding: '3px', height: '70px'}}>
+					<span style={{padding: '2px'}}>Above: {this.state.selectedValue}</span>
 					<Slider
 						min={this.state.values[0]}
 						max={this.state.values[1]}
@@ -119,7 +125,6 @@ export default class FilterItem extends React.Component {
 						sliderStyle={{backgroundColor: 'silver'}}
 						onChange={(e, value)=>th.addFilter(value)}
 					/>
-					Above: {this.state.selectedValue}
 				</div>
 			);
 		}

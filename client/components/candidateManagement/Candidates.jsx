@@ -30,7 +30,6 @@ export default class Candidates extends React.Component {
 			filteredCandidates: [],
 			showCandidate: false,
 			displayCandidate: {},
-			candidatesName:[],
 			appliedFilters: [
 				{EmployeeID: {$in: []}},
 				{EmployeeName: {$in: []}},
@@ -52,6 +51,7 @@ export default class Candidates extends React.Component {
 		this.removeFilter = this.removeFilter.bind(this);
 		this.hideSnackbar = this.hideSnackbar.bind(this);
 		this.getFilteredCandidates = this.getFilteredCandidates.bind(this);
+		this.openSnackbar = this.openSnackbar.bind(this);
 	}
 
 	componentWillMount() {
@@ -127,7 +127,7 @@ export default class Candidates extends React.Component {
 		    	console.log(err);
 		    else {
 					let cadets = res.body.filter(function(cadet) {
-						if(!(cadet.Wave == undefined))
+						// if(!(cadet.Wave == undefined))
 							return cadet;
 					})
 		    	th.setState({
@@ -197,22 +197,29 @@ export default class Candidates extends React.Component {
 
 	getAccordianValues(key) {
 		let valueArr = [];
-		this.state.candidates.map(function(candidate) {
+		this.state.candidates.map(function(candidate, index) {
 			if(candidate[key]) valueArr.push(candidate[key].toString());
 			else valueArr.push(candidate[key]);
 		});
-		return valueArr.filter(this.distinct);
+		return valueArr.filter(this.distinctDefined);
 	}
 
-	distinct(value, index, self) {
-		return self.indexOf(value) === index;
+	distinctDefined(value, index, self) {
+		return self.indexOf(value) === index && value != undefined;
+	}
+
+	openSnackbar(message) {
+		this.setState({
+			snackbarMessage: message,
+			snackbarOpen: true
+		});
 	}
 
 	hideSnackbar() {
 		this.setState({
 			snackbarMessage: '',
 			snackbarOpen: false
-		})
+		});
 	}
 
 	// fetching filtered candidates from db
@@ -313,12 +320,14 @@ export default class Candidates extends React.Component {
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('EmployeeID')}
 									onAddFilter={(filterValue)=>th.addFilter('EmployeeID', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 								<FilterItem
 									title={'EmployeeName'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('EmployeeName')}
 									onAddFilter={(filterValue)=>th.addFilter('EmployeeName', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 								<FilterItem
 									title={'DigithonQualified'}
@@ -331,6 +340,7 @@ export default class Candidates extends React.Component {
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('DigiThonPhase')}
 									onAddFilter={(filterValue)=>th.addFilter('DigiThonPhase', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 								<FilterItem
 									title={'DigithonScore'}
@@ -343,12 +353,14 @@ export default class Candidates extends React.Component {
 									type={'CheckBox'}
 									onGetAccordianValues={()=>th.getAccordianValues('Skills')}
 									onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 								<FilterItem
 									title={'Wave'}
-									type={'CheckBox'}
+									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('Wave')}
 									onAddFilter={(filterValue)=>th.addFilter('Wave', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 							</Col>
 							<Col md={9}>
