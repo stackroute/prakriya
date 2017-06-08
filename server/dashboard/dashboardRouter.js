@@ -778,4 +778,28 @@ router.post('/updatewave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, r
   }
 })
 
+/****************************************************
+*********          Candidate Filter         *********
+****************************************************/
+
+// Get filtered candidates
+router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+  try{
+    console.log('Filter Query 1: ', JSON.stringify(req.body.filterQuery))
+    dashboardMongoController.getFilteredCandidates(req.body.filterQuery, function(candidates) {
+      res.status(201).json(candidates);
+    }, function(err) {
+      console.log('Error: ', err)
+      res.status(500).json({ error: 'Cannot filter candidates from db...!' });
+    });
+  }
+  catch(err) {
+    console.log('Internal Error: ', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+
 module.exports = router;

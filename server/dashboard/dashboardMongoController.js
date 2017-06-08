@@ -515,6 +515,18 @@ let getAbsentees = function(successCB, errorCB) {
 	})
 }
 
+/****************************************************
+*********          Candidate Filter         *********
+****************************************************/
+
+let getFilteredCandidates = function(filterQuery, successCB, errorCB) {
+	CandidateModel.find({$or: filterQuery}, function(err, candidates) {
+		if(err)
+			errorCB(err)
+		successCB(candidates)
+	})
+}
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -552,5 +564,6 @@ module.exports = {
 	updateCadetWave,
 	getUserRole,
 	getAbsentees,
-	updateApproval
+	updateApproval,
+	getFilteredCandidates
 }

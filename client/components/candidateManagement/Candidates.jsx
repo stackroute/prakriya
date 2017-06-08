@@ -27,15 +27,15 @@ export default class Candidates extends React.Component {
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
+			filteredCandidates: [],
 			showCandidate: false,
 			displayCandidate: {},
-			cadets: [],
 			candidatesName:[],
 			appliedFilters: [
 				{EmployeeID: {$in: []}},
 				{EmployeeName: {$in: []}},
-				{DigithonQualified: ''},
-				{DigithonPhase: ''}
+				{DigiThonQualified: ''},
+				{DigiThonPhase: ''}
 			]
 		}
 
@@ -67,11 +67,11 @@ export default class Candidates extends React.Component {
 				if(!this.duplicateFilterFound(appliedFilters[1].EmployeeName.$in, value))
 					appliedFilters[1].EmployeeName.$in.push(value);
 				break;
-			case 'DigithonQualified':
-				appliedFilters[2].DigithonQualified = value;
+			case 'DigiThonQualified':
+				appliedFilters[2].DigiThonQualified = value;
 				break;
-			case 'DigithonPhase':
-				appliedFilters[3].DigithonPhase = value;
+			case 'DigiThonPhase':
+				appliedFilters[3].DigiThonPhase = value;
 				break;
 			default:
 				break;
@@ -82,7 +82,7 @@ export default class Candidates extends React.Component {
 		});
 
 		console.log('Add - AppliedFilters: ', appliedFilters)
-		// this.getFilteredCandidates()
+		this.getFilteredCandidates()
 	}
 
 	removeFilter(index, key, value) {
@@ -100,6 +100,7 @@ export default class Candidates extends React.Component {
 			appliedFilters: appliedFilters
 		});
 		console.log('Delete - AppliedFilters: ', appliedFilters)
+		this.getFilteredCandidates();
 	}
 
 	duplicateFilterFound(arr, value) {
@@ -202,9 +203,24 @@ export default class Candidates extends React.Component {
 		})
 	}
 
-	// go to server and fetch filtered candidates
+	// fetching filtered candidates from db
 	getFilteredCandidates() {
-
+		let th = this;
+		Request
+			.post('/dashboard/filteredcandidates')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({'filterQuery': th.state.appliedFilters})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+					th.setState({
+						filteredCandidates: res.body
+					});
+		    	console.log('Filter Success');
+					console.log(res);
+		    }
+			})
 	}
 
 	render() {
@@ -294,19 +310,19 @@ export default class Candidates extends React.Component {
 									title={'DigithonQualified'}
 									type={'RadioButton'}
 									onGetAccordianValues={()=>['Yes', 'No']}
-									onAddFilter={(filterValue)=>th.addFilter('DigithonQualified', filterValue)}
+									onAddFilter={(filterValue)=>th.addFilter('DigiThonQualified', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonPhase'}
 									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('DigithonPhase')}
-									onAddFilter={(filterValue)=>th.addFilter('DigithonPhase', filterValue)}
+									onGetAccordianValues={()=>th.getAccordianValues('DigiThonPhase')}
+									onAddFilter={(filterValue)=>th.addFilter('DigiThonPhase', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonScore'}
 									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('DigithonScore')}
-									onAddFilter={(filterValue)=>th.addFilter('DigithonScore', filterValue)}
+									onGetAccordianValues={()=>th.getAccordianValues('DigiThonScore')}
+									onAddFilter={(filterValue)=>th.addFilter('DigiThonScore', filterValue)}
 								/>
 								<FilterItem
 									title={'Skills'}
@@ -317,7 +333,18 @@ export default class Candidates extends React.Component {
 							</Col>
 							<Col md={9}>
 								{
+									this.state.filteredCandidates.length == 0 ?
 									this.state.candidates.map(function(candidate, key) {
+										return (
+													<CandidateCard
+														candidate={candidate}
+														handleCardClick={th.candidateView}
+														handleDelete={th.deleteCandidate}
+														k={key}
+													/>
+											)
+									}) :
+									this.state.filteredCandidates.map(function(candidate, key) {
 										return (
 													<CandidateCard
 														candidate={candidate}
