@@ -124,7 +124,6 @@ export default class UserList extends React.Component {
 		const accountTooltip = this.disabledUser() ? 'Unlock Account' : 'Lock Account' ;
 		const disabled = this.disabledUser()
 		let type = typeof color;
-		console.log(type);
 		return (
 			<div>
 					<Card>

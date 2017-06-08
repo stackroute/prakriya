@@ -11,7 +11,7 @@ const adminMongoController = require('../admin/adminMongoController.js');
 const UserModel = require('../../models/users.js');
 const CONFIG = require('../../config');
 const logger = require('./../../applogger');
-
+var mongoose = require('mongoose');
 
 /****************************************************
 *******          Notification System         ********
@@ -234,6 +234,15 @@ let getCadet = function(email, successCB, errorCB) {
 	});
 }
 
+let getUserRole = function(email, successCB, errorCB) {
+	console.log(email);
+	UserModel.findOne({'email': email},function(err, result) {
+		if (err)
+				errorCB(err);
+		successCB(result);
+	});
+}
+
 let getCadets = function(successCB, errorCB) {
 	CandidateModel.find({},function(err, result) {
 		if (err)
@@ -343,14 +352,26 @@ let getWaveSpecificCandidates = function(waveID,successCB, errorCB) {
 }
 
 //update absentees
-let updateAbsentees = function(AbsenteesID,successCB, errorCB) {
-	console.log("absentees"+AbsenteesID.absentees);
-	CandidateModel.updateMany({EmployeeID:{$in:AbsenteesID.absentees}},{$push:{'Attendance.DaysAbsent':AbsenteesID.date}}, function(err, result) {
+let updateAbsentees = function(Absentees,successCB, errorCB) {
+	console.log("absentees"+(Absentees.details.fromDate));
+	CandidateModel.updateMany({EmployeeID:Absentees.absentee},{$push:{'DaysAbsent':Absentees.details}}, function(err, result) {
 		if(err) {
 			console.log("error"+err)
 			errorCB(err);
 		}
 		console.log(result);
+		successCB(result);
+	});
+}
+
+let updateApproval = function(Approval,successCB, errorCB) {
+	console.log("approval"+Approval.id+"done?"+Approval.approval);
+	var id = new mongoose.mongo.ObjectId(Approval.id);
+	CandidateModel.update({"DaysAbsent._id" : id}, {$set: {"DaysAbsent.$.approved": Approval.approval}}, function(err, result) {
+		if(err) {
+			console.log("error"+err)
+			errorCB(err);
+		}
 		successCB(result);
 	});
 }
@@ -500,6 +521,26 @@ let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 				})
 }
 
+let getAbsentees = function(successCB, errorCB) {
+	CandidateModel.find({DaysAbsent:{$elemMatch:{approved:'no'}}},function(err, cadets) {
+		if(err)
+			errorCB(err)
+		successCB(cadets)
+	})
+}
+
+/****************************************************
+*********          Candidate Filter         *********
+****************************************************/
+
+let getFilteredCandidates = function(filterQuery, successCB, errorCB) {
+	CandidateModel.find({$or: filterQuery}, function(err, candidates) {
+		if(err)
+			errorCB(err)
+		successCB(candidates)
+	})
+}
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -535,5 +576,9 @@ module.exports = {
 	getActiveWaves,
 	updateWave,
 	getCadetsOfProj,
-	updateCadetWave
+	updateCadetWave,
+	getUserRole,
+	getAbsentees,
+	updateApproval,
+	getFilteredCandidates
 }

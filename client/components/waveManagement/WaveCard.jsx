@@ -21,6 +21,7 @@ import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import dialog from '../../styles/dialog.json';
 import select from '../../styles/select.json';
+import Moment from 'moment';
 
 const styles = {
     text: {
@@ -77,6 +78,7 @@ export default class WaveCard extends React.Component {
 		this.openAddDialog = this.openAddDialog.bind(this);
 		this.handleCadetsChange = this.handleCadetsChange.bind(this);
 		this.getNewCadets = this.getNewCadets.bind(this);
+		this.formatDate = this.formatDate.bind(this);
 	}
 
 	handleEditWave() {
@@ -135,6 +137,10 @@ export default class WaveCard extends React.Component {
 		    	console.log(th.state.newCadets);
 		    }
 			})
+	}
+
+	formatDate(date) {
+		return Moment(date).format("MMM Do YYYY");
 	}
 
 	handleUpdateWave() {
@@ -287,23 +293,7 @@ export default class WaveCard extends React.Component {
 		startdate = startdate.getFullYear() + '/' + (startdate.getMonth()+1) + '/' + startdate.getDate();
 		let enddate = new Date(this.props.wave.EndDate);
 		enddate = enddate.getFullYear() + '/' + (enddate.getMonth()+1) + '/' + enddate.getDate();
-		let start = (new Date(startdate));
-		start = start.toString();
-		start = start.split(' ');
-		start = start[2]+' '+start[1]+' '+start[3];
-		let end = (new Date(enddate));
-		end = end.toString();
-		end = end.split(' ');
-		end = end[2]+' '+end[1]+' '+end[3];
-		let date = start + ' - ' + end;
 		let th = this
-		let viewMembers = 1
-		let pointer = 'pointer'
-		if(this.props.wave.CourseNames.length === 0)
-		{
-			viewMembers = 0,
-			pointer = 'auto'
-		}
 
 		const deleteDialogActions = [
       <FlatButton
@@ -366,7 +356,7 @@ export default class WaveCard extends React.Component {
 				    <IconButton tooltip="Date">
 				      <DateIcon/>
 				    </IconButton>
-				    <span style={{position: 'absolute',top: '47%'}}>{date}</span><br/>
+				    <span style={{position: 'absolute',top: '47%'}}>{this.formatDate(this.props.wave.StartDate)}-{this.formatDate(this.props.wave.EndDate)}</span><br/>
 				    <IconButton  tooltip="Course">
 				      <CourseIcon/>
 				    </IconButton><span style={{position: 'absolute',top: '62%'}}>
@@ -377,7 +367,7 @@ export default class WaveCard extends React.Component {
 			    			return <span key={index}>{course}</span>
 			    	})
 			    	}</span><br/>
-			    	<IconButton tooltip="Members" onClick={this.handleOpen} style={{opacity:viewMembers, cursor:pointer}}>
+			    	<IconButton tooltip="Members" onClick={this.handleOpen}>
 				      <GroupIcon/>
 				    </IconButton>
 				  	<IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{float:'right'}}>

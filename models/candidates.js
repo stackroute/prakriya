@@ -1,11 +1,6 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-var attendance = new Schema({
-	DaysPresent: [Date],
-	DaysAbsent: [Date]
-});
-
 var candidates = new Schema({
 		EmployeeID: {type: Number, unique: true, required: true},
 		EmployeeName: String,
@@ -35,9 +30,16 @@ var candidates = new Schema({
 		ProjectName: String,
 		ProjectDescription: String,
 		ProjectSkills: [String],
-		AssetID: String,		
+		AssetID: String,
 		AssessmentTrack: [String],
-		Attendance: attendance
+		DaysPresent: [Date],
+		DaysAbsent: [{
+			fromDate: Date,
+			toDate: Date,
+			approved: String,
+			leaveType: String,
+			reason: String
+		}]
 });
 
 module.exports = mongoose.model('Candidates', candidates);
