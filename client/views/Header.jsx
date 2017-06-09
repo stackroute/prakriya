@@ -93,21 +93,17 @@ export default class Header extends React.Component {
 			this.getActions()
       this.getNotifications(this.props.username)
 		}
-	}
-
-  componentDidMount() {
     let th = this
-
     let socket = io()
-		socket.on('show notification', function(data) {
+    socket.on('show notification', function(data) {
       if(data.to === th.props.useremail) {
         let notifications = th.state.notifications
         notifications.push(data.notification)
-  			th.setState({
+        th.setState({
           notifications: notifications
         })
       }
-		})
+    })
 	}
 
   getNotifications(username) {

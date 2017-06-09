@@ -96,7 +96,7 @@ export default class ProfileView extends React.Component {
 		this.handlePicSave = this.handlePicSave.bind(this);
 		this.formatDate = this.formatDate.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		let picPreview = this.state.defaultProfilePic;
 		this.setState({
 			cadet: this.props.cadet,

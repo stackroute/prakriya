@@ -356,6 +356,23 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function(req, res) {
   }
 })
 
+// Update many cadets
+router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try {
+    logger.debug('Update cadets', req.body)
+    dashboardMongoController.updateCadets(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update candidates in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 // Delete a cadet
 router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try {
@@ -794,5 +811,29 @@ router.post('/updatewave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, r
     });
   }
 })
+
+/****************************************************
+*********          Candidate Filter         *********
+****************************************************/
+
+// Get filtered candidates
+router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+  try{
+    console.log('Filter Query 1: ', JSON.stringify(req.body.filterQuery))
+    dashboardMongoController.getFilteredCandidates(req.body.filterQuery, function(candidates) {
+      res.status(201).json(candidates);
+    }, function(err) {
+      console.log('Error: ', err)
+      res.status(500).json({ error: 'Cannot filter candidates from db...!' });
+    });
+  }
+  catch(err) {
+    console.log('Internal Error: ', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 
 module.exports = router;

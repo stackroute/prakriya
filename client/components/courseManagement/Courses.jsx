@@ -40,7 +40,7 @@ export default class Courses extends React.Component {
 		this.addCourse = this.addCourse.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.getCourses();
 	}
 

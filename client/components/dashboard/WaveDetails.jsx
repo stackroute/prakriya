@@ -13,6 +13,9 @@ const styles = {
 	},
 	heading: {
 		textAlign: 'center'
+	},
+	wave: {
+		marginBottom: 30
 	}
 }
 
@@ -27,7 +30,7 @@ export default class WaveDetails extends React.Component {
 		this.showProgress = this.showProgress.bind(this);
 		this.formatDate = this.formatDate.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.getWaves();
 	}
 	getWaves() {
@@ -67,12 +70,12 @@ export default class WaveDetails extends React.Component {
 		let th = this;
 		return(
 			<div style={styles.container}>
-				<h3 style={styles.heading}>On going waves</h3>
+				<h3>On going waves</h3>
 				{
 					this.state.activeWaves.map(function(wave, key) {
 						return (
-							<div>
-								{wave.WaveNumber} ({wave.WaveID}) at {wave.Location}
+							<div style={styles.wave} key={key}>
+								<div style={styles.heading}>{wave.WaveNumber} ({wave.WaveID}) at {wave.Location}</div>
 								<LinearProgress 
 									mode="determinate" 
 									value={th.showProgress(wave)} 

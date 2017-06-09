@@ -27,15 +27,16 @@ export default class Candidates extends React.Component {
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
+			filteredCandidates: [],
 			showCandidate: false,
 			displayCandidate: {},
-			cadets: [],
-			candidatesName:[],
 			appliedFilters: [
 				{EmployeeID: {$in: []}},
 				{EmployeeName: {$in: []}},
-				{DigithonQualified: ''},
-				{DigithonPhase: ''}
+				{DigiThonQualified: ''},
+				{DigiThonPhase: ''},
+				{Wave: ''},
+				{DigiThonScore: {$gte: 9999}}
 			]
 		}
 
@@ -50,6 +51,7 @@ export default class Candidates extends React.Component {
 		this.removeFilter = this.removeFilter.bind(this);
 		this.hideSnackbar = this.hideSnackbar.bind(this);
 		this.getFilteredCandidates = this.getFilteredCandidates.bind(this);
+		this.openSnackbar = this.openSnackbar.bind(this);
 	}
 
 	componentWillMount() {
@@ -67,12 +69,17 @@ export default class Candidates extends React.Component {
 				if(!this.duplicateFilterFound(appliedFilters[1].EmployeeName.$in, value))
 					appliedFilters[1].EmployeeName.$in.push(value);
 				break;
-			case 'DigithonQualified':
-				appliedFilters[2].DigithonQualified = value;
+			case 'DigiThonQualified':
+				appliedFilters[2].DigiThonQualified = value;
 				break;
-			case 'DigithonPhase':
-				appliedFilters[3].DigithonPhase = value;
+			case 'DigiThonPhase':
+				appliedFilters[3].DigiThonPhase = value;
 				break;
+			case 'Wave':
+				appliedFilters[4].Wave = value;
+				break;
+			case 'DigiThonScore':
+				appliedFilters[5].DigiThonScore.$gte = value;
 			default:
 				break;
 		}
@@ -82,14 +89,15 @@ export default class Candidates extends React.Component {
 		});
 
 		console.log('Add - AppliedFilters: ', appliedFilters)
-		// this.getFilteredCandidates()
+		this.getFilteredCandidates()
 	}
 
 	removeFilter(index, key, value) {
 		let appliedFilters = this.state.appliedFilters
 		console.log('RemoveFilter: ', appliedFilters)
 		if(appliedFilters[index][key].$in == undefined) {
-			appliedFilters[index][key] = '';
+			if(appliedFilters[index][key].$gte == undefined) appliedFilters[index][key] = '';
+			else appliedFilters[index][key].$gte = 9999;
 		} else {
 			let $in = appliedFilters[index][key].$in.filter(function(element) {
 				return element != value;
@@ -100,6 +108,7 @@ export default class Candidates extends React.Component {
 			appliedFilters: appliedFilters
 		});
 		console.log('Delete - AppliedFilters: ', appliedFilters)
+		this.getFilteredCandidates();
 	}
 
 	duplicateFilterFound(arr, value) {
@@ -118,7 +127,7 @@ export default class Candidates extends React.Component {
 		    	console.log(err);
 		    else {
 					let cadets = res.body.filter(function(cadet) {
-						if(!(cadet.Wave == undefined))
+						// if(!(cadet.Wave == undefined))
 							return cadet;
 					})
 		    	th.setState({
@@ -188,23 +197,49 @@ export default class Candidates extends React.Component {
 
 	getAccordianValues(key) {
 		let valueArr = [];
-		this.state.candidates.map(function(candidate) {
+		this.state.candidates.map(function(candidate, index) {
 			if(candidate[key]) valueArr.push(candidate[key].toString());
 			else valueArr.push(candidate[key]);
 		});
-		return valueArr;
+		return valueArr.filter(this.distinctDefined);
+	}
+
+	distinctDefined(value, index, self) {
+		return self.indexOf(value) === index && value != undefined;
+	}
+
+	openSnackbar(message) {
+		this.setState({
+			snackbarMessage: message,
+			snackbarOpen: true
+		});
 	}
 
 	hideSnackbar() {
 		this.setState({
 			snackbarMessage: '',
 			snackbarOpen: false
-		})
+		});
 	}
 
-	// go to server and fetch filtered candidates
+	// fetching filtered candidates from db
 	getFilteredCandidates() {
-
+		let th = this;
+		Request
+			.post('/dashboard/filteredcandidates')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({'filterQuery': th.state.appliedFilters})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+					th.setState({
+						filteredCandidates: res.body
+					});
+		    	console.log('Filter Success');
+					console.log(res);
+		    }
+			})
 	}
 
 	render() {
@@ -249,8 +284,10 @@ export default class Candidates extends React.Component {
 										th.state.appliedFilters.map(function(filter, index) {
 											let key = Object.keys(filter)[0];
 											if(filter[key].$in == undefined) {
-												let value = Object.values(filter)[0];
-												if(value != '') {
+												let value = Object.values(filter)[0].$gte == undefined ?
+													Object.values(filter)[0] :
+													Object.values(filter)[0].$gte;
+												if(value != '' && value != 9999) {
 													return (
 														<Chip
 															key={key}
@@ -283,41 +320,63 @@ export default class Candidates extends React.Component {
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('EmployeeID')}
 									onAddFilter={(filterValue)=>th.addFilter('EmployeeID', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 								<FilterItem
 									title={'EmployeeName'}
 									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('EmployeeName')}
 									onAddFilter={(filterValue)=>th.addFilter('EmployeeName', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 								<FilterItem
 									title={'DigithonQualified'}
 									type={'RadioButton'}
 									onGetAccordianValues={()=>['Yes', 'No']}
-									onAddFilter={(filterValue)=>th.addFilter('DigithonQualified', filterValue)}
+									onAddFilter={(filterValue)=>th.addFilter('DigiThonQualified', filterValue)}
 								/>
 								<FilterItem
 									title={'DigithonPhase'}
 									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('DigithonPhase')}
-									onAddFilter={(filterValue)=>th.addFilter('DigithonPhase', filterValue)}
+									onGetAccordianValues={()=>th.getAccordianValues('DigiThonPhase')}
+									onAddFilter={(filterValue)=>th.addFilter('DigiThonPhase', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 								<FilterItem
 									title={'DigithonScore'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('DigithonScore')}
-									onAddFilter={(filterValue)=>th.addFilter('DigithonScore', filterValue)}
+									type={'Slider'}
+									onGetAccordianValues={()=>[0, 200]}
+									onAddFilter={(filterValue)=>th.addFilter('DigiThonScore', filterValue)}
 								/>
 								<FilterItem
 									title={'Skills'}
 									type={'CheckBox'}
 									onGetAccordianValues={()=>th.getAccordianValues('Skills')}
 									onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
+								/>
+								<FilterItem
+									title={'Wave'}
+									type={'AutoComplete'}
+									onGetAccordianValues={()=>th.getAccordianValues('Wave')}
+									onAddFilter={(filterValue)=>th.addFilter('Wave', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
 								/>
 							</Col>
 							<Col md={9}>
 								{
+									this.state.filteredCandidates.length == 0 ?
 									this.state.candidates.map(function(candidate, key) {
+										return (
+													<CandidateCard
+														candidate={candidate}
+														handleCardClick={th.candidateView}
+														handleDelete={th.deleteCandidate}
+														k={key}
+													/>
+											)
+									}) :
+									this.state.filteredCandidates.map(function(candidate, key) {
 										return (
 													<CandidateCard
 														candidate={candidate}

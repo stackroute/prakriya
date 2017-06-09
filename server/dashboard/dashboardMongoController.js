@@ -259,6 +259,20 @@ let updateCadet = function (cadetObj, successCB, errorCB) {
 	})
 }
 
+let updateCadets = function (cadetArr, successCB, errorCB) {
+	let count = 0;
+	cadetArr.forEach(function(cadetObj) {
+		CandidateModel.update({"EmployeeID": cadetObj.EmployeeID}, cadetObj, function(err, status) {
+			if(err)
+				errorCB(err);
+			count++;
+			if(count == cadetArr.length)
+				successCB(status);
+		})
+	})
+
+}
+
 let deleteCadet = function(cadetObj, successCB, errorCB) {
 	console.log('cadetObj to delete', cadetObj)
 	CandidateModel
@@ -526,6 +540,18 @@ let getAbsentees = function(successCB, errorCB) {
 	})
 }
 
+/****************************************************
+*********          Candidate Filter         *********
+****************************************************/
+
+let getFilteredCandidates = function(filterQuery, successCB, errorCB) {
+	CandidateModel.find({$or: filterQuery}, function(err, candidates) {
+		if(err)
+			errorCB(err)
+		successCB(candidates)
+	})
+}
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -539,6 +565,7 @@ module.exports = {
 	updateProject,
 	getFiles,
 	updateCadet,
+	updateCadets,
 	deleteCadet,
 	saveFeedback,
 	saveEvaluation,
@@ -564,5 +591,6 @@ module.exports = {
 	getUserRole,
 	getAbsentees,
 	updateApproval,
-	cancelLeave
+	cancelLeave,
+	getFilteredCandidates
 }

@@ -9,7 +9,7 @@ const styles = {
 	},
 	body: {
 		fontFamily: 'sans-serif',
-		marginTop: 100,
+		marginTop: 65,
 	}
 };
 

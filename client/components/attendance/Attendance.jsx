@@ -375,8 +375,8 @@ export default class Attendance extends React.Component {
 							<TableHeaderColumn>From Date</TableHeaderColumn>
 							<TableHeaderColumn>To Date</TableHeaderColumn>
 							<TableHeaderColumn>Reason</TableHeaderColumn>
-							<TableHeaderColumn>Approved</TableHeaderColumn>
-							<TableHeaderColumn>Rejected</TableHeaderColumn>
+							<TableHeaderColumn>Approve</TableHeaderColumn>
+							<TableHeaderColumn>Reject</TableHeaderColumn>
 						</TableRow>
 					</TableHeader>
 					<TableBody displayRowCheckbox={false} showRowHover={true}>
