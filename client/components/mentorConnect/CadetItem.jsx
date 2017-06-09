@@ -9,9 +9,9 @@ const styles = {
 	container: {
 		marginTop: 10
 	},
-	row: {
-		display: 'flex',
-  	alignItems: 'center'
+	radioBtn: {
+		display: 'flex', 
+		width: 100
 	}
 }
 
@@ -104,6 +104,7 @@ export default class CadetItem extends React.Component {
 							name="selected"
 							onChange={this.handleSelectedChange}
 							valueSelected={this.state.cadet.Selected}
+							style={styles.radioBtn}
 						>
 							<RadioButton
 				        value="Yes"

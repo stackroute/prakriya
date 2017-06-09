@@ -19,7 +19,7 @@ const styles = {
 		fontWeight: 'bold',
 		color: '#eee',
 		background: '#555',
-		paddingTop: 10
+		paddingTop: 10,
 	},
 	paper1: {
 		padding: 10
@@ -262,10 +262,10 @@ export default class MentorConnect extends React.Component {
 						<Col md={2}>
 							Cadet Name
 						</Col>
-						<Col md={4}>
+						<Col md={4} style={styles.heading}>
 							Remarks
 						</Col>
-						<Col md={3}>
+						<Col md={3} style={styles.heading}>
 							Selected
 						</Col>
 					</Row>
