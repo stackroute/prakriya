@@ -11,12 +11,7 @@ import AddCandidate from './AddCandidate.jsx';
 import FilterItem from './FilterItem.jsx';
 import Chip from 'material-ui/Chip';
 import Snackbar from 'material-ui/Snackbar';
-
-const styles = {
-	heading: {
-		textAlign: 'center'
-	}
-}
+import app from '../../styles/app.json';
 
 export default class Candidates extends React.Component {
 
@@ -275,7 +270,7 @@ export default class Candidates extends React.Component {
 			{
 				!this.state.showCandidate ?
 				<div>
-					<h1 style={styles.heading}>Candidate Management</h1>
+					<h1 style={app.heading}>Candidate Management</h1>
 					<Grid>
 						<Row>
 							<Col md={3}>

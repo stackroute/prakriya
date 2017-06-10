@@ -1,10 +1,12 @@
-import React from 'react'
-import Request from 'superagent'
-import SelectField from 'material-ui/SelectField'
-import MenuItem from 'material-ui/MenuItem'
-import {Grid, Row, Col} from 'react-flexbox-grid'
-import TrackItem from './TrackItem.jsx'
-import FlatButton from 'material-ui/FlatButton'
+import React from 'react';
+import Request from 'superagent';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import {Grid, Row, Col} from 'react-flexbox-grid';
+import TrackItem from './TrackItem.jsx';
+import FlatButton from 'material-ui/FlatButton';
+import Paper from 'material-ui/Paper';
+import app from '../../styles/app.json';
 
 export default class AssessmentTracker extends React.Component {
 	constructor(props) {
@@ -138,12 +140,10 @@ export default class AssessmentTracker extends React.Component {
 		let th = this
 		return(
 			<div>
+				<h1 style={app.heading}>Assessment Tracker</h1>
 				<Grid>
 					<Row>
-						<h1>Assessment Tracker</h1>
-					</Row>
-					<Row>
-						<Col md={6}>
+						<Col md={6}><Paper style={{boxSizing: 'border-box', padding: '5px'}}>
 						<SelectField
 							onChange={th.onWaveChange}
 							floatingLabelText="Select Wave"
@@ -166,8 +166,8 @@ export default class AssessmentTracker extends React.Component {
 								})
 							}
 						</SelectField>
-						</Col>
-						<Col md={6}>
+						</Paper></Col>
+						<Col md={6}><Paper style={{boxSizing: 'border-box', padding: '5px'}}>
 						<SelectField
 							floatingLabelText="Select Candidate"
 							value={th.state.filteredCandidate}
@@ -181,9 +181,9 @@ export default class AssessmentTracker extends React.Component {
 						<FlatButton
 							label="Clear Filter"
 							onClick={this.clearFilter}
-							style={{backgroundColor: 'teal'}}
+							style={{top: '-20px'}}
 						/>
-						</Col>
+						</Paper></Col>
 					</Row>
 				</Grid>
 
@@ -192,7 +192,7 @@ export default class AssessmentTracker extends React.Component {
 						th.state.filteredCandidates.length > 0 ?
 						th.state.filteredCandidates.map(function(candidate, index) {
 							let categories = th.state.assessmentCategories
-							return (<Row key={candidate.EmployeeID}><Col md={10}><TrackItem
+							return (<Row key={candidate.EmployeeID}><Col md={12}><TrackItem
 								track={
 									{
 										candidateID: candidate.EmployeeID,

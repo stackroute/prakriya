@@ -14,22 +14,7 @@ import Session from './Session.jsx'
 import {Card, CardText, CardHeader} from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
 import {lightBlack} from 'material-ui/styles/colors';
-
-const styles = {
-	heading:{
-		textAlign:'center'
-	},
-	save: {
-		textAlign: 'center',
-		marginBottom: 20
-	},
-	addButton: {
-		position:'fixed',
-		bottom: '60px',
-		right: '15px',
-		zIndex: 1
-	}
-}
+import app from '../../styles/app.json';
 
 export default class Wave extends React.Component {
 	constructor(props) {
@@ -77,7 +62,6 @@ export default class Wave extends React.Component {
 			.get(`/dashboard/waveobject/${waveID}`)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
-				// console.log('Wave recieved from server: ', res.body.waveObject)
 				th.setState({
 					waveObject: res.body.waveObject,
 				})
@@ -133,10 +117,8 @@ export default class Wave extends React.Component {
 		let th = this
 		return(
 			<div>
+				<h1 style={app.heading}>Program Flow</h1>
 				<Grid>
-					<Row>
-						<h2 style={styles.heading}>Program Flow</h2>
-					</Row>
 					<Row>
 						<Col md={6}>
 						<SelectField
@@ -173,7 +155,7 @@ export default class Wave extends React.Component {
 					}
 					</Row>
 				</Grid>
-					<FloatingActionButton style={styles.addButton} mini={true} onTouchTap={this.addSession}>
+					<FloatingActionButton style={app.fab} mini={true} onTouchTap={this.addSession}>
 						<AddIcon />
 					</FloatingActionButton>
 					{this.state.addSessionDialog &&
