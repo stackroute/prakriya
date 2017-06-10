@@ -545,7 +545,7 @@ let getAbsentees = function(successCB, errorCB) {
 ****************************************************/
 
 let getFilteredCandidates = function(filterQuery, successCB, errorCB) {
-	CandidateModel.find({$or: filterQuery}, function(err, candidates) {
+	CandidateModel.find(filterQuery, function(err, candidates) {
 		if(err)
 			errorCB(err)
 		successCB(candidates)

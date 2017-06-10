@@ -27,6 +27,7 @@ export default class Candidates extends React.Component {
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
+			filtersCount: 0,
 			filteredCandidates: [],
 			showCandidate: false,
 			displayCandidate: {},
@@ -52,6 +53,7 @@ export default class Candidates extends React.Component {
 		this.hideSnackbar = this.hideSnackbar.bind(this);
 		this.getFilteredCandidates = this.getFilteredCandidates.bind(this);
 		this.openSnackbar = this.openSnackbar.bind(this);
+		this.resetFilters = this.resetFilters.bind(this);
 	}
 
 	componentWillMount() {
@@ -59,6 +61,7 @@ export default class Candidates extends React.Component {
 	}
 
 	addFilter(key, value) {
+		let th = this;
 		let appliedFilters = this.state.appliedFilters;
 		switch(key) {
 			case 'EmployeeID':
@@ -83,8 +86,8 @@ export default class Candidates extends React.Component {
 			default:
 				break;
 		}
-
 		this.setState({
+			filtersCount: th.state.filtersCount + 1,
 			appliedFilters: appliedFilters
 		});
 
@@ -93,7 +96,8 @@ export default class Candidates extends React.Component {
 	}
 
 	removeFilter(index, key, value) {
-		let appliedFilters = this.state.appliedFilters
+		let th = this;
+		let appliedFilters = this.state.appliedFilters;
 		console.log('RemoveFilter: ', appliedFilters)
 		if(appliedFilters[index][key].$in == undefined) {
 			if(appliedFilters[index][key].$gte == undefined) appliedFilters[index][key] = '';
@@ -105,6 +109,7 @@ export default class Candidates extends React.Component {
 			appliedFilters[index][key].$in = $in
 		}
 		this.setState({
+			filtersCount: th.state.filtersCount - 1,
 			appliedFilters: appliedFilters
 		});
 		console.log('Delete - AppliedFilters: ', appliedFilters)
@@ -131,7 +136,8 @@ export default class Candidates extends React.Component {
 							return cadet;
 					})
 		    	th.setState({
-		    		candidates: cadets
+		    		candidates: cadets,
+						filteredCandidates: cadets
 		    	})
 		    }
 		  })
@@ -225,10 +231,12 @@ export default class Candidates extends React.Component {
 	// fetching filtered candidates from db
 	getFilteredCandidates() {
 		let th = this;
+		console.log('FiltersCount: ', th.state.filtersCount)
+		let filterQuery = th.state.filtersCount > 0 ? {'$or': th.state.appliedFilters} : {};
 		Request
 			.post('/dashboard/filteredcandidates')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send({'filterQuery': th.state.appliedFilters})
+			.send({'filterQuery': filterQuery})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
@@ -242,20 +250,25 @@ export default class Candidates extends React.Component {
 			})
 	}
 
+	resetFilters() {
+		let th = this;
+		this.setState({
+			filtersCount: 0,
+			appliedFilters: [
+				{EmployeeID: {$in: []}},
+				{EmployeeName: {$in: []}},
+				{DigiThonQualified: ''},
+				{DigiThonPhase: ''},
+				{Wave: ''},
+				{DigiThonScore: {$gte: 9999}}
+			],
+			filteredCandidates: th.state.candidates
+		});
+	}
+
 	render() {
 		let th = this;
-		let cadetsName = [];
-		let cadetsWave=[];
-		let cadetsDistinctWave=[];
-		this.state.candidates.map(function (cadet, i) {
-			cadetsName.push(cadet.EmployeeName);
-		})
-		this.state.candidates.map(function (cadet, i) {
-			cadetsWave.push(cadet.Wave);
-			})
-		cadetsDistinctWave=cadetsWave.filter(function (cadet, i, cadetsWave) {
-	    return cadetsWave.indexOf(cadet) == i;
-		});
+
 		return(
 			<div>
 			<AddCandidate addCandidate={this.addCandidate}/>
@@ -266,18 +279,47 @@ export default class Candidates extends React.Component {
 					<Grid>
 						<Row>
 							<Col md={3}>
+							<div style={{
+								backgroundColor: '#eeeeee',
+								border: '2px solid silver',
+								width: '100%',
+								marginLeft: '0px',
+								marginRight: '0px',
+								marginTop: '5px',
+								marginBottom: '0px',
+								padding: '3px'
+							}}>
 								<h3 style={{
 									textAlign: 'center',
-									backgroundColor: '#eeeeee',
-									border: '2px solid silver',
-									width: '100%',
-									marginLeft: '0px',
-									marginRight: '0px',
-									marginTop: '5px',
-									marginBottom: '0px',
-									padding: '3px',
 									color: 'teal'
 								}}>... FILTERS ...</h3>
+								<div>
+									<div style={{
+										width: '60%',
+										display: 'inline-block',
+										boxSizing: 'border-box',
+										padding: '2px'
+									}}>
+										Candidates Found: {this.state.filteredCandidates.length}
+									</div>
+									<div
+										style={{
+											cursor: 'pointer',
+											width: '40%',
+											display: 'inline-block',
+											padding: '2px',
+											boxSizing: 'border-box',
+											textAlign: 'center',
+											borderRadius: '5px',
+											color: 'blue',
+											textDecoration: 'underline'
+										}}
+										onTouchTap={th.resetFilters}
+									>
+										Reset Filters
+									</div>
+								</div>
+							</div>
 								{
 									<div style={{border: '2px solid silver', width: ' 100%', padding: '3px'}}>
 									{
@@ -365,17 +407,6 @@ export default class Candidates extends React.Component {
 							</Col>
 							<Col md={9}>
 								{
-									this.state.filteredCandidates.length == 0 ?
-									this.state.candidates.map(function(candidate, key) {
-										return (
-													<CandidateCard
-														candidate={candidate}
-														handleCardClick={th.candidateView}
-														handleDelete={th.deleteCandidate}
-														k={key}
-													/>
-											)
-									}) :
 									this.state.filteredCandidates.map(function(candidate, key) {
 										return (
 													<CandidateCard
