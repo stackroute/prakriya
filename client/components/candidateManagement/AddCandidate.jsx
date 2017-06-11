@@ -11,39 +11,8 @@ import FlatButton from 'material-ui/FlatButton';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
-
-const styles = {
-	addButton: {
-		position:'fixed',
-	  bottom: '60px',
-	  right: '15px',
-	  zIndex: 1
-	},
-	dialog: {
-		backgroundColor: '#DDDBF1',
-		borderBottom: '3px solid teal',
-		borderRight: '10px solid teal',
-		borderLeft: '10px solid teal'
-	},
-	dialogTitle: {
-		fontWeight: 'bold',
-		backgroundColor: 'teal',
-		color: '#DDDBF1',
-		textAlign: 'center'
-	},
-	actionsContainer: {
-		backgroundColor: 'teal',
-		borderTop: '0px',
-		marginTop: '0px'
-	},
-	actionButton: {
-		backgroundColor: '#DDDBF1',
-		width: '50%',
-		color: 'teal',
-		border: '1px solid teal',
-		height: '100%'
-	}
-}
+import dialog from '../../styles/dialog.json';
+import app from '../../styles/app.json';
 
 export default class AddCourse extends React.Component {
 	constructor(props) {
@@ -391,32 +360,32 @@ export default class AddCourse extends React.Component {
 		let actions = [
 			<FlatButton
 				label="CANCEL"
-				style={styles.actionButton}
+				style={dialog.actionButton}
 				onClick={(e) => this.handleClose(e, 'CLOSE')}
 				/>,
 			<FlatButton
 				label="Add Candidate"
-				style={styles.actionButton}
+				style={dialog.actionButton}
 				onClick={(e) => this.handleClose(e, 'ADD')}
 				/>
 		]
 			return(
 				<div>
-				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
+				<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
 					<Dialog
-			    	bodyStyle={styles.dialog}
 	          title="ADD CANDIDATE"
 	          open={this.state.showDialog}
 	          autoScrollBodyContent={true}
-						actionsContainerStyle={styles.actionsContainer}
-						titleStyle={styles.dialogTitle}
+						actionsContainerStyle={dialog.actionsContainer}
+						bodyStyle={dialog.body}
+						titleStyle={dialog.title}
 						actions={actions}
 	          onRequestClose={(e) => this.handleClose(e, 'CLOSE')}
 	        >
 					<div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 	        	<TextField
 			    		hintText="Enter a six digit Employee ID"
 			    		floatingLabelText="Employee ID"
@@ -425,7 +394,7 @@ export default class AddCourse extends React.Component {
 							errorText={this.state.empIDErrorText}
 			    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Name"
 			    		floatingLabelText="Name"
@@ -436,7 +405,7 @@ export default class AddCourse extends React.Component {
 						</div>
 					</div>
 					<div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Email"
 			    		floatingLabelText="Email"
@@ -445,7 +414,7 @@ export default class AddCourse extends React.Component {
 							errorText={this.state.emailErrorText}
 			    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Enter a 10 digit mobile number"
 			    		floatingLabelText="Contact"
@@ -456,7 +425,7 @@ export default class AddCourse extends React.Component {
 						</div>
 					</div>
 					<div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Career Band"
 			    		floatingLabelText="Career Band"
@@ -465,7 +434,7 @@ export default class AddCourse extends React.Component {
 							errorText={this.state.careerBandErrorText}
 			    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="BU"
 			    		floatingLabelText="Revised BU"
@@ -476,7 +445,7 @@ export default class AddCourse extends React.Component {
 						</div>
 					</div>
 					<div>
-						<div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box33}>
 			    	<TextField
 			    		hintText="Digithon"
 			    		floatingLabelText="Digithon Qualified"
@@ -485,7 +454,7 @@ export default class AddCourse extends React.Component {
 							errorText={this.state.digithonQualifiedErrorText}
 			    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '34%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box34}>
 			    	<TextField
 			    		hintText="Phase"
 			    		floatingLabelText="Digithon Phase"
@@ -495,7 +464,7 @@ export default class AddCourse extends React.Component {
 							errorText={this.state.digithonPhaseErrorText}
 			    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box33}>
 			    	<TextField
 			    		hintText="Score"
 			    		floatingLabelText="Digithon Score"
@@ -507,7 +476,7 @@ export default class AddCourse extends React.Component {
 						</div>
 					</div>
 					<div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Status"
 			    		floatingLabelText="Training Status"
@@ -516,7 +485,7 @@ export default class AddCourse extends React.Component {
 							errorText={this.state.trainingStatusErrorText}
 			    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Trainings Undergone"
 			    		floatingLabelText="Trainings Undergone"
@@ -527,7 +496,7 @@ export default class AddCourse extends React.Component {
 						</div>
 					</div>
 					<div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Experience In Years"
 			    		floatingLabelText="Experience In Years"
@@ -536,7 +505,7 @@ export default class AddCourse extends React.Component {
 							errorText={this.state.workExperienceYearErrorText}
 			    	/>Year(s)
 						</div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Experience In Months"
 			    		floatingLabelText="Experience In Months"
@@ -547,7 +516,7 @@ export default class AddCourse extends React.Component {
 						</div>
 					</div>
 					<div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Primary Supervisor"
 			    		floatingLabelText="Primary Supervisor"
@@ -556,7 +525,7 @@ export default class AddCourse extends React.Component {
 							errorText={this.state.primarySupervisorErrorText}
 			    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Project Supervisor"
 			    		floatingLabelText="Project Supervisor"
@@ -567,7 +536,7 @@ export default class AddCourse extends React.Component {
 						</div>
 					</div>
 					<div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="College"
 			    		floatingLabelText="College"
@@ -575,7 +544,7 @@ export default class AddCourse extends React.Component {
 			    		onChange={this.onChangeCollege}
 			    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="CGPA"
 			    		floatingLabelText="CGPA"
