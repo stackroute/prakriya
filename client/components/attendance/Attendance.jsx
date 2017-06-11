@@ -11,6 +11,7 @@ import IconButton from 'material-ui/IconButton';
 import RejectIcon from 'material-ui/svg-icons/navigation/close';
 import ApproveIcon from 'material-ui/svg-icons/navigation/check';
 import {red500, green500} from 'material-ui/styles/colors';
+import DatePicker from 'material-ui/DatePicker';
 import Moment from 'moment';
 import {
   Table,
@@ -51,7 +52,9 @@ export default class Attendance extends React.Component {
       slideIndex: 0,
       result: 'rejected',
 			WaveIds: [],
-			cadetsOfWave: []
+			cadetsOfWave: [],
+      WaveID: '',
+      Date: '',
     }
     this.handleSelect = this.handleSelect.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -70,6 +73,9 @@ export default class Attendance extends React.Component {
 		this.getWaveId = this.getWaveId.bind(this);
 		this.onWaveIdChange = this.onWaveIdChange.bind(this);
 		this.getWaveSpecificCandidates = this.getWaveSpecificCandidates.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.updatePresent = this.updatePresent.bind(this);
+    this.handlePresent = this.handlePresent.bind(this);
   }
 
   componentWillMount() {
@@ -92,12 +98,20 @@ export default class Attendance extends React.Component {
     })
   }
 
+  updatePresent(EmpID, details) {
+    var cadet = this.state.cadetsOfWave.filter(function(cadets){
+      return cadets.EmployeeID != EmpID
+    })
+    this.setState({
+        cadetsOfWave : cadet
+    })
+  }
+
 	onWaveIdChange(e) {
             this.setState({
-                WaveIds: e.target.textContent
-      })
-      console.log(e.target.textContent);
-      this.getWaveSpecificCandidates(e.target.textContent);
+                WaveId: e.target.textContent
+              })
+            this.getWaveSpecificCandidates(e.target.textContent);
   }
 
 	getWaveSpecificCandidates(waveId){
@@ -108,9 +122,8 @@ export default class Attendance extends React.Component {
                 .get('/dashboard/wavespecificcandidates?waveID='+waveId)
                 .set({'Authorization': localStorage.getItem('token')})
                 .end(function(err, res){
-									console.log(res.body);
-                th.setState({
-                    cadetsOfWave: res.body
+									th.setState({
+                    cadetsOfWave: res.body.data
                 })
                 })
             }
@@ -184,6 +197,7 @@ export default class Attendance extends React.Component {
       this.setState({slideIndex: value, type: 'no', result: 'rejected'})
     } else {
       this.setState({slideIndex: value})
+      if(this.state.role !== 'candidate')
 			this.getWaveId();
     }
   };
@@ -271,11 +285,54 @@ export default class Attendance extends React.Component {
     })
   }
 
+  handlePresent(EmpID) {
+    let th = this
+    Request.post('/dashboard/updatepresent').set({'Authorization': localStorage.getItem('token')}).send({
+      EmployeeID: EmpID
+    }).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+          let cadet = th.state.cadet;
+          cadet.DaysPresent.push(new Date());
+          th.setState({
+            cadet: cadet
+          })
+        }
+    })
+  }
+
+	handleDateChange(event, date) {
+		let startDate = new Date(date);
+		this.setState({
+			Date: date
+		})
+	}
+
+
   render() {
     let th = this;
     if (this.state.role === 'candidate') {
       const {finished, stepIndex} = this.state;
       if (th.state.cadet != null) {
+        let attendance = '';
+        let today = this.formatDate(new Date());
+        let lastDay = this.formatDate(this.state.cadet.DaysPresent[this.state.cadet.DaysPresent.length-1])
+
+        this.state.cadet.DaysAbsent.map(function(details){
+        if((new Date(details.fromDate)<= new Date()) && (new Date(details.toDate) >= new Date()) )
+            attendance = (<h2>You are on leave.Please contact admin for further approval</h2>)
+        })
+        if(attendance === '') {
+        if(today === lastDay && this.state.cadet.DaysPresent.length > 0) {
+          attendance = (<h2>You have marked today's attendance... For updation contact StackRoute Admin</h2>)
+        }
+        else {
+          attendance = (<div>
+            <h2>Do you wish to mark today's attendance </h2>
+            <FlatButton label="Yes" onTouchTap={this.handlePresent.bind(this, this.state.cadet.EmployeeID)} primary={true}/></div>
+          )
+        }}
         return (
           <div>
             <h1 style={styles.content}>ATTENDANCE</h1>
@@ -330,7 +387,7 @@ export default class Attendance extends React.Component {
                   </TableHeader>
                   <TableBody displayRowCheckbox={false} showRowHover={true}>
                     {th.state.cadet.DaysAbsent.map(function(dates, index) {
-                      if (dates.approved === 'no' || dates.approved === 'rejected')
+                        if (dates.approved === 'no' || dates.approved === 'rejected' || dates.approved === 'closed')
                         return (
                           <TableRow>
                             <TableRowColumn>{th.formatDate(dates.fromDate)}</TableRowColumn>
@@ -349,7 +406,7 @@ export default class Attendance extends React.Component {
                 </Table>
               </Tab>
               <Tab label="Mark Attendance" value={2}>
-
+                {attendance}
               </Tab>
             </Tabs>
 
@@ -421,6 +478,13 @@ export default class Attendance extends React.Component {
               <Tab label="Approve Leaves" value={0}> {table}</Tab>
               <Tab label="Rejected Leaves" value={1}> {table}</Tab>
               <Tab label="Update Attendance" value={2}>
+              <DatePicker
+                hintText="Date to be updated"
+                floatingLabelText='Date'
+                errorText={this.state.StartDateErrorText}
+                value={this.state.Date}
+                onChange={this.handleDateChange}
+              />
 							<SelectField
 													onChange={th.onWaveIdChange}
 													floatingLabelText="Select WaveID"
@@ -449,12 +513,12 @@ export default class Attendance extends React.Component {
 														{cadet.EmployeeName}
 												</TableRowColumn>
 												<TableRowColumn>
-													<IconButton tooltip="Approve" onClick={th.updateAttendance.bind(th, details._id, 'yes', index, key)}>
+													<IconButton tooltip="Approve">
 														<ApproveIcon color={green500}/>
 													</IconButton>
 												</TableRowColumn>
 												<TableRowColumn>
-													<IconButton tooltip="Reject" onClick={th.updateAttendance.bind(th, details._id, th.state.result, index, key)}>
+													<IconButton tooltip="Reject">
 														<RejectIcon color={red500}/>
 													</IconButton>
 												</TableRowColumn>

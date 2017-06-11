@@ -530,6 +530,22 @@ router.post("/updateabsentees", auth.canAccess(CONFIG.CANDIDATE), function(req, 
   }
 });
 
+//update present
+router.post("/updatepresent", auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+  try{
+    dashboardMongoController.updatePresent(req.body.EmployeeID, function(status) {
+      res.status(201).json({success: 'success'});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!'});
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 //cancelleave
 router.post("/cancelleave", auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try{
@@ -540,7 +556,6 @@ router.post("/cancelleave", auth.canAccess(CONFIG.CANDIDATE), function(req, res)
     });
   }
   catch(err){
-    console.log(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });

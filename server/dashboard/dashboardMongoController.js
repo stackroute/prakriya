@@ -552,6 +552,15 @@ let getFilteredCandidates = function(filterQuery, successCB, errorCB) {
 	})
 }
 
+let updatePresent = function(EmpID, successCB, errorCB) {
+	let present = new Date();
+	CandidateModel.update({EmployeeID: EmpID},{$push: {DaysPresent: present}}, function(err, candidates) {
+		if(err)
+			errorCB(err)
+		successCB(candidates)
+	})
+}
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -592,5 +601,6 @@ module.exports = {
 	getAbsentees,
 	updateApproval,
 	cancelLeave,
+	updatePresent,
 	getFilteredCandidates
 }
