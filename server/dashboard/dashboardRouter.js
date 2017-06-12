@@ -533,8 +533,48 @@ router.post("/updateabsentees", auth.canAccess(CONFIG.CANDIDATE), function(req, 
 //update present
 router.post("/updatepresent", auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try{
-    dashboardMongoController.updatePresent(req.body.EmployeeID, function(status) {
+    dashboardMongoController.updatePresent(req.body.EmployeeID, new Date(), function(status) {
       res.status(201).json({success: 'success'});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!'});
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//update present
+router.post("/present", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try{
+    dashboardMongoController.updatePresent(req.body.EmployeeID, req.body.Date, function(status) {
+      dashboardMongoController.cancelLeave({id:req.body.id}, function(status) {
+        res.status(201).json({success: 'success'});
+      }, function(err) {
+        res.status(500).json({ error: 'Cannot update candidate db...!'});
+      })
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!'});
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//update absent
+router.post("/absent", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try{
+    dashboardMongoController.updateAbsentees({details: req.body.details, absentee: req.body.EmployeeID}, function(status) {
+      dashboardMongoController.cancelPresent(req.body.EmployeeID, req.body.Date, function(status) {
+        res.status(201).json({success: 'success'});
+      }, function(err) {
+        res.status(500).json({ error: 'Cannot update candidate db...!'});
+      })
     }, function(err) {
       res.status(500).json({ error: 'Cannot update candidate db...!'});
     });

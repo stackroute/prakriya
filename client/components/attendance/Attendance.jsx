@@ -76,6 +76,7 @@ export default class Attendance extends React.Component {
     this.handleDateChange = this.handleDateChange.bind(this);
     this.updatePresent = this.updatePresent.bind(this);
     this.handlePresent = this.handlePresent.bind(this);
+    this.updateAbsent = this.updateAbsent.bind(this);
   }
 
   componentWillMount() {
@@ -99,11 +100,49 @@ export default class Attendance extends React.Component {
   }
 
   updatePresent(EmpID, details) {
-    var cadet = this.state.cadetsOfWave.filter(function(cadets){
-      return cadets.EmployeeID != EmpID
+    let th = this
+    Request.post('/dashboard/present').set({'Authorization': localStorage.getItem('token')}).send({
+      EmployeeID: EmpID,
+      id: details,
+      Date: th.state.Date
+    }).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+          let cadet = th.state.cadetsOfWave.filter(function(cadet){
+            return cadet.EmployeeID === EmpID;
+          });
+          cadet[0].DaysPresent.push(th.state.Date);
+          cadet[0].DaysAbsent = cadet[0].DaysAbsent.filter(function(cadets, key) {
+            return details != cadets._id
+          })
+          th.setState({
+            cadet: cadet[0]
+          })
+        }
     })
-    this.setState({
-        cadetsOfWave : cadet
+  }
+
+  updateAbsent(EmpID, date) {
+    let th = this
+    let details = {
+      fromDate: th.state.Date,
+      toDate: th.state.Date,
+      approved: 'yes',
+      leaveType: 'absent',
+      reason: 'absent'
+    }
+    Request.post('/dashboard/absent').set({'Authorization': localStorage.getItem('token')}).send({
+      EmployeeID: EmpID,
+      details: details,
+      Date: date
+    }).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log(th.state.WaveId);
+          th.getWaveSpecificCandidates(th.state.WaveId);
+        }
     })
   }
 
@@ -165,16 +204,7 @@ export default class Attendance extends React.Component {
       if (err)
         console.log(err);
       else {
-        let cadet = th.state.cadet;
-        let details = {
-          fromDate: th.state.fromDate,
-          toDate: th.state.toDate,
-          approved: 'no',
-          leaveType: th.state.leaveType,
-          reason: th.state.reason
-        };
-        cadet.DaysAbsent.push(details);
-        th.setState({cadet: cadet})
+        th.getCadet();
       }
     })
   }
@@ -387,6 +417,7 @@ export default class Attendance extends React.Component {
                   </TableHeader>
                   <TableBody displayRowCheckbox={false} showRowHover={true}>
                     {th.state.cadet.DaysAbsent.map(function(dates, index) {
+                      if(new Date() < new Date(dates.fromDate)) {
                         if (dates.approved === 'no' || dates.approved === 'rejected' || dates.approved === 'closed')
                         return (
                           <TableRow>
@@ -400,6 +431,7 @@ export default class Attendance extends React.Component {
                             </TableRowColumn>
                           </TableRow>
                         )
+                      }
                     })
 }
                   </TableBody>
@@ -507,21 +539,42 @@ export default class Attendance extends React.Component {
 									<TableBody displayRowCheckbox={false} showRowHover={true}>
 										{
 											th.state.cadetsOfWave.map(function(cadet, index) {
+                        let absent = true;
+                        let present = false;
+                        let date = '';
+                        cadet.DaysAbsent.map(function(details) {
+                          console.log((th.formatDate(new Date(details.fromDate))<= th.formatDate(new Date(th.state.Date))) && ((new Date(details.toDate) >= new Date(th.state.Date))|| (th.formatDate(new Date(details.fromDate)) === (th.formatDate(new Date(details.toDate))))))
+                        if((th.formatDate(new Date(details.fromDate))<= th.formatDate(new Date(th.state.Date))) && ((new Date(details.toDate) >= new Date(th.state.Date))|| (th.formatDate(new Date(details.fromDate)) === (th.formatDate(new Date(details.toDate))))))
+                          {
+                             absent = false
+                             present = true
+                             date = details._id
+                             console.log(details);
+                          }
+                        })
+                        cadet.DaysPresent.filter(function(detail) {
+                          if(th.formatDate(detail)===th.formatDate(th.state.Date))
+                          {
+                            present = false
+                            absent = true
+                            date = detail
+                          }
+                        })
 											return (
 												<TableRow>
 												<TableRowColumn>
 														{cadet.EmployeeName}
 												</TableRowColumn>
 												<TableRowColumn>
-													<IconButton tooltip="Approve">
-														<ApproveIcon color={green500}/>
-													</IconButton>
+                          <IconButton tooltip="Present" disabled={absent} onClick = {th.updatePresent.bind(this, cadet.EmployeeID, date)}>
+                             <ApproveIcon color={green500}/>
+                           </IconButton>
 												</TableRowColumn>
 												<TableRowColumn>
-													<IconButton tooltip="Reject">
-														<RejectIcon color={red500}/>
-													</IconButton>
-												</TableRowColumn>
+                        <IconButton tooltip="Reject"  disabled={present} onClick = {th.updateAbsent.bind(this, cadet.EmployeeID, date)}>
+                          <RejectIcon color={red500}/>
+                        </IconButton>
+                      	</TableRowColumn>
 											</TableRow>
 											)
 										})
