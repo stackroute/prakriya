@@ -266,11 +266,11 @@ let updateCadets = function (cadetArr, successCB, errorCB) {
 			if(err)
 				errorCB(err);
 			count++;
-			if(count == cadetArr.length) 
+			if(count == cadetArr.length)
 				successCB(status);
 		})
 	})
-	
+
 }
 
 let deleteCadet = function(cadetObj, successCB, errorCB) {
@@ -353,7 +353,6 @@ let getWaveSpecificCandidates = function(waveID,successCB, errorCB) {
 
 //update absentees
 let updateAbsentees = function(Absentees,successCB, errorCB) {
-	console.log("absentees"+(Absentees.details.fromDate));
 	CandidateModel.updateMany({EmployeeID:Absentees.absentee},{$push:{'DaysAbsent':Absentees.details}}, function(err, result) {
 		if(err) {
 			console.log("error"+err)
@@ -364,8 +363,20 @@ let updateAbsentees = function(Absentees,successCB, errorCB) {
 	});
 }
 
+//cancel Leave
+let cancelLeave = function(details,successCB, errorCB) {
+	var id = new mongoose.mongo.ObjectId(details.id);
+	CandidateModel.update({"DaysAbsent._id" : id},{$pull:{DaysAbsent:{"_id": id}}}, function(err, result) {
+		if(err) {
+			console.log("error"+err)
+			errorCB(err);
+		}
+		console.log(result);
+		successCB(result);
+	});
+}
+
 let updateApproval = function(Approval,successCB, errorCB) {
-	console.log("approval"+Approval.id+"done?"+Approval.approval);
 	var id = new mongoose.mongo.ObjectId(Approval.id);
 	CandidateModel.update({"DaysAbsent._id" : id}, {$set: {"DaysAbsent.$.approved": Approval.approval}}, function(err, result) {
 		if(err) {
@@ -522,7 +533,7 @@ let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 }
 
 let getAbsentees = function(successCB, errorCB) {
-	CandidateModel.find({DaysAbsent:{$elemMatch:{approved:'no'}}},function(err, cadets) {
+	CandidateModel.find({DaysAbsent:{$elemMatch:{$or:[{approved:'no'},{approved:'rejected'}]}}},function(err, cadets) {
 		if(err)
 			errorCB(err)
 		successCB(cadets)
@@ -534,7 +545,16 @@ let getAbsentees = function(successCB, errorCB) {
 ****************************************************/
 
 let getFilteredCandidates = function(filterQuery, successCB, errorCB) {
-	CandidateModel.find({$or: filterQuery}, function(err, candidates) {
+	CandidateModel.find(filterQuery, function(err, candidates) {
+		if(err)
+			errorCB(err)
+		successCB(candidates)
+	})
+}
+
+let updatePresent = function(EmpID, successCB, errorCB) {
+	let present = new Date();
+	CandidateModel.update({EmployeeID: EmpID},{$push: {DaysPresent: present}}, function(err, candidates) {
 		if(err)
 			errorCB(err)
 		successCB(candidates)
@@ -580,5 +600,7 @@ module.exports = {
 	getUserRole,
 	getAbsentees,
 	updateApproval,
+	cancelLeave,
+	updatePresent,
 	getFilteredCandidates
 }

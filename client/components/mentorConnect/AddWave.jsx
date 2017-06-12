@@ -7,38 +7,8 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
-
-const styles = {
-	addButton: {
-		position:'fixed',
-	  bottom: 40,
-	  right: 20,
-	},
-	dialog: {
-		backgroundColor: '#DDDBF1',
-		borderBottom: '3px solid teal',
-		borderRight: '10px solid teal',
-		borderLeft: '10px solid teal'
-	},
-	dialogTitle: {
-		fontWeight: 'bold',
-		backgroundColor: 'teal',
-		color: '#DDDBF1',
-		textAlign: 'center'
-	},
-	actionsContainer: {
-		backgroundColor: 'teal',
-		borderTop: '0px',
-		marginTop: '0px'
-	},
-	actionButton: {
-		backgroundColor: '#DDDBF1',
-		width: '50%',
-		color: 'teal',
-		border: '1px solid teal',
-		height: '100%'
-	}
-}
+import app from '../../styles/app.json';
+import dialog from '../../styles/dialog.json';
 
 export default class AddWave extends React.Component {
 	constructor(props) {
@@ -211,12 +181,12 @@ export default class AddWave extends React.Component {
 		const dialogActions = [
       <FlatButton
         label="Cancel"
-        style={styles.actionButton}
+        style={dialog.actionButton}
         onTouchTap={(e) => this.handleClose(e, 'CLOSE')}
       />,
       <FlatButton
         label="Add"
-				style={styles.actionButton}
+				style={dialog.actionButton}
         onTouchTap={(e) => this.handleClose(e, 'ADD')}
       />
     ];
@@ -225,16 +195,16 @@ export default class AddWave extends React.Component {
 				<Dialog
 					bodyStyle={styles.dialog}
           title="ADD A NEW WAVE"
-					titleStyle={styles.dialogTitle}
+					titleStyle={dialog.title}
           actions={dialogActions}
-					actionsContainerStyle={styles.actionsContainer}
+					actionsContainerStyle={dialog.actionsContainer}
           modal={false}
           open={this.state.open}
           onRequestClose={(e) => this.handleClose(e, 'CLOSE')}
           autoScrollBodyContent={true}
         >
 				<div>
-					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+					<div style={dialog.box50}>
         	<TextField
 			      hintText="It should be unique"
 			      floatingLabelText="Wave ID"
@@ -244,7 +214,7 @@ export default class AddWave extends React.Component {
 						errorText={this.state.WaveIDErrorText}
 			    />
 					</div>
-					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+					<div style={dialog.box50}>
 			    <TextField
 			      hintText="Provide some name to the wave"
 			      floatingLabelText="Wave Name"
@@ -256,7 +226,7 @@ export default class AddWave extends React.Component {
 					</div>
 				</div>
 				<div>
-					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+					<div style={dialog.box50}>
 			    <DatePicker
 			    	hintText="Start Date"
 						floatingLabelText='Start Date'
@@ -265,7 +235,7 @@ export default class AddWave extends React.Component {
 			    	onChange={this.handleStartDateChange}
 			    />
 					</div>
-					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+					<div style={dialog.box50}>
 			    <DatePicker
 			    	hintText="End Date"
 						floatingLabelText='End Date'
@@ -275,7 +245,7 @@ export default class AddWave extends React.Component {
 			    />
 					</div>
 				</div>
-					<div style={{border: '2px solid white', width: '100%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+					<div style={dialog.box100}>
 			    <TextField
 			      hintText="Provide the base location"
 			      floatingLabelText="Location"
@@ -285,7 +255,7 @@ export default class AddWave extends React.Component {
 						errorText={this.state.LocationErrorText}
 			    />
 					</div>
-					<div style={{border: '2px solid white', width: '100%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+					<div style={dialog.box100}>
 			    <SelectField
 		        multiple={true}
 		        hintText="Select Cadets"
@@ -321,7 +291,7 @@ export default class AddWave extends React.Component {
 		      </SelectField>
 				</div>
         </Dialog>
-				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
+				<FloatingActionButton mini={true} style={dialog.fab} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
 			</div>

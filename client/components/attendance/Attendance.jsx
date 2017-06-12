@@ -11,6 +11,7 @@ import IconButton from 'material-ui/IconButton';
 import RejectIcon from 'material-ui/svg-icons/navigation/close';
 import ApproveIcon from 'material-ui/svg-icons/navigation/check';
 import {red500, green500} from 'material-ui/styles/colors';
+import DatePicker from 'material-ui/DatePicker';
 import Moment from 'moment';
 import {
   Table,
@@ -20,10 +21,15 @@ import {
   TableRow,
   TableRowColumn
 } from 'material-ui/Table';
+import BigCalendar from 'react-big-calendar';
+import {Tabs, Tab} from 'material-ui/Tabs';
 
 const styles = {
   content: {
     marginLeft: '25%'
+  },
+  row: {
+    wordWrap: 'break-word'
   }
 }
 
@@ -41,7 +47,14 @@ export default class Attendance extends React.Component {
       days: 0,
       cadet: null,
       role: 'candidate',
-      cadets: []
+      cadets: [],
+      type: 'no',
+      slideIndex: 0,
+      result: 'rejected',
+			WaveIds: [],
+			cadetsOfWave: [],
+      WaveID: '',
+      Date: '',
     }
     this.handleSelect = this.handleSelect.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -55,9 +68,17 @@ export default class Attendance extends React.Component {
     this.getAbsentees = this.getAbsentees.bind(this);
     this.updateAttendance = this.updateAttendance.bind(this);
     this.formatDate = this.formatDate.bind(this);
+    this.handleChangeTab = this.handleChangeTab.bind(this);
+    this.cancelLeave = this.cancelLeave.bind(this);
+		this.getWaveId = this.getWaveId.bind(this);
+		this.onWaveIdChange = this.onWaveIdChange.bind(this);
+		this.getWaveSpecificCandidates = this.getWaveSpecificCandidates.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.updatePresent = this.updatePresent.bind(this);
+    this.handlePresent = this.handlePresent.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.getRole();
   }
 
@@ -68,7 +89,6 @@ export default class Attendance extends React.Component {
         console.log(err);
       else {
         th.setState({role: res.body})
-        console.log(res.body);
         if (th.state.role === 'candidate') {
           th.getCadet();
         } else {
@@ -78,6 +98,36 @@ export default class Attendance extends React.Component {
     })
   }
 
+  updatePresent(EmpID, details) {
+    var cadet = this.state.cadetsOfWave.filter(function(cadets){
+      return cadets.EmployeeID != EmpID
+    })
+    this.setState({
+        cadetsOfWave : cadet
+    })
+  }
+
+	onWaveIdChange(e) {
+            this.setState({
+                WaveId: e.target.textContent
+              })
+            this.getWaveSpecificCandidates(e.target.textContent);
+  }
+
+	getWaveSpecificCandidates(waveId){
+            let th = this;
+            let candidateName = [];
+            let candidateID = [];
+            Request
+                .get('/dashboard/wavespecificcandidates?waveID='+waveId)
+                .set({'Authorization': localStorage.getItem('token')})
+                .end(function(err, res){
+									th.setState({
+                    cadetsOfWave: res.body.data
+                })
+                })
+            }
+
   getAbsentees() {
     let th = this
     Request.get('/dashboard/getabsentees').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
@@ -85,7 +135,6 @@ export default class Attendance extends React.Component {
         console.log(err);
       else {
         th.setState({cadets: res.body})
-        console.log(res.body);
       }
     })
   }
@@ -103,8 +152,6 @@ export default class Attendance extends React.Component {
 
   updateabsentees() {
     let th = this;
-    let fromDate = th.state.fromDate;
-    fromDate.setDate(fromDate.getDate() + 1);
     Request.post('/dashboard/updateabsentees').set({'Authorization': localStorage.getItem('token')}).send({
       details: {
         fromDate: th.state.fromDate,
@@ -118,7 +165,16 @@ export default class Attendance extends React.Component {
       if (err)
         console.log(err);
       else {
-        console.log('Successfully updated leave');
+        let cadet = th.state.cadet;
+        let details = {
+          fromDate: th.state.fromDate,
+          toDate: th.state.toDate,
+          approved: 'no',
+          leaveType: th.state.leaveType,
+          reason: th.state.reason
+        };
+        cadet.DaysAbsent.push(details);
+        th.setState({cadet: cadet})
       }
     })
   }
@@ -132,6 +188,30 @@ export default class Attendance extends React.Component {
 
   handleChange(event, index, value) {
     this.setState({leaveType: value});
+  }
+
+  handleChangeTab(value) {
+    if (value == 1) {
+      this.setState({slideIndex: value, type: 'rejected', result: 'closed'});
+    } else if (value == 0) {
+      this.setState({slideIndex: value, type: 'no', result: 'rejected'})
+    } else {
+      this.setState({slideIndex: value})
+      if(this.state.role !== 'candidate')
+			this.getWaveId();
+    }
+  };
+
+	getWaveId() {
+            let th = this
+            Request
+                .get('/dashboard/waveids')
+                .set({'Authorization': localStorage.getItem('token')})
+                .end(function(err, res){
+                th.setState({
+                    WaveIds: res.body.waveids
+                })
+                })
   }
 
   handleReasonChange(event) {
@@ -149,16 +229,15 @@ export default class Attendance extends React.Component {
     }
   };
 
-  updateAttendance(id, approval) {
+  updateAttendance(id, approval, cadet, detailID) {
     let th = this;
-    Request.post('/dashboard/updateapproval').set({'Authorization': localStorage.getItem('token')}).send({
-      id: id,
-			approval: approval
-    }).end(function(err, res) {
+    Request.post('/dashboard/updateapproval').set({'Authorization': localStorage.getItem('token')}).send({id: id, approval: approval}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-        console.log('Successfully updated leave');
+        let cadets = th.state.cadets;
+        cadets[cadet].DaysAbsent[detailID].approved = approval;
+        th.setState({cadets: cadets})
       }
     })
   }
@@ -191,102 +270,271 @@ export default class Attendance extends React.Component {
     );
   }
 
+  cancelLeave(index, dateID) {
+    let th = this
+    Request.post('/dashboard/cancelleave').set({'Authorization': localStorage.getItem('token')}).send({id: dateID}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        let cadet = th.state.cadet;
+        cadet.DaysAbsent = th.state.cadet.DaysAbsent.filter(function(cadets, key) {
+          return index != key
+        })
+        th.setState({cadet: cadet})
+      }
+    })
+  }
+
+  handlePresent(EmpID) {
+    let th = this
+    Request.post('/dashboard/updatepresent').set({'Authorization': localStorage.getItem('token')}).send({
+      EmployeeID: EmpID
+    }).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+          let cadet = th.state.cadet;
+          cadet.DaysPresent.push(new Date());
+          th.setState({
+            cadet: cadet
+          })
+        }
+    })
+  }
+
+	handleDateChange(event, date) {
+		let startDate = new Date(date);
+		this.setState({
+			Date: date
+		})
+	}
+
+
   render() {
     let th = this;
     if (this.state.role === 'candidate') {
       const {finished, stepIndex} = this.state;
-      return (
-        <div style={styles.content}>
-          <h1>ATTENDANCE</h1>
-          <Stepper activeStep={stepIndex} orientation="vertical">
-            <Step>
-              <StepLabel>Leave Details and Reason</StepLabel>
-              <StepContent>
-                <SelectField floatingLabelText="Leave Type" value={this.state.leaveType} onChange={this.handleChange}>
-                  <MenuItem value={'Personal Leave'} primaryText="Personal Leave"/>
-                  <MenuItem value={'Sick Leave'} primaryText="Sick Leave"/>
-                </SelectField>
-                <br/>
-                <h5>Reason:</h5>
-                <TextField hintText="Reason for leave" multiLine={true} value={this.state.reason} onChange={this.handleReasonChange}/> {this.renderStepActions(0)}
-              </StepContent>
-            </Step>
-            <Step>
-              <StepLabel>Select DateRange</StepLabel>
-              <StepContent>
-                <DateRange onInit={this.handleSelect} onChange={this.handleSelect}/>
-                <h3>Number of Days:{this.state.days}</h3>
-                {this.renderStepActions(1)}
-              </StepContent>
-            </Step>
-            <Step>
-              <StepLabel>Approval</StepLabel>
-              <StepContent>
-                <h4>Sure to submit for Approval?</h4>
-                {this.renderStepActions(2)}
-              </StepContent>
-            </Step>
-          </Stepper>
-          {finished && (
-            <p style={{
-              margin: '20px 0',
-              textAlign: 'center'
-            }}>
-              Leave submitted wait for Approval
-            </p>
-          )}
-        </div>
-      )
-    } else {
-      let leaveno = 1;
-      if (this.state.cadets) {
+      if (th.state.cadet != null) {
+        let attendance = '';
+        let today = this.formatDate(new Date());
+        let lastDay = this.formatDate(this.state.cadet.DaysPresent[this.state.cadet.DaysPresent.length-1])
+
+        this.state.cadet.DaysAbsent.map(function(details){
+        if((new Date(details.fromDate)<= new Date()) && (new Date(details.toDate) >= new Date()) )
+            attendance = (<h2>You are on leave.Please contact admin for further approval</h2>)
+        })
+        if(attendance === '') {
+        if(today === lastDay && this.state.cadet.DaysPresent.length > 0) {
+          attendance = (<h2>You have marked today's attendance... For updation contact StackRoute Admin</h2>)
+        }
+        else {
+          attendance = (<div>
+            <h2>Do you wish to mark today's attendance </h2>
+            <FlatButton label="Yes" onTouchTap={this.handlePresent.bind(this, this.state.cadet.EmployeeID)} primary={true}/></div>
+          )
+        }}
         return (
           <div>
-            <h3>Admin</h3>
-            <Table>
-              <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                <TableRow>
-                  <TableHeaderColumn>Leave No</TableHeaderColumn>
-                  <TableHeaderColumn>Cadet Name</TableHeaderColumn>
-                  <TableHeaderColumn>Leave Type</TableHeaderColumn>
-                  <TableHeaderColumn>From Date</TableHeaderColumn>
-                  <TableHeaderColumn>To Date</TableHeaderColumn>
-                  <TableHeaderColumn>Reason</TableHeaderColumn>
-                  <TableHeaderColumn>Approved</TableHeaderColumn>
-                  <TableHeaderColumn>Rejected</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
-              <TableBody displayRowCheckbox={false}>
-                {this.state.cadets.map(function(cadets, index) {
-                  return (cadets.DaysAbsent.map(function(details, index) {
-                    if (details.approved === 'no')
-                      return (
-                        <TableRow>
-                          <TableRowColumn>{leaveno++}</TableRowColumn>
-                          <TableRowColumn>{cadets.EmployeeName}</TableRowColumn>
-                          <TableRowColumn>{details.leaveType}</TableRowColumn>
-                          <TableRowColumn>{th.formatDate(details.fromDate)}</TableRowColumn>
-                          <TableRowColumn>{th.formatDate(details.toDate)}</TableRowColumn>
-                          <TableRowColumn>{details.reason}</TableRowColumn>
-                          <TableRowColumn>
-                            <IconButton tooltip="Approve" onClick={th.updateAttendance.bind(th, details._id, 'yes')}>
-                              <ApproveIcon color={green500}/>
-                            </IconButton>
-                          </TableRowColumn>
-                          <TableRowColumn>
-                            <IconButton tooltip="Reject" onClick={th.updateAttendance.bind(th, details._id, 'no')}>
-                              <RejectIcon color={red500}/>
-                            </IconButton>
-                          </TableRowColumn>
-                        </TableRow>
-                      )
-                  }))
-                })}
-              </TableBody>
-            </Table>
+            <h1 style={styles.content}>ATTENDANCE</h1>
+            <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
+              <Tab label="Apply Leave" value={0}>
+                <Stepper activeStep={stepIndex} orientation="vertical" style={styles.content}>
+                  <Step>
+                    <StepLabel>Leave Details and Reason</StepLabel>
+                    <StepContent>
+                      <SelectField floatingLabelText="Leave Type" value={this.state.leaveType} onChange={this.handleChange}>
+                        <MenuItem value={'Personal Leave'} primaryText="Personal Leave"/>
+                        <MenuItem value={'Sick Leave'} primaryText="Sick Leave"/>
+                      </SelectField>
+                      <br/>
+                      <h5>Reason:</h5>
+                      <TextField hintText="Reason for leave" multiLine={true} value={this.state.reason} onChange={this.handleReasonChange}/> {this.renderStepActions(0)}
+                    </StepContent>
+                  </Step>
+                  <Step>
+                    <StepLabel>Select DateRange</StepLabel>
+                    <StepContent>
+                      <DateRange onInit={this.handleSelect} onChange={this.handleSelect}/>
+                      <h3>Number of Days:{this.state.days}</h3>
+                      {this.renderStepActions(1)}
+                    </StepContent>
+                  </Step>
+                  <Step>
+                    <StepLabel>Approval</StepLabel>
+                    <StepContent>
+                      <h4>Sure to submit for Approval?</h4>
+                      {this.renderStepActions(2)}
+                    </StepContent>
+                  </Step>
+                </Stepper>
+                {finished && (
+                  <p style={{
+                    margin: '20px 0',
+                    textAlign: 'center'
+                  }}>
+                    Leave submitted wait for Approval
+                  </p>
+                )}</Tab>
+              <Tab label="Cancel Leave" value={1}>
+                <Table fixedHeader={true}>
+                  <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                    <TableRow>
+                      <TableHeaderColumn>From Date</TableHeaderColumn>
+                      <TableHeaderColumn>To Date</TableHeaderColumn>
+                      <TableHeaderColumn>Reason</TableHeaderColumn>
+                      <TableHeaderColumn>Cancel</TableHeaderColumn>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody displayRowCheckbox={false} showRowHover={true}>
+                    {th.state.cadet.DaysAbsent.map(function(dates, index) {
+                        if (dates.approved === 'no' || dates.approved === 'rejected' || dates.approved === 'closed')
+                        return (
+                          <TableRow>
+                            <TableRowColumn>{th.formatDate(dates.fromDate)}</TableRowColumn>
+                            <TableRowColumn>{th.formatDate(dates.toDate)}</TableRowColumn>
+                            <TableRowColumn>{dates.reason}</TableRowColumn>
+                            <TableRowColumn>
+                              <IconButton tooltip="Cancel" onClick={th.cancelLeave.bind(this, index, dates._id)}>
+                                <RejectIcon color={red500}/>
+                              </IconButton>
+                            </TableRowColumn>
+                          </TableRow>
+                        )
+                    })
+}
+                  </TableBody>
+                </Table>
+              </Tab>
+              <Tab label="Mark Attendance" value={2}>
+                {attendance}
+              </Tab>
+            </Tabs>
+
           </div>
         )
-      } else { < h3 > No pending leave approvals < /h3>
+      } else {
+        return (
+          <h3>Loading...</h3>
+        )
+      }
+    } else {
+      let leaveno = 1;
+      let rowno = 0;
+      let row = 0;
+      let cadetsLength = th.state.cadets.length;
+			let table = (
+				<Table fixedHeader={true}>
+					<TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+						<TableRow>
+							<TableHeaderColumn>Leave No</TableHeaderColumn>
+							<TableHeaderColumn>Cadet Name</TableHeaderColumn>
+							<TableHeaderColumn>Leave Type</TableHeaderColumn>
+							<TableHeaderColumn>From Date</TableHeaderColumn>
+							<TableHeaderColumn>To Date</TableHeaderColumn>
+							<TableHeaderColumn>Reason</TableHeaderColumn>
+							<TableHeaderColumn>Approve</TableHeaderColumn>
+							<TableHeaderColumn>Reject</TableHeaderColumn>
+						</TableRow>
+					</TableHeader>
+					<TableBody displayRowCheckbox={false} showRowHover={true}>
+						{this.state.cadets.map(function(cadets, index) {
+							return (cadets.DaysAbsent.map(function(details, key) {
+								if (details.approved === th.state.type) {
+									return (
+										<TableRow>
+											<TableRowColumn>{leaveno++}</TableRowColumn>
+											<TableRowColumn>{cadets.EmployeeName}</TableRowColumn>
+											<TableRowColumn>{details.leaveType}</TableRowColumn>
+											<TableRowColumn>{th.formatDate(details.fromDate)}</TableRowColumn>
+											<TableRowColumn>{th.formatDate(details.toDate)}</TableRowColumn>
+											<TableRowColumn style={styles.row}>
+												<p title={details.reason}>{details.reason}</p>
+											</TableRowColumn>
+											<TableRowColumn>
+												<IconButton tooltip="Approve" onClick={th.updateAttendance.bind(th, details._id, 'yes', index, key)}>
+													<ApproveIcon color={green500}/>
+												</IconButton>
+											</TableRowColumn>
+											<TableRowColumn>
+												<IconButton tooltip="Reject" onClick={th.updateAttendance.bind(th, details._id, th.state.result, index, key)}>
+													<RejectIcon color={red500}/>
+												</IconButton>
+											</TableRowColumn>
+										</TableRow>
+									)
+								} else {
+									rowno++;
+									return false;
+								}
+							}))
+						})}
+					</TableBody>
+				</Table>
+			)
+      if (cadetsLength > 0) {
+        return (
+          <div>
+            <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
+              <Tab label="Approve Leaves" value={0}> {table}</Tab>
+              <Tab label="Rejected Leaves" value={1}> {table}</Tab>
+              <Tab label="Update Attendance" value={2}>
+              <DatePicker
+                hintText="Date to be updated"
+                floatingLabelText='Date'
+                errorText={this.state.StartDateErrorText}
+                value={this.state.Date}
+                onChange={this.handleDateChange}
+              />
+							<SelectField
+													onChange={th.onWaveIdChange}
+													floatingLabelText="Select WaveID"
+													value={th.state.WaveId}
+											>
+													{
+															th.state.WaveIds.map(function(val, key) {
+																	return <MenuItem key={key} value={val} primaryText={val} />
+															})
+													}
+								</SelectField>
+								<Table fixedHeader={true}>
+									<TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+										<TableRow>
+											<TableHeaderColumn>EmployeeName</TableHeaderColumn>
+											<TableHeaderColumn>Present</TableHeaderColumn>
+											<TableHeaderColumn>Absent</TableHeaderColumn>
+										</TableRow>
+									</TableHeader>
+									<TableBody displayRowCheckbox={false} showRowHover={true}>
+										{
+											th.state.cadetsOfWave.map(function(cadet, index) {
+											return (
+												<TableRow>
+												<TableRowColumn>
+														{cadet.EmployeeName}
+												</TableRowColumn>
+												<TableRowColumn>
+													<IconButton tooltip="Approve">
+														<ApproveIcon color={green500}/>
+													</IconButton>
+												</TableRowColumn>
+												<TableRowColumn>
+													<IconButton tooltip="Reject">
+														<RejectIcon color={red500}/>
+													</IconButton>
+												</TableRowColumn>
+											</TableRow>
+											)
+										})
+									}
+									</TableBody>
+									</Table>
+							</Tab>
+            </Tabs>
+
+          </div>
+        )
+      } else {
+        return ( < h3 > No pending leave approvals < /h3>)
 	}
 	}
 	}

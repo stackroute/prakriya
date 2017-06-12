@@ -34,8 +34,8 @@ var candidates = new Schema({
 		AssessmentTrack: [String],
 		DaysPresent: [Date],
 		DaysAbsent: [{
-			fromDate: Date,
-			toDate: Date,
+			fromDate: {type:Date, unique:true},
+			toDate: {type:Date, unique:true},
 			approved: String,
 			leaveType: String,
 			reason: String

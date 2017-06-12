@@ -1,0 +1,11 @@
+module.exports = {
+  'heading': {
+    'textAlign': 'center'
+  },
+  'fab': {
+		'position':'fixed',
+		'bottom': '60px',
+		'right': '15px',
+		'zIndex': 1
+	}
+}

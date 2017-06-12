@@ -39,6 +39,7 @@
     "passport-jwt": "^2.2.1",
     "prop-types": "^15.5.8",
     "react": "^15.5.4",
+    "react-big-calendar": "^0.14.0",
     "react-csv": "^1.0.8",
     "react-date-range": "^0.9.4",
     "react-dom": "^15.5.4",
