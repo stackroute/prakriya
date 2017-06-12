@@ -7,7 +7,7 @@ import SaveIcon from 'material-ui/svg-icons/content/save';
 
 const styles = {
 	container: {
-		marginTop: 10
+		marginTop: 2
 	},
 	radioBtn: {
 		display: 'flex', 

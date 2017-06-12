@@ -6,6 +6,10 @@ import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import Paper from 'material-ui/Paper';
 import Moment from 'moment';
 import WaveDetails from './WaveDetails.jsx';
+import WiproAdmin from './WiproAdmin.jsx';
+import SRAdmin from './SRAdmin.jsx';
+import Mentor from './Mentor.jsx';
+import Candidate from './Candidate.jsx';
 
 const styles = {
 	lastLogin: {
@@ -13,7 +17,7 @@ const styles = {
 		padding: 15,
 		textAlign: 'center',
 		background: '#C6D8D3'
-	},	
+	},
 	heading: {
 		textAlign: 'center'
 	},
@@ -52,9 +56,20 @@ export default class Dashboard extends React.Component {
 					<Row>
 						<Col md={5} mdOffset={1}>
 							{
-								(this.state.user.role == 'wiproadmin' ||
-									this.state.user.role == 'sradmin') &&
-								<WaveDetails />
+								this.props.user.role == 'wiproadmin' &&
+								<WiproAdmin />
+							}
+							{
+								this.props.user.role == 'sradmin' &&
+								<SRAdmin />
+							}
+							{
+								this.props.user.role == 'mentor' &&
+								<Mentor />
+							}
+							{
+								this.props.user.role == 'candidate' &&
+								<Candidate />
 							}
 						</Col>
 					  <Col md={3} mdOffset={2} >
