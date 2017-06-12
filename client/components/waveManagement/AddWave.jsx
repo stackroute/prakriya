@@ -190,10 +190,6 @@ export default class AddWave extends React.Component {
 			this.setState({
 				LocationErrorText: 'This field cannot be empty'
 			})
-		} else if(this.state.selectedCadets.length == 0) {
-			this.setState({
-				CadetsErrorText: 'Select atleast one cadet'
-			})
 		} else {
 				return true
 		}

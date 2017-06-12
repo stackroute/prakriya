@@ -333,7 +333,7 @@ export default class WaveCard extends React.Component {
 		let bgIcon = this.props.bgIcon;
 		return (
 			<div>
-		<Card
+				<Card
 					style={{
 						width:'300px',
 						marginRight:'20px',
