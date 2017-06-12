@@ -86,7 +86,7 @@ ReactDOM.render(
 				<Route path="/feedback" component={Feedback} />
 				<Route path="/evaluationforms" component={EvaluationForms} />
 				<Route path="/attendance" component={Attendance} />
-				<Route path="/waves" component={Wave} />
+				<Route path="/waves" component={() => <Wave user={user}/>} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,
