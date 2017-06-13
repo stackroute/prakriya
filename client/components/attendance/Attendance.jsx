@@ -347,14 +347,17 @@ export default class Attendance extends React.Component {
       if (th.state.cadet != null) {
         let attendance = '';
         let today = this.formatDate(new Date());
-        let lastDay = this.formatDate(this.state.cadet.DaysPresent[this.state.cadet.DaysPresent.length-1])
-
+        let todayAttendance = false;
+        this.state.cadet.DaysPresent.map(function(date) {
+          if(today === th.formatDate(date))
+            todayAttendance = true;
+        })
         this.state.cadet.DaysAbsent.map(function(details){
         if((new Date(details.fromDate)<= new Date()) && (new Date(details.toDate) >= new Date()) )
             attendance = (<h2>You are on leave.Please contact admin for further approval</h2>)
         })
         if(attendance === '') {
-        if(today === lastDay && this.state.cadet.DaysPresent.length > 0) {
+        if(todayAttendance) {
           attendance = (<h2>You have marked today's attendance... For updation contact StackRoute Admin</h2>)
         }
         else {
