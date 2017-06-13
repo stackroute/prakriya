@@ -264,7 +264,8 @@ export default class Candidates extends React.Component {
 				{Wave: ''},
 				{DigiThonScore: {$gte: 9999}}
 			],
-			filteredCandidates: th.state.candidates
+			filteredCandidates: th.state.candidates,
+			displayCandidates: th.state.candidates.slice(0, 3)
 		});
 	}
 
@@ -436,6 +437,17 @@ export default class Candidates extends React.Component {
 							</Col>
 						</Row>
 					</Grid>
+					{
+						this.state.filteredCandidates.length > 3 ?
+						<div style={app.pager}>
+							<Pagination
+				          total={this.state.filteredCandidates.length/3}
+				          current={this.state.currentPage}
+				          display={3}
+				          onChange={this.setPage}
+							/>
+						</div> : ''
+					}
 				</div>
 				:
 				<div>
@@ -446,23 +458,6 @@ export default class Candidates extends React.Component {
 						handleUpdate={this.updateCandidate}
 					/>
 				</div>
-			}
-			<Snackbar
-				open={this.state.snackbarOpen}
-				message={this.state.snackbarMessage}
-				autoHideDuration={4000}
-				onRequestClose={this.hideSnackbar}
-			/>
-			{
-				this.state.filteredCandidates.length > 3 ?
-				<div style={app.pager}>
-					<Pagination
-		          total={this.state.filteredCandidates.length/3}
-		          current={this.state.currentPage}
-		          display={3}
-		          onChange={this.setPage}
-					/>
-				</div> : ''
 			}
 			</div>
 		)
