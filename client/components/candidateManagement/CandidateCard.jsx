@@ -90,11 +90,16 @@ export default class CandidateCard extends React.Component {
 		let y = 20;
 		doc.setFontSize(22);
 		doc.text(110, y+=10, this.props.candidate.EmployeeName, 'center')
-		doc.setFontSize(14);
-		doc.text(x, y+=10, this.props.candidate.EmployeeID+'')
-		doc.text(x, y+=10, this.props.candidate.EmailID)
+		doc.setFontSize(12);
+		doc.text(x, y+=10, 'Employee ID: ' + this.props.candidate.EmployeeID+'')
+		doc.text(x, y+=10, 'Email: ' + this.props.candidate.EmailID)
+		doc.text(x, y+=10, 'Band: ' + this.props.candidate.CareerBand)
+		doc.text(x, y+=10, 'Wave: ' + this.props.candidate.Wave)
+		doc.text(x, y+=10, 'Experience: ' + this.props.candidate.WorkExperience)
+		doc.text(x, y+=10, 'Digithon Score: ' + this.props.candidate.DigiThonScore+'')
+
 		// doc.addImage(this.state.imageURL, 'JPEG', x, y+=10)
-		doc.text(x, y+=10, $('<div>Hello</div>').html());
+		// doc.text(x, y+=10, $('<img src='+this.state.imageURL+'/>').html());
 		doc.save(this.props.candidate.EmployeeID + '.pdf')
 	}
 
