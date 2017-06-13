@@ -4,8 +4,19 @@ module.exports = {
   },
   'fab': {
 		'position':'fixed',
-		'bottom': '60px',
+		'bottom': '20px',
 		'right': '15px',
-		'zIndex': 1
-	}
+		'zIndex': 1,
+    'border': '2px solid teal'
+	},
+  'pager': {
+    'width': '200px',
+    'border': '1px solid silver',
+    'position':'fixed',
+    'bottom': '20px',
+    'right': 'calc(50% - 100px)',
+    'borderRadius': '10px',
+    'zIndex': 1,
+    'textAlign': 'center'
+  }
 }

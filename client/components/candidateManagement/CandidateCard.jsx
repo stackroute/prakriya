@@ -6,6 +6,8 @@ import Dialog from 'material-ui/Dialog';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import {lightBlack} from 'material-ui/styles/colors';
 import Request from 'superagent';
+import jsPDF from 'jspdf';
+import DownloadProfile from './DownloadProfile.jsx';
 import dialog from '../../styles/dialog.json';
 
 const styles = {
@@ -30,6 +32,7 @@ export default class CandidateCard extends React.Component {
 		super(props);
 		this.state = {
 			showDeleteDialog: false,
+			showDownloadDialog: false,
 			imageURL: '../../assets/images/avt-default.jpg',
 		}
 		this.getProfilePic = this.getProfilePic.bind(this);
@@ -46,17 +49,16 @@ export default class CandidateCard extends React.Component {
 		Request
 			.get(`/dashboard/getimage?eid=${eid}`)
 			.set({'Authorization': localStorage.getItem('token')})
-			.query({q: eid})
 			.end(function(err, res) {
 				if(err)
-		    	console.log(err);
+		    	console.log('Image not found for ', eid);
 		    else {
 		    	if(res.text) {
 		    		let array = new Uint8Array(res.text.length);
 		        for (var i = 0; i < res.text.length; i++){
 		            array[i] = res.text.charCodeAt(i);
 		        }
-		        var blob = new Blob([array], {type: 'image/jpeg'});
+		        let blob = new Blob([array], {type: 'image/jpeg'});
 			    	let blobUrl = URL.createObjectURL(blob);
 			    	th.setState({
 			    		imageURL: blobUrl
@@ -117,6 +119,17 @@ export default class CandidateCard extends React.Component {
 			    	style={styles.cardTitle}
 			    />
 			    <CardActions style={styles.actions}>
+			    	<IconButton 
+			    		tooltip="Download Profile" 
+			    		style={{float: 'left'}}
+			    		onTouchTap={this.downloadProfile}
+			    	>
+				      <DownloadProfile 
+				      	color={lightBlack} 
+				      	candidate={this.props.candidate} 
+				      	imageURL={this.state.imageURL}
+				      />
+				    </IconButton>
 				    <IconButton tooltip="Delete Candidate" onTouchTap={this.openDeleteDialog}>
 				      <DeleteIcon color={lightBlack} />
 				    </IconButton>

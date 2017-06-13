@@ -4,6 +4,7 @@ import {Card, CardMedia} from 'material-ui/Card';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import Dialog from 'material-ui/Dialog';
 import DatePicker from 'material-ui/DatePicker';
 import {grey50} from 'material-ui/styles/colors';
@@ -11,6 +12,7 @@ import Request from 'superagent';
 import Moment from 'moment';
 import CandidateEdit from './CandidateEdit.jsx';
 import PerformanceMatrix from './PerformanceMatrix.jsx';
+import DownloadProfile from './DownloadProfile.jsx';
 
 const styles = {
 	back: {
@@ -195,8 +197,18 @@ export default class CandidateHome extends React.Component {
 											<h3>
 												{this.props.candidate.EmployeeName}
 												<span style={styles.iconWrapper}>
+													<DownloadProfile 
+														color={grey50} 
+														style={styles.actionIcon}
+														candidate={this.props.candidate}
+													/>
 													<EditIcon style={styles.actionIcon} color={grey50} onClick={this.openEditDialog}/>
-													<DeleteIcon style={styles.actionIcon} color={grey50} onClick={this.openDeleteDialog}/>
+													<DeleteIcon 
+														style={styles.actionIcon} 
+														color={grey50} 
+														onClick={this.openDeleteDialog}
+														imageURL={this.state.imageURL}
+													/>
 												</span>
 											</h3>
 										</span>
