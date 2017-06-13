@@ -20,7 +20,7 @@ export default class Candidates extends React.Component {
 		super(props)
 
 		this.state = {
-			currentPage: '1',
+			currentPage: 1,
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
@@ -28,7 +28,7 @@ export default class Candidates extends React.Component {
 			filteredCandidates: [],
 			displayCandidates: [],
 			showCandidate: false,
-			displayCandidates: {},
+			displayCandidate: {},
 			appliedFilters: [
 				{EmployeeID: {$in: []}},
 				{EmployeeName: {$in: []}},
@@ -56,6 +56,7 @@ export default class Candidates extends React.Component {
 	}
 
 	componentWillMount() {
+		console.log('Will Mount...');
 		this.getCandidates();
 	}
 
@@ -138,7 +139,7 @@ export default class Candidates extends React.Component {
 		    		candidates: cadets,
 						filteredCandidates: cadets
 		    	});
-					this.setPage(1);
+					th.setPage(1);
 		    }
 		  })
 	}
@@ -246,7 +247,7 @@ export default class Candidates extends React.Component {
 					});
 		    	console.log('Filter Success');
 					console.log(res);
-					this.setPage(1);
+					th.setPage(1);
 		    }
 			})
 	}
@@ -268,11 +269,13 @@ export default class Candidates extends React.Component {
 	}
 
 	setPage(pageNumber) {
+		let th = this;
+		console.log(th.state);
 		console.log('Page Changed To -- ' + pageNumber);
 		let start = (pageNumber - 1) * 3;
 		let end = start + 3;
-		let sliced = this.state.filteredCandidates.slice(start, end);
-		this.setState({
+		let sliced = th.state.filteredCandidates.slice(start, end);
+		th.setState({
 			displayCandidates: sliced,
 			currentPage: pageNumber
 		});
@@ -281,7 +284,6 @@ export default class Candidates extends React.Component {
 
 	render() {
 		let th = this;
-
 		return(
 			<div>
 			<AddCandidate addCandidate={this.addCandidate}/>
@@ -426,7 +428,7 @@ export default class Candidates extends React.Component {
 														candidate={candidate}
 														handleCardClick={th.candidateView}
 														handleDelete={th.deleteCandidate}
-														k={key}
+														k={key + th.state.currentPage}
 													/>
 											)
 									})
@@ -458,7 +460,7 @@ export default class Candidates extends React.Component {
 		          total={this.state.filteredCandidates.length/3}
 		          current={this.state.currentPage}
 		          display={3}
-		          onChange={(pageNumber)=>{this.setPage(pageNumber)}}
+		          onChange={this.setPage}
 					/>
 				</div> : ''
 			}
