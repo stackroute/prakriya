@@ -441,7 +441,11 @@ export default class Candidates extends React.Component {
 						this.state.filteredCandidates.length > 3 ?
 						<div style={app.pager}>
 							<Pagination
-				          total={this.state.filteredCandidates.length/3}
+				          total={
+										this.state.filteredCandidates.length%3>0?
+										parseInt(this.state.filteredCandidates.length/3 + 1):
+										parseInt(this.state.filteredCandidates.length/3)
+									}
 				          current={this.state.currentPage}
 				          display={3}
 				          onChange={this.setPage}
