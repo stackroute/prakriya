@@ -365,6 +365,7 @@ let updateAbsentees = function(Absentees,successCB, errorCB) {
 
 //cancel Leave
 let cancelLeave = function(details,successCB, errorCB) {
+	if(details.id != ''){
 	var id = new mongoose.mongo.ObjectId(details.id);
 	CandidateModel.update({"DaysAbsent._id" : id},{$pull:{DaysAbsent:{"_id": id}}}, function(err, result) {
 		if(err) {
@@ -374,6 +375,10 @@ let cancelLeave = function(details,successCB, errorCB) {
 		console.log(result);
 		successCB(result);
 	});
+}
+else {
+	successCB();
+}
 }
 
 let updateApproval = function(Approval,successCB, errorCB) {

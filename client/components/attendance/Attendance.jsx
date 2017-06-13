@@ -22,6 +22,7 @@ import {
   TableRowColumn
 } from 'material-ui/Table';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import Calendar from './Calendar.jsx';
 
 const styles = {
   content: {
@@ -361,13 +362,6 @@ export default class Attendance extends React.Component {
         }
         return (
           <div>
-          <EventCalendar
-    month={7}
-    year={2015}
-    events={events}
-    onEventClick={(target, eventData, day) => console.log(eventData)
-}
-    />
             <h1 style={styles.content}>ATTENDANCE</h1>
             <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
               <Tab label="Apply Leave" value={0}>
@@ -420,8 +414,7 @@ export default class Attendance extends React.Component {
                   </TableHeader>
                   <TableBody displayRowCheckbox={false} showRowHover={true}>
                     {th.state.cadet.DaysAbsent.map(function(dates, index) {
-                      if (new Date() < new Date(dates.fromDate)) {
-                        return (
+                      return (
                           <TableRow>
                             <TableRowColumn>{th.formatDate(dates.fromDate)}</TableRowColumn>
                             <TableRowColumn>{th.formatDate(dates.toDate)}</TableRowColumn>
@@ -433,7 +426,6 @@ export default class Attendance extends React.Component {
                             </TableRowColumn>
                           </TableRow>
                         )
-                      }
                     })
 }
                   </TableBody>
@@ -569,6 +561,9 @@ export default class Attendance extends React.Component {
 }
                 </TableBody>
               </Table>
+            </Tab>
+            <Tab label="View Attendance" value={3}>
+              <Calendar/>
             </Tab>
           </Tabs>
         </div>
