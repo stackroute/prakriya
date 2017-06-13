@@ -13,7 +13,6 @@ import ApproveIcon from 'material-ui/svg-icons/navigation/check';
 import {red500, green500} from 'material-ui/styles/colors';
 import DatePicker from 'material-ui/DatePicker';
 import Moment from 'moment';
-import EventCalendar from 'react-event-calendar';
 import {
   Table,
   TableBody,
