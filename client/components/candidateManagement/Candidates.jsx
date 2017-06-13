@@ -3,6 +3,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
+import Pagination from 'material-ui-pagination';
 import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import CandidateCard from './CandidateCard.jsx';
@@ -19,13 +20,15 @@ export default class Candidates extends React.Component {
 		super(props)
 
 		this.state = {
+			currentPage: '1',
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
 			filtersCount: 0,
 			filteredCandidates: [],
+			displayCandidates: [],
 			showCandidate: false,
-			displayCandidate: {},
+			displayCandidates: {},
 			appliedFilters: [
 				{EmployeeID: {$in: []}},
 				{EmployeeName: {$in: []}},
@@ -49,6 +52,7 @@ export default class Candidates extends React.Component {
 		this.getFilteredCandidates = this.getFilteredCandidates.bind(this);
 		this.openSnackbar = this.openSnackbar.bind(this);
 		this.resetFilters = this.resetFilters.bind(this);
+		this.setPage = this.setPage.bind(this);
 	}
 
 	componentWillMount() {
@@ -133,7 +137,8 @@ export default class Candidates extends React.Component {
 		    	th.setState({
 		    		candidates: cadets,
 						filteredCandidates: cadets
-		    	})
+		    	});
+					this.setPage(1);
 		    }
 		  })
 	}
@@ -241,6 +246,7 @@ export default class Candidates extends React.Component {
 					});
 		    	console.log('Filter Success');
 					console.log(res);
+					this.setPage(1);
 		    }
 			})
 	}
@@ -259,6 +265,18 @@ export default class Candidates extends React.Component {
 			],
 			filteredCandidates: th.state.candidates
 		});
+	}
+
+	setPage(pageNumber) {
+		console.log('Page Changed To -- ' + pageNumber);
+		let start = (pageNumber - 1) * 3;
+		let end = start + 3;
+		let sliced = this.state.filteredCandidates.slice(start, end);
+		this.setState({
+			displayCandidates: sliced,
+			currentPage: pageNumber
+		});
+		console.log(sliced);
 	}
 
 	render() {
@@ -402,7 +420,7 @@ export default class Candidates extends React.Component {
 							</Col>
 							<Col md={9}>
 								{
-									this.state.filteredCandidates.map(function(candidate, key) {
+									this.state.displayCandidates.map(function(candidate, key) {
 										return (
 													<CandidateCard
 														candidate={candidate}
@@ -433,6 +451,17 @@ export default class Candidates extends React.Component {
 				autoHideDuration={4000}
 				onRequestClose={this.hideSnackbar}
 			/>
+			{
+				this.state.filteredCandidates.length > 3 ?
+				<div style={app.pager}>
+					<Pagination
+		          total={this.state.filteredCandidates.length/3}
+		          current={this.state.currentPage}
+		          display={3}
+		          onChange={(pageNumber)=>{this.setPage(pageNumber)}}
+					/>
+				</div> : ''
+			}
 			</div>
 		)
 	}
