@@ -4,10 +4,10 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import {lightBlack} from 'material-ui/styles/colors';
 import Request from 'superagent';
 import jsPDF from 'jspdf';
+import DownloadProfile from './DownloadProfile.jsx';
 import dialog from '../../styles/dialog.json';
 
 const styles = {
@@ -40,7 +40,6 @@ export default class CandidateCard extends React.Component {
 		this.handleCardClick = this.handleCardClick.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-		this.downloadProfile = this.downloadProfile.bind(this);
 	}
 	componentWillMount() {
 		this.getProfilePic(this.props.candidate.EmployeeID);
@@ -84,24 +83,6 @@ export default class CandidateCard extends React.Component {
 	handleDelete() {
 		this.props.handleDelete(this.props.candidate);
 	}
-	downloadProfile() {
-		let doc = new jsPDF()
-		let x = 10;
-		let y = 20;
-		doc.setFontSize(22);
-		doc.text(110, y+=10, this.props.candidate.EmployeeName, 'center')
-		doc.setFontSize(12);
-		doc.text(x, y+=10, 'Employee ID: ' + this.props.candidate.EmployeeID+'')
-		doc.text(x, y+=10, 'Email: ' + this.props.candidate.EmailID)
-		doc.text(x, y+=10, 'Band: ' + this.props.candidate.CareerBand)
-		doc.text(x, y+=10, 'Wave: ' + this.props.candidate.Wave)
-		doc.text(x, y+=10, 'Experience: ' + this.props.candidate.WorkExperience)
-		doc.text(x, y+=10, 'Digithon Score: ' + this.props.candidate.DigiThonScore+'')
-
-		// doc.addImage(this.state.imageURL, 'JPEG', x, y+=10)
-		// doc.text(x, y+=10, $('<img src='+this.state.imageURL+'/>').html());
-		doc.save(this.props.candidate.EmployeeID + '.pdf')
-	}
 
 	render() {
 		const deleteDialogActions = [
@@ -143,7 +124,11 @@ export default class CandidateCard extends React.Component {
 			    		style={{float: 'left'}}
 			    		onTouchTap={this.downloadProfile}
 			    	>
-				      <DownloadIcon color={lightBlack} />
+				      <DownloadProfile 
+				      	color={lightBlack} 
+				      	candidate={this.props.candidate} 
+				      	imageURL={this.state.imageURL}
+				      />
 				    </IconButton>
 				    <IconButton tooltip="Delete Candidate" onTouchTap={this.openDeleteDialog}>
 				      <DeleteIcon color={lightBlack} />
