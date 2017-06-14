@@ -453,15 +453,19 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
         img.data = buffer;
         img.contentType = files.file.type;
         cadet.ProfilePic = img;
-        if (!fs.existsSync(dir)){
-          logger.debug('Directory not present')
+        if (!fs.existsSync('./public/')) {
+          logger.debug('Public Directory not present')
+          mkdirp.sync('./public/');
+          mkdirp(dir);
+        }
+        else if(!fs.existsSync(dir)) {
+          logger.debug('ProfilePics Directory not present')
           mkdirp(dir);
         }
         let imagePath = dir + cadet.EmployeeID + '.jpeg'
         logger.debug('Image Path', imagePath)
         fs.writeFile(imagePath, data, 'binary', function(err){
             if (err) throw err
-            console.log('File saved.')
         })
         res.send(data);
       }
