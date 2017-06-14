@@ -46,7 +46,7 @@ let sendEmail = function (emailObj) {
             });
         });
     } catch (error) {
-        logger.fatal('Exception occured' + err);
+        logger.fatal('Exception occured' + error);
         return error;
     }
 };

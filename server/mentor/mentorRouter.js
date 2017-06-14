@@ -60,13 +60,17 @@ router.get('/coursesfrom/:wave', auth.canAccess(CONFIG.MENTOR), function(req, re
 });
 
 // Get all candidates and tracks
-router.get('/candidatesandtracks/:trainingTrack/:wave/:course', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+router.
+get('/candidatesandtracks/:trainingTrack/:wave/:course',
+ auth.canAccess(CONFIG.MENTOR), function(req, res) {
   console.log('API HIT ===> GET Candidates And Tracks');
   try{
-    mentorMongoController.getCandidates(req.params.trainingTrack, req.params.wave, req.params.course,
+    mentorMongoController.
+    getCandidates(req.params.trainingTrack, req.params.wave, req.params.course,
        function(candidates) {
          console.log('Candidates Fetched: ', JSON.stringify(candidates));
-         mentorMongoController.getAssesmentTrack(req.params.trainingTrack, req.params.wave, req.params.course,
+         mentorMongoController.
+         getAssesmentTrack(req.params.trainingTrack, req.params.wave, req.params.course,
            function(assessmentTrack) {
              console.log('AssessmentTrack Fetched: ', JSON.stringify(assessmentTrack));
               res.status(201).json({
@@ -131,7 +135,8 @@ router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
 router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try{
     let courseObj = req.body;
-    courseObj.History = courseObj.History + ' last update by ' + req.user.name + ' on ' + new Date() + '\n';
+    courseObj.History = courseObj.History + ' last update by ' +
+     req.user.name + ' on ' + new Date() + '\n';
     mentorMongoController.updateCourse(courseObj, function(courses) {
       res.status(201).json(courses);
     }, function(err) {
@@ -149,7 +154,8 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
 router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try{
     let courseObj = req.body;
-    courseObj.History = courseObj.History + ' added by ' + req.user.name + ' on ' + new Date() + '\n';
+    courseObj.History = courseObj.History + ' added by ' +
+     req.user.name + ' on ' + new Date() + '\n';
     mentorMongoController.addCourse(courseObj, function(courses) {
       res.status(201).json(courses);
     }, function(err) {
@@ -167,7 +173,8 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
 router.post('/deletecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {
     let courseObj = req.body;
-    courseObj.History = courseObj.History + ' deleted by ' + req.user.name + ' on ' + new Date() + '\n';
+    courseObj.History = courseObj.History + ' deleted by ' +
+     req.user.name + ' on ' + new Date() + '\n';
     mentorMongoController.deleteCourse(courseObj, function (status) {
       res.status(200).json(status);
     }, function (err) {
@@ -203,7 +210,8 @@ router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function(req, res) 
 router.post('/addcategory', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {
     let categoryObj = req.body;
-    categoryObj.History = categoryObj.History + ' last modification by ' + req.user.name + ' on ' + new Date() + ' : added new sub course \n';
+    categoryObj.History = categoryObj.History + ' last modification by ' +
+     req.user.name + ' on ' + new Date() + ' : added new sub course \n';
     mentorMongoController.addCategory(categoryObj, function(status) {
       res.json(status);
     }, function (err) {
@@ -221,7 +229,8 @@ router.post('/addcategory', auth.canAccess(CONFIG.MENCAN), function(req, res) {
 router.post('/deletecategory', auth.canAccess(CONFIG.MENCAN), function(req, res) {
   try {
     let categoryObj = req.body;
-    categoryObj.History = categoryObj.History + ' last modification by ' + req.user.name + ' on ' + new Date() + ' : deleted a sub course \n';
+    categoryObj.History = categoryObj.History + ' last modification by ' +
+     req.user.name + ' on ' + new Date() + ' : deleted a sub course \n';
     mentorMongoController.deleteCategory(categoryObj, function(status) {
       res.json(status);
     }, function (err) {
@@ -240,10 +249,12 @@ router.post('/deletecategory', auth.canAccess(CONFIG.MENCAN), function(req, res)
 ***********************************************/
 
 // Get all waves
-router.get('/waveobject/:trainingTrack/:waveNumber', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+router.
+get('/waveobject/:trainingTrack/:waveNumber', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   console.log('API HIT ===> GET Wave Object');
   try{
-    mentorMongoController.getWaveObject(req.params.trainingTrack, req.params.waveNumber, function(waveObject) {
+    mentorMongoController.
+    getWaveObject(req.params.trainingTrack, req.params.waveNumber, function(waveObject) {
       console.log('Recieved: ', JSON.stringify(waveObject));
       res.status(201).json({waveObject: waveObject});
     }, function(err) {

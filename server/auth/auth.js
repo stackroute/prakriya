@@ -11,10 +11,10 @@ let params = {
 };
 
 module.exports = function() {
-  passport.use(new JwtStrategy(params, function(jwt_payload, done) {
+  passport.use(new JwtStrategy(params, function(jwtPayload, done) {
     console.log('payload for authentication!!!');
-    console.log(jwt_payload);
-    userModel.findOne({username: jwt_payload.user}, function(err, user) {
+    console.log(jwtPayload);
+    userModel.findOne({username: jwtPayload.user}, function(err, user) {
       if (err) {
         return done(err, false);
       }

@@ -15,13 +15,13 @@ const config = {
 		publicPath: '/assets/'
 	},
 	plugins: [
-		new webpack.HotModuleReplacementPlugin(),
+		new webpack.HotModuleReplacementPlugin()
 	],
 	node: {
       	child_process: 'empty',
-      	fs: "empty",
-      	net: "empty",
-      	tls: "empty"
+      	fs: 'empty',
+      	net: 'empty',
+      	tls: 'empty'
     },
   devtool: 'cheap-module-eval-source-map',
 	module: {
@@ -37,10 +37,10 @@ const config = {
 			{
 			  test: /\.css$/,
 			  loader: 'style!css?modules',
-			  include: /flexboxgrid/,
+			  include: /flexboxgrid/
 			}
 		]
 	}
-}
+};
 
 module.exports = config;
