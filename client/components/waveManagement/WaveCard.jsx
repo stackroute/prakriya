@@ -140,6 +140,8 @@ export default class WaveCard extends React.Component {
 	}
 
 	formatDate(date) {
+    let dateString = Moment(date).format("MMM Do YYYY");
+    if(dateString == 'Invalid date') return '';
 		return Moment(date).format("MMM Do YYYY");
 	}
 
@@ -356,7 +358,7 @@ export default class WaveCard extends React.Component {
 				    <IconButton tooltip="Date">
 				      <DateIcon/>
 				    </IconButton>
-				    <span style={{position: 'absolute',top: '47%'}}>{this.formatDate(this.props.wave.StartDate)}-{this.formatDate(this.props.wave.EndDate)}</span><br/>
+				    <span style={{position: 'absolute',top: '47%'}}>{this.formatDate(this.props.wave.StartDate)} - {this.formatDate(this.props.wave.EndDate)}</span><br/>
 				    <IconButton  tooltip="Course">
 				      <CourseIcon/>
 				    </IconButton><span style={{position: 'absolute',top: '62%'}}>

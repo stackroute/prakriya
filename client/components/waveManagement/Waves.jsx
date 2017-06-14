@@ -5,11 +5,9 @@ import Masonry from 'react-masonry-component'
 import {Tabs, Tab} from 'material-ui/Tabs'
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import AddWave from './AddWave.jsx';
+import app from '../../styles/app.json';
 
 const styles = {
-	heading: {
-		textAlign: 'center'
-	},
 	col: {
 		marginBottom: 20
 	},
@@ -197,7 +195,7 @@ export default class Waves extends React.Component {
 		let th = this;
 		return (
 			<div>
-				<h2 style={styles.heading}>Wave Management</h2>
+				<h2 style={app.heading}>Wave Management</h2>
 				<Grid><Row><Tabs
 					style={styles.tabs}
 					tabItemContainerStyle={styles.tabItemContainer}
