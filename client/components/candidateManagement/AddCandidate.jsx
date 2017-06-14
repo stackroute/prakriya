@@ -28,9 +28,7 @@ export default class AddCourse extends React.Component {
 			contact: '',
 			contactErrorText: '',
 			careerBand: '',
-			careerBandErrorText: '',
 			revisedBU: '',
-			revisedBUErrorText: '',
 			digithonQualified: '',
 			digithonQualifiedErrorText: '',
 			digithonPhase: '',
@@ -38,17 +36,11 @@ export default class AddCourse extends React.Component {
 			digithonScore: '',
 			digithonScoreErrorText: '',
 			trainingStatus: '',
-			trainingStatusErrorText: '',
 			trainingsUndergone: '',
-			trainingsUndergoneErrorText: '',
 			workExperienceYear: '',
-			workExperienceYearErrorText: '',
 			workExperienceMonths: '',
-			workExperienceMonthsErrorText: '',
 			primarySupervisor: '',
-			primarySupervisorErrorText: '',
 			projectSupervisor: '',
-			projectSupervisorErrorText: '',
 			college: '',
 			CGPA: ''
 		}
@@ -129,15 +121,13 @@ export default class AddCourse extends React.Component {
 
 	onChangeCareerBand(e) {
 		this.setState({
-			careerBand: e.target.value,
-			careerBandErrorText: ''
+			careerBand: e.target.value
 		})
 	}
 
 	onChangeRevisedBU(e) {
 		this.setState({
-			revisedBU: e.target.value,
-			revisedBUErrorText: ''
+			revisedBU: e.target.value
 		})
 	}
 
@@ -157,43 +147,37 @@ export default class AddCourse extends React.Component {
 
 	onChangeTrainingStatus(e) {
 		this.setState({
-			trainingStatus: e.target.value,
-			trainingStatusErrorText: ''
+			trainingStatus: e.target.value
 		})
 	}
 
 	onChangeTrainingsUndergone(e) {
 		this.setState({
-			trainingsUndergone: e.target.value,
-			trainingsUndergoneErrorText: ''
+			trainingsUndergone: e.target.value
 		})
 	}
 
 	onChangeWorkExperienceYear(e) {
 		this.setState({
-			workExperienceYear: e.target.value,
-			workExperienceYearErrorText: ''
+			workExperienceYear: e.target.value
 		})
 	}
 
 	onChangeWorkExperienceMonths(e) {
 		this.setState({
-			workExperienceMonths: e.target.value,
-			workExperienceMonthsErrorText: ''
+			workExperienceMonths: e.target.value
 		})
 	}
 
 	onChangePrimarySupervisor(e) {
 		this.setState({
-			primarySupervisor: e.target.value,
-			primarySupervisorErrorText: ''
+			primarySupervisor: e.target.value
 		})
 	}
 
 	onChangeProjectSupervisor(e) {
 		this.setState({
-			projectSupervisor: e.target.value,
-			projectSupervisorErrorText: ''
+			projectSupervisor: e.target.value
 		})
 	}
 
@@ -220,6 +204,7 @@ export default class AddCourse extends React.Component {
 			revisedBU: '',
 			digithonQualified: '',
 			digithonPhase: '',
+			digithonScore: '',
 			trainingStatus: '',
 			trainingsUndergone: '',
 			workExperienceYear: '',
@@ -231,26 +216,19 @@ export default class AddCourse extends React.Component {
 			empIDErrorText: '',
 			empNameErrorText: '',
 			emailErrorText: '',
-			contactErrorText: '',
-			careerBandErrorText: '',
-			revisedBUErrorText: '',
 			digithonQualifiedErrorText: '',
 			digithonPhaseErrorText: '',
-			trainingStatusErrorText: '',
-			trainingsUndergoneErrorText: '',
-			workExperienceYearErrorText: '',
-			workExperienceMonthsErrorText: '',
-			primarySupervisiorErrorText: '',
-			projectSupervisiorErrorText: '',
+			digithonScoreErrorText: '',
+			contactErrorText: ''
 		})
 	}
 
 	validationSuccess() {
 		let empIDPattern = /[0-9]{6}/
 		let emailPattern = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+[^<>()\.,;:\s@\"]{2,})$/
-		let contactPattern = /[0-9]{10}/
 		let digithonScorePattern1 = /[0-9]{1,}/
 		let digithonScorePattern2 = /[0-9]{1,}.[0-9]{1,}/
+		let contactPattern = /[0-9]{10}/
 		if(this.state.empID.trim().length == 0) {
 			this.setState({
 				empIDErrorText: 'This field cannot be empty.'
@@ -265,27 +243,15 @@ export default class AddCourse extends React.Component {
 			})
 		} else if(this.state.email.trim().length == 0) {
 			this.setState({
-				emailErrorText: 'This field cannot be empty'
+				emailErrorText: 'This field cannot be empty.'
 			})
 		} else if(!emailPattern.test(this.state.email)) {
 			this.setState({
-				emailErrorText: 'Enter a valid email address'
+				emailErrorText: 'Enter a valid email address.'
 			})
-		} else if(this.state.contact.trim().length == 0) {
+		} else if(this.state.contact.trim().length != 0 && !contactPattern.test(this.state.contact)) {
 			this.setState({
-				contactErrorText: 'This field cannot be empty'
-			})
-		} else if(!contactPattern.test(this.state.contact)) {
-			this.setState({
-				contactErrorText: 'Invalid Contact! Expecting a 10 digit mobile number.'
-			})
-		} else if(this.state.careerBand.trim().length == 0) {
-			this.setState({
-				careerBandErrorText: 'This field cannot be empty.'
-			})
-		} else if(this.state.revisedBU.trim().length == 0) {
-			this.setState({
-				revisedBUErrorText: 'This field cannot be empty.'
+				contactErrorText: 'Enter a valid 10 digit mobile number.'
 			})
 		} else if(this.state.digithonQualified.trim().length == 0) {
 			this.setState({
@@ -299,33 +265,9 @@ export default class AddCourse extends React.Component {
 			this.setState({
 				digithonScoreErrorText: 'This field cannot be empty.'
 			})
-		} else if(!(digithonScorePattern1.test(this.digithonScore) || digithonScorePattern2.test(this.digithonScore))) {
+		} else if(!digithonScorePattern1.test(this.state.digithonScore)) {
 			this.setState({
 				digithonScoreErrorText: 'Invalid Score. Digithon score must be a number.'
-			})
-		} else if(this.state.trainingStatus.trim().length == 0) {
-			this.setState({
-				trainingStatusErrorText: 'This field cannot be empty.'
-			})
-		} else if(this.state.trainingsUndergone.trim().length == 0) {
-			this.setState({
-				trainingsUndergoneErrorText: 'This field cannot be empty.'
-			})
-		} else if(this.state.workExperienceYear.trim().length == 0) {
-			this.setState({
-				workExperienceYearErrorText: 'This field cannot be empty.'
-			})
-		} else if(this.state.workExperienceMonths.trim().length == 0) {
-			this.setState({
-				workExperienceMonthsErrorText: 'This field cannot be empty.'
-			})
-		} else if(this.state.primarySupervisor.trim().length == 0) {
-			this.setState({
-				primarySupervisorErrorText: 'This field cannot be empty.'
-			})
-		} else if(this.state.projectSupervisor.trim().length == 0) {
-			this.setState({
-				projectSupervisorErrorText: 'This field cannot be empty.'
 			})
 		} else {
 			return true
@@ -335,24 +277,24 @@ export default class AddCourse extends React.Component {
 
 	handleAdd() {
 		let candidate = {}
-		candidate.EmployeeID = this.state.empID
-		candidate.EmployeeName = this.state.empName
-		candidate.EmailID = this.state.email
-		candidate.Contact = this.state.contact
-		candidate.CareerBand = this.state.careerBand
+		candidate.EmployeeID = this.state.empID;
+		candidate.EmployeeName = this.state.empName;
+		candidate.EmailID = this.state.email;
+		candidate.Contact = this.state.contact;
+		candidate.CareerBand = this.state.careerBand;
 		candidate.RevisedBU = this.state.revisedBU;
-		candidate.DigiThonQualified = this.state.digithonQualified
-		candidate.DigiThonPhase = this.state.digithonPhase
-		candidate.DigiThonScore = this.state.digithonScore
+		candidate.DigiThonQualified = this.state.digithonQualified;
+		candidate.DigiThonPhase = this.state.digithonPhase;
+		candidate.DigiThonScore = this.state.digithonScore;
 		candidate.TrainingStatus = this.state.trainingStatus;
-		candidate.TrainingsUndergone = this.state.trainingsUndergone
-		candidate.WorkExperience = `${this.state.workExperienceYear} Year(s) ${this.state.workExperienceMonths} Month(s)`
-		candidate.PrimarySupervisor = this.state.primarySupervisor
-		candidate.ProjectSupervisor = this.state.projectSupervisor
-		candidate.College = this.state.college
-		candidate.CGPA = this.state.CGPA
-		this.props.addCandidate(candidate)
-		this.resetFields()
+		candidate.TrainingsUndergone = this.state.trainingsUndergone;
+		candidate.WorkExperience = `${this.state.workExperienceYear} Year(s) ${this.state.workExperienceMonths} Month(s)`;
+		candidate.PrimarySupervisor = this.state.primarySupervisor;
+		candidate.ProjectSupervisor = this.state.projectSupervisor;
+		candidate.College = this.state.college;
+		candidate.CGPA = this.state.CGPA;
+		this.props.addCandidate(candidate);
+		this.resetFields();
 	}
 
 	render() {
@@ -388,7 +330,8 @@ export default class AddCourse extends React.Component {
 						<div style={dialog.box50}>
 	        	<TextField
 			    		hintText="Enter a six digit Employee ID"
-			    		floatingLabelText="Employee ID"
+			    		floatingLabelText="Employee ID *"
+							floatingLabelStyle={app.mandatoryField}
 			    		value={this.state.empID}
 			    		onChange={this.onChangeID}
 							errorText={this.state.empIDErrorText}
@@ -397,7 +340,8 @@ export default class AddCourse extends React.Component {
 						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Name"
-			    		floatingLabelText="Name"
+			    		floatingLabelText="Name *"
+							floatingLabelStyle={app.mandatoryField}
 			    		value={this.state.empName}
 			    		onChange={this.onChangeName}
 							errorText={this.state.empNameErrorText}
@@ -408,7 +352,8 @@ export default class AddCourse extends React.Component {
 						<div style={dialog.box50}>
 			    	<TextField
 			    		hintText="Email"
-			    		floatingLabelText="Email"
+			    		floatingLabelText="Email *"
+							floatingLabelStyle={app.mandatoryField}
 			    		value={this.state.email}
 			    		onChange={this.onChangeEmail}
 							errorText={this.state.emailErrorText}
@@ -440,7 +385,6 @@ export default class AddCourse extends React.Component {
 			    		floatingLabelText="Revised BU"
 			    		value={this.state.revisedBU}
 			    		onChange={this.onChangeRevisedBU}
-							errorText={this.state.revisedBUErrorText}
 			    	/>
 						</div>
 					</div>
@@ -448,7 +392,8 @@ export default class AddCourse extends React.Component {
 						<div style={dialog.box33}>
 			    	<TextField
 			    		hintText="Digithon"
-			    		floatingLabelText="Digithon Qualified"
+			    		floatingLabelText="Digithon Qualified *"
+							floatingLabelStyle={app.mandatoryField}
 			    		value={this.state.digithonQualified}
 			    		onChange={this.onChangeDigithonQualified}
 							errorText={this.state.digithonQualifiedErrorText}
@@ -457,7 +402,8 @@ export default class AddCourse extends React.Component {
 						<div style={dialog.box34}>
 			    	<TextField
 			    		hintText="Phase"
-			    		floatingLabelText="Digithon Phase"
+			    		floatingLabelText="Digithon Phase *"
+							floatingLabelStyle={app.mandatoryField}
 			    		value={this.state.digithonPhase}
 			    		onChange={this.onChangeDigiThonPhase}
 			    		type="number"
@@ -467,10 +413,10 @@ export default class AddCourse extends React.Component {
 						<div style={dialog.box33}>
 			    	<TextField
 			    		hintText="Score"
-			    		floatingLabelText="Digithon Score"
+			    		floatingLabelText="Digithon Score *"
+							floatingLabelStyle={app.mandatoryField}
 			    		value={this.state.digithonScore}
 			    		onChange={this.onChangeDigiThonScore}
-			    		type="number"
 							errorText={this.state.digithonScoreErrorText}
 			    	/>
 						</div>
@@ -482,7 +428,6 @@ export default class AddCourse extends React.Component {
 			    		floatingLabelText="Training Status"
 			    		value={this.state.trainingStatus}
 			    		onChange={this.onChangeTrainingStatus}
-							errorText={this.state.trainingStatusErrorText}
 			    	/>
 						</div>
 						<div style={dialog.box50}>
@@ -491,7 +436,6 @@ export default class AddCourse extends React.Component {
 			    		floatingLabelText="Trainings Undergone"
 			    		value={this.state.trainingsUndergone}
 			    		onChange={this.onChangeTrainingsUndergone}
-							errorText={this.state.trainingsUndergoneErrorText}
 			    	/>
 						</div>
 					</div>
@@ -502,7 +446,6 @@ export default class AddCourse extends React.Component {
 			    		floatingLabelText="Experience In Years"
 			    		value={this.state.workExperienceYear}
 			    		onChange={this.onChangeWorkExperienceYear}
-							errorText={this.state.workExperienceYearErrorText}
 			    	/>Year(s)
 						</div>
 						<div style={dialog.box50}>
@@ -511,7 +454,6 @@ export default class AddCourse extends React.Component {
 			    		floatingLabelText="Experience In Months"
 			    		value={this.state.workExperienceMonths}
 			    		onChange={this.onChangeWorkExperienceMonths}
-							errorText={this.state.workExperienceMonthsErrorText}
 			    	/>Month(s)
 						</div>
 					</div>
@@ -522,7 +464,6 @@ export default class AddCourse extends React.Component {
 			    		floatingLabelText="Primary Supervisor"
 			    		value={this.state.primarySupervisor}
 			    		onChange={this.onChangePrimarySupervisor}
-							errorText={this.state.primarySupervisorErrorText}
 			    	/>
 						</div>
 						<div style={dialog.box50}>
@@ -531,7 +472,6 @@ export default class AddCourse extends React.Component {
 			    		floatingLabelText="Project Supervisor"
 			    		value={this.state.projectSupervisor}
 			    		onChange={this.onChangeProjectSupervisor}
-							errorText={this.state.projectSupervisorErrorText}
 			    	/>
 						</div>
 					</div>
