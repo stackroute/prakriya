@@ -1,18 +1,18 @@
 const router = require('express').Router();
-var mongoose = require('mongoose');
+let mongoose = require('mongoose');
 
 const userModel = require('../../models/users.js');
 const passport = require('passport');
-var jwt = require("jwt-simple");  
-var cfg = require("../../config"); 
-var auth = require('../auth')();
+let jwt = require('jwt-simple');
+let cfg = require('../../config');
+let auth = require('../auth')();
 
 
-// router.post('/', 
+// router.post('/',
 //   passport.authenticate(
-//   	'local', 
+//   	'local',
 //   	{
-//   		failureFlash : 'Invalid login attempt..!', 
+//   		failureFlash : 'Invalid login attempt..!',
 //   		successFlash: 'Welcome to Prakriya'
 //   	}
 //   ),
@@ -22,21 +22,20 @@ var auth = require('../auth')();
 // )
 
 
-
-//encoding tokens here!!!!!
-router.post("/", function(req, res) {  
+// encoding tokens here!!!!!
+router.post('/', function(req, res) {
     if (req.body.username && req.body.password) {
-        var uname = req.body.username;
-        var password = req.body.password;
+        let uname = req.body.username;
+        let password = req.body.password;
 
-        let user = {}; 
+        let user = {};
 
-        var query = userModel.findOne({'username': uname, 'password': password});
+        let query = userModel.findOne({username: uname, password: password});
 
-        var promise = query.exec();
+        let promise = query.exec();
 
-        promise.then(function(user){
-          console.log('User object in the loginRouter',user);
+        promise.then(function(user) {
+          console.log('User object in the loginRouter', user);
           // user = doc;
           if (user) {
             if(user.role != 'admin' && user.actions.indexOf('login') <= -1)
@@ -44,17 +43,17 @@ router.post("/", function(req, res) {
               res.send('Account suspended');
             }
             else {
-              var payload = {
+              let payload = {
                   id: user._id,
                   user: user.username
               };
               console.log(payload);
-              var token = jwt.encode(payload, cfg.jwtSecret);
+              let token = jwt.encode(payload, cfg.jwtSecret);
       // expiresIn: 10080 // in seconds});
               console.log(token);
               res.json({
                   // user: user,
-                  token: "JWT " + token
+                  token: 'JWT ' + token
               });
             }
           } else {
@@ -63,7 +62,7 @@ router.post("/", function(req, res) {
         });
     } else {
         res.sendStatus(401);
-    }   
+    }
 });
 
 module.exports = router;

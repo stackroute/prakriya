@@ -44,14 +44,22 @@ export default class CandidateCard extends React.Component {
 	componentWillMount() {
 		this.getProfilePic(this.props.candidate.EmployeeID);
 	}
+	componentWillReceiveProps(nextProps) {
+		console.log('new props received');
+		this.getProfilePic(nextProps.candidate.EmployeeID);
+	}
 	getProfilePic(eid) {
 		let th = this;
 		Request
 			.get(`/dashboard/getimage?eid=${eid}`)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
-				if(err)
+				if(err) {
 		    	console.log('Image not found for ', eid);
+					th.setState({
+						imageURL: '../../assets/images/avt-default.jpg'
+					})
+				}
 		    else {
 		    	if(res.text) {
 		    		let array = new Uint8Array(res.text.length);
@@ -119,14 +127,14 @@ export default class CandidateCard extends React.Component {
 			    	style={styles.cardTitle}
 			    />
 			    <CardActions style={styles.actions}>
-			    	<IconButton 
-			    		tooltip="Download Profile" 
+			    	<IconButton
+			    		tooltip="Download Profile"
 			    		style={{float: 'left'}}
 			    		onTouchTap={this.downloadProfile}
 			    	>
-				      <DownloadProfile 
-				      	color={lightBlack} 
-				      	candidate={this.props.candidate} 
+				      <DownloadProfile
+				      	color={lightBlack}
+				      	candidate={this.props.candidate}
 				      	imageURL={this.state.imageURL}
 				      />
 				    </IconButton>

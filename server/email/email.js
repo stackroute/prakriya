@@ -20,12 +20,12 @@ let sendEmail = function (emailObj) {
             from: CONFIG.EMAIL.USERNAME,
             to: emailObj.email,
             subject: emailObj.subject,
-            html: 
+            html:
                 `<div>
                     <h2>Prakriya</h2>
-                    <p><em>`+
+                    <p><em>` +
                         emailObj.content
-                    +`</em></p>
+                    + `</em></p>
                     <h4>Thank You!</h4>
                     <strong>Note: </strong>
                     This is an automated mail. Do not reply to this mail.
@@ -34,12 +34,12 @@ let sendEmail = function (emailObj) {
         return new Promise((resolve, reject) => {
             transporter.sendMail(mail, function (err, response) {
                 if (err) {
-                    logger.error('response not found',err);
+                    logger.error('response not found', err);
                     reject(err);
                 } else {
-                    resolve({ 
-                        success: true, 
-                        response: response, 
+                    resolve({
+                        success: true,
+                        response: response,
                         msg: 'Mail sent successfully to ' + emailObj.email
                     });
                 }
@@ -53,4 +53,4 @@ let sendEmail = function (emailObj) {
 
 module.exports = {
     sendEmail: sendEmail
-}
+};

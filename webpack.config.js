@@ -25,6 +25,9 @@ const config = {
     },
   devtool: 'cheap-module-eval-source-map',
 	module: {
+		noParse: [
+			/node_modules\/jspdf\/dist\/jspdf.debug.js/
+		],
 		loaders: [
 			{
 				test: /\.jsx$/,

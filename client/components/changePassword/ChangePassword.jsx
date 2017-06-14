@@ -51,7 +51,7 @@ export default class ChangePassword extends React.Component {
 			confirmPasswordErrorText: "This field cannot be empty"
 		})
 		if(th.state.confirmPassword.trim() !== th.state.newPassword.trim()) th.setState({
-		
+
 			confirmPasswordErrorText: "This field should be same as New Password"
 		})
 		/* need to be changed */
@@ -79,8 +79,6 @@ export default class ChangePassword extends React.Component {
 			    	})
 			    }
 			    else {
-			    	console.log(res);
-			    	localStorage.setItem('token', res.body.token);
 			    	th.context.router.push('/app')
 			    }
 			  })

@@ -18,5 +18,8 @@ module.exports = {
     'borderRadius': '10px',
     'zIndex': 1,
     'textAlign': 'center'
+  },
+  'mandatoryField': {
+    'color': '#990000'
   }
 }
