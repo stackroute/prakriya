@@ -139,7 +139,7 @@ export default class Candidates extends React.Component {
 		    		candidates: cadets,
 						filteredCandidates: cadets
 		    	});
-					th.setPage(1);
+					th.setPage(th.state.currentPage);
 		    }
 		  })
 	}
@@ -247,7 +247,7 @@ export default class Candidates extends React.Component {
 					});
 		    	console.log('Filter Success');
 					console.log(res);
-					th.setPage(1);
+					th.setPage(th.state.currentPage)
 		    }
 			})
 	}
