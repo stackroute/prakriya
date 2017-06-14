@@ -29,7 +29,14 @@ let getCourses = function(successCB, errorCB) {
 };
 
 let updateCourse = function (CourseObj, successCB, errorCB) {
-	CourseModel.update({CourseID: CourseObj.CourseID}, {$set: {CourseName: CourseObj.CourseName, AssessmentCategories: CourseObj.AssessmentCategories, Duration: CourseObj.Duration, History: CourseObj.History}}, function(err, status) {
+	CourseModel.
+	update({CourseID: CourseObj.CourseID},
+		{$set: {
+			CourseName: CourseObj.CourseName,
+			AssessmentCategories: CourseObj.AssessmentCategories,
+			Duration: CourseObj.Duration, History: CourseObj.History}
+		},
+		function(err, status) {
 		if(err)
 			{errorCB(err);}
 		successCB(status);
@@ -47,7 +54,8 @@ let addCourse = function (CourseObj, successCB, errorCB) {
 };
 
 let deleteCourse = function(courseObj, successCB, errorCB) {
-	CourseModel.update({CourseID: courseObj.CourseID}, {$set: {Removed: true}}, function(err, status) {
+	CourseModel.
+	update({CourseID: courseObj.CourseID}, {$set: {Removed: true}}, function(err, status) {
 		if(err)
 			{errorCB(err);}
 		successCB(status);
@@ -55,7 +63,8 @@ let deleteCourse = function(courseObj, successCB, errorCB) {
 };
 
 let restoreCourse = function(restoreObj, successCB, errorCB) {
-	CourseModel.updateMany({CourseName: {$in: restoreObj}}, {$set: {Removed: false}}, function(err, status) {
+	CourseModel.
+	updateMany({CourseName: {$in: restoreObj}}, {$set: {Removed: false}}, function(err, status) {
 		if(err)
 			{errorCB(err);}
 		successCB(status);
@@ -64,20 +73,52 @@ let restoreCourse = function(restoreObj, successCB, errorCB) {
 
 let addCategory = function(object, successCB, errorCB) {
 	let categoryObj = object.Categories;
-	CourseModel.update({CourseID: object.CourseID}, {$set: {History: object.History}, $push: {Categories: {Name: categoryObj.Name, Mentor: categoryObj.Mentor, Duration: categoryObj.Duration, Videos: categoryObj.Videos, Blogs: categoryObj.Blogs, Docs: categoryObj.Docs}}}, function(err, status) {
-		if(err)
-			{errorCB(err);}
-		successCB(status);
-	});
+	CourseModel.
+	update({CourseID: object.CourseID},
+		{
+			$set: {History: object.History},
+			$push: {Categories:
+				{
+					Name: categoryObj.Name,
+					Mentor: categoryObj.Mentor,
+					Duration: categoryObj.Duration,
+					Videos: categoryObj.Videos,
+					Blogs: categoryObj.Blogs,
+					Docs: categoryObj.Docs
+				}
+			}
+		},
+		function(err, status) {
+			if(err)
+				{errorCB(err);}
+			successCB(status);
+		});
 };
 
 let deleteCategory = function(object, successCB, errorCB) {
 	let categoryObj = object.Categories;
-	CourseModel.update({CourseID: object.CourseID}, {$set: {History: object.History}, $pull: {Categories: {Name: categoryObj.Name, Mentor: categoryObj.Mentor, Duration: categoryObj.Duration, Videos: categoryObj.Videos, Blogs: categoryObj.Blogs, Docs: categoryObj.Docs}}}, function(err, status) {
-		if(err)
-			{errorCB(err);}
-		successCB(status);
-	});
+	CourseModel.
+	update(
+		{CourseID: object.CourseID},
+		{$set:
+			{History: object.History},
+			$pull: {Categories:
+				{
+					Name: categoryObj.Name,
+					Mentor: categoryObj.Mentor,
+					Duration: categoryObj.Duration,
+					Videos: categoryObj.Videos,
+					Blogs: categoryObj.Blogs,
+					Docs: categoryObj.Docs
+				}
+			}
+		},
+		function(err, status) {
+			if(err)
+				{errorCB(err);}
+			successCB(status);
+		}
+	);
 };
 
 /** *********************************************
@@ -102,14 +143,14 @@ let addNewSession = function(object, successCB, errorCB) {
 			{Sessions:
 				{
 					SessionID: timeStamp,
-				  CourseName: object.session.CourseName,
-				  Week: object.session.Week,
-				  Activities: object.session.Activities,
-				  Status: object.session.Status,
-				  ContextSetSession: object.session.ContextSetSession,
-				  SessionBy: object.session.SessionBy,
-				  SessionOn: object.session.SessionOn,
-				  Remarks: object.session.Remarks
+					CourseName: object.session.CourseName,
+					Week: object.session.Week,
+					Activities: object.session.Activities,
+					Status: object.session.Status,
+					ContextSetSession: object.session.ContextSetSession,
+					SessionBy: object.session.SessionBy,
+					SessionOn: object.session.SessionOn,
+					Remarks: object.session.Remarks
 				}
 			}
 		}, function(err, result) {
