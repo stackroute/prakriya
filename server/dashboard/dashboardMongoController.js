@@ -146,6 +146,7 @@ let getActiveWaves = function(successCB, errorCB) {
 ****************************************************/
 
 let getProjects = function(successCB, errorCB) {
+	console.log("inside getproj in cntrlr")
 	ProjectModel.find({},function(err, result) {
 		if (err)
 			errorCB(err);
@@ -154,14 +155,16 @@ let getProjects = function(successCB, errorCB) {
 }
 
 let addProject = function (projectObj, successCB, errorCB) {
+	console.log(projectObj,"projectObj")
+	console.log(projectObj.version[0].members,"dashboardMongoController")
 	let saveProject = new ProjectModel(projectObj);
 	saveProject.save(function (err, result) {
 		if(err)
 			errorCB(err);
 		else
 		{
-			projectObj.members.map(function(member) {
-				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.name,ProjectDescription: projectObj.description,ProjectSkills: projectObj.skills}},function(err,result){
+			projectObj.version[0].members.map(function(member) {
+				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.version[0].name,ProjectDescription: projectObj.version[0].description,ProjectSkills: projectObj.version[0].skills}},function(err,result){
 					if(err)
 						errorCB(err)
 					console.log(result);
@@ -171,16 +174,15 @@ let addProject = function (projectObj, successCB, errorCB) {
 		}
 	})
 }
-
 let updateProject = function (projectObj,delList, prevWave, successCB, errorCB) {
-	console.log(prevWave)
-	ProjectModel.update({name:projectObj.name},projectObj,function (err, result) {
+	console.log(projectObj,"projectObj")
+	ProjectModel.update({name:projectObj.product},projectObj.version[0],function (err, result) {
 		if(err)
 			errorCB(err);
 		else
 		{
-			projectObj.members.map(function(member) {
-				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.name,ProjectDescription: projectObj.description,ProjectSkills: projectObj.skills}},function(err,result){
+			projectObj.version[0].members.map(function(member) {
+				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.product,ProjectDescription: projectObj.version[0].description,ProjectSkills: projectObj.version[0].skills}},function(err,result){
 					if(err)
 						errorCB(err)
 					console.log(result);
@@ -202,12 +204,12 @@ let updateProject = function (projectObj,delList, prevWave, successCB, errorCB) 
 }
 
 let deleteProject = function (projectObj, successCB, errorCB) {
-	ProjectModel.remove({name:projectObj.name},function (err, result) {
+	ProjectModel.remove({'version.name':projectObj.version.name},function (err, result) {
 		if(err)
-			errorCB(err);
+			console.log(err,'err');
 		else
 		{
-			CandidateModel.updateMany({ProjectName:projectObj.name},{$set:{ProjectName: '',ProjectDescription: '',ProjectSkills: []}},function(err,result){
+			CandidateModel.updateMany({ProjectName:projectObj.product},{$set:{ProjectName: '',ProjectDescription: '',ProjectSkills: []}},function(err,result){
 					if(err)
 						errorCB(err)
 					console.log(result)
@@ -218,6 +220,7 @@ let deleteProject = function (projectObj, successCB, errorCB) {
 }
 
 let getCadetsOfProj = function(name, successCB, errorCB) {
+	console.log("inside getcadetsproj")
 	CandidateModel.find({ProjectName:name},function(err, result) {
 		if (err)
 				errorCB(err);
@@ -365,6 +368,7 @@ let updateAbsentees = function(Absentees,successCB, errorCB) {
 
 //cancel Leave
 let cancelLeave = function(details,successCB, errorCB) {
+	if(details.id != ''){
 	var id = new mongoose.mongo.ObjectId(details.id);
 	CandidateModel.update({"DaysAbsent._id" : id},{$pull:{DaysAbsent:{"_id": id}}}, function(err, result) {
 		if(err) {
@@ -374,6 +378,10 @@ let cancelLeave = function(details,successCB, errorCB) {
 		console.log(result);
 		successCB(result);
 	});
+}
+else {
+	successCB();
+}
 }
 
 let updateApproval = function(Approval,successCB, errorCB) {

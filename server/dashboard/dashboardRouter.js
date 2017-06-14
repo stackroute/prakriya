@@ -209,8 +209,8 @@ router.post('/updatecadetwave', auth.canAccess(CONFIG.ADMIN), function(req, res)
 
 // Get all projects
 router.get('/projects', auth.canAccess(CONFIG.MENCAN), function(req, res) {
-  try{
-    dashboardMongoController.getProjects(function(projects) {
+    try{
+      dashboardMongoController.getProjects(function(projects) {
       res.status(201).json(projects);
     }, function(err) {
       res.status(500).json({ error: 'Cannot get all projects from db...!' });
@@ -231,6 +231,7 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
     dashboardMongoController.addProject(projectObj, function(project) {
       res.status(201).json(project);
     }, function (err) {
+      console.log(err)
       res.status(500).json({ error: 'Cannot add the project...!' });
     })
   }
@@ -244,10 +245,12 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
 
 //update a project
 router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  console.log(req.body.project,"updateproj pro")
+  console.log(req.user.name,"upatwproj name")
   try {
     let projectObj = req.body.project;
-    projectObj.addedBy = req.user.name;
-    projectObj.updatedBy = true;
+    projectObj.version[0].addedBy = req.user.name;
+    projectObj.version[0].updatedBy = true;
     dashboardMongoController.updateProject(projectObj, req.body.delList, req.body.prevWave, function(project) {
       res.status(201).json(project);
     }, function (err) {
@@ -818,7 +821,9 @@ router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req,
 
 // Get all cadets of a particular project
 router.post('/cadetsofproj', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  console.log("insiderouter")
   try{
+    console.log("try block")
     dashboardMongoController.getCadetsOfProj(req.body.name, function(cadets) {
       res.status(201).json(cadets);
     }, function(err) {

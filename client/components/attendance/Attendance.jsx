@@ -21,8 +21,8 @@ import {
   TableRow,
   TableRowColumn
 } from 'material-ui/Table';
-import BigCalendar from 'react-big-calendar';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import Calendar from './Calendar.jsx';
 
 const styles = {
   content: {
@@ -32,6 +32,23 @@ const styles = {
     wordWrap: 'break-word'
   }
 }
+
+const events = [
+    {
+        start: '2015-07-20',
+        end: '2015-07-02',
+        eventClasses: 'optionalEvent',
+        title: 'test event',
+        description: 'This is a test description of an event',
+    },
+    {
+        start: '2015-07-19',
+        end: '2015-07-25',
+        title: 'test event',
+        description: 'This is a test description of an event',
+        data: 'you can add what ever random data you may want to use later',
+    },
+];
 
 export default class Attendance extends React.Component {
   constructor(props) {
@@ -51,10 +68,10 @@ export default class Attendance extends React.Component {
       type: 'no',
       slideIndex: 0,
       result: 'rejected',
-			WaveIds: [],
-			cadetsOfWave: [],
+      WaveIds: [],
+      cadetsOfWave: [],
       WaveID: '',
-      Date: '',
+      Date: ''
     }
     this.handleSelect = this.handleSelect.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -70,9 +87,9 @@ export default class Attendance extends React.Component {
     this.formatDate = this.formatDate.bind(this);
     this.handleChangeTab = this.handleChangeTab.bind(this);
     this.cancelLeave = this.cancelLeave.bind(this);
-		this.getWaveId = this.getWaveId.bind(this);
-		this.onWaveIdChange = this.onWaveIdChange.bind(this);
-		this.getWaveSpecificCandidates = this.getWaveSpecificCandidates.bind(this);
+    this.getWaveId = this.getWaveId.bind(this);
+    this.onWaveIdChange = this.onWaveIdChange.bind(this);
+    this.getWaveSpecificCandidates = this.getWaveSpecificCandidates.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.updatePresent = this.updatePresent.bind(this);
     this.handlePresent = this.handlePresent.bind(this);
@@ -101,25 +118,19 @@ export default class Attendance extends React.Component {
 
   updatePresent(EmpID, details) {
     let th = this
-    Request.post('/dashboard/present').set({'Authorization': localStorage.getItem('token')}).send({
-      EmployeeID: EmpID,
-      id: details,
-      Date: th.state.Date
-    }).end(function(err, res) {
+    Request.post('/dashboard/present').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID, id: details, Date: th.state.Date}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-          let cadet = th.state.cadetsOfWave.filter(function(cadet){
-            return cadet.EmployeeID === EmpID;
-          });
-          cadet[0].DaysPresent.push(th.state.Date);
-          cadet[0].DaysAbsent = cadet[0].DaysAbsent.filter(function(cadets, key) {
-            return details != cadets._id
-          })
-          th.setState({
-            cadet: cadet[0]
-          })
-        }
+        let cadet = th.state.cadetsOfWave.filter(function(cadet) {
+          return cadet.EmployeeID === EmpID;
+        });
+        cadet[0].DaysPresent.push(th.state.Date);
+        cadet[0].DaysAbsent = cadet[0].DaysAbsent.filter(function(cadets, key) {
+          return details != cadets._id
+        })
+        th.setState({cadet: cadet[0]})
+      }
     })
   }
 
@@ -132,40 +143,28 @@ export default class Attendance extends React.Component {
       leaveType: 'absent',
       reason: 'absent'
     }
-    Request.post('/dashboard/absent').set({'Authorization': localStorage.getItem('token')}).send({
-      EmployeeID: EmpID,
-      details: details,
-      Date: date
-    }).end(function(err, res) {
+    Request.post('/dashboard/absent').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID, details: details, Date: date}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-        console.log(th.state.WaveId);
-          th.getWaveSpecificCandidates(th.state.WaveId);
-        }
+        th.getWaveSpecificCandidates(th.state.WaveId);
+      }
     })
   }
 
-	onWaveIdChange(e) {
-            this.setState({
-                WaveId: e.target.textContent
-              })
-            this.getWaveSpecificCandidates(e.target.textContent);
+  onWaveIdChange(e) {
+    this.setState({WaveId: e.target.textContent})
+    this.getWaveSpecificCandidates(e.target.textContent);
   }
 
-	getWaveSpecificCandidates(waveId){
-            let th = this;
-            let candidateName = [];
-            let candidateID = [];
-            Request
-                .get('/dashboard/wavespecificcandidates?waveID='+waveId)
-                .set({'Authorization': localStorage.getItem('token')})
-                .end(function(err, res){
-									th.setState({
-                    cadetsOfWave: res.body.data
-                })
-                })
-            }
+  getWaveSpecificCandidates(waveId) {
+    let th = this;
+    let candidateName = [];
+    let candidateID = [];
+    Request.get('/dashboard/wavespecificcandidates?waveID=' + waveId).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      th.setState({cadetsOfWave: res.body.data})
+    })
+  }
 
   getAbsentees() {
     let th = this
@@ -227,21 +226,16 @@ export default class Attendance extends React.Component {
       this.setState({slideIndex: value, type: 'no', result: 'rejected'})
     } else {
       this.setState({slideIndex: value})
-      if(this.state.role !== 'candidate')
-			this.getWaveId();
-    }
-  };
+      if (this.state.role !== 'candidate')
+        this.getWaveId();
+      }
+    };
 
-	getWaveId() {
-            let th = this
-            Request
-                .get('/dashboard/waveids')
-                .set({'Authorization': localStorage.getItem('token')})
-                .end(function(err, res){
-                th.setState({
-                    WaveIds: res.body.waveids
-                })
-                })
+  getWaveId() {
+    let th = this
+    Request.get('/dashboard/waveids').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      th.setState({WaveIds: res.body.waveids})
+    })
   }
 
   handleReasonChange(event) {
@@ -317,28 +311,21 @@ export default class Attendance extends React.Component {
 
   handlePresent(EmpID) {
     let th = this
-    Request.post('/dashboard/updatepresent').set({'Authorization': localStorage.getItem('token')}).send({
-      EmployeeID: EmpID
-    }).end(function(err, res) {
+    Request.post('/dashboard/updatepresent').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-          let cadet = th.state.cadet;
-          cadet.DaysPresent.push(new Date());
-          th.setState({
-            cadet: cadet
-          })
-        }
+        let cadet = th.state.cadet;
+        cadet.DaysPresent.push(new Date());
+        th.setState({cadet: cadet})
+      }
     })
   }
 
-	handleDateChange(event, date) {
-		let startDate = new Date(date);
-		this.setState({
-			Date: date
-		})
-	}
-
+  handleDateChange(event, date) {
+    let startDate = new Date(date);
+    this.setState({Date: date})
+  }
 
   render() {
     let th = this;
@@ -349,23 +336,30 @@ export default class Attendance extends React.Component {
         let today = this.formatDate(new Date());
         let todayAttendance = false;
         this.state.cadet.DaysPresent.map(function(date) {
-          if(today === th.formatDate(date))
+          if (today === th.formatDate(date))
             todayAttendance = true;
+          }
+        )
+        this.state.cadet.DaysAbsent.map(function(details) {
+          if ((new Date(details.fromDate) <= new Date()) && (new Date(details.toDate) >= new Date()))
+            attendance = (
+              <h2>You are on leave.Please contact admin for further approval</h2>
+            )
         })
-        this.state.cadet.DaysAbsent.map(function(details){
-        if((new Date(details.fromDate)<= new Date()) && (new Date(details.toDate) >= new Date()) )
-            attendance = (<h2>You are on leave.Please contact admin for further approval</h2>)
-        })
-        if(attendance === '') {
-        if(todayAttendance) {
-          attendance = (<h2>You have marked today's attendance... For updation contact StackRoute Admin</h2>)
+        if (attendance === '') {
+          if (todayAttendance) {
+            attendance = (
+              <h2>You have marked today's attendance... For updation contact StackRoute Admin</h2>
+            )
+          } else {
+            attendance = (
+              <div>
+                <h2>Do you wish to mark today's attendance
+                </h2>
+                <FlatButton label="Yes" onTouchTap={this.handlePresent.bind(this, this.state.cadet.EmployeeID)} primary={true}/></div>
+            )
+          }
         }
-        else {
-          attendance = (<div>
-            <h2>Do you wish to mark today's attendance </h2>
-            <FlatButton label="Yes" onTouchTap={this.handlePresent.bind(this, this.state.cadet.EmployeeID)} primary={true}/></div>
-          )
-        }}
         return (
           <div>
             <h1 style={styles.content}>ATTENDANCE</h1>
@@ -420,9 +414,7 @@ export default class Attendance extends React.Component {
                   </TableHeader>
                   <TableBody displayRowCheckbox={false} showRowHover={true}>
                     {th.state.cadet.DaysAbsent.map(function(dates, index) {
-                      if(new Date() < new Date(dates.fromDate)) {
-                        if (dates.approved === 'no' || dates.approved === 'rejected' || dates.approved === 'closed')
-                        return (
+                      return (
                           <TableRow>
                             <TableRowColumn>{th.formatDate(dates.fromDate)}</TableRowColumn>
                             <TableRowColumn>{th.formatDate(dates.toDate)}</TableRowColumn>
@@ -434,7 +426,6 @@ export default class Attendance extends React.Component {
                             </TableRowColumn>
                           </TableRow>
                         )
-                      }
                     })
 }
                   </TableBody>
@@ -457,141 +448,126 @@ export default class Attendance extends React.Component {
       let rowno = 0;
       let row = 0;
       let cadetsLength = th.state.cadets.length;
-			let table = (
-				<Table fixedHeader={true}>
-					<TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-						<TableRow>
-							<TableHeaderColumn>Leave No</TableHeaderColumn>
-							<TableHeaderColumn>Cadet Name</TableHeaderColumn>
-							<TableHeaderColumn>Leave Type</TableHeaderColumn>
-							<TableHeaderColumn>From Date</TableHeaderColumn>
-							<TableHeaderColumn>To Date</TableHeaderColumn>
-							<TableHeaderColumn>Reason</TableHeaderColumn>
-							<TableHeaderColumn>Approve</TableHeaderColumn>
-							<TableHeaderColumn>Reject</TableHeaderColumn>
-						</TableRow>
-					</TableHeader>
-					<TableBody displayRowCheckbox={false} showRowHover={true}>
-						{this.state.cadets.map(function(cadets, index) {
-							return (cadets.DaysAbsent.map(function(details, key) {
-								if (details.approved === th.state.type) {
-									return (
-										<TableRow>
-											<TableRowColumn>{leaveno++}</TableRowColumn>
-											<TableRowColumn>{cadets.EmployeeName}</TableRowColumn>
-											<TableRowColumn>{details.leaveType}</TableRowColumn>
-											<TableRowColumn>{th.formatDate(details.fromDate)}</TableRowColumn>
-											<TableRowColumn>{th.formatDate(details.toDate)}</TableRowColumn>
-											<TableRowColumn style={styles.row}>
-												<p title={details.reason}>{details.reason}</p>
-											</TableRowColumn>
-											<TableRowColumn>
-												<IconButton tooltip="Approve" onClick={th.updateAttendance.bind(th, details._id, 'yes', index, key)}>
-													<ApproveIcon color={green500}/>
-												</IconButton>
-											</TableRowColumn>
-											<TableRowColumn>
-												<IconButton tooltip="Reject" onClick={th.updateAttendance.bind(th, details._id, th.state.result, index, key)}>
-													<RejectIcon color={red500}/>
-												</IconButton>
-											</TableRowColumn>
-										</TableRow>
-									)
-								} else {
-									rowno++;
-									return false;
-								}
-							}))
-						})}
-					</TableBody>
-				</Table>
-			)
-      if (cadetsLength > 0) {
-        return (
-          <div>
-            <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
-              <Tab label="Approve Leaves" value={0}> {table}</Tab>
-              <Tab label="Rejected Leaves" value={1}> {table}</Tab>
-              <Tab label="Update Attendance" value={2}>
-              <DatePicker
-                hintText="Date to be updated"
-                floatingLabelText='Date'
-                errorText={this.state.StartDateErrorText}
-                value={this.state.Date}
-                onChange={this.handleDateChange}
-              />
-							<SelectField
-													onChange={th.onWaveIdChange}
-													floatingLabelText="Select WaveID"
-													value={th.state.WaveId}
-											>
-													{
-															th.state.WaveIds.map(function(val, key) {
-																	return <MenuItem key={key} value={val} primaryText={val} />
-															})
-													}
-								</SelectField>
-								<Table fixedHeader={true}>
-									<TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-										<TableRow>
-											<TableHeaderColumn>EmployeeName</TableHeaderColumn>
-											<TableHeaderColumn>Present</TableHeaderColumn>
-											<TableHeaderColumn>Absent</TableHeaderColumn>
-										</TableRow>
-									</TableHeader>
-									<TableBody displayRowCheckbox={false} showRowHover={true}>
-										{
-											th.state.cadetsOfWave.map(function(cadet, index) {
-                        let absent = true;
-                        let present = false;
-                        let date = '';
-                        cadet.DaysAbsent.map(function(details) {
-                          console.log((th.formatDate(new Date(details.fromDate))<= th.formatDate(new Date(th.state.Date))) && ((new Date(details.toDate) >= new Date(th.state.Date))|| (th.formatDate(new Date(details.fromDate)) === (th.formatDate(new Date(details.toDate))))))
-                        if((th.formatDate(new Date(details.fromDate))<= th.formatDate(new Date(th.state.Date))) && ((new Date(details.toDate) >= new Date(th.state.Date))|| (th.formatDate(new Date(details.fromDate)) === (th.formatDate(new Date(details.toDate))))))
-                          {
-                             absent = false
-                             present = true
-                             date = details._id
-                             console.log(details);
-                          }
-                        })
-                        cadet.DaysPresent.filter(function(detail) {
-                          if(th.formatDate(detail)===th.formatDate(th.state.Date))
-                          {
-                            present = false
-                            absent = true
-                            date = detail
-                          }
-                        })
-											return (
-												<TableRow>
-												<TableRowColumn>
-														{cadet.EmployeeName}
-												</TableRowColumn>
-												<TableRowColumn>
-                          <IconButton tooltip="Present" disabled={absent} onClick = {th.updatePresent.bind(this, cadet.EmployeeID, date)}>
-                             <ApproveIcon color={green500}/>
-                           </IconButton>
-												</TableRowColumn>
-												<TableRowColumn>
-                        <IconButton tooltip="Reject"  disabled={present} onClick = {th.updateAbsent.bind(this, cadet.EmployeeID, date)}>
+      let table = (
+        <Table fixedHeader={true}>
+          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+            <TableRow>
+              <TableHeaderColumn>Leave No</TableHeaderColumn>
+              <TableHeaderColumn>Cadet Name</TableHeaderColumn>
+              <TableHeaderColumn>Leave Type</TableHeaderColumn>
+              <TableHeaderColumn>From Date</TableHeaderColumn>
+              <TableHeaderColumn>To Date</TableHeaderColumn>
+              <TableHeaderColumn>Reason</TableHeaderColumn>
+              <TableHeaderColumn>Approve</TableHeaderColumn>
+              <TableHeaderColumn>Reject</TableHeaderColumn>
+            </TableRow>
+          </TableHeader>
+          <TableBody displayRowCheckbox={false} showRowHover={true}>
+            {this.state.cadets.map(function(cadets, index) {
+              return (cadets.DaysAbsent.map(function(details, key) {
+                if (details.approved === th.state.type) {
+                  return (
+                    <TableRow>
+                      <TableRowColumn>{leaveno++}</TableRowColumn>
+                      <TableRowColumn>{cadets.EmployeeName}</TableRowColumn>
+                      <TableRowColumn>{details.leaveType}</TableRowColumn>
+                      <TableRowColumn>{th.formatDate(details.fromDate)}</TableRowColumn>
+                      <TableRowColumn>{th.formatDate(details.toDate)}</TableRowColumn>
+                      <TableRowColumn style={styles.row}>
+                        <p title={details.reason}>{details.reason}</p>
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        <IconButton tooltip="Approve" onClick={th.updateAttendance.bind(th, details._id, 'yes', index, key)}>
+                          <ApproveIcon color={green500}/>
+                        </IconButton>
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        <IconButton tooltip="Reject" onClick={th.updateAttendance.bind(th, details._id, th.state.result, index, key)}>
                           <RejectIcon color={red500}/>
                         </IconButton>
-                      	</TableRowColumn>
-											</TableRow>
-											)
-										})
-									}
-									</TableBody>
-									</Table>
-							</Tab>
-            </Tabs>
+                      </TableRowColumn>
+                    </TableRow>
+                  )
+                } else {
+                  rowno++;
+                  return false;
+                }
 
-          </div>
-        )
-      } else {
-        return ( < h3 > No pending leave approvals < /h3>)
-	}
-	}
-	}
+              }))
+            })}
+          </TableBody>
+        </Table>
+      )
+      return (
+        <div>
+          <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
+            <Tab label="Approve Leaves" value={0}>
+              {table}</Tab>
+            <Tab label="Rejected Leaves" value={1}>
+              {table}</Tab>
+            <Tab label="Update Attendance" value={2}>
+              <DatePicker hintText="Date to be updated" floatingLabelText='Date' errorText={this.state.StartDateErrorText} value={this.state.Date} onChange={this.handleDateChange}/>
+              <SelectField onChange={th.onWaveIdChange} floatingLabelText="Select WaveID" value={th.state.WaveId}>
+                {th.state.WaveIds.map(function(val, key) {
+                  return <MenuItem key={key} value={val} primaryText={val}/>
+                })
+}
+              </SelectField>
+              <Table fixedHeader={true}>
+                <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                  <TableRow>
+                    <TableHeaderColumn>EmployeeName</TableHeaderColumn>
+                    <TableHeaderColumn>Present</TableHeaderColumn>
+                    <TableHeaderColumn>Absent</TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false} showRowHover={true}>
+                  {th.state.cadetsOfWave.map(function(cadet, index) {
+                    let absent = false;
+                    let present = true;
+                    let date = '';
+                    cadet.DaysAbsent.map(function(details) {
+                      if ((th.formatDate(new Date(details.fromDate)) <= th.formatDate(new Date(th.state.Date))) && ((new Date(details.toDate) >= new Date(th.state.Date)) || (th.formatDate(new Date(details.fromDate)) === (th.formatDate(new Date(details.toDate)))))) {
+                        absent = false
+                        present = true
+                        date = details._id
+                      }
+                    })
+                    cadet.DaysPresent.filter(function(detail) {
+                      if (th.formatDate(detail) === th.formatDate(th.state.Date)) {
+                        present = false
+                        absent = true
+                        date = detail
+                      }
+                    })
+                    return (
+                      <TableRow>
+                        <TableRowColumn>
+                          {cadet.EmployeeName}
+                        </TableRowColumn>
+                        <TableRowColumn>
+                          <IconButton tooltip="Present" disabled={absent} onClick={th.updatePresent.bind(this, cadet.EmployeeID, date)}>
+                            <ApproveIcon color={green500}/>
+                          </IconButton>
+                        </TableRowColumn>
+                        <TableRowColumn>
+                          <IconButton tooltip="Reject" disabled={present} onClick={th.updateAbsent.bind(this, cadet.EmployeeID, date)}>
+                            <RejectIcon color={red500}/>
+                          </IconButton>
+                        </TableRowColumn>
+                      </TableRow>
+                    )
+                  })
+}
+                </TableBody>
+              </Table>
+            </Tab>
+            <Tab label="View Attendance" value={3}>
+              <Calendar/>
+            </Tab>
+          </Tabs>
+        </div>
+      )
+    }
   }
+}
