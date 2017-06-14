@@ -248,9 +248,28 @@ router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
   console.log(req.user.name, 'upatwproj name');
   try {
     let projectObj = req.body.project;
-    projectObj.version[0].addedBy = req.user.name;
-    projectObj.version[0].updatedBy = true;
-    dashboardMongoController.updateProject(projectObj, req.body.delList, req.body.prevWave, function(project) {
+    projectObj.version[req.body.version].addedBy = req.user.name;
+    projectObj.version[req.body.version].updatedBy = true;
+    dashboardMongoController.updateProject(projectObj, req.body.delList, req.body.prevWave, req.body.version, function(project) {
+      res.status(201).json(project);
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update the project...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//add a new version
+router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    let versionObj = req.body.version;
+    versionObj.addedBy = req.user.name;
+    versionObj.updatedBy = true;
+    dashboardMongoController.addVersion(req.body.product, versionObj,function(project) {
       res.status(201).json(project);
     }, function (err) {
       res.status(500).json({ error: 'Cannot update the project...!' });

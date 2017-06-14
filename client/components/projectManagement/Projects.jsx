@@ -58,6 +58,7 @@ export default class Projects extends React.Component {
 		this.addProject = this.addProject.bind(this)
 		this.handleUpdate = this.handleUpdate.bind(this)
 		this.handleDelete = this.handleDelete.bind(this)
+		this.addVersion = this.addVersion.bind(this)
 	}
 	componentWillMount() {
 		this.getActiveWaves()
@@ -74,7 +75,7 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully fetched all active waves', res.body)
+		    	console.log('Successfully fetched all active waves')
 		    	th.setState({
 		    		activeWaves: res.body
 		    	})
@@ -92,7 +93,7 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err,"err");
 		    else {
-					console.log('Successfully fetched all projects', res.body)
+					console.log('Successfully fetched all projects')
 		    	th.setState({
 		    		projects: res.body
 		    	})
@@ -110,7 +111,7 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully added a project', res.body)
+		    	console.log('Successfully added a project')
 		    	let projects = th.state.projects;
 		    	projects.push(res.body);
 		    	th.setState({
@@ -120,8 +121,23 @@ export default class Projects extends React.Component {
 			})
 	}
 
+	addVersion(version) {
+		let th = this;
+		Request
+			.post('/dashboard/addversion')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(version)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Successfully added a version')
+		    	th.getProjects();
+		    	}
+			})
+	}
+
 	handleUpdate(projObj) {
-		console.log(projObj.delList);
 		let th = this;
 		Request
 			.post('/dashboard/updateproject')
@@ -131,7 +147,7 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully updated a project', res.body)
+		    	console.log('Successfully updated a project')
 		    	th.getProjects();
 		    	}
 			})
@@ -148,7 +164,7 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully deleted a project', res.body)
+		    	console.log('Successfully deleted a project')
 		    	th.getProjects();
 		    	}
 			})
@@ -184,6 +200,7 @@ export default class Projects extends React.Component {
 													project={project}
 													handleUpdate={th.handleUpdate}
 													handleDelete={th.handleDelete}
+													handleAdd={th.addVersion}
 													bgColor={backgroundColors[key%4]}
 												/>
 											)
@@ -210,6 +227,7 @@ export default class Projects extends React.Component {
 													project={project}
 													handleUpdate={th.handleUpdate}
 													handleDelete={th.handleDelete}
+													handleAdd={th.addVersion}
 													bgColor={backgroundColors[key%4]}
 												/>
 											)
@@ -235,6 +253,7 @@ export default class Projects extends React.Component {
 												project={project}
 												handleUpdate={th.handleUpdate}
 												handleDelete={th.handleDelete}
+												handleAdd={th.addVersion}
 												bgColor={backgroundColors[key%4]}
 											/>
 										)
