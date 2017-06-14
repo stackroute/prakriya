@@ -11,6 +11,9 @@ import ProjectDialog from './ProjectDialog.jsx';
 import FlatButton from 'material-ui/FlatButton';
 import Cadets from './Cadets.jsx';
 import {Grid, Row, Col} from 'react-flexbox-grid';
+import ExpandIcon from 'material-ui/svg-icons/navigation/expand-more';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 const styles = {
     text: {
@@ -58,6 +61,7 @@ const styles = {
 			border: '1px solid teal',
 			height: '100%'
 		}
+
 };
 
 export default class ProjectCard extends React.Component {
@@ -68,7 +72,11 @@ export default class ProjectCard extends React.Component {
 			openDialog: false,
 			dialogOpen: false,
 			showDeleteDialog: false,
-			cadets: []
+      versionName:[],
+      selectedVersion: '',
+      selectedVersionIndex: 0,
+			cadets: [],
+      project: {}
 		}
 		this.formatDate = this.formatDate.bind(this);
 		this.handleClose = this.handleClose.bind(this);
@@ -79,7 +87,21 @@ export default class ProjectCard extends React.Component {
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 		this.getCadets = this.getCadets.bind(this);
 		this.handleDeleteProject = this.handleDeleteProject.bind(this);
+    this.onVersionChange = this.onVersionChange.bind(this);
 	}
+  componentWillMount() {
+
+    let versionName = [];
+    this.props.project.version.map(function (x, i) {
+			versionName.push(x.name);
+		})
+    this.setState({
+      project: this.props.project,
+      versionName: versionName
+    })
+    console.log('Version Names', versionName)
+    console.log('ProjectObj from props', this.props.project);
+  }
 
 	getCadets(name) {
 		let th = this;
@@ -145,14 +167,22 @@ export default class ProjectCard extends React.Component {
 		this.props.handleDelete(this.props.project);
 		this.closeDeleteDialog();
 	}
+  onVersionChange(index, value) {
 
+    this.setState({
+      selectedVersion: value,
+      selectedVersionIndex: index
+    })
+
+    }
 
 	render() {
-		let detail = '';
-		if(this.props.project.updated) {
-			detail = this.props.project.addedBy + ' updated ' + this.formatDate(this.props.project.addedOn)
+    console.log(this.state.project.version[this.state.selectedVersionIndex].updated,"updated")
+    let detail = '';
+  		if(this.state.project.version[this.state.selectedVersionIndex].updated) {
+			detail = this.state.project.version[this.state.selectedVersionIndex].addedBy + ' updated ' + this.formatDate(this.state.project.version[this.state.selectedVersionIndex].addedOn)
 		} else {
-			detail = this.props.project.addedBy + ' added ' + this.formatDate(this.props.project.addedOn)
+			detail = this.state.project.version[this.state.selectedVersionIndex].addedBy + ' added ' + this.formatDate(this.state.project.version[this.state.selectedVersionIndex].addedOn)
 		}
 		const deleteDialogActions = [
       <FlatButton
@@ -178,32 +208,49 @@ export default class ProjectCard extends React.Component {
 						background: bgColor
 					}}
 				>
+
 					<CardHeader
-			      title={this.props.project.name}
-			      subtitle={detail}
+			      title={this.props.project.product}
+            subtitle={detail}
 			      avatar={
 			      	<Avatar>
-			      		{this.props.project.name.charAt(0).toUpperCase()}
-			      	</Avatar>
+			      		{this.props.project.product.charAt(0).toUpperCase()}
+                </Avatar>
 			      }/>
-			    	<CardText style={styles.text}>
-			    	<h3>Description:</h3>{this.props.project.description}
-			    	<h3>Tech Skills:</h3><ul>{this.props.project.skills.map(function(skill, index){
+            <div>
+              <h3 style={{marginLeft:'15px',marginBottom:'-60px'}}>Version:</h3>
+              <SelectField
+  							floatingLabelText="Select Version"
+  							value={th.state.selectedVersion}
+                style={{marginLeft:'110px',width:'130'}}
+                floatingLabelStyle={{color:'blue'}}
+                underlineStyle={{display:'none'}}
+                >
+  							{
+  								th.state.versionName.map(function(val, key) {
+  									return <MenuItem key={key} value={val} primaryText={val} onTouchTap={(e)=>th.onVersionChange(key, val)}/>
+  								})
+  							}
+  						</SelectField>
+              </div>
+          <CardText style={styles.text}>
+            <h3>Description:</h3>{this.props.project.version[this.state.selectedVersionIndex].description}
+			    	<h3>Tech Skills:</h3><ul>{this.props.project.version[this.state.selectedVersionIndex].skills.map(function(skill, index){
         		return <li key={index}>{skill}</li>
         		})}</ul>
-			    	<h3>Developed By:</h3>{this.props.project.wave}
+			    	<h3>Developed By:</h3>{this.props.project.version[this.state.selectedVersionIndex].wave}
 			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>view members</span>
 			    	</CardText>
-			    	<IconButton tooltip="Edit Course" onClick={this.handleEditProject}>
+			    	<IconButton tooltip="Edit project" onClick={this.handleEditProject}>
 				      <EditIcon/>
 				    </IconButton>
-				    <IconButton tooltip="Delete Course" onClick={this.openDeleteDialog}>
+				    <IconButton tooltip="Delete project" onClick={this.openDeleteDialog}>
 				      <DeleteIcon/>
 				    </IconButton>
 				  	</Card>
 				 {
 				 		this.state.dialog &&
-				 		th.getCadets(this.props.project.name)}
+				 		th.getCadets(this.props.project.version[this.state.selectedVersionIndex].name)}
 				 		<Dialog
                 bodyStyle={styles.dialog}
 			          title='TEAM MEMBERS'
@@ -226,7 +273,7 @@ export default class ProjectCard extends React.Component {
 
         {
 							this.state.openDialog &&
-							<ProjectDialog project={this.props.project} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PRODUCT'}/>
+							<ProjectDialog project={this.props.project}  versionIndex={this.props.selectedVersionIndex} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PRODUCT'}/>
 				}
 				<Dialog
 					bodyStyle={styles.deleteDialog}
