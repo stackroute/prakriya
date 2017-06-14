@@ -8,6 +8,16 @@ export default class DownloadProfile extends React.Component {
 		super(props);
 		this.downloadProfile = this.downloadProfile.bind(this);	
 	}
+	componentWillMount() {
+		this.setState({
+			imageURL: this.props.imageURL
+		})
+	}
+	componentWillReceiveProps(nextProps) {
+		this.setState({
+			imageURL: nextProps.imageURL
+		})
+	}
 
 	downloadProfile() {
 		let doc = new jsPDF()
