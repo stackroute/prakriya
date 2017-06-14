@@ -91,7 +91,8 @@ export default class ProjectDialog extends React.Component {
 			candidatesName: [] ,
 			candidateIDList: [] ,
 			candidateDelList: [],
-			prevWave: ''
+			prevWave: '',
+			project: {}
 		}
 		this.getWaveIDs = this.getWaveIDs.bind(this)
 		this.handleOpen = this.handleOpen.bind(this);
@@ -108,7 +109,8 @@ export default class ProjectDialog extends React.Component {
 		this.onChangeSkill = this.onChangeSkill.bind(this);
 		this.handleSkillDelete = this.handleSkillDelete.bind(this);
 		this.handleUpdate = this.handleUpdate.bind(this);
-		this.validationSuccess = this.validationSuccess.bind(this)
+		this.validationSuccess = this.validationSuccess.bind(this);
+		this.handleAddVersion = this.handleAddVersion.bind(this);
 	}
 
 	componentWillMount() {
@@ -116,26 +118,32 @@ export default class ProjectDialog extends React.Component {
 			this.getWaveIDs()
 		}
 		if(this.props.dialogTitle == 'EDIT PRODUCT') {
-			console.log(this.props.project.version[0].name,"name")
-			console.log(this.props.project.version[0].members,"members")
+			let th = this;
 			let candidateList = [];
 			let candidateIDList = [];
-			this.props.project.version[0].members.map(function(member) {
+			this.props.project.version[th.props.version].members.map(function(member) {
 				candidateList.push(member.EmployeeName)
 				candidateIDList.push(member.EmployeeID)
 			})
 			this.setState({
+				project: th.props.project,
 				projectName: this.props.project.product,
-				versionName: this.props.project.version[0].name,
-				projectDesc: this.props.project.version[0].description,
+				versionName: this.props.project.version[th.props.version].name,
+				projectDesc: this.props.project.version[th.props.version].description,
 				candidateList:candidateList,
 				candidateIDList:candidateIDList,
-				wave: this.props.project.version[0].wave,
-				prevWave: this.props.project.version[0].wave,
-				skills: this.props.project.version[0].skills,
+				wave: this.props.project.version[th.props.version].wave,
+				prevWave: this.props.project.version[th.props.version].wave,
+				skills: this.props.project.version[th.props.version].skills,
 				showDialog: this.props.openDialog
 			})
-			this.getCandidates(this.props.project.version[0].wave);
+			this.getCandidates(this.props.project.version[th.props.version].wave);
+		}
+		if(this.props.dialogTitle == 'ADD VERSION') {
+			this.setState({
+				showDialog: this.props.openDialog,
+				projectName: this.props.project.product
+			})
 		}
 	}
 
@@ -249,8 +257,6 @@ export default class ProjectDialog extends React.Component {
 	}
 
 	handleClose(e, action) {
-		console.log(this.props.dialogTitle,"dialogTitle")
-		console.log(action,"action")
 		if(action == 'CLOSE') {
 			if(this.props.dialogTitle == 'ADD PRODUCT') {
 				console.log("addproduct")
@@ -275,6 +281,19 @@ export default class ProjectDialog extends React.Component {
 					skillsErrorText: ''
 				})
 				this.props.handleClose()
+			} else if(this.props.dialogTitle == 'ADD VERSION') {
+				this.setState({
+					showDialog: false,
+					projectName: '',
+					versionName: '',
+					projectDesc: '',
+					wave: '',
+					projectNameErrorText: '',
+					projectDescErrorText: '',
+					waveErrorText: '',
+					skillsErrorText: ''
+				})
+				this.props.handleClose();
 			}
 		} else if(this.validationSuccess()) {
 			if(action == 'ADD') {
@@ -283,6 +302,10 @@ export default class ProjectDialog extends React.Component {
 			} else if(action == 'EDIT') {
 				this.props.handleClose()
 				this.handleUpdate()
+			} else if(action == 'VERSION') {
+				console.log('here')
+				this.props.handleClose()
+				this.handleAddVersion()
 			}
 			this.setState({
 				showDialog: false
@@ -338,6 +361,29 @@ export default class ProjectDialog extends React.Component {
 			console.log(project,"handleadd")
 	}
 
+		handleAddVersion() {
+			let th = this;
+			let product = th.state.projectName;
+			let version = {}
+		  version.members =[]
+			this.state.candidateList.map(function(name, index){
+				version.members.push({EmployeeID:th.state.candidateIDList[index],EmployeeName:name})
+			})
+			version.name= this.state.versionName;
+			version.description = this.state.projectDesc;
+			version.wave = this.state.wave;
+			version.skills = this.state.skills;
+			this.setState({
+				projectName: '',
+				versionName: '',
+				projectDesc: '',
+				candidates:[],
+				wave: '',
+				skills: []
+			})
+			this.props.handleAddVersion({product: product, version: version});
+		}
+
 	onChangeAddSkill() {
 		if(this.state.skillName.trim().length != 0) {
 			let skills = this.state.skills
@@ -376,20 +422,18 @@ export default class ProjectDialog extends React.Component {
 		{
 			prevWave = this.state.prevWave
 		}
-		let project = {}
-		project.version = []
-		project.version.push({})
-		project.version[0].members =[]
+		let project = this.state.project;
 		let th = this
+		project.version[th.props.version].members = [];
 			this.state.candidateList.map(function(name, index){
-				project.version[0].members.push({EmployeeName:name,EmployeeID:th.state.candidateIDList[index]})
+				project.version[th.props.version].members.push({EmployeeName:name,EmployeeID:th.state.candidateIDList[index]})
 			})
-		console.log(project.version[0].members,"members in handleupdate");
+		console.log(project.version[th.props.version].members,"members in handleupdate");
 		project.product= this.state.projectName;
-		project.version[0].name = this.state.versionName;
-		project.version[0].description = this.state.projectDesc;
-		project.version[0].wave = this.state.wave;
-		project.version[0].skills = this.state.skills;
+		project.version[th.props.version].name = this.state.versionName;
+		project.version[th.props.version].description = this.state.projectDesc;
+		project.version[th.props.version].wave = this.state.wave;
+		project.version[th.props.version].skills = this.state.skills;
 		this.setState({
 			projectName: '',
 			projectDesc: '',
@@ -400,7 +444,8 @@ export default class ProjectDialog extends React.Component {
 		let projObj = {
 			project: project,
 			delList: this.state.candidateDelList,
-			prevWave: prevWave
+			prevWave: prevWave,
+			version: th.props.version
 		}
 		this.props.handleUpdate(projObj);
 		this.props.handleClose();
@@ -457,6 +502,19 @@ export default class ProjectDialog extends React.Component {
       />
     ]
 
+		const	VersionActions = [
+      <FlatButton
+        label='Cancel'
+        onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
+				style={styles.actionButton}
+      />,
+      <FlatButton
+        label='Add'
+        onTouchTap={(e)=>{this.handleClose(e, 'VERSION')}}
+				style={styles.actionButton}
+      />
+    ]
+
     const	EditActions = [
       <FlatButton
         label='Cancel'
@@ -473,6 +531,7 @@ export default class ProjectDialog extends React.Component {
 
 		let actions = []
 		if(this.props.dialogTitle == 'ADD PRODUCT') actions = AddActions
+		else if(this.props.dialogTitle == 'ADD VERSION') actions = VersionActions
 		else actions = EditActions
 
 		return(
@@ -501,21 +560,16 @@ export default class ProjectDialog extends React.Component {
 						style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', top:'-22px'}}
 			    />
 					<br/>
-					  <SelectField
-						 floatingLabelText='Version'
-						 value={this.state.version}
-						 onChange={this.handleVersionChange}
-						 errorText={this.state.projectVersionErrorText}
-						 underlineDisabledStyle={styles.underlineDisabled}
-						 style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', top:'-22px'}}
-					 >
-					 {
-	 					th.state.waves.map(function(val, key) {
-	 						return <MenuItem key={key} value={val} primaryText={val} />
-	 					})
-	 				}
-	 		</SelectField>
-					<SelectField
+					<TextField
+					floatingLabelText='Version'
+					value={this.state.versionName}
+					onChange={this.handleVersionChange}
+					errorText={this.state.projectVersionErrorText}
+					disabled={this.props.showAddVersion}
+					underlineDisabledStyle={styles.underlineDisabled}
+					style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', top:'-22px'}}
+				/>
+					 <SelectField
 							onChange={th.onWaveChange}
 							errorText={this.state.waveErrorText}
 							floatingLabelText='Select Wave'

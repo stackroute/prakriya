@@ -155,16 +155,15 @@ let getProjects = function(successCB, errorCB) {
 }
 
 let addProject = function (projectObj, successCB, errorCB) {
-	console.log(projectObj,"projectObj")
-	console.log(projectObj.version[0].members,"dashboardMongoController")
 	let saveProject = new ProjectModel(projectObj);
+	let length = projectObj.version.length;
 	saveProject.save(function (err, result) {
 		if(err)
 			errorCB(err);
 		else
 		{
-			projectObj.version[0].members.map(function(member) {
-				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.version[0].name,ProjectDescription: projectObj.version[0].description,ProjectSkills: projectObj.version[0].skills}},function(err,result){
+			projectObj.version[length-1].members.map(function(member) {
+				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.version[length-1].name,ProjectDescription: projectObj.version[length-1].description,ProjectSkills: projectObj.version[length-1].skills}},function(err,result){
 					if(err)
 						errorCB(err)
 					console.log(result);
@@ -174,15 +173,37 @@ let addProject = function (projectObj, successCB, errorCB) {
 		}
 	})
 }
-let updateProject = function (projectObj,delList, prevWave, successCB, errorCB) {
-	console.log(projectObj,"projectObj")
-	ProjectModel.update({name:projectObj.product},projectObj.version[0],function (err, result) {
+
+let addVersion = function (name, versionObj,successCB, errorCB) {
+	console.log(versionObj,"versionObj")
+	ProjectModel.update({product:name},{$push:{version: versionObj}},function (err, result) {
+		if(err)
+			errorCB(err);
+			else
+			{
+				versionObj.members.map(function(member) {
+					CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: versionObj.name,ProjectDescription: versionObj.description,ProjectSkills: versionObj.skills}},function(err,result){
+						if(err)
+							errorCB(err)
+						console.log(result);
+					})
+				},
+						successCB(result))
+			}
+	});
+}
+
+let updateProject = function (projectObj,delList, prevWave, version, successCB, errorCB) {
+	let proj = projectObj.version[version];
+	proj._id =  new mongoose.mongo.ObjectId(proj._id);
+	console.log(proj);
+	ProjectModel.findOneAndUpdate({version:{$elemMatch:{"_id":proj._id}}},{$set:{'version.$':proj}},function (err, result) {
 		if(err)
 			errorCB(err);
 		else
 		{
-			projectObj.version[0].members.map(function(member) {
-				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.product,ProjectDescription: projectObj.version[0].description,ProjectSkills: projectObj.version[0].skills}},function(err,result){
+			projectObj.version[version].members.map(function(member) {
+				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.version[version].name,ProjectDescription: projectObj.version[version].description,ProjectSkills: projectObj.version[version].skills}},function(err,result){
 					if(err)
 						errorCB(err)
 					console.log(result);
@@ -586,6 +607,7 @@ module.exports = {
 	getCadets,
 	getProjects,
 	addProject,
+	addVersion,
 	deleteProject,
 	updateProject,
 	getFiles,
