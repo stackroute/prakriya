@@ -46,7 +46,11 @@ export default class Projects extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			projects: [],
+			projects:{
+				product: " ",
+				description: " ",
+				version:[]
+			},
 			activeWaves: []
 		}
 		this.getProjects = this.getProjects.bind(this)
@@ -57,10 +61,10 @@ export default class Projects extends React.Component {
 	}
 	componentWillMount() {
 		this.getActiveWaves()
+		 this.getProjects()
+
 	}
-	componentDidMount() {
-		this.getProjects()
-	}
+
 	getActiveWaves() {
 		let th = this
 		Request
@@ -78,14 +82,17 @@ export default class Projects extends React.Component {
 			})
 	}
 	getProjects() {
-		let th = this
+		console.log("inside getproj in proj")
+    let th = this
 		Request
 			.get('/dashboard/projects')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
+				console.log("success")
 				if(err)
-		    	console.log(err);
+		    	console.log(err,"err");
 		    else {
+					console.log('Successfully fetched all projects', res.body)
 		    	th.setState({
 		    		projects: res.body
 		    	})
@@ -93,6 +100,7 @@ export default class Projects extends React.Component {
 			})
 	}
 	addProject(project) {
+		console.log("addproj n projects",project)
 		let th = this;
 		Request
 			.post('/dashboard/addproject')
@@ -147,8 +155,11 @@ export default class Projects extends React.Component {
 	}
 
 	render() {
+
 		let th = this;
-		return(
+				console.log(th.state.projects,"wavejoe")
+				console.log(th.state.projects.length,"length")
+				return(
 			<div>
 				<h2 style={styles.heading}>Product Management</h2>
 				<ProjectDialog addProject={this.addProject} dialogTitle={'ADD PRODUCT'}/>
