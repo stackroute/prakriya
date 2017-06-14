@@ -28,17 +28,14 @@ router.post('/', function(req, res) {
         let uname = req.body.username;
         let password = req.body.password;
 
-        let user = {};
-
         let query = userModel.findOne({username: uname, password: password});
 
         let promise = query.exec();
 
         promise.then(function(user) {
           console.log('User object in the loginRouter', user);
-          // user = doc;
           if (user) {
-            if(user.role != 'admin' && user.actions.indexOf('login') <= -1)
+            if(user.role !== 'admin' && user.actions.indexOf('login') <= -1)
             {
               res.send('Account suspended');
             }

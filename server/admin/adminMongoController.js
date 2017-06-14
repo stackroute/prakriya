@@ -44,21 +44,29 @@ let updateUser = function (userObj, successCB, errorCB) {
 let lockUser = function (userObj, successCB, errorCB) {
 	console.log('User obj from server', userObj);
 	console.log(userObj.username);
-	UserModel.update({username: userObj.username}, {$pull: {actions: 'login'}}, function(err, status) {
-		if(err)
-			{errorCB(err);}
-		successCB(status);
-	});
+	UserModel.update(
+		{username: userObj.username},
+		{$pull: {actions: 'login'}},
+		function(err, status) {
+			if(err)
+				{errorCB(err);}
+			successCB(status);
+		}
+	);
 };
 
 let unlockUser = function (userObj, successCB, errorCB) {
 	console.log('User obj from server', userObj);
 	console.log(userObj.username);
-	UserModel.update({username: userObj.username}, {$push: {actions: 'login'}}, function(err, status) {
-		if(err)
-			{errorCB(err);}
-		successCB(status);
-	});
+	UserModel.update(
+		{username: userObj.username},
+		{$push: {actions: 'login'}},
+		function(err, status) {
+			if(err)
+				{errorCB(err);}
+			successCB(status);
+		}
+	);
 };
 
 let getRoles = function(successCB, errorCB) {

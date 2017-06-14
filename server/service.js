@@ -3,8 +3,8 @@ const path = require('path');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const flash = require('connect-flash');
-const auth = require("./auth")();
-const CONFIG = require('../config')
+const auth = require('./auth')();
+const CONFIG = require('../config');
 
 const logger = require('./../applogger');
 
@@ -79,7 +79,7 @@ function setupMiddlewares(app) {
 }
 
 function setupWebpack(app) {
-  if (config.NODE_ENV !== 'production') {
+  if (CONFIG.NODE_ENV !== 'production') {
     const webpack = require('webpack');
     const webpackDevMiddleware = require('webpack-dev-middleware');
     const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -104,13 +104,14 @@ function setupMongooseConnections() {
     const ControlsModel = require('../models/accesscontrols.js');
     const RoleModel = require('../models/roles.js');
     const UserModel = require('../models/users.js');
-    CONFIG.BASEDATA.ACCESS_CONTROLS.map(function(control) {
-      let saveControl = new ControlsModel(control);
+    CONFIG.BASEDATA.ACCESS_CONTROLS.map(function(controlObj) {
+      let saveControl = new ControlsModel(controlObj);
       saveControl.save(function(err, control) {
-        if(!err)
+        if(!err) {
           logger.info('Access Control added', control.name);
-      })
-    })
+        }
+      });
+    });
     let saveRole = new RoleModel(CONFIG.BASEDATA.ADMIN_ROLE);
     saveRole.save(function(err, role) {
       if(!err)

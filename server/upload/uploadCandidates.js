@@ -5,7 +5,7 @@ const async = require('async');
 const uploadMongoController = require('./uploadMongoController');
 
 let registerCandidates = function () {
-	client.brpop('fileImport', 0, function(err, fileId) {
+	client.brpop('fileImport', 0, function(err1, fileId) {
 		let importedCadets = [];
 		let failedCadets = [];
 		let total = 0;
@@ -18,61 +18,61 @@ let registerCandidates = function () {
 
 				lines.map(function (line, index) {
 					if(index > 0 && line !== '') {
-			  		let lineCol = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+					let lineCol = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 						let cadetObj = {};
 						headers.map(function (head, key) {
 							if(key > 0) {
-								if(lineCol[key] != '') {
+								if(lineCol[key] !== '') {
 									cadetObj[head] = lineCol[key];
 								}
 							}
 						});
 						cadetColln.push(cadetObj);
-						total++;
+						total = total + 1;
 					}
 				});
 
 				async.each(cadetColln,
 					function(cadetObj, callback) {
-				    uploadMongoController.addCadet(cadetObj, function (cadet) {
-			  			importedCadets.push(cadet);
-			  			callback();
-			  		}, function (err) {
-			  			let cadet = {};
-			  			if(err.name == 'MongoError') {
-			  				cadet.errmsg = 'Duplicate cadet error';
-			  				cadet.eid = cadetObj.EmployeeID;
-			  			}
-			  			else if(err.name == 'ValidationError') {
-			  				cadet.errmsg = 'Employee ID is required';
-			  				if(cadetObj.EmailID)
-			  					{cadet.eid = cadetObj.EmailID;}
-			  				else if(cadetObj.EmployeeName)
-			  					{cadet.eid = cadetObj.EmployeeName;}
-			  			}
-			  			failedCadets.push(cadet);
-			  			callback();
-			  		});
-				  },
-				  function(err) {
-				  	logger.debug('Final function');
-					  fileObj.totalCadets = total;
-					  fileObj.importedCadets = importedCadets.length;
-					  fileObj.failedCadets = failedCadets;
-					  if(fileObj.totalCadets == fileObj.importedCadets + fileObj.failedCadets.length) {
-					  	uploadMongoController.updateFileStatus(fileObj);
-					  }
-				  }
+						uploadMongoController.addCadet(cadetObj, function (cadet) {
+							importedCadets.push(cadet);
+							callback();
+						}, function (err2) {
+							let cadet = {};
+							if(err2.name === 'MongoError') {
+								cadet.errmsg = 'Duplicate cadet error';
+								cadet.eid = cadetObj.EmployeeID;
+							}
+							else if(err2.name === 'ValidationError') {
+								cadet.errmsg = 'Employee ID is required';
+								if(cadetObj.EmailID)
+									{cadet.eid = cadetObj.EmailID;}
+								else if(cadetObj.EmployeeName)
+									{cadet.eid = cadetObj.EmployeeName;}
+							}
+							failedCadets.push(cadet);
+							callback();
+						});
+					},
+					function(err3) {
+						logger.debug('Final function');
+						fileObj.totalCadets = total;
+						fileObj.importedCadets = importedCadets.length;
+						fileObj.failedCadets = failedCadets;
+						if(fileObj.totalCadets === fileObj.importedCadets + fileObj.failedCadets.length) {
+							uploadMongoController.updateFileStatus(fileObj);
+						}
+					}
 				);
-			}, function (err) {
-				logger.error('Error while fetching File Id', err);
-	    });
+			}, function (err4) {
+				logger.error('Error while fetching File Id', err4);
+			});
 		}
 		catch(err) {
 			console.log(err);
 		}
 	});
-  setTimeout(registerCandidates, 1000);
+	setTimeout(registerCandidates, 1000);
 };
 
 module.exports = {

@@ -12,8 +12,8 @@ let CONFIG = require('../../config');
 router.get('/users', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   console.log('API HIT!!!');
   try{
-    adminMongoController.getUsers(function(users) {
-      res.status(201).json(users);
+    adminMongoController.getUsers(function(userColl) {
+      res.status(201).json(userColl);
     }, function(err) {
       res.status(500).json({ error: 'Cannot get all users from db...!' });
     });
@@ -27,9 +27,9 @@ router.get('/users', auth.canAccess(CONFIG.ADMIN), function(req, res) {
 
 // Add a new user
 router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
-  let user = req.body;
+  let userObj = req.body;
   try{
-    adminMongoController.addUser(user, function(user) {
+    adminMongoController.addUser(userObj, function(user) {
       res.status(200).json(user);
     }, function (err) {
       res.status(500).json({ error: 'Cannot add user in db...!' });
