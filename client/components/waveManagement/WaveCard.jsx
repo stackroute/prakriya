@@ -337,7 +337,7 @@ export default class WaveCard extends React.Component {
 			<div>
 				<Card
 					style={{
-						width:'300px',
+						width:'373px',
 						marginRight:'20px',
 						marginBottom:'20px',
 						background: bgColor
