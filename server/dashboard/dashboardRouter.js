@@ -310,6 +310,23 @@ router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   }
 })
 
+// Get user Role
+router.get('/userrole', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try {
+    dashboardMongoController.getUserRole(req.user.email, function(cadet) {
+      res.status(201).json(cadet.role);
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot get the role from db...!' });
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+
 // Get all the cadets
 router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   try{
@@ -333,6 +350,23 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function(req, res) {
       res.status(200).json(status)
     }, function (err) {
       res.status(500).json({ error: 'Cannot update candidate in db...!' });
+    })
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+// Update many cadets
+router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try {
+    logger.debug('Update cadets', req.body)
+    dashboardMongoController.updateCadets(req.body, function (status) {
+      res.status(200).json(status)
+    }, function (err) {
+      res.status(500).json({ error: 'Cannot update candidates in db...!' });
     })
   }
   catch(err) {
@@ -483,11 +517,10 @@ router.get("/wavespecificcandidates", auth.canAccess(CONFIG.ADMMEN), function(re
 });
 
 //update absentees
-router.post("/updateabsentees", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
-
+router.post("/updateabsentees", auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try{
     dashboardMongoController.updateAbsentees(req.body,function(status) {
-      res.status(201);
+      res.status(201).json({success:'success'});
     }, function(err) {
       res.status(500).json({ error: 'Cannot update candidate db...!' });
     });
@@ -499,6 +532,111 @@ router.post("/updateabsentees", auth.canAccess(CONFIG.ADMINISTRATOR), function(r
     });
   }
 });
+
+//update present
+router.post("/updatepresent", auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+  try{
+    dashboardMongoController.updatePresent(req.body.EmployeeID, new Date(), function(status) {
+      res.status(201).json({success: 'success'});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!'});
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//update present
+router.post("/present", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try{
+    dashboardMongoController.updatePresent(req.body.EmployeeID, req.body.Date, function(status) {
+      dashboardMongoController.cancelLeave({id:req.body.id}, function(status) {
+        res.status(201).json({success: 'success'});
+      }, function(err) {
+        res.status(500).json({ error: 'Cannot update candidate db...!'});
+      })
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!'});
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//update absent
+router.post("/absent", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try{
+    dashboardMongoController.updateAbsentees({details: req.body.details, absentee: req.body.EmployeeID}, function(status) {
+      dashboardMongoController.cancelPresent(req.body.EmployeeID, req.body.Date, function(status) {
+        res.status(201).json({success: 'success'});
+      }, function(err) {
+        res.status(500).json({ error: 'Cannot update candidate db...!'});
+      })
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!'});
+    });
+  }
+  catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+//cancelleave
+router.post("/cancelleave", auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+  try{
+    dashboardMongoController.cancelLeave(req.body,function(status) {
+      res.status(201).json({success:'success'});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!' });
+    });
+  }
+  catch(err){
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+//update absentees
+router.post("/updateapproval", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try{
+    dashboardMongoController.updateApproval(req.body,function(status) {
+      res.status(201).json({success:'success'});
+    }, function(err) {
+      res.status(500).json({ error: 'Cannot update candidate db...!' });
+    });
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+router.get("/getabsentees", auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try{
+    dashboardMongoController.getAbsentees(function(cadets) {
+      res.status(201).json(cadets);
+    }, function(err) {
+      res.status(500).json({ error: 'get absentees from db failed...!' });
+    });
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
 
 
 // Get all courses for specific wave
@@ -735,23 +873,27 @@ router.post('/updatewave', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, r
 })
 
 /****************************************************
-**************          Filters         *************
+*********          Candidate Filter         *********
 ****************************************************/
 
-// Get filter categories of a candidate model
-router.get('/candidatefilters', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+// Get filtered candidates
+router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function(req, res) {
   try{
-    dashboardMongoController.getCandidateFilters(function(filters) {
-      res.status(201).json(filters);
+    console.log('Filter Query 1: ', JSON.stringify(req.body.filterQuery))
+    dashboardMongoController.getFilteredCandidates(req.body.filterQuery, function(candidates) {
+      res.status(201).json(candidates);
     }, function(err) {
-      res.status(500).json({ error: 'Cannot get candidate filter categories...!'});
-    })
+      console.log('Error: ', err)
+      res.status(500).json({ error: 'Cannot filter candidates from db...!' });
+    });
   }
   catch(err) {
+    console.log('Internal Error: ', err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
   }
 })
+
 
 module.exports = router;

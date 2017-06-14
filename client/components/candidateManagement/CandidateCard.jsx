@@ -6,6 +6,9 @@ import Dialog from 'material-ui/Dialog';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import {lightBlack} from 'material-ui/styles/colors';
 import Request from 'superagent';
+import jsPDF from 'jspdf';
+import DownloadProfile from './DownloadProfile.jsx';
+import dialog from '../../styles/dialog.json';
 
 const styles = {
 	profilePic: {
@@ -20,28 +23,6 @@ const styles = {
 	},
 	cardTitle: {
 		paddingBottom: 0
-	},
-	dialog: {
-		backgroundColor: '#DDDBF1',
-		border: '10px solid teal'
-	},
-	dialogTitle: {
-		fontWeight: 'bold',
-		backgroundColor: 'teal',
-		color: '#DDDBF1',
-		textAlign: 'center'
-	},
-	actionsContainer: {
-		backgroundColor: 'teal',
-		borderTop: '0px',
-		marginTop: '0px'
-	},
-	actionButton: {
-		backgroundColor: '#DDDBF1',
-		width: '50%',
-		color: 'teal',
-		border: '1px solid teal',
-		height: '100%'
 	}
 }
 
@@ -51,6 +32,7 @@ export default class CandidateCard extends React.Component {
 		super(props);
 		this.state = {
 			showDeleteDialog: false,
+			showDownloadDialog: false,
 			imageURL: '../../assets/images/avt-default.jpg',
 		}
 		this.getProfilePic = this.getProfilePic.bind(this);
@@ -59,7 +41,7 @@ export default class CandidateCard extends React.Component {
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.getProfilePic(this.props.candidate.EmployeeID);
 	}
 	getProfilePic(eid) {
@@ -67,17 +49,16 @@ export default class CandidateCard extends React.Component {
 		Request
 			.get(`/dashboard/getimage?eid=${eid}`)
 			.set({'Authorization': localStorage.getItem('token')})
-			.query({q: eid})
 			.end(function(err, res) {
 				if(err)
-		    	console.log(err);
+		    	console.log('Image not found for ', eid);
 		    else {
 		    	if(res.text) {
 		    		let array = new Uint8Array(res.text.length);
 		        for (var i = 0; i < res.text.length; i++){
 		            array[i] = res.text.charCodeAt(i);
 		        }
-		        var blob = new Blob([array], {type: 'image/jpeg'});
+		        let blob = new Blob([array], {type: 'image/jpeg'});
 			    	let blobUrl = URL.createObjectURL(blob);
 			    	th.setState({
 			    		imageURL: blobUrl
@@ -107,18 +88,18 @@ export default class CandidateCard extends React.Component {
 		const deleteDialogActions = [
       <FlatButton
         label="Cancel"
-        style={styles.actionButton}
+        style={dialog.actionButton}
         onTouchTap={this.closeDeleteDialog}
       />,
       <FlatButton
         label="Delete"
-        style={styles.actionButton}
+        style={dialog.actionButton}
         onTouchTap={this.closeDeleteDialog}
         onClick={this.handleDelete}
       />
     ]
 		return(
-			<div style={{width: '285px', display: 'inline-block', padding: '5px'}}>
+			<div style={{width: '285px', display: 'inline-block', padding: '5px'}} key={this.props.k}>
 				<Card style={{border: '2px solid silver'}}>
 			    <CardMedia
 			    	style={styles.cardClick}
@@ -138,6 +119,17 @@ export default class CandidateCard extends React.Component {
 			    	style={styles.cardTitle}
 			    />
 			    <CardActions style={styles.actions}>
+			    	<IconButton 
+			    		tooltip="Download Profile" 
+			    		style={{float: 'left'}}
+			    		onTouchTap={this.downloadProfile}
+			    	>
+				      <DownloadProfile 
+				      	color={lightBlack} 
+				      	candidate={this.props.candidate} 
+				      	imageURL={this.state.imageURL}
+				      />
+				    </IconButton>
 				    <IconButton tooltip="Delete Candidate" onTouchTap={this.openDeleteDialog}>
 				      <DeleteIcon color={lightBlack} />
 				    </IconButton>
@@ -145,8 +137,8 @@ export default class CandidateCard extends React.Component {
 			  </Card>
 			  <Dialog
           actions={deleteDialogActions}
-					actionsContainerStyle={styles.actionsContainer}
-					bodyStyle={styles.dialog}
+					actionsContainerStyle={dialog.actionsContainer}
+					bodyStyle={dialog.confirmBox}
           open={this.state.showDeleteDialog}
           onRequestClose={this.closeDeleteDialog}
         >

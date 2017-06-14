@@ -1,313 +1,573 @@
-	import React from 'react';
-	import Request from 'superagent';
-	import SelectField from 'material-ui/SelectField';
-	import MenuItem from 'material-ui/MenuItem';
-	import DatePicker from 'material-ui/DatePicker';
-	import {Card,  CardHeader,  CardTitle, CardText} from 'material-ui/Card';
-	import AutoComplete from 'material-ui/AutoComplete';
-	import Paper from 'material-ui/Paper';
-	import Chip from 'material-ui/Chip';
-	import Snackbar from 'material-ui/Snackbar';
-	import RaisedButton from 'material-ui/RaisedButton';
+import React from 'react';
+import Request from 'superagent';
+import {DateRange} from 'react-date-range';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
+import {Step, Stepper, StepLabel, StepContent} from 'material-ui/Stepper';
+import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+import RejectIcon from 'material-ui/svg-icons/navigation/close';
+import ApproveIcon from 'material-ui/svg-icons/navigation/check';
+import {red500, green500} from 'material-ui/styles/colors';
+import DatePicker from 'material-ui/DatePicker';
+import Moment from 'moment';
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn
+} from 'material-ui/Table';
+import {Tabs, Tab} from 'material-ui/Tabs';
+import Calendar from './Calendar.jsx';
 
+const styles = {
+  content: {
+    marginLeft: '25%'
+  },
+  row: {
+    wordWrap: 'break-word'
+  }
+}
 
+const events = [
+    {
+        start: '2015-07-20',
+        end: '2015-07-02',
+        eventClasses: 'optionalEvent',
+        title: 'test event',
+        description: 'This is a test description of an event',
+    },
+    {
+        start: '2015-07-19',
+        end: '2015-07-25',
+        title: 'test event',
+        description: 'This is a test description of an event',
+        data: 'you can add what ever random data you may want to use later',
+    },
+];
 
-	const styles = {
-		heading: {
-			textAlign: 'center'
-		},
-		chip: {
-	    margin: '4px',
-	    background: '#eee'
-	  },
-	  chipName: {
-	  	// fontSize: '12px'
-	  },
-	  paper: {
-		margin: '5px',
-		padding: '5px',
-		width: 'auto',
-		height: '120px',
-		borderRadius: '2px'
-		},
-		wrapper: {
-	    display: 'flex',
-	    flexWrap: 'wrap',
-	  },
-		actionButton: {
-			textAlign:'center',
-			marginLeft:'380px',
-			marginBottom:'20px'
-		},
-		cancelButton: {
-			textAlign:'center',
-			marginLeft:'20px'
+export default class Attendance extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      leaveType: 'Personal Leave',
+      fromDate: '',
+      toDate: '',
+      stepIndex: 0,
+      finished: false,
+      reason: '',
+      submit: true,
+      days: 0,
+      cadet: null,
+      role: 'candidate',
+      cadets: [],
+      type: 'no',
+      slideIndex: 0,
+      result: 'rejected',
+      WaveIds: [],
+      cadetsOfWave: [],
+      WaveID: '',
+      Date: ''
+    }
+    this.handleSelect = this.handleSelect.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleReasonChange = this.handleReasonChange.bind(this);
+    this.renderStepActions = this.renderStepActions.bind(this);
+    this.handleNext = this.handleNext.bind(this);
+    this.handlePrev = this.handlePrev.bind(this);
+    this.getCadet = this.getCadet.bind(this);
+    this.updateabsentees = this.updateabsentees.bind(this);
+    this.getRole = this.getRole.bind(this);
+    this.getAbsentees = this.getAbsentees.bind(this);
+    this.updateAttendance = this.updateAttendance.bind(this);
+    this.formatDate = this.formatDate.bind(this);
+    this.handleChangeTab = this.handleChangeTab.bind(this);
+    this.cancelLeave = this.cancelLeave.bind(this);
+    this.getWaveId = this.getWaveId.bind(this);
+    this.onWaveIdChange = this.onWaveIdChange.bind(this);
+    this.getWaveSpecificCandidates = this.getWaveSpecificCandidates.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.updatePresent = this.updatePresent.bind(this);
+    this.handlePresent = this.handlePresent.bind(this);
+    this.updateAbsent = this.updateAbsent.bind(this);
+  }
 
-		}
-	  }
+  componentWillMount() {
+    this.getRole();
+  }
 
+  getRole() {
+    let th = this
+    Request.get('/dashboard/userrole').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({role: res.body})
+        if (th.state.role === 'candidate') {
+          th.getCadet();
+        } else {
+          th.getAbsentees();
+        }
+      }
+    })
+  }
 
+  updatePresent(EmpID, details) {
+    let th = this
+    Request.post('/dashboard/present').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID, id: details, Date: th.state.Date}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        let cadet = th.state.cadetsOfWave.filter(function(cadet) {
+          return cadet.EmployeeID === EmpID;
+        });
+        cadet[0].DaysPresent.push(th.state.Date);
+        cadet[0].DaysAbsent = cadet[0].DaysAbsent.filter(function(cadets, key) {
+          return details != cadets._id
+        })
+        th.setState({cadet: cadet[0]})
+      }
+    })
+  }
 
-	export default class Attendance extends React.Component {
-		constructor(props) {
-			super(props);
-			this.state = {
-			WaveIds:[],
-			WaveId:'',
-			candidatesName:[],
-			candidatesID:[],
-			absentList:[],
-			absentListNames:[],
-			searchPerm: '',
-			openSnackBar: false,
-			snackBarMsg: '',
-			sessionOn: {}
-			}
-			this.onWaveIdChange = this.onWaveIdChange.bind(this);
-			this.getWaveSpecificCandidates=this.getWaveSpecificCandidates.bind(this);
-			this.getWaveId = this.getWaveId.bind(this);
-			this.handleControlDelete = this.handleControlDelete.bind(this);
-			this.handleUpdateInputPerm = this.handleUpdateInputPerm.bind(this);
-			this.handleAddNewPerm = this.handleAddNewPerm.bind(this);
-			this.savePerms = this.savePerms.bind(this);
-			this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
-			this.handleSessionOn = this.handleSessionOn.bind(this);
-			this.handleCancel = this.handleCancel.bind(this);
-		}
-		componentWillMount() {
-			if(localStorage.getItem('token')) {
-				this.getWaveId()
-			}
-			this.setState({
-				sessionOn: new Date().getDate()
-			})
-		}
+  updateAbsent(EmpID, date) {
+    let th = this
+    let details = {
+      fromDate: th.state.Date,
+      toDate: th.state.Date,
+      approved: 'yes',
+      leaveType: 'absent',
+      reason: 'absent'
+    }
+    Request.post('/dashboard/absent').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID, details: details, Date: date}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.getWaveSpecificCandidates(th.state.WaveId);
+      }
+    })
+  }
 
-		handleControlDelete(perm) {
-			let index = this.state.absentListNames.indexOf(perm);
-			let absentListNames = this.state.absentListNames.filter(function(control) {
-				return perm != control
-			})
-			let absentList = this.state.absentList.filter(function(control, id) {
-				return index != id
-			})
-			this.setState({
-				absentListNames: absentListNames,
-				absentList: absentList,
-				disableSave: false
-			})
-		}
+  onWaveIdChange(e) {
+    this.setState({WaveId: e.target.textContent})
+    this.getWaveSpecificCandidates(e.target.textContent);
+  }
 
-		handleUpdateInputPerm(searchPerm) {
-			this.setState({
-				searchPerm: searchPerm
-			})
-		}
-		handleCancel(){
-		this.setState({
-					 WaveId:'',
-					 candidatesName:[],
-					 candidatesID:[],
-					 absentList:[],
-					 absentListNames:[],
-					 sessionOn: {}
-		})
-		}
+  getWaveSpecificCandidates(waveId) {
+    let th = this;
+    let candidateName = [];
+    let candidateID = [];
+    Request.get('/dashboard/wavespecificcandidates?waveID=' + waveId).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      th.setState({cadetsOfWave: res.body.data})
+    })
+  }
 
-		handleAddNewPerm() {
-			let perms = [];
-			let permName = [];
-			let permIndex = 0;
-			let th = this;
-			if(this.state.candidatesName.indexOf(this.state.searchPerm)> -1 && this.state.absentListNames.indexOf(this.state.searchPerm) === -1)
-			{
-					perms = this.state.absentList;
-					permName = this.state.absentListNames;
-					permName.push(this.state.searchPerm);
-					permIndex = this.state.candidatesName.indexOf(this.state.searchPerm);
-					perms.push(this.state.candidatesID[permIndex]);
-					this.setState({
-						absentList: perms,
-						searchPerm: '',
-						disableSave: false,
-						absentListNames: permName
-					})
-			}
-			else
-			{
-				if(this.state.absentListNames.indexOf(this.state.searchPerm) >= 0)
-				{
-				this.setState({
-					snackBarMsg: "Candidate already added",
-					openSnackBar: true
-				})
-				}
-				else
-				{
-				this.setState({
-					snackBarMsg: "Candidate not available",
-					openSnackBar: true
-				})
-				}
-			}
-		}
+  getAbsentees() {
+    let th = this
+    Request.get('/dashboard/getabsentees').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({cadets: res.body})
+      }
+    })
+  }
 
-		savePerms() {
-			this.setState({
-				snackBarMsg: "Updated Absentees",
-				openSnackBar: true,
-				sessionOn : this.state.sessionOn.setDate(this.state.sessionOn.getDate() + 1)
-			})
-			let th = this
-			Request
-				.post('/dashboard/updateabsentees')
-				.set({'Authorization': localStorage.getItem('token')})
-				.send({date:th.state.sessionOn,absentees:th.state.absentList})
-				.end(function(err, res){
-				if(err)
-		    	console.log(err);
-		    else {
-		    	th.getWaveId();
-		    }
-				})
-		}
+  getCadet() {
+    let th = this;
+    Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({cadet: res.body})
+      }
+    })
+  }
 
-		handleSessionOn(e,date) {
-			this.setState({
-				sessionOn: date,
-				absentList: [],
-				absentListNames: []
-			})
-		}
+  updateabsentees() {
+    let th = this;
+    Request.post('/dashboard/updateabsentees').set({'Authorization': localStorage.getItem('token')}).send({
+      details: {
+        fromDate: th.state.fromDate,
+        toDate: th.state.toDate,
+        approved: 'no',
+        leaveType: th.state.leaveType,
+        reason: th.state.reason
+      },
+      absentee: th.state.cadet.EmployeeID
+    }).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.getCadet();
+      }
+    })
+  }
 
-		handleSnackBarClose() {
-			this.setState({openSnackBar: false})
-		}
+  handleSelect(range) {
+    let day = range.endDate._d - range.startDate._d;
+    day = day / 1000;
+    day = Math.floor(day / 86400) + 1;
+    this.setState({fromDate: range.startDate._d, toDate: range.endDate._d, days: day})
+  }
 
-		getWaveId() {
-			let th = this
-			Request
-				.get('/dashboard/waveids')
-				.set({'Authorization': localStorage.getItem('token')})
-				.end(function(err, res){
-				th.setState({
-					WaveIds: res.body.waveids
-				})
-				})
-			}
+  handleChange(event, index, value) {
+    this.setState({leaveType: value});
+  }
 
-			getWaveSpecificCandidates(waveId){
-			let th = this;
-			let candidateName = [];
-			let candidateID = [];
-			Request
-				.get('/dashboard/wavespecificcandidates?waveID='+waveId)
-				.set({'Authorization': localStorage.getItem('token')})
-				.end(function(err, res){
-				th.setState({
-            candidatesName:res.body.data
-				})
-				th.state.candidatesName.map(function(candidate,index) {
-					candidateName.push(candidate.EmployeeName);
-					candidateID.push(candidate.EmployeeID);
-				})
-				th.setState({
-					candidatesName: candidateName,
-					candidatesID: candidateID
-				})
-				})
-			}
+  handleChangeTab(value) {
+    if (value == 1) {
+      this.setState({slideIndex: value, type: 'rejected', result: 'closed'});
+    } else if (value == 0) {
+      this.setState({slideIndex: value, type: 'no', result: 'rejected'})
+    } else {
+      this.setState({slideIndex: value})
+      if (this.state.role !== 'candidate')
+        this.getWaveId();
+      }
+    };
 
-		onWaveIdChange(e) {
-			this.setState({
-				WaveId: e.target.textContent,
-				absentList: [],
-				absentListNames: []
-			})
-			console.log(e.target.textContent);
-			this.getWaveSpecificCandidates(e.target.textContent);
-		}
+  getWaveId() {
+    let th = this
+    Request.get('/dashboard/waveids').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      th.setState({WaveIds: res.body.waveids})
+    })
+  }
 
-		render() {
-		let th=this;
-			return(
-				<div>
-				<h1 style={styles.heading}> Attendance </h1>
-				<Card>
-					<CardText>
-						<SelectField
-							onChange={th.onWaveIdChange}
-							floatingLabelText="Select WaveID"
-							value={th.state.WaveId}
-						>
-							{
-								th.state.WaveIds.map(function(val, key) {
-									return <MenuItem key={key} value={val} primaryText={val} />
-								})
-							}
-						</SelectField>
-						<br/>
-						<br/>
-						<DatePicker hintText="Select Date" mode="landscape" value={this.state.sessionOn} onChange={this.handleSessionOn}/>
-									{
-										th.state.candidatesName.map(function(cand, index) {
-											return (
-												<div>{cand.EmployeeName}</div>
-												);
-										})
-									}
-								</CardText>
-								<CardText style={styles.cardText} >
-									<AutoComplete
-							      floatingLabelText="Select absentees..."
-							      filter={AutoComplete.fuzzyFilter}
-							      searchText={this.state.searchPerm}
-					          onUpdateInput={this.handleUpdateInputPerm}
-					          onNewRequest={this.handleAddNewPerm}
-							      dataSource={this.state.candidatesName}
-							      maxSearchResults={5}
-							    />
-						    	<Paper style={styles.paper} zDepth={1} >
-										<div style={styles.wrapper}>
-											{
-												th.state.absentListNames.map(function (absent, index) {
-													return(
-														<Chip
-															onRequestDelete={() => th.handleControlDelete(absent)}
-										          style={styles.chip}
-										          key={index}
-										        >
-										          <span style={styles.chipName}>{absent}</span>
-										        </Chip>
-									        )
-												})
-											}
-										</div>
-									</Paper>
-						    </CardText>
-								<br/>
-								<RaisedButton
-					    		label="Save"
-									style={styles.actionButton}
-					    		primary={true}
-					    		disabled={this.state.disableSave}
-					    		onClick = {this.savePerms}
-					    	/>
-								<RaisedButton
-					    		label="Cancel"
-									style={styles.cancelButton}
-									primary={true}
-									onClick = {this.handleCancel}
-					    		/>
-				</Card>
-				<Snackbar
-          open={this.state.openSnackBar}
-          message={this.state.snackBarMsg}
-          autoHideDuration={2000}
-          onRequestClose={this.handleSnackBarClose}
-					onClick={this.savePerms}
-        />
-				</div>
-			)
-		}
-	}
+  handleReasonChange(event) {
+    this.setState({reason: event.target.value, submit: false})
+  }
+
+  handleNext() {
+    const {stepIndex} = this.state;
+    this.setState({
+      stepIndex: stepIndex + 1,
+      finished: stepIndex >= 2
+    });
+    if (stepIndex >= 2) {
+      this.updateabsentees();
+    }
+  };
+
+  updateAttendance(id, approval, cadet, detailID) {
+    let th = this;
+    Request.post('/dashboard/updateapproval').set({'Authorization': localStorage.getItem('token')}).send({id: id, approval: approval}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        let cadets = th.state.cadets;
+        cadets[cadet].DaysAbsent[detailID].approved = approval;
+        th.setState({cadets: cadets})
+      }
+    })
+  }
+
+  handlePrev() {
+    const {stepIndex} = this.state;
+    if (stepIndex > 0) {
+      this.setState({
+        stepIndex: stepIndex - 1
+      });
+    }
+  };
+
+  formatDate(date) {
+    return Moment(date).format("MMM Do YYYY");
+  }
+
+  renderStepActions(step) {
+    const {stepIndex} = this.state;
+    return (
+      <div style={{
+        margin: '12px 0'
+      }}>
+        <RaisedButton label={stepIndex === 2
+          ? 'Submit'
+          : 'Next'} disableTouchRipple={true} disableFocusRipple={true} primary={true} disabled={this.state.submit} onTouchTap={this.handleNext} style={{
+          marginRight: 12
+        }}/> {step > 0 && (<FlatButton label="Back" disabled={stepIndex === 0} disableTouchRipple={true} disableFocusRipple={true} onTouchTap={this.handlePrev}/>)}
+      </div>
+    );
+  }
+
+  cancelLeave(index, dateID) {
+    let th = this
+    Request.post('/dashboard/cancelleave').set({'Authorization': localStorage.getItem('token')}).send({id: dateID}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        let cadet = th.state.cadet;
+        cadet.DaysAbsent = th.state.cadet.DaysAbsent.filter(function(cadets, key) {
+          return index != key
+        })
+        th.setState({cadet: cadet})
+      }
+    })
+  }
+
+  handlePresent(EmpID) {
+    let th = this
+    Request.post('/dashboard/updatepresent').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        let cadet = th.state.cadet;
+        cadet.DaysPresent.push(new Date());
+        th.setState({cadet: cadet})
+      }
+    })
+  }
+
+  handleDateChange(event, date) {
+    let startDate = new Date(date);
+    this.setState({Date: date})
+  }
+
+  render() {
+    let th = this;
+    if (this.state.role === 'candidate') {
+      const {finished, stepIndex} = this.state;
+      if (th.state.cadet != null) {
+        let attendance = '';
+        let today = this.formatDate(new Date());
+        let todayAttendance = false;
+        this.state.cadet.DaysPresent.map(function(date) {
+          if (today === th.formatDate(date))
+            todayAttendance = true;
+          }
+        )
+        this.state.cadet.DaysAbsent.map(function(details) {
+          if ((new Date(details.fromDate) <= new Date()) && (new Date(details.toDate) >= new Date()))
+            attendance = (
+              <h2>You are on leave.Please contact admin for further approval</h2>
+            )
+        })
+        if (attendance === '') {
+          if (todayAttendance) {
+            attendance = (
+              <h2>You have marked today's attendance... For updation contact StackRoute Admin</h2>
+            )
+          } else {
+            attendance = (
+              <div>
+                <h2>Do you wish to mark today's attendance
+                </h2>
+                <FlatButton label="Yes" onTouchTap={this.handlePresent.bind(this, this.state.cadet.EmployeeID)} primary={true}/></div>
+            )
+          }
+        }
+        return (
+          <div>
+            <h1 style={styles.content}>ATTENDANCE</h1>
+            <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
+              <Tab label="Apply Leave" value={0}>
+                <Stepper activeStep={stepIndex} orientation="vertical" style={styles.content}>
+                  <Step>
+                    <StepLabel>Leave Details and Reason</StepLabel>
+                    <StepContent>
+                      <SelectField floatingLabelText="Leave Type" value={this.state.leaveType} onChange={this.handleChange}>
+                        <MenuItem value={'Personal Leave'} primaryText="Personal Leave"/>
+                        <MenuItem value={'Sick Leave'} primaryText="Sick Leave"/>
+                      </SelectField>
+                      <br/>
+                      <h5>Reason:</h5>
+                      <TextField hintText="Reason for leave" multiLine={true} value={this.state.reason} onChange={this.handleReasonChange}/> {this.renderStepActions(0)}
+                    </StepContent>
+                  </Step>
+                  <Step>
+                    <StepLabel>Select DateRange</StepLabel>
+                    <StepContent>
+                      <DateRange onInit={this.handleSelect} onChange={this.handleSelect}/>
+                      <h3>Number of Days:{this.state.days}</h3>
+                      {this.renderStepActions(1)}
+                    </StepContent>
+                  </Step>
+                  <Step>
+                    <StepLabel>Approval</StepLabel>
+                    <StepContent>
+                      <h4>Sure to submit for Approval?</h4>
+                      {this.renderStepActions(2)}
+                    </StepContent>
+                  </Step>
+                </Stepper>
+                {finished && (
+                  <p style={{
+                    margin: '20px 0',
+                    textAlign: 'center'
+                  }}>
+                    Leave submitted wait for Approval
+                  </p>
+                )}</Tab>
+              <Tab label="Cancel Leave" value={1}>
+                <Table fixedHeader={true}>
+                  <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                    <TableRow>
+                      <TableHeaderColumn>From Date</TableHeaderColumn>
+                      <TableHeaderColumn>To Date</TableHeaderColumn>
+                      <TableHeaderColumn>Reason</TableHeaderColumn>
+                      <TableHeaderColumn>Cancel</TableHeaderColumn>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody displayRowCheckbox={false} showRowHover={true}>
+                    {th.state.cadet.DaysAbsent.map(function(dates, index) {
+                      return (
+                          <TableRow>
+                            <TableRowColumn>{th.formatDate(dates.fromDate)}</TableRowColumn>
+                            <TableRowColumn>{th.formatDate(dates.toDate)}</TableRowColumn>
+                            <TableRowColumn>{dates.reason}</TableRowColumn>
+                            <TableRowColumn>
+                              <IconButton tooltip="Cancel" onClick={th.cancelLeave.bind(this, index, dates._id)}>
+                                <RejectIcon color={red500}/>
+                              </IconButton>
+                            </TableRowColumn>
+                          </TableRow>
+                        )
+                    })
+}
+                  </TableBody>
+                </Table>
+              </Tab>
+              <Tab label="Mark Attendance" value={2}>
+                {attendance}
+              </Tab>
+            </Tabs>
+
+          </div>
+        )
+      } else {
+        return (
+          <h3>Loading...</h3>
+        )
+      }
+    } else {
+      let leaveno = 1;
+      let rowno = 0;
+      let row = 0;
+      let cadetsLength = th.state.cadets.length;
+      let table = (
+        <Table fixedHeader={true}>
+          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+            <TableRow>
+              <TableHeaderColumn>Leave No</TableHeaderColumn>
+              <TableHeaderColumn>Cadet Name</TableHeaderColumn>
+              <TableHeaderColumn>Leave Type</TableHeaderColumn>
+              <TableHeaderColumn>From Date</TableHeaderColumn>
+              <TableHeaderColumn>To Date</TableHeaderColumn>
+              <TableHeaderColumn>Reason</TableHeaderColumn>
+              <TableHeaderColumn>Approve</TableHeaderColumn>
+              <TableHeaderColumn>Reject</TableHeaderColumn>
+            </TableRow>
+          </TableHeader>
+          <TableBody displayRowCheckbox={false} showRowHover={true}>
+            {this.state.cadets.map(function(cadets, index) {
+              return (cadets.DaysAbsent.map(function(details, key) {
+                if (details.approved === th.state.type) {
+                  return (
+                    <TableRow>
+                      <TableRowColumn>{leaveno++}</TableRowColumn>
+                      <TableRowColumn>{cadets.EmployeeName}</TableRowColumn>
+                      <TableRowColumn>{details.leaveType}</TableRowColumn>
+                      <TableRowColumn>{th.formatDate(details.fromDate)}</TableRowColumn>
+                      <TableRowColumn>{th.formatDate(details.toDate)}</TableRowColumn>
+                      <TableRowColumn style={styles.row}>
+                        <p title={details.reason}>{details.reason}</p>
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        <IconButton tooltip="Approve" onClick={th.updateAttendance.bind(th, details._id, 'yes', index, key)}>
+                          <ApproveIcon color={green500}/>
+                        </IconButton>
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        <IconButton tooltip="Reject" onClick={th.updateAttendance.bind(th, details._id, th.state.result, index, key)}>
+                          <RejectIcon color={red500}/>
+                        </IconButton>
+                      </TableRowColumn>
+                    </TableRow>
+                  )
+                } else {
+                  rowno++;
+                  return false;
+                }
+
+              }))
+            })}
+          </TableBody>
+        </Table>
+      )
+      return (
+        <div>
+          <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
+            <Tab label="Approve Leaves" value={0}>
+              {table}</Tab>
+            <Tab label="Rejected Leaves" value={1}>
+              {table}</Tab>
+            <Tab label="Update Attendance" value={2}>
+              <DatePicker hintText="Date to be updated" floatingLabelText='Date' errorText={this.state.StartDateErrorText} value={this.state.Date} onChange={this.handleDateChange}/>
+              <SelectField onChange={th.onWaveIdChange} floatingLabelText="Select WaveID" value={th.state.WaveId}>
+                {th.state.WaveIds.map(function(val, key) {
+                  return <MenuItem key={key} value={val} primaryText={val}/>
+                })
+}
+              </SelectField>
+              <Table fixedHeader={true}>
+                <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                  <TableRow>
+                    <TableHeaderColumn>EmployeeName</TableHeaderColumn>
+                    <TableHeaderColumn>Present</TableHeaderColumn>
+                    <TableHeaderColumn>Absent</TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false} showRowHover={true}>
+                  {th.state.cadetsOfWave.map(function(cadet, index) {
+                    let absent = false;
+                    let present = true;
+                    let date = '';
+                    cadet.DaysAbsent.map(function(details) {
+                      if ((th.formatDate(new Date(details.fromDate)) <= th.formatDate(new Date(th.state.Date))) && ((new Date(details.toDate) >= new Date(th.state.Date)) || (th.formatDate(new Date(details.fromDate)) === (th.formatDate(new Date(details.toDate)))))) {
+                        absent = false
+                        present = true
+                        date = details._id
+                      }
+                    })
+                    cadet.DaysPresent.filter(function(detail) {
+                      if (th.formatDate(detail) === th.formatDate(th.state.Date)) {
+                        present = false
+                        absent = true
+                        date = detail
+                      }
+                    })
+                    return (
+                      <TableRow>
+                        <TableRowColumn>
+                          {cadet.EmployeeName}
+                        </TableRowColumn>
+                        <TableRowColumn>
+                          <IconButton tooltip="Present" disabled={absent} onClick={th.updatePresent.bind(this, cadet.EmployeeID, date)}>
+                            <ApproveIcon color={green500}/>
+                          </IconButton>
+                        </TableRowColumn>
+                        <TableRowColumn>
+                          <IconButton tooltip="Reject" disabled={present} onClick={th.updateAbsent.bind(this, cadet.EmployeeID, date)}>
+                            <RejectIcon color={red500}/>
+                          </IconButton>
+                        </TableRowColumn>
+                      </TableRow>
+                    )
+                  })
+}
+                </TableBody>
+              </Table>
+            </Tab>
+            <Tab label="View Attendance" value={3}>
+              <Calendar/>
+            </Tab>
+          </Tabs>
+        </div>
+      )
+    }
+  }
+}

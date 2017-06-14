@@ -7,11 +7,11 @@ import SaveIcon from 'material-ui/svg-icons/content/save';
 
 const styles = {
 	container: {
-		marginTop: 10
+		marginTop: 2
 	},
-	row: {
-		display: 'flex',
-  	alignItems: 'center'
+	radioBtn: {
+		display: 'flex', 
+		width: 100
 	}
 }
 
@@ -20,29 +20,27 @@ export default class CadetItem extends React.Component {
 		super(props);
 		this.state = {
 			cadet: {},
-			disableSave: true,
 			showDetail: false
 		}
 		this.handleRemarksChange = this.handleRemarksChange.bind(this);
 		this.handleSelectedChange = this.handleSelectedChange.bind(this);
 		this.handleRemarksUpdate = this.handleRemarksUpdate.bind(this);
 		this.handleShowDetail = this.handleShowDetail.bind(this);
+		this.testing = this.testing.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.setState({
 			cadet: this.props.cadet
 		})
 	}
-	componentWillUpdate(nextProps, nextState) {
+	componentWillReceiveProps(nextProps) {
+		this.setState({
+			cadet: nextProps.cadet
+		})
 	}
 	handleRemarksChange(event) {
 		let cadet = this.state.cadet;
 		cadet.Remarks = event.target.value;
-		if(event.target.value != '') {
-			this.setState({
-				disableSave: false
-			})
-		}
 		this.setState({
 			cadet: cadet
 		})
@@ -50,25 +48,21 @@ export default class CadetItem extends React.Component {
 	handleSelectedChange(event, value) {
 		let cadet = this.state.cadet;
 		cadet.Selected = value;
-		if(value != '') {
-			this.setState({
-				disableSave: false
-			})
-		}
 		this.setState({
 			cadet: cadet
 		})
+		this.handleRemarksUpdate();
 	}
 	handleRemarksUpdate() {
 		this.props.handleRemarksUpdate(this.state.cadet);
-		this.setState({
-			disableSave: true
-		})
 	}
 	handleShowDetail() {
 		this.setState({
 			showDetail: !this.state.showDetail
 		})
+	}
+	testing() {
+		console.log('hit the on blur');
 	}
 
 	render() {
@@ -97,18 +91,20 @@ export default class CadetItem extends React.Component {
 						<TextField
 				      floatingLabelText="Provide Remarks"
 				      multiLine={true}
-				      rows={3}
+				      rows={2}
 				      rowsMax={3}
 				      fullWidth={true}
 				      value={this.state.cadet.Remarks}
 				      onChange={this.handleRemarksChange}
+				      onBlur={this.handleRemarksUpdate}
 				    />
 					</Col>
-					<Col md={2}>
+					<Col md={3}>
 						<RadioButtonGroup
 							name="selected"
 							onChange={this.handleSelectedChange}
 							valueSelected={this.state.cadet.Selected}
+							style={styles.radioBtn}
 						>
 							<RadioButton
 				        value="Yes"
@@ -123,14 +119,6 @@ export default class CadetItem extends React.Component {
 				        label="DS"
 				      />
 						</RadioButtonGroup>
-					</Col>
-					<Col md={1}>
-						<IconButton
-							disabled={this.state.disableSave}
-							onClick={this.handleRemarksUpdate}
-						>
-							<SaveIcon />
-						</IconButton>
 					</Col>
 					<Col md={4} mdOffset={2}>
 						{

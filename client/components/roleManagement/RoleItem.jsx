@@ -102,7 +102,7 @@ export default class RoleItem extends React.Component {
 		this.handleDeleteRole = this.handleDeleteRole.bind(this);
 		this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		let th = this;
 		let date = new Date(this.props.roleperm.lastModified);
 		date = date.toString();

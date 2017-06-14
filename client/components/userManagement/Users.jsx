@@ -44,7 +44,7 @@ export default class Users extends React.Component {
 		this.unlockUser = this.unlockUser.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.getRoles()
 		this.getUsers()
 	}

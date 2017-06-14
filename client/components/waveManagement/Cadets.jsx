@@ -19,7 +19,7 @@ export default class CandidateCard extends React.Component {
 		this.getProfilePic = this.getProfilePic.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.getProfilePic(this.props.cadet.EmployeeID)
 	}
 

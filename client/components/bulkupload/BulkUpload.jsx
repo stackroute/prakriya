@@ -5,6 +5,12 @@ import FileDrop from './FileDrop.jsx';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import Snackbar from 'material-ui/Snackbar';
 
+const styles = {
+	msg: {
+		textAlign: 'center'
+	}
+}
+
 export default class BulkUpload extends React.Component {
 	constructor(props) {
 		super(props)
@@ -21,7 +27,7 @@ export default class BulkUpload extends React.Component {
 		this.getUsers = this.getUsers.bind(this);
 		this.pushNotification = this.pushNotification.bind(this);
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.setState({
 			user: this.props.user
 		})
@@ -134,8 +140,10 @@ export default class BulkUpload extends React.Component {
 	   	 		users={this.state.users}
 	   	 	/>
 		    {
-		    	this.state.files.length > 0 &&
+		    	this.state.files.length > 0 ?
 		    	<FileList files={this.state.files}/>
+		    	:
+		    	<h3 style={styles.msg}>No files uploaded</h3>
 		    }
 		    <Snackbar
           open={this.state.open}

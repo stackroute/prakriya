@@ -72,7 +72,7 @@ export default class AddWave extends React.Component {
 		this.resetFields = this.resetFields.bind(this)
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.setState({
 			cadets: this.props.cadets
 		})
@@ -170,7 +170,6 @@ export default class AddWave extends React.Component {
 	}
 
 	validationSuccess() {
-		console.log('EndDate: ', this.state.EndDate)
 		if(this.state.WaveID.trim().length == 0) {
 			this.setState({
 				WaveIDErrorText: 'This field cannot be empty'
@@ -190,10 +189,6 @@ export default class AddWave extends React.Component {
 		} else if(this.state.Location.trim().length == 0) {
 			this.setState({
 				LocationErrorText: 'This field cannot be empty'
-			})
-		} else if(this.state.selectedCadets.length == 0) {
-			this.setState({
-				CadetsErrorText: 'Select atleast one cadet'
 			})
 		} else {
 				return true

@@ -56,21 +56,42 @@ export default class Waves extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			cadets: [],
 			waves : [],
 			activeWaves: []
 		}
+		this.getCadets = this.getCadets.bind(this)
 		this.getWaves = this.getWaves.bind(this)
 		this.getActiveWaves = this.getActiveWaves.bind(this)
 		this.handleDelete = this.handleDelete.bind(this)
 		this.handleUpdate = this.handleUpdate.bind(this)
+		this.addWave = this.addWave.bind(this);
 	}
 
 	componentWillMount() {
+		this.getCadets()
+		this.getWaves()
 		this.getActiveWaves()
 	}
 
-	componentDidMount() {
-		this.getWaves()
+	getCadets() {
+		let th = this;
+		Request
+			.get('/dashboard/cadets')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	let cadets = res.body.filter(function(cadet) {
+		    		if(cadet.Wave == undefined || cadet.Wave == '')
+		    			return cadet;
+		    	})
+		    	th.setState({
+		    		cadets: cadets
+		    	})
+		    }
+		  })
 	}
 
 	getActiveWaves() {
@@ -150,13 +171,34 @@ export default class Waves extends React.Component {
 		console.log('handle delete');
 	}
 
+	addWave(wave) {
+		let th = this;
+		Request
+			.post('/dashboard/addwave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(wave)
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+		    	th.setState({
+		    		open: true,
+		    		message: "Wave added successfully with Wave ID: " + res.body.WaveID
+		    	})
+		    	th.getCadets();
+		    	th.getWaves();
+		    	th.getActiveWaves();
+		    }
+			});
+	}
+
 
 	render() {
 		let th = this;
 		return (
 			<div>
 				<h2 style={styles.heading}>Wave Management</h2>
-				<Grid><Row md={10}><Tabs
+				<Grid><Row><Tabs
 					style={styles.tabs}
 					tabItemContainerStyle={styles.tabItemContainer}
 					inkBarStyle={styles.inkBar}>
@@ -187,7 +229,7 @@ export default class Waves extends React.Component {
 								}
 						</Masonry>
 					</Tab>
-					<Tab label='Completed Waves' style={styles.tab}>
+					<Tab label='Upcoming Waves' style={styles.tab}>
 						<Masonry
 							className={'my-class'}
 							elementType={'ul'}
@@ -197,7 +239,7 @@ export default class Waves extends React.Component {
 								{
 									this.state.waves.length > 0 ?
 									this.state.waves.map(function (wave, key) {
-										if(th.state.activeWaves.indexOf(wave.WaveID) < 0) {
+										if(new Date(wave.StartDate) > Date.now()) {
 											return (
 												<WaveCard
 													key={key}
@@ -240,6 +282,11 @@ export default class Waves extends React.Component {
 						</Masonry>
 					</Tab>
 				</Tabs></Row></Grid>
+				{
+					this.props.user.role == "sradmin" &&
+					this.state.cadets.length > 0 &&
+					<AddWave  cadets={this.state.cadets} handleWaveAdd={this.addWave}/>
+				}
 			</div>
 		)
 	}

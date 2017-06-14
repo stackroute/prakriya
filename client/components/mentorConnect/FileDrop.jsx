@@ -22,6 +22,10 @@ const styles = {
 	},
 	downloadIcon: {
 		float: 'right'
+	},
+	uploadBtn: {
+		marginTop: 20, 
+		float: 'left'
 	}
 }
 
@@ -39,7 +43,7 @@ export default class FileDrop extends React.Component {
 		this.handleDrop = this.handleDrop.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		this.getTemplate();	
 	}
 
@@ -76,43 +80,42 @@ export default class FileDrop extends React.Component {
 	render() {
 		return(
 			<div style={styles.container}>
-				<Grid>
-					<Row>
-						<Col md={2} mdOffset={7}>
-							<CSVLink 
-								data={this.state.template}
-								filename={"remarks_template.csv"} 
-							>
-								<FlatButton
-						      label="Template"
-						      secondary={true}
-						      icon={<DownloadIcon />}
-						      style={styles.downloadIcon}
-						    />
-						  </CSVLink>
-						</Col>
-					</Row>
-	    		<Row>
-	    			<Col md={6} mdOffset={3}>
-							<Dropzone style={styles.dropzone} onDrop={this.handleDrop}>
-			          <div>Drop or Click to upload csv files in required format</div>
-			        </Dropzone>
-					    <RaisedButton
-					      label="Upload"
-					      primary={true}
-					      icon={<UploadIcon />}
-					      onClick={this.handleUpdateRemarks}
-					      disabled={!this.state.showSelFile}
+				<Row>
+					<Col md={6} mdOffset={9}>
+						<CSVLink 
+							data={this.state.template}
+							filename={"remarks_template.csv"} 
+						>
+							<FlatButton
+					      label="Template"
+					      secondary={true}
+					      icon={<DownloadIcon />}
+					      style={styles.downloadIcon}
 					    />
-					    {
-					    	this.state.showSelFile &&
-					    	<span>
-					    		{this.state.selectedFile.name}
-					    	</span>
-					    }
-		    		</Col>
-	    		</Row>
-	    	</Grid>
+					  </CSVLink>
+					</Col>
+				</Row>
+    		<Row>
+    			<Col md={12} mdOffset={3}>
+						<Dropzone style={styles.dropzone} onDrop={this.handleDrop}>
+		          <div>Drop or Click to upload csv files in required format</div>
+		        </Dropzone>
+				    <RaisedButton
+				      label="Upload"
+				      primary={true}
+				      icon={<UploadIcon />}
+				      onClick={this.handleUpdateRemarks}
+				      disabled={!this.state.showSelFile}
+				      style={styles.uploadBtn}
+				    />
+				    {
+				    	this.state.showSelFile &&
+				    	<span>
+				    		{this.state.selectedFile.name}
+				    	</span>
+				    }
+	    		</Col>
+    		</Row>
 			</div>
 		)
 	}

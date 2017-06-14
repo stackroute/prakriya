@@ -11,38 +11,10 @@ import FlatButton from 'material-ui/FlatButton';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import IconButton from 'material-ui/IconButton';
+import app from '../../styles/app.json';
+import dialog from '../../styles/dialog.json';
 
 const styles = {
-	addButton: {
-		position:'fixed',
-	  bottom: '60px',
-	  right: '15px',
-	  zIndex: 1
-	},
-	dialog: {
-		backgroundColor: '#DDDBF1',
-		borderBottom: '3px solid teal',
-		borderRight: '10px solid teal',
-		borderLeft: '10px solid teal'
-	},
-	dialogTitle: {
-		fontWeight: 'bold',
-		backgroundColor: 'teal',
-		color: '#DDDBF1',
-		textAlign: 'center'
-	},
-	actionsContainer: {
-		backgroundColor: 'teal',
-		borderTop: '0px',
-		marginTop: '0px'
-	},
-	actionButton: {
-		backgroundColor: '#DDDBF1',
-		width: '50%',
-		color: 'teal',
-		border: '1px solid teal',
-		height: '100%'
-	},
 	paper: {
 		margin: '5px',
 		padding: '5px',
@@ -87,7 +59,7 @@ export default class AddCourse extends React.Component {
 		this.validationSuccess = this.validationSuccess.bind(this)
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		if(this.props.openDialog) {
 			this.setState({
 				showDialog: true,
@@ -234,12 +206,12 @@ export default class AddCourse extends React.Component {
 				<FlatButton
 					label="Cancel"
 					onTouchTap={(e)=>this.handleClose(e, 'CLOSE')}
-					style={styles.actionButton}
+					style={dialog.actionButton}
 				/>,
 				<FlatButton
 					label="Update Course"
 					onClick={(e)=>this.handleClose(e, 'EDIT')}
-					style={styles.actionButton}
+					style={dialog.actionButton}
 				/>
 			]
 			title = 'EDIT COURSE'
@@ -248,33 +220,33 @@ export default class AddCourse extends React.Component {
 					<FlatButton
 						label="Cancel"
 						onTouchTap={(e)=>this.handleClose(e, 'CLOSE')}
-						style={styles.actionButton}
+						style={dialog.actionButton}
 					/>,
 					<FlatButton
 						label="Add Course"
 						onClick={(e)=>this.handleClose(e, 'ADD')}
-						style={styles.actionButton}
+						style={dialog.actionButton}
 					/>
 			]
 			title = 'ADD COURSE'
 		}
 		return(
 				<div>
-				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
+				<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
 				<Dialog
-		    	bodyStyle={styles.dialog}
+		    	bodyStyle={dialog.body}
           title={title}
-					titleStyle={styles.dialogTitle}
-					actionsContainerStyle={styles.actionsContainer}
+					titleStyle={dialog.title}
+					actionsContainerStyle={dialog.actionsContainer}
           open={this.state.showDialog}
           autoScrollBodyContent={true}
           onRequestClose={()=>this.handleClose('CLOSE')}
 					actions={actions}
 	        >
 					<div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 			        <TextField
 				    		hintText="Course Name"
 				    		floatingLabelText="Name"
@@ -283,7 +255,7 @@ export default class AddCourse extends React.Component {
 								errorText={this.state.CourseNameErrorText}
 				    	/>
 						</div>
-						<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+						<div style={dialog.box50}>
 							<TextField
 								hintText="In Weeks"
 								floatingLabelText="Duration"
@@ -293,7 +265,7 @@ export default class AddCourse extends React.Component {
 							/>
 						</div>
 					</div>
-					<div  style={{border: '2px solid white', width: '100%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
+					<div  style={dialog.box100}>
 			    	<TextField
 			    		hintText="assessment"
 			    		floatingLabelText="Assessment Category"

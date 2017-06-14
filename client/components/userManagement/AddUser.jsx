@@ -85,7 +85,7 @@ export default class AddUser extends React.Component {
 		this.handleUpdate = this.handleUpdate.bind(this)
 		this.resetFields = this.resetFields.bind(this)
 	}
-	componentDidMount() {
+	componentWillMount() {
 		this.setState({
 			roles: this.props.roles
 		})

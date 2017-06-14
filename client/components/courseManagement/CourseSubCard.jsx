@@ -86,7 +86,7 @@ export default class CourseCard extends React.Component {
 
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		if(this.props.openDialog) {
 			this.setState({
 					open: true,
