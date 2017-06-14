@@ -159,7 +159,9 @@ let addProject = function (projectObj, successCB, errorCB) {
 	let length = projectObj.version.length;
 	saveProject.save(function (err, result) {
 		if(err)
-			{errorCB(err);}
+			{
+				console.log(err);
+				errorCB(err);}
 		else
 		{
 			projectObj.version[length-1].members.map(function(member) {
@@ -195,9 +197,8 @@ let addVersion = function (name, versionObj,successCB, errorCB) {
 
 let updateProject = function (projectObj,delList, prevWave, version, successCB, errorCB) {
 	let proj = projectObj.version[version];
-	proj._id =  new mongoose.mongo.ObjectId(proj._id);
 	console.log(proj);
-	ProjectModel.findOneAndUpdate({version:{$elemMatch:{"_id":proj._id}}},{$set:{'version.$':proj}},function (err, result) {
+	ProjectModel.findOneAndUpdate({version:{$elemMatch:{"name":proj.name}}},{$set:{'version.$':proj}},function (err, result) {
 		if(err)
 			{errorCB(err);}
 		else
@@ -224,18 +225,36 @@ let updateProject = function (projectObj,delList, prevWave, version, successCB, 
 	});
 };
 
-let deleteProject = function (projectObj, successCB, errorCB) {
-	ProjectModel.remove({'version.name': projectObj.version.name}, function (err, result) {
+let deleteVersion = function (versionObj, successCB, errorCB) {
+	console.log("version"+versionObj)
+	ProjectModel.update({version:{$elemMatch:{"name":versionObj.name}}},{$pull:{version:{"name":versionObj.name}}}, function (err, result) {
 		if(err)
 			{console.log(err, 'err');}
 		else
 		{
-			CandidateModel.updateMany({ProjectName: projectObj.product}, {$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}}, function(err, result) {
+			CandidateModel.updateMany({ProjectName: versionObj.name}, {$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}}, function(err, result) {
 					if(err)
 						{errorCB(err);}
 					console.log(result);
 					successCB(result);
 				});
+		}
+	});
+}
+
+let deleteProject = function (projectObj, successCB, errorCB) {
+	ProjectModel.remove({'product': projectObj.product}, function (err, result) {
+		if(err)
+			{console.log(err, 'err');}
+		else
+		{
+			projectObj.version.map(function(version){
+				CandidateModel.updateMany({ProjectName: version.name}, {$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}}, function(err, result) {
+						if(err)
+							{errorCB(err);}
+						console.log(result);
+					});
+			},successCB(result));
 		}
 	});
 };
@@ -607,6 +626,7 @@ module.exports = {
 	addProject,
 	addVersion,
 	deleteProject,
+	deleteVersion,
 	updateProject,
 	getFiles,
 	updateCadet,

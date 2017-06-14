@@ -23,6 +23,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
 import MoreVertIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 
 const styles = {
   text: {
@@ -86,7 +87,8 @@ export default class ProjectCard extends React.Component {
       selectedVersionIndex: 0,
       cadets: [],
       project: {},
-      newVersionDialog: false
+      newVersionDialog: false,
+      delete: ''
     }
     this.formatDate = this.formatDate.bind(this);
     this.handleClose = this.handleClose.bind(this);
@@ -100,9 +102,10 @@ export default class ProjectCard extends React.Component {
     this.onVersionChange = this.onVersionChange.bind(this);
     this.addVersion = this.addVersion.bind(this);
     this.newVersion = this.newVersion.bind(this);
+    this.handleDeleteChange = this.handleDeleteChange.bind(this);
   }
-  componentWillMount() {
 
+  componentWillMount() {
     let versionName = [];
     this.props.project.version.map(function(x, i) {
       versionName.push(x.name);
@@ -153,8 +156,16 @@ export default class ProjectCard extends React.Component {
   }
 
   handleDeleteProject() {
-    this.props.handleDelete(this.props.project);
-    this.closeDeleteDialog();
+    if(this.state.delete === 'Project')
+    {
+      this.props.handleDelete(this.props.project, 'project');
+      this.closeDeleteDialog();
+    }
+    else {
+        this.props.handleDelete(this.state.project.version[this.state.selectedVersionIndex],'version');
+        this.closeDeleteDialog();
+    }
+
   }
   onVersionChange(index, value) {
     this.setState({selectedVersion: value, selectedVersionIndex: index})
@@ -167,7 +178,16 @@ export default class ProjectCard extends React.Component {
   }
 
   addVersion(version) {
-    this.props.handleAdd(version);
+    this.props.handleAddVersion(version);
+    this.setState({
+      selectedVersionIndex: 0
+    })
+  }
+
+  handleDeleteChange(event, value) {
+    this.setState({
+      delete: value
+    })
   }
 
   render() {
@@ -254,7 +274,24 @@ export default class ProjectCard extends React.Component {
         {this.state.newVersionDialog && <ProjectDialog project={this.props.project} version={th.state.selectedVersionIndex} showAddVersion={false} openDialog={this.state.newVersionDialog} handleAddVersion={this.addVersion} handleClose={this.handleClose} dialogTitle={'ADD VERSION'}/>
 }
         <Dialog bodyStyle={styles.deleteDialog} actions={deleteDialogActions} modal={false} actionsContainerStyle={styles.actionsContainer} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
-          Are you sure you want to delete this project?
+          Wanna delete the whole project or this particular version?
+          <p>
+          <RadioButtonGroup
+            name="selected"
+            onChange={this.handleDeleteChange}
+            valueSelected={this.state.delete}
+            style={{padding:'5px'}}
+          >
+            <RadioButton
+              value="Project"
+              label={<span>Project:<b>{th.state.project.product}</b></span>}
+              style={{paddingBottom:'10px'}}
+            />
+            <RadioButton
+              value="Version"
+              label={<span>Current Version:<b>{th.state.versionName[th.state.selectedVersionIndex]}</b></span>}
+            />
+          </RadioButtonGroup></p>
         </Dialog>
       </div>
     )

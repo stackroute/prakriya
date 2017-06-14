@@ -227,6 +227,7 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
     let projectObj = req.body;
     projectObj.addedBy = req.user.name;
+    console.log(req.user.name);
     dashboardMongoController.addProject(projectObj, function(project) {
       res.status(201).json(project);
     }, function (err) {
@@ -285,7 +286,9 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function(req, res) {
 // delete a project
 router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
-    let projectObj = req.body;
+    if(req.body.type === 'project')
+    {
+    let projectObj = req.body.project;
     projectObj.addedBy = req.user.name;
     projectObj.updatedBy = true;
     dashboardMongoController.deleteProject(projectObj, function(project) {
@@ -293,6 +296,14 @@ router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
     }, function (err) {
       res.status(500).json({ error: 'Cannot delete the project...!' });
     });
+    }
+    else {
+      dashboardMongoController.deleteVersion(req.body.project, function(project) {
+        res.status(201).json(project);
+      }, function (err) {
+        res.status(500).json({ error: 'Cannot delete the version...!' });
+      });
+    }
   }
   catch(err) {
     console.log(err);

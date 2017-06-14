@@ -153,13 +153,13 @@ export default class Projects extends React.Component {
 			})
 	}
 
-	handleDelete(project)
+	handleDelete(project, type)
 	{
 		let th = this;
 		Request
 			.post('/dashboard/deleteproject')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send(project)
+			.send({project:project,type:type})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
@@ -173,8 +173,6 @@ export default class Projects extends React.Component {
 	render() {
 
 		let th = this;
-				console.log(th.state.projects,"wavejoe")
-				console.log(th.state.projects.length,"length")
 				return(
 			<div>
 				<h2 style={styles.heading}>Product Management</h2>
@@ -196,11 +194,11 @@ export default class Projects extends React.Component {
 										if(th.state.activeWaves.indexOf(project.wave) >= 0) {
 											return (
 												<ProjectCard
-													key={key}
+													key={project.version.length}
 													project={project}
 													handleUpdate={th.handleUpdate}
 													handleDelete={th.handleDelete}
-													handleAdd={th.addVersion}
+													handleAddVersion={th.addVersion}
 													bgColor={backgroundColors[key%4]}
 												/>
 											)
@@ -223,11 +221,11 @@ export default class Projects extends React.Component {
 										if(th.state.activeWaves.indexOf(project.wave) < 0) {
 											return (
 												<ProjectCard
-													key={key}
+													key={project.version.length}
 													project={project}
 													handleUpdate={th.handleUpdate}
 													handleDelete={th.handleDelete}
-													handleAdd={th.addVersion}
+													handleAddVersion={th.addVersion}
 													bgColor={backgroundColors[key%4]}
 												/>
 											)
@@ -249,11 +247,11 @@ export default class Projects extends React.Component {
 									this.state.projects.map(function (project, key) {
 										return (
 											<ProjectCard
-												key={key}
+												key={project.version.length}
 												project={project}
 												handleUpdate={th.handleUpdate}
 												handleDelete={th.handleDelete}
-												handleAdd={th.addVersion}
+												handleAddVersion={th.addVersion}
 												bgColor={backgroundColors[key%4]}
 											/>
 										)
