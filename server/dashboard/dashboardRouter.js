@@ -3,11 +3,10 @@ const formidable = require('formidable');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const logger = require('./../../applogger');
-var auth = require('../auth')();
 const dashboardMongoController = require('./dashboardMongoController');
 const adminMongoController = require('../admin/adminMongoController.js');
 const email = require('./../email');
-var auth = require('../auth')();
+let auth = require('../auth')();
 let CONFIG = require('../../config');
 
 /** **************************************************
@@ -87,8 +86,8 @@ router.post('/lastlogin', auth.canAccess(CONFIG.ALL), function(req, res) {
     let user = req.user;
     user.lastLogin = req.body.lastLogin;
     logger.debug('Last Login', user);
-    dashboardMongoController.updateLastLogin(user, function(user) {
-      res.status(201).json(user);
+    dashboardMongoController.updateLastLogin(user, function(userObj) {
+      res.status(201).json(userObj);
     }, function (err) {
       res.status(500).json({ error: 'Cannot update the last login...!' });
     });
@@ -115,7 +114,7 @@ router.get('/user', function(req, res) {
         userObj.username = req.user.username;
         userObj.email = req.user.email;
         userObj.actions = accesscontrols;
-        if(req.user.lastLogin != undefined)
+        if(req.user.lastLogin !== undefined)
           {userObj.lastLogin = req.user.lastLogin;}
         res.status(201).json(userObj);
       }, function(err) {
@@ -251,26 +250,34 @@ router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function(req, res) 
     let projectObj = req.body.project;
     projectObj.version[req.body.version].addedBy = req.user.name;
     projectObj.version[req.body.version].updatedBy = true;
-    dashboardMongoController.updateProject(projectObj, req.body.delList, req.body.prevWave, req.body.version, function(project) {
-      res.status(201).json(project);
-    }, function (err) {
-      res.status(500).json({ error: 'Cannot update the project...!' });
-    })
+    dashboardMongoController.
+    updateProject(
+      projectObj,
+      req.body.delList,
+      req.body.prevWave,
+      req.body.version,
+      function(project) {
+        res.status(201).json(project);
+      },
+      function (err) {
+        res.status(500).json({ error: 'Cannot update the project...!' });
+      }
+    );
   }
   catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
   }
-})
+});
 
-//add a new version
+// add a new version
 router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
     let versionObj = req.body.version;
     versionObj.addedBy = req.user.name;
     versionObj.updatedBy = true;
-    dashboardMongoController.addVersion(req.body.product, versionObj,function(project) {
+    dashboardMongoController.addVersion(req.body.product, versionObj, function(project) {
       res.status(201).json(project);
     }, function (err) {
       res.status(500).json({ error: 'Cannot update the project...!' });
@@ -456,8 +463,8 @@ router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res
 // Save the cadet evaluation
 router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
-    dashboardMongoController.saveEvaluation(req.body, function (eval) {
-      res.status(200).json(eval);
+    dashboardMongoController.saveEvaluation(req.body, function (evalObj) {
+      res.status(200).json(evalObj);
     }, function (err) {
       res.status(500).json({ error: 'Cannot save cadet evaluation in db...!' });
     });
@@ -473,7 +480,7 @@ router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function(req, res)
 router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   let form = new formidable.IncomingForm();
   form.parse(req, function(err, fields, files) {
-    fs.readFile(files.file.path, 'binary', (err, data) => {
+    fs.readFile(files.file.path, 'binary', (readFileError, data) => {
       try {
         let buffer = new Buffer(data, 'binary');
         let cadet = JSON.parse(fields.cadet);
@@ -493,13 +500,15 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
         }
         let imagePath = dir + cadet.EmployeeID + '.jpeg';
         logger.debug('Image Path', imagePath);
-        fs.writeFile(imagePath, data, 'binary', function(err) {
-            if (err) {throw err;}
+        fs.writeFile(imagePath, data, 'binary', function(writeFileError) {
+            if(writeFileError) {
+              throw writeFileError;
+            }
         });
         res.send(data);
       }
-      catch(err) {
-        logger.error(err);
+      catch(err1) {
+        logger.error(err1);
         res.status(500).json({
           error: 'Internal error occurred, please report...!'
         });
@@ -586,7 +595,7 @@ router.post('/updatepresent', auth.canAccess(CONFIG.CANDIDATE), function(req, re
 router.post('/present', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try{
     dashboardMongoController.updatePresent(req.body.EmployeeID, req.body.Date, function(status) {
-      dashboardMongoController.cancelLeave({id: req.body.id}, function(status) {
+      dashboardMongoController.cancelLeave({id: req.body.id}, function(cancelLeaveStatus) {
         res.status(201).json({success: 'success'});
       }, function(err) {
         res.status(500).json({ error: 'Cannot update candidate db...!'});
@@ -605,8 +614,10 @@ router.post('/present', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
 // update absent
 router.post('/absent', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try{
-    dashboardMongoController.updateAbsentees({details: req.body.details, absentee: req.body.EmployeeID}, function(status) {
-      dashboardMongoController.cancelPresent(req.body.EmployeeID, req.body.Date, function(status) {
+    dashboardMongoController.
+    updateAbsentees({details: req.body.details, absentee: req.body.EmployeeID}, function(status) {
+      dashboardMongoController.
+      cancelPresent(req.body.EmployeeID, req.body.Date, function(cancelPresentStatus) {
         res.status(201).json({success: 'success'});
       }, function(err) {
         res.status(500).json({ error: 'Cannot update candidate db...!'});
@@ -691,7 +702,8 @@ router.get('/coursesforwave', auth.canAccess(CONFIG.ADMMEN), function(req, res) 
 });
 
 // Get all candidates and tracks
-router.get('/candidatesandtracks/:waveID/:courseName', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+router.
+get('/candidatesandtracks/:waveID/:courseName', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   console.log('API HIT ===> GET Candidates And Tracks');
   try{
     dashboardMongoController.getCandidates(req.params.waveID, req.params.courseName,
@@ -772,8 +784,8 @@ router.get('/waveobject/:waveID', auth.canAccess(CONFIG.ADMMEN), function(req, r
 // Save the cadet information
 router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try {
-    dashboardMongoController.saveCandidate(req.body, function (eval) {
-      res.status(200).json(eval);
+    dashboardMongoController.saveCandidate(req.body, function (evalObj) {
+      res.status(200).json(evalObj);
     }, function (err) {
       res.status(500).json({ error: 'Cannot save cadidate in db...!' });
     });
