@@ -194,7 +194,7 @@ export default class Projects extends React.Component {
 										if(th.state.activeWaves.indexOf(project.wave) >= 0) {
 											return (
 												<ProjectCard
-													key={project.version.length}
+													key={key}
 													project={project}
 													handleUpdate={th.handleUpdate}
 													handleDelete={th.handleDelete}
@@ -221,7 +221,7 @@ export default class Projects extends React.Component {
 										if(th.state.activeWaves.indexOf(project.wave) < 0) {
 											return (
 												<ProjectCard
-													key={project.version.length}
+													key={key}
 													project={project}
 													handleUpdate={th.handleUpdate}
 													handleDelete={th.handleDelete}
@@ -247,7 +247,7 @@ export default class Projects extends React.Component {
 									this.state.projects.map(function (project, key) {
 										return (
 											<ProjectCard
-												key={project.version.length}
+												key={key}
 												project={project}
 												handleUpdate={th.handleUpdate}
 												handleDelete={th.handleDelete}
