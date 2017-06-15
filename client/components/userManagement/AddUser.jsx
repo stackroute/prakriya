@@ -11,6 +11,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Dialog from 'material-ui/Dialog';
 import Request from 'superagent';
+import app from '../../styles/app.json';
 
 const items = [
   <MenuItem key={1} value={"mentor"} primaryText="Mentor" />,
@@ -292,16 +293,18 @@ export default class AddUser extends React.Component {
           <div>
 						<TextField
 			    		hintText='Display Name'
-			    		floatingLabelText='Name'
-              errorText={this.state.nameErrorText}
+			    		floatingLabelText='Name *'
+              floatingLabelStyle={app.mandatoryField}
+			    		errorText={this.state.nameErrorText}
 			    		value={this.state.name}
 			    		onChange={this.onChangeName}
               style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
 			    	/>
 			    	<TextField
 			    		hintText='Should not be your name'
-			    		floatingLabelText='Username'
-              errorText={this.state.usernameErrorText}
+			    		floatingLabelText='Username *'
+              floatingLabelStyle={app.mandatoryField}
+			    		errorText={this.state.usernameErrorText}
 			    		value={this.state.username}
 			    		onChange={this.onChangeUsername}
 			    		disabled={this.props.openDialog}
@@ -311,8 +314,9 @@ export default class AddUser extends React.Component {
           </div>
           <div>
             <TextField
-              floatingLabelText="Password"
-              hintText="Secure your account"
+              floatingLabelText="Password *"
+              floatingLabelStyle={app.mandatoryField}
+			    		hintText="Secure your account"
               type="password"
               errorText={this.state.passwordErrorText}
               value={this.state.password}
@@ -320,8 +324,9 @@ export default class AddUser extends React.Component {
               style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
             />
             <TextField
-              floatingLabelText="Confirm Password"
-              hintText="Confirm password"
+              floatingLabelText="Confirm Password *"
+              floatingLabelStyle={app.mandatoryField}
+			    		hintText="Confirm password"
               type="password"
               errorText={this.state.cpasswordErrorText}
               value={this.state.cpassword}
@@ -332,8 +337,9 @@ export default class AddUser extends React.Component {
           <div>
 						    	<TextField
 						    		hintText="This will be unique"
-						    		floatingLabelText="Email"
-						    		value={this.state.email}
+						    		floatingLabelText="Email *"
+                    floatingLabelStyle={app.mandatoryField}
+      			    		value={this.state.email}
 						    		onChange={this.onChangeEmail}
                     errorText={this.state.emailErrorText}
                     style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', top: '-22px'}}
@@ -341,8 +347,9 @@ export default class AddUser extends React.Component {
 						    	<SelectField
                     errorText={this.state.roleErrorText}
 						        onChange={this.onChangeRole}
-						        floatingLabelText="Select Role"
-						        value={this.state.role}
+						        floatingLabelText="Select Role *"
+                    floatingLabelStyle={app.mandatoryField}
+      			    		value={this.state.role}
                     style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
         						menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
         						listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}

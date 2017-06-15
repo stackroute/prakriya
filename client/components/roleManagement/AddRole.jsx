@@ -6,6 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import {Grid, Row, Col} from 'react-flexbox-grid';
+import app from '../../styles/app.json';
 
 const styles = {
 	addButton: {
@@ -184,8 +185,9 @@ export default class AddRole extends React.Component {
 					actionsContainerStyle={styles.actionsContainer}
         >
           <TextField
-          	floatingLabelText='Role'
-          	hintText='Name a new role'
+          	floatingLabelText='Role *'
+						floatingLabelStyle={app.mandatoryField}
+						hintText='Name a new role'
 						errorText={this.state.roleErrorText}
           	onChange={this.onChangeRole}
 						style={{width: '100%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
