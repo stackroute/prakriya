@@ -24,7 +24,7 @@ let addNotification = function(email, message, successCB, errorCB) {
 		if(err) {
 			errorCB(err);
 		}
-		console.log('add results: ', result);
+		logger.debug('add results: ', result);
 		successCB(result);
 	});
 };
@@ -214,7 +214,6 @@ let addVersion = function (name, versionObj, successCB, errorCB) {
 						if(err) {
 							errorCB(err);
 						}
-						console.log(result);
 					}
 				);
 			},

@@ -38,7 +38,7 @@ module.exports = {
     //
     "comma-dangle": 2, // disallow or enforce trailing commas
     "no-cond-assign": 2, // disallow assignment in conditional expressions
-    // "no-console": 1, // disallow use of console (off by default in the node environment)
+    "no-console": 1, // disallow use of console (off by default in the node environment)
     "no-constant-condition": 2, // disallow use of constant expressions in conditions
     "no-control-regex": 2, // disallow control characters in regular expressions
     "no-debugger": 2, // disallow use of debugger
@@ -72,7 +72,7 @@ module.exports = {
     //
     "block-scoped-var": 0, // treat var statements as if they were block scoped (off by default). 0: deep destructuring is not compatible https://github.com/eslint/eslint/issues/1863
     "complexity": 0, // specify the maximum cyclomatic complexity allowed in a program (off by default)
-    // "consistent-return": 2, // require return statements to either always or never specify values
+    "consistent-return": 2, // require return statements to either always or never specify values
     "curly": 2, // specify curly brace conventions for all control statements
     "default-case": 2, // require default case in switch statements (off by default)
     "dot-notation": 2, // encourages use of dot notation whenever possible
@@ -102,7 +102,7 @@ module.exports = {
     "no-new-wrappers": 2, // disallows creating new instances of String,Number, and Boolean
     "no-octal": 2, // disallow use of octal literals
     "no-octal-escape": 2, // disallow use of octal escape sequences in string literals, such as var foo = "Copyright \251";
-    //"no-param-reassign": 2, // disallow reassignment of function parameters (off by default)
+    "no-param-reassign": 2, // disallow reassignment of function parameters (off by default)
     "no-process-env": 2, // disallow use of process.env (off by default)
     "no-proto": 2, // disallow usage of __proto__ property
     "no-redeclare": 2, // disallow declaring the same variable more then once
@@ -137,16 +137,16 @@ module.exports = {
     "no-shadow-restricted-names": 2, // disallow shadowing of names such as arguments
     "no-undef": 2, // disallow use of undeclared variables unless mentioned in a /*global */ block
     "no-undef-init": 2, // disallow use of undefined when initializing variables
-    // "no-undefined": 2, // disallow use of undefined variable (off by default)
-    //"no-unused-vars": 2, // disallow declaration of variables that are not used in the code
+    "no-undefined": 2, // disallow use of undefined variable (off by default)
+    "no-unused-vars": 2, // disallow declaration of variables that are not used in the code
     "no-use-before-define": 2, // disallow use of variables before they are defined
     //
     //Stylistic Issues
     //
     // These rules are purely matters of style and are quite subjective.
     //
-    //"indent": [1, 2], // this option sets a specific tab width for your code (off by default)
-    // "brace-style": 1, // enforce one true brace style (off by default)
+    // "indent": [1, 2], // this option sets a specific tab width for your code (off by default)
+    "brace-style": 1, // enforce one true brace style (off by default)
     "camelcase": 1, // require camel case names
     "comma-spacing": [1, {"before": false, "after": true}], // enforce spacing before and after comma
     "comma-style": [1, "last"], // enforce one true comma style (off by default)
@@ -169,7 +169,7 @@ module.exports = {
     "no-spaced-func": 1, // disallow space between function identifier and application
     "no-ternary": 0, // disallow the use of ternary operators (off by default)
     "no-trailing-spaces": 1, // disallow trailing whitespace at the end of lines
-    // "no-underscore-dangle": 1, // disallow dangling underscores in identifiers
+    "no-underscore-dangle": 1, // disallow dangling underscores in identifiers
     "no-extra-parens": 1, // disallow wrapping of non-IIFE statements in parens
     "one-var": [1, "never"], // allow just one var statement per function (off by default)
     "operator-assignment": [1, "never"], // require assignment operator shorthand where possible or prohibit it entirely (off by default)
@@ -179,10 +179,10 @@ module.exports = {
     "semi": [1, "always"], // require or disallow use of semicolons instead of ASI
     "semi-spacing": [1, {"before": false, "after": true}], // enforce spacing before and after semicolons
     "sort-vars": 0, // sort variables within the same declaration block (off by default)
-    // "keyword-spacing": [0], // require a space after certain keywords (off by default)
+    "keyword-spacing": [0], // require a space after certain keywords (off by default)
     "space-before-blocks": [1, "always"], // require or disallow space before blocks (off by default)
-    //"space-before-function-paren": [1, {"anonymous": "always", "named": "never"}], // require or disallow space before function opening parenthesis (off by default)
-    // "object-curly-spacing": [1, "never"], // require or disallow spaces inside brackets (off by default)
+    "space-before-function-paren": [1, {"anonymous": "always", "named": "never"}], // require or disallow space before function opening parenthesis (off by default)
+    "object-curly-spacing": [1, "never"], // require or disallow spaces inside brackets (off by default)
     "array-bracket-spacing": [1, "never"], // require or disallow spaces inside brackets (off by default)
     "computed-property-spacing": [1, "never"], // require or disallow spaces inside brackets (off by default)
     "space-in-parens": [1, "never"], // require or disallow spaces inside parentheses (off by default)
@@ -224,9 +224,9 @@ module.exports = {
     "react/no-did-update-set-state": 2, // Prevent usage of setState in componentDidUpdate
     "react/no-multi-comp": 0, // Prevent multiple component definition per file
     "react/no-unknown-property": 2, // Prevent usage of unknown DOM property
-    // "react/prop-types": 2, // Prevent missing props validation in a React component definition
+    "react/prop-types": 2, // Prevent missing props validation in a React component definition
     "react/react-in-jsx-scope": 2, // Prevent missing React when using JSX
-    // "react/self-closing-comp": 2, // Prevent extra closing tags for components without children
+    "react/self-closing-comp": 2, // Prevent extra closing tags for components without children
     "react/jsx-wrap-multilines": 2, // Prevent missing parentheses around multilines JSX
   }
 }

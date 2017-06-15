@@ -5,11 +5,10 @@ const async = require('async');
 const uploadMongoController = require('./uploadMongoController');
 
 let registerCandidates = function () {
-	client.brpop('fileImport', 0, function(err1, fileId) {
+	client.brpop('fileImport', 0, function (err1, fileId) {
 		let importedCadets = [];
 		let failedCadets = [];
 		let total = 0;
-		let cadetsFetched = 0;
 		try {
 			uploadMongoController.getFileById(fileId, function (fileObj) {
 				let lines = fileObj.data.split('\n');
@@ -33,7 +32,7 @@ let registerCandidates = function () {
 				});
 
 				async.each(cadetColln,
-					function(cadetObj, callback) {
+					function (cadetObj, callback) {
 						uploadMongoController.addCadet(cadetObj, function (cadet) {
 							importedCadets.push(cadet);
 							callback();
@@ -42,20 +41,20 @@ let registerCandidates = function () {
 							if(err2.name === 'MongoError') {
 								cadet.errmsg = 'Duplicate cadet error';
 								cadet.eid = cadetObj.EmployeeID;
-							}
-							else if(err2.name === 'ValidationError') {
+							} else if(err2.name === 'ValidationError') {
 								cadet.errmsg = 'Employee ID is required';
-								if(cadetObj.EmailID)
-									{cadet.eid = cadetObj.EmailID;}
-								else if(cadetObj.EmployeeName)
-									{cadet.eid = cadetObj.EmployeeName;}
+								if(cadetObj.EmailID) {
+cadet.eid = cadetObj.EmailID;
+} else if(cadetObj.EmployeeName) {
+cadet.eid = cadetObj.EmployeeName;
+}
 							}
 							failedCadets.push(cadet);
 							callback();
 						});
 					},
-					function(err3) {
-						logger.debug('Final function');
+					function (err3) {
+						logger.debug('Final function', err3);
 						fileObj.totalCadets = total;
 						fileObj.importedCadets = importedCadets.length;
 						fileObj.failedCadets = failedCadets;
@@ -67,9 +66,8 @@ let registerCandidates = function () {
 			}, function (err4) {
 				logger.error('Error while fetching File Id', err4);
 			});
-		}
-		catch(err) {
-			console.log(err);
+		} catch(err) {
+			logger.error(err);
 		}
 	});
 	setTimeout(registerCandidates, 1000);

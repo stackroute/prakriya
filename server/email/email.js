@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-const jwt = require('jsonwebtoken');
 const smtpTransport = require('nodemailer-smtp-transport');
 const logger = require('./../../applogger');
 const CONFIG = require('../../config');

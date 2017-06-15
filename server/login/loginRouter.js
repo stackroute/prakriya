@@ -1,12 +1,8 @@
 const router = require('express').Router();
-let mongoose = require('mongoose');
-
 const userModel = require('../../models/users.js');
-const passport = require('passport');
 let jwt = require('jwt-simple');
 let cfg = require('../../config');
-let auth = require('../auth')();
-
+const logger = require('./../../applogger');
 
 // router.post('/',
 //   passport.authenticate(
@@ -23,7 +19,7 @@ let auth = require('../auth')();
 
 
 // encoding tokens here!!!!!
-router.post('/', function(req, res) {
+router.post('/', function (req, res) {
     if (req.body.username && req.body.password) {
         let uname = req.body.username;
         let password = req.body.password;
@@ -32,22 +28,20 @@ router.post('/', function(req, res) {
 
         let promise = query.exec();
 
-        promise.then(function(user) {
-          console.log('User object in the loginRouter', user);
+        promise.then(function (user) {
+          logger.debug('User object in the loginRouter', user);
           if (user) {
-            if(user.role !== 'admin' && user.actions.indexOf('login') <= -1)
-            {
+            if(user.role !== 'admin' && user.actions.indexOf('login') <= -1) {
               res.send('Account suspended');
-            }
-            else {
+            } else {
               let payload = {
                   id: user._id,
                   user: user.username
               };
-              console.log(payload);
+              logger.debug(payload);
               let token = jwt.encode(payload, cfg.jwtSecret);
       // expiresIn: 10080 // in seconds});
-              console.log(token);
+              logger.debug(token);
               res.json({
                   // user: user,
                   token: 'JWT ' + token

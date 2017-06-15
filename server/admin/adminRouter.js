@@ -9,16 +9,15 @@ let CONFIG = require('../../config');
 ****************************************/
 
 // Get all the users
-router.get('/users', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.get('/users', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   console.log('API HIT!!!');
   try{
-    adminMongoController.getUsers(function(userColl) {
+    adminMongoController.getUsers(function (userColl) {
       res.status(201).json(userColl);
-    }, function(err) {
-      res.status(500).json({ error: 'Cannot get all users from db...!' });
+    }, function (err) {
+      res.status(500).json({error: 'Cannot get all users from db...!'});
     });
-  }
-  catch(err) {
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -26,77 +25,72 @@ router.get('/users', auth.canAccess(CONFIG.ADMIN), function(req, res) {
 });
 
 // Add a new user
-router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   let userObj = req.body;
   try{
-    adminMongoController.addUser(userObj, function(user) {
+    adminMongoController.addUser(userObj, function (user) {
       res.status(200).json(user);
     }, function (err) {
-      res.status(500).json({ error: 'Cannot add user in db...!' });
+      res.status(500).json({error: 'Cannot add user in db...!'});
     });
-  }
-  catch(err) {
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
   }
 });
 
-router.delete('/deleteuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.delete('/deleteuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   console.log(req.body);
   try {
     adminMongoController.deleteUser(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
-      res.status(500).json({ error: 'Cannot delete user in db...!' });
+      res.status(500).json({error: 'Cannot delete user in db...!'});
     });
-  }
-  catch(err) {
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
   }
 });
 
-router.post('/updateuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.post('/updateuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try {
     adminMongoController.updateUser(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
-      res.status(500).json({ error: 'Cannot update user in db...!' });
+      res.status(500).json({error: 'Cannot update user in db...!'});
     });
-  }
-  catch(err) {
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
   }
 });
 
-router.post('/lockuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.post('/lockuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try {
     adminMongoController.lockUser(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
-      res.status(500).json({ error: 'Cannot lock user account in db...!' });
+      res.status(500).json({error: 'Cannot lock user account in db...!'});
     });
-  }
-  catch(err) {
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
   }
 });
 
-router.post('/unlockuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.post('/unlockuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try {
     adminMongoController.unlockUser(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
-      res.status(500).json({ error: 'Cannot unlock user account in db...!' });
+      res.status(500).json({error: 'Cannot unlock user account in db...!'});
     });
-  }
-  catch(err) {
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -108,15 +102,14 @@ router.post('/unlockuser', auth.canAccess(CONFIG.ADMIN), function(req, res) {
 ****************************************/
 
 // Get all the roles
-router.get('/roles', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.get('/roles', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try{
-    adminMongoController.getRoles(function(roles) {
+    adminMongoController.getRoles(function (roles) {
       res.status(201).json(roles);
-    }, function(err) {
-      res.status(500).json({ error: 'Cannot get all roles from db...!' });
+    }, function (err) {
+      res.status(500).json({error: 'Cannot get all roles from db...!'});
     });
-  }
-  catch(err) {
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -124,15 +117,14 @@ router.get('/roles', auth.canAccess(CONFIG.ADMIN), function(req, res) {
 });
 
 // Add a new role
-router.post('/addrole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.post('/addrole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
     try {
       adminMongoController.addRole(req.body, function (role) {
         res.status(200).json(role);
       }, function (err) {
-        res.status(500).json({ error: 'Cannot add role in db...!' });
+        res.status(500).json({error: 'Cannot add role in db...!'});
       });
-    }
-    catch(err) {
+    } catch(err) {
       res.status(500).json({
         error: 'Internal error occurred, please report...!'
       });
@@ -141,15 +133,14 @@ router.post('/addrole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
 );
 
 // Update role
-router.post('/updaterole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.post('/updaterole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
     try {
       adminMongoController.updateRole(req.body, function (status) {
         res.status(200).json(status);
       }, function (err) {
-        res.status(500).json({ error: 'Cannot update role in db...!' });
+        res.status(500).json({error: 'Cannot update role in db...!'});
       });
-    }
-    catch(err) {
+    } catch(err) {
       res.status(500).json({
         error: 'Internal error occurred, please report...!'
       });
@@ -158,15 +149,14 @@ router.post('/updaterole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
 );
 
 // Delete a role
-router.delete('/deleterole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.delete('/deleterole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
     try {
       adminMongoController.deleteRole(req.body, function (status) {
         res.status(200).json(status);
       }, function (err) {
-        res.status(500).json({ error: 'Cannot delete role in db...!' });
+        res.status(500).json({error: 'Cannot delete role in db...!'});
       });
-    }
-    catch(err) {
+    } catch(err) {
       res.status(500).json({
         error: 'Internal error occurred, please report...!'
       });
@@ -179,15 +169,14 @@ router.delete('/deleterole', auth.canAccess(CONFIG.ADMIN), function(req, res) {
 ****************************************/
 
 // Get all the access controls
-router.get('/accesscontrols', auth.canAccess(CONFIG.ADMIN), function(req, res) {
+router.get('/accesscontrols', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try{
-    adminMongoController.getAccessControls(function(controls) {
+    adminMongoController.getAccessControls(function (controls) {
       res.status(201).json(controls);
-    }, function(err) {
-      res.status(500).json({ error: 'Cannot get all access controls from db...!' });
+    }, function (err) {
+      res.status(500).json({error: 'Cannot get all access controls from db...!'});
     });
-  }
-  catch(err) {
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
