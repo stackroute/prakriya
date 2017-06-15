@@ -10,6 +10,7 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import RemoveIcon from 'material-ui/svg-icons/content/remove-circle-outline';
+import app from '../../styles/app.json';
 
 const styles = {
   dialog: {
@@ -366,24 +367,27 @@ export default class CourseCard extends React.Component {
             <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
             	<TextField
     						    		hintText="Category Name"
-    						    		floatingLabelText="Category Name"
-    						    		value={this.state.AssessmentName}
+    						    		floatingLabelText="Category Name *"
+                        floatingLabelStyle={app.mandatoryField}
+          			    		value={this.state.AssessmentName}
     						    		onChange={this.onChangeAssessmentName}
     					/>
 					  </div>
             <div style={{border: '2px solid white', width: '34%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
               <TextField
     						    		hintText="Duration"
-    						    		floatingLabelText="Duration"
-    						    		value={this.state.AssessmentDuration}
+    						    		floatingLabelText="Duration *"
+                        floatingLabelStyle={app.mandatoryField}
+          			    		value={this.state.AssessmentDuration}
     						    		onChange={this.onChangeAssessmentDuration}
     					/>
             </div>
             <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
               <TextField
     		    		hintText="Mentor Name"
-    		    		floatingLabelText="Mentor"
-    		    		value={this.state.AssessmentMentor}
+    		    		floatingLabelText="Mentor *"
+                floatingLabelStyle={app.mandatoryField}
+  			    		value={this.state.AssessmentMentor}
     		    		onChange={this.onChangeAssessmentMentor}
     		    	/>
             </div>

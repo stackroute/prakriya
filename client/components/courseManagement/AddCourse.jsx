@@ -249,7 +249,8 @@ export default class AddCourse extends React.Component {
 						<div style={dialog.box50}>
 			        <TextField
 				    		hintText="Course Name"
-				    		floatingLabelText="Name"
+				    		floatingLabelText="Name *"
+								floatingLabelStyle={app.mandatoryField}
 				    		value={this.state.CourseName}
 				    		onChange={this.onChangeName}
 								errorText={this.state.CourseNameErrorText}
@@ -258,8 +259,9 @@ export default class AddCourse extends React.Component {
 						<div style={dialog.box50}>
 							<TextField
 								hintText="In Weeks"
-								floatingLabelText="Duration"
-								value={this.state.Duration}
+								floatingLabelText="Duration *"
+								floatingLabelStyle={app.mandatoryField}
+				    		value={this.state.Duration}
 								onChange={this.onChangeDuration}
 								errorText={this.state.DurationErrorText}
 							/>
@@ -269,7 +271,7 @@ export default class AddCourse extends React.Component {
 			    	<TextField
 			    		hintText="assessment"
 			    		floatingLabelText="Assessment Category"
-			    		value={this.state.AssessmentName}
+							value={this.state.AssessmentName}
 			    		onChange={this.onChangeAssessment}
 			    	/>
 			    	<IconButton tooltip="Add Assessment" onClick={this.onChangeAssessmentCategory} disabled={this.state.disableSave}>
