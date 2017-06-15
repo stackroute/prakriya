@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const logger = require('./../applogger');
 const uploadCandidates = require('./upload/uploadCandidates');
-const CONFIG = require('../config')
+const CONFIG = require('../config');
 
 let setupMongooseConnections = function() {
   mongoose.connect(CONFIG.MONGO.mongoURL);
@@ -26,20 +26,18 @@ let setupMongooseConnections = function() {
       process.exit(0);
     });
   });
-}
+};
 
 let welcome = function() {
   process.stdout.write('\n=========== Bulk Upload ===========\n');
-}
+};
 
 let startBulkUpload = function () {
-
 	welcome();
 
 	setupMongooseConnections();
 
 	uploadCandidates.registerCandidates();
-
-}
+};
 
 startBulkUpload();

@@ -1,7 +1,7 @@
 const path = require('path');
 const logger = require('./../applogger');
 
-var auth = require('./auth')();
+let auth = require('./auth')();
 const loginRoutes = require('./login');
 const dashboardRoutes = require('./dashboard');
 const adminRoutes = require('./admin');
@@ -24,22 +24,21 @@ function welcome() {
 
 // App Constructor function is exported
 module.exports = function() {
-
   welcome();
-  
+
   let app = service.createApp();
-  
+
   // app = service.setupWebpack(app);
-  
+
   app = service.setupStaticRoutes(app);
-  
+
   app = service.setupMiddlewares(app);
-  
+
   app = setupWebAppRESTRoutes(app);
-  
+
   app = service.setupRestRoutes(app);
-  
+
   service.setupMongooseConnections();
-  
+
   return app;
-}
+};
