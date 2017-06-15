@@ -256,12 +256,12 @@ export default class ProjectCard extends React.Component {
           >
             <RadioButton
               value="Project"
-              label={<span>Product:&nbsp<b>{th.state.project.product}</b></span>}
+              label={<span>Product: <b>{th.state.project.product}</b></span>}
               style={{paddingBottom:'10px'}}
             />
             <RadioButton
               value="Version"
-              label={<span>Current Version:&nbsp<b>{th.state.versionName[th.state.selectedVersionIndex]}</b></span>}
+              label={<span>Current Version: <b>{th.state.versionName[th.state.selectedVersionIndex]}</b></span>}
             />
           </RadioButtonGroup></p>
         </Dialog>
