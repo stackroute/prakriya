@@ -216,9 +216,8 @@ router.get('/projects', auth.canAccess(CONFIG.MENCAN), function (req, res) {
 router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     let projectObj = req.body;
-    projectObj.addedBy = req.user.name;
-    console.log(req.user.name);
-    dashboardMongoController.addProject(projectObj, function (project) {
+    projectObj.version[0].addedBy = req.user.name;
+    dashboardMongoController.addProject(projectObj, function(project) {
       res.status(201).json(project);
     }, function (err) {
       console.log(err);
