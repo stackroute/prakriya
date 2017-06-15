@@ -2,7 +2,7 @@ version: "2"
 services:
   web:
     image: prakriya/prakriya-platform:v1.0.0
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile
     network_mode: host
@@ -11,7 +11,7 @@ services:
       - 8080:8080
     depends_on:
       - mongodb
-      - redis  
+      - redis
     env_file:
       - ./prakriya.env
     entrypoint:
@@ -20,7 +20,7 @@ services:
       - 'npm run serve --production'
   upload:
     image: prakriya/prakriya-platform:v1.0.0
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile
     network_mode: host
@@ -39,10 +39,10 @@ services:
     network_mode: host
     restart: always
     volumes:
-     - $HOME/mongo/data:/data/db 
+     - $HOME/mongo/data:/data/db
     expose:
       - 27017
-    ports: 
+    ports:
       - "27017:27017"
   redis:
     image: smebberson/alpine-redis
@@ -51,4 +51,4 @@ services:
     expose:
       - 6379
     ports:
-      - "6379:6379"    
+      - "6379:6379"

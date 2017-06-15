@@ -1,4 +1,5 @@
 FROM mhart/alpine-node
+FROM bravissimolabs/alpine-git
 
 # Create app directory
 RUN mkdir -p /usr/src/app && echo "Prakriya"
@@ -6,7 +7,7 @@ WORKDIR /usr/src/app
 
 #Install App dependencies
 COPY package.json /usr/src/app/
-RUN npm install
+RUN npm install --production
 
 #Bundle app source
 COPY . /usr/src/app/

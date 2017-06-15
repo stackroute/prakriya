@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha",
     "start": "node ./bin/www",
-    "serve": "gulp build lint && node ./bin/www",
+    "serve": "gulp build && node ./bin/www",
+    "lint": "gulp lint",
     "upload": "node ./server/bulkUpload.service"
   },
   "author": "",
