@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const flash = require('connect-flash');
 const auth = require('./auth')();
 const CONFIG = require('../config');
-
 const logger = require('./../applogger');
 
 function createApp() {
@@ -114,16 +113,14 @@ function setupMongooseConnections() {
     });
     let saveRole = new RoleModel(CONFIG.BASEDATA.ADMIN_ROLE);
     saveRole.save(function(err, role) {
-      if(!err){
-          logger.info('Role added', role.name);
-        }
-    })
+      if(!err)
+          {logger.info('Role added', role.name);}
+    });
     let saveUser = new UserModel(CONFIG.BASEDATA.ADMIN_USER);
     saveUser.save(function(err, user) {
-      if(!err){
-          logger.info('User added', user.name);
-        }
-    })
+      if(!err)
+          {logger.info('User added', user.name);}
+    });
   });
 
   mongoose.connection.on('error', function(err) {

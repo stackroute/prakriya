@@ -18,11 +18,11 @@ const config = {
 		new webpack.HotModuleReplacementPlugin()
 	],
 	node: {
-      	child_process: 'empty',
-      	fs: 'empty',
-      	net: 'empty',
-      	tls: 'empty'
-    },
+		child_process: 'empty',
+		fs: 'empty',
+		net: 'empty',
+		tls: 'empty'
+  },
   devtool: 'cheap-module-eval-source-map',
 	module: {
 		noParse: [
@@ -35,9 +35,9 @@ const config = {
 				exclude: [/node_modules/]
 			},
 			{
-			  test: /\.css$/,
-			  loader: 'style!css?modules',
-			  include: /flexboxgrid/
+				test: /\.css$/,
+				loader: 'style!css?modules',
+				include: /flexboxgrid/
 			}
 		]
 	}
