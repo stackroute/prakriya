@@ -214,7 +214,6 @@ let addVersion = function (name, versionObj, successCB, errorCB) {
 						if(err) {
 							errorCB(err);
 						}
-						console.log(result);
 					}
 				);
 			},
