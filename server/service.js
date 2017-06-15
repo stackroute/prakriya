@@ -114,13 +114,15 @@ function setupMongooseConnections() {
     });
     let saveRole = new RoleModel(CONFIG.BASEDATA.ADMIN_ROLE);
     saveRole.save(function(err, role) {
-      if(!err)
+      if(!err){
           logger.info('Role added', role.name);
+        }
     })
     let saveUser = new UserModel(CONFIG.BASEDATA.ADMIN_USER);
     saveUser.save(function(err, user) {
-      if(!err)
+      if(!err){
           logger.info('User added', user.name);
+        }
     })
   });
 
