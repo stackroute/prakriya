@@ -53,7 +53,8 @@ let getNotifications = function(username, successCB, errorCB) {
 };
 
 let updateLastLogin = function(user, successCB, errorCB) {
-	UserModel.update({username: user.username}, {$set: {lastLogin: user.lastLogin}}, function(err, result) {
+	UserModel.
+	update({username: user.username}, {$set: {lastLogin: user.lastLogin}}, function(err, result) {
 		if(err) {
 			errorCB(err);
 		}
@@ -63,7 +64,8 @@ let updateLastLogin = function(user, successCB, errorCB) {
 };
 
 let changePassword = function(user, successCB, errorCB) {
-	UserModel.update({username: user.username}, {$set: {password: user.password}}, function(err, result) {
+	UserModel.
+	update({username: user.username}, {$set: {password: user.password}}, function(err, result) {
 		if(err) {
 			errorCB(err);
 		}
@@ -88,12 +90,15 @@ let addWave = function (waveObj, successCB, errorCB) {
 			{errorCB(err);}
 		else {
 			async.each(result.Cadets,
-			  function(cadetID, callback) {
-			    CandidateModel.findOneAndUpdate({EmployeeID: cadetID}, {$set: {Wave: result.WaveID}}, function(err, user) {
-						if(err)
-							{errorCB(err);}
-						else
-						{
+				function(cadetID, callback) {
+					CandidateModel.
+					findOneAndUpdate(
+						{EmployeeID: cadetID},
+						{$set: {Wave: result.WaveID}},
+						function(err1, user) {
+						if(err1) {
+							errorCB(err1);
+						} else {
 							userObj.name = user.EmployeeName;
 							userObj.email = user.EmailID;
 							userObj.username = user.EmailID.split('@')[0];
@@ -102,15 +107,15 @@ let addWave = function (waveObj, successCB, errorCB) {
 							adminMongoController.addUser(userObj, function (savedUser) {
 								logger.info('User created', user.EmployeeName);
 								callback();
-							}, function (err) {
-								logger.error('Error in creating user', err);
+							}, function (err2) {
+								logger.error('Error in creating user', err2);
 							});
 						}
 					});
-			  },
-			  function(err) {
-			  	successCB(result);
-			  }
+				},
+				function(err3) {
+					successCB(result);
+				}
 			);
 		}
 	});
@@ -164,60 +169,113 @@ let addProject = function (projectObj, successCB, errorCB) {
 				errorCB(err);}
 		else
 		{
-			projectObj.version[length-1].members.map(function(member) {
-				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.version[length-1].name,ProjectDescription: projectObj.version[length-1].description,ProjectSkills: projectObj.version[length-1].skills}},function(err,result){
-					if(err)
-						{errorCB(err);}
-					console.log(result);
-				});
+			projectObj.version[length - 1].members.map(function(member) {
+				CandidateModel.
+				update(
+					{EmployeeID: member.EmployeeID},
+					{$set:
+						{
+							ProjectName: projectObj.version[length - 1].name,
+							ProjectDescription: projectObj.version[length - 1].description,
+							ProjectSkills: projectObj.version[length - 1].skills
+						}
+					},
+					function(updateError, updateResult) {
+						if(updateError) {
+							errorCB(updateError);
+						}
+						console.log(updateResult);
+					}
+				);
 			},
 					successCB(result));
 		}
-	})
-}
-
-let addVersion = function (name, versionObj,successCB, errorCB) {
-	console.log(versionObj,"versionObj")
-	ProjectModel.update({product:name},{$push:{version: versionObj}},function (err, result) {
-		if(err)
-			errorCB(err);
-			else
-			{
-				versionObj.members.map(function(member) {
-					CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: versionObj.name,ProjectDescription: versionObj.description,ProjectSkills: versionObj.skills}},function(err,result){
-						if(err)
-							errorCB(err)
-						console.log(result);
-					})
-				},
-						successCB(result))
-			}
 	});
-}
+};
 
-let updateProject = function (projectObj,delList, prevWave, version, successCB, errorCB) {
+let addVersion = function (name, versionObj, successCB, errorCB) {
+	console.log(versionObj, 'versionObj');
+	ProjectModel.update({product: name}, {$push: {version: versionObj}}, function (err, result) {
+		if(err) {
+			errorCB(err);
+		} else {
+			versionObj.members.map(function(member) {
+				CandidateModel.
+				update(
+					{EmployeeID: member.EmployeeID},
+					{$set:
+						{
+							ProjectName: versionObj.name,
+							ProjectDescription: versionObj.description,
+							ProjectSkills: versionObj.skills
+						}
+					},
+					function(updateError2, updateResult2) {
+						if(err) {
+							errorCB(err);
+						}
+						console.log(result);
+					}
+				);
+			},
+			successCB(result));
+		}
+	});
+};
+
+let updateProject = function (projectObj, delList, prevWave, version, successCB, errorCB) {
 	let proj = projectObj.version[version];
 	console.log(proj);
-	ProjectModel.findOneAndUpdate({version:{$elemMatch:{"name":proj.name}}},{$set:{'version.$':proj}},function (err, result) {
-		if(err)
-			{errorCB(err);}
-		else
-		{
+	ProjectModel.
+	findOneAndUpdate(
+		{version: {$elemMatch: {name: proj.name}}},
+		{$set: {'version.$': proj}},
+		function (err, result) {
+		if(err) {
+			errorCB(err);
+		} else {
 			projectObj.version[version].members.map(function(member) {
-				CandidateModel.update({EmployeeID:member.EmployeeID},{$set:{ProjectName: projectObj.version[version].name,ProjectDescription: projectObj.version[version].description,ProjectSkills: projectObj.version[version].skills}},function(err,result){
-					if(err)
-						{errorCB(err);}
+				CandidateModel.
+				update(
+					{EmployeeID: member.EmployeeID},
+					{$set:
+						{
+							ProjectName: projectObj.version[version].name,
+							ProjectDescription: projectObj.version[version].description,
+							ProjectSkills: projectObj.version[version].skills
+						}
+					},
+					function(updateError3, updateResult3) {
+					if(err) {
+						errorCB(err);
+					}
 					console.log(result);
 				});
 			},
-			CandidateModel.updateMany({EmployeeID: {$in: delList}}, {$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}}, function(err, result) {
-					if(err)
-						{errorCB(err);}
+			CandidateModel.
+			updateMany(
+				{EmployeeID: {$in: delList}},
+				{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
+				function(updateManyError, updateManyResult) {
+					if(err) {
+						errorCB(err);
+					}
 					console.log(result);
-				}, CandidateModel.updateMany({$and: [{ProjectName: projectObj.name}, {Wave: prevWave}]}, {$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}}, function(err, result) {
-					if(err)
-						{errorCB(err);}
-					successCB(result);
+				},
+				CandidateModel.
+				updateMany(
+					{$and:
+						[
+							{ProjectName: projectObj.name},
+							{Wave: prevWave}
+						]
+					},
+					{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
+					function(updateManyError2, updateManyResult2) {
+					if(updateManyError2) {
+						errorCB(updateManyError2);
+					}
+					successCB(updateManyResult2);
 				})
 				)
 			);
@@ -226,35 +284,50 @@ let updateProject = function (projectObj,delList, prevWave, version, successCB, 
 };
 
 let deleteVersion = function (versionObj, successCB, errorCB) {
-	console.log("version"+versionObj)
-	ProjectModel.update({version:{$elemMatch:{"name":versionObj.name}}},{$pull:{version:{"name":versionObj.name}}}, function (err, result) {
-		if(err)
-			{console.log(err, 'err');}
-		else
-		{
-			CandidateModel.updateMany({ProjectName: versionObj.name}, {$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}}, function(err, result) {
-					if(err)
-						{errorCB(err);}
-					console.log(result);
-					successCB(result);
+	console.log('version' + versionObj);
+	ProjectModel.update(
+		{version: {$elemMatch: {name: versionObj.name}}},
+		{$pull: {version: {name: versionObj.name}}},
+		function (err, result) {
+		if(err) {
+			console.log(err, 'err');
+		} else {
+			CandidateModel.
+			updateMany(
+				{ProjectName: versionObj.name},
+				{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
+				function(updateManyError3, updateManyResult3) {
+					if(updateManyError3) {
+						errorCB(updateManyError3);
+					}
+					successCB(updateManyResult3);
 				});
 		}
 	});
-}
+};
 
 let deleteProject = function (projectObj, successCB, errorCB) {
-	ProjectModel.remove({'product': projectObj.product}, function (err, result) {
-		if(err)
-			{console.log(err, 'err');}
-		else
-		{
-			projectObj.version.map(function(version){
-				CandidateModel.updateMany({ProjectName: version.name}, {$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}}, function(err, result) {
-						if(err)
-							{errorCB(err);}
-						console.log(result);
+	ProjectModel.remove({product: projectObj.product}, function (err, result) {
+		if(err) {
+			console.log(err, 'err');
+		} else {
+			projectObj.version.map(function(version) {
+				CandidateModel.
+				updateMany(
+					{ProjectName: version.name},
+					{$set:
+						{
+							ProjectName: '',
+							ProjectDescription: '',
+							ProjectSkills: []
+						}
+					},
+					function(updateManyError4, updateManyResult4) {
+						if(updateManyError4) {
+							errorCB(updateManyError4);
+						}
 					});
-			},successCB(result));
+			}, successCB(result));
 		}
 	});
 };
@@ -308,8 +381,8 @@ let updateCadets = function (cadetArr, successCB, errorCB) {
 		CandidateModel.update({EmployeeID: cadetObj.EmployeeID}, cadetObj, function(err, status) {
 			if(err)
 				{errorCB(err);}
-			count++;
-			if(count == cadetArr.length)
+			count = count + 1;
+			if(count === cadetArr.length)
 				{successCB(status);}
 		});
 	});
@@ -327,21 +400,32 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
 				user.name = cadetObj.EmployeeName;
 				user.email = cadetObj.EmailID;
 				user.username = cadetObj.EmailID.split('@')[0];
-				adminMongoController.deleteUser(user, function (status) {
-		      WaveModel.update({Cadets: cadetObj.EmployeeID}, {$pull: {Cadets: cadetObj.EmployeeID}}, function (err, result) {
-		      	if(err)
-		      		{errorCB(err);}
-		      	else {
-		      		ProjectModel.update({members: {$elemMatch: {EmployeeID: cadetObj.EmployeeID}}}, {$pull: {members: {EmployeeID: cadetObj.EmployeeID}}}, function (err, result) {
-		      			if(err)
-				      		{errorCB(err);}
-					      	successCB(result);
-					      });
-		      	}
-		      });
-		    }, function (err) {
-		      errorCB(err);
-		    });
+				adminMongoController.deleteUser(user, function (deleteUserStatus) {
+					WaveModel.
+					update(
+						{Cadets: cadetObj.EmployeeID},
+						{$pull: {Cadets: cadetObj.EmployeeID}},
+						function (errr, resultt) {
+							if(errr) {
+							errorCB(errr);
+						} else {
+							ProjectModel.
+							update(
+								{members:
+									{$elemMatch: {EmployeeID: cadetObj.EmployeeID}}},
+									{$pull: {members: {EmployeeID: cadetObj.EmployeeID}}},
+									function (er, result) {
+										if(er) {
+									errorCB(er);
+								}
+								successCB(result);
+							});
+						}
+					});
+				},
+				function (erR) {
+					errorCB(erR);
+				});
 			}
 		});
 };
@@ -394,21 +478,27 @@ let getWaveSpecificCandidates = function(waveID, successCB, errorCB) {
 
 // update absentees
 let updateAbsentees = function(Absentees, successCB, errorCB) {
-	CandidateModel.updateMany({EmployeeID: Absentees.absentee}, {$push: {DaysAbsent: Absentees.details}}, function(err, result) {
-		if(err) {
-			console.log('error' + err);
-			errorCB(err);
+	CandidateModel.
+	updateMany(
+		{EmployeeID: Absentees.absentee},
+		{$push: {DaysAbsent: Absentees.details}},
+		function(err, result) {
+			if(err) {
+				console.log('error' + err);
+				errorCB(err);
+			}
+			console.log(result);
+			successCB(result);
 		}
-		console.log(result);
-		successCB(result);
-	});
+	);
 };
 
 // cancel Leave
 let cancelLeave = function(details, successCB, errorCB) {
-	if(details.id != '') {
+	if(details.id !== '') {
 	let id = new mongoose.mongo.ObjectId(details.id);
-	CandidateModel.update({'DaysAbsent._id': id}, {$pull: {DaysAbsent: {_id: id}}}, function(err, result) {
+	CandidateModel.
+	update({'DaysAbsent._id': id}, {$pull: {DaysAbsent: {_id: id}}}, function(err, result) {
 		if(err) {
 			console.log('error' + err);
 			errorCB(err);
@@ -424,13 +514,18 @@ else {
 
 let updateApproval = function(Approval, successCB, errorCB) {
 	let id = new mongoose.mongo.ObjectId(Approval.id);
-	CandidateModel.update({'DaysAbsent._id': id}, {$set: {'DaysAbsent.$.approved': Approval.approval}}, function(err, result) {
-		if(err) {
-			console.log('error' + err);
-			errorCB(err);
+	CandidateModel.
+	update(
+		{'DaysAbsent._id': id},
+		{$set: {'DaysAbsent.$.approved': Approval.approval}},
+		function(err, result) {
+			if(err) {
+				console.log('error' + err);
+				errorCB(err);
+			}
+			successCB(result);
 		}
-		successCB(result);
-	});
+	);
 };
 
 
@@ -524,22 +619,28 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 			{errorCB(err);}
 		else
 		{
-			CandidateModel.find({EmployeeID: {$in: waveObj.Cadets}}, function(err, cadets) {
+			CandidateModel.find({EmployeeID: {$in: waveObj.Cadets}}, function(ERR, cadets) {
 				cadets.map(function(cadetObj) {
 				let user = {};
 				user.name = cadetObj.EmployeeName;
 				user.email = cadetObj.EmailID;
 				user.username = cadetObj.EmailID.split('@')[0];
 				adminMongoController.deleteUser(user, function (status) {
-		 				if(err)
-		 					{console.log(err);}
-		 				console.log('...........' + status);
-		    });
-		    });
+					if(err) {
+						console.log(err);
+					}
+					console.log('...........' + status);
+				});
+			});
 			},
-				CandidateModel.updateMany({EmployeeID: {$in: waveObj.Cadets}}, {$set: {Wave: undefined}}, function(err, res) {
-					if(err)
-						{console.log(err);}
+				CandidateModel.
+				updateMany(
+					{EmployeeID: {$in: waveObj.Cadets}},
+					{$set: {Wave: undefined}},
+					function(eRR, res) {
+					if(eRR) {
+						console.log(eRR);
+					}
 					successCB(result);
 				})
 			);
@@ -570,8 +671,8 @@ let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 							userObj.role = 'candidate';
 							adminMongoController.addUser(userObj, function (savedUser) {
 								logger.info('User created', user.EmployeeName);
-							}, function (err) {
-								logger.error('Error in creating user', err);
+							}, function (Err) {
+								logger.error('Error in creating user', Err);
 							});
 						}
 					});
@@ -579,11 +680,15 @@ let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 };
 
 let getAbsentees = function(successCB, errorCB) {
-	CandidateModel.find({DaysAbsent: {$elemMatch: {$or: [{approved: 'no'}, {approved: 'rejected'}]}}}, function(err, cadets) {
-		if(err)
-			{errorCB(err);}
-		successCB(cadets);
-	});
+	CandidateModel.
+	find(
+		{DaysAbsent: {$elemMatch: {$or: [{approved: 'no'}, {approved: 'rejected'}]}}},
+		function(err, cadets) {
+			if(err)
+				{errorCB(err);}
+			successCB(cadets);
+		}
+	);
 };
 
 /** **************************************************
@@ -599,7 +704,8 @@ let getFilteredCandidates = function(filterQuery, successCB, errorCB) {
 };
 
 let updatePresent = function(EmpID, present, successCB, errorCB) {
-	CandidateModel.update({EmployeeID: EmpID}, {$push: {DaysPresent: present}}, function(err, candidates) {
+	CandidateModel.
+	update({EmployeeID: EmpID}, {$push: {DaysPresent: present}}, function(err, candidates) {
 		if(err)
 			{errorCB(err);}
 		successCB(candidates);
@@ -607,7 +713,8 @@ let updatePresent = function(EmpID, present, successCB, errorCB) {
 };
 
 let cancelPresent = function(EmpID, date, successCB, errorCB) {
-	CandidateModel.update({EmployeeID: EmpID}, {$pull: {DaysPresent: date}}, function(err, candidates) {
+	CandidateModel.
+	update({EmployeeID: EmpID}, {$pull: {DaysPresent: date}}, function(err, candidates) {
 		if(err)
 			{errorCB(err);}
 		console.log(candidates);
