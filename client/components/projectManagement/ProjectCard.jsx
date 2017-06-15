@@ -24,6 +24,7 @@ import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
 import MoreVertIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
+import dialog from '../../styles/dialog.json';
 
 const styles = {
   text: {
@@ -35,18 +36,6 @@ const styles = {
     textDecoration: 'underline',
     color: 'blue'
   },
-  dialog: {
-    backgroundColor: '#DDDBF1',
-    borderBottom: '10px solid teal',
-    borderRight: '10px solid teal',
-    borderLeft: '10px solid teal'
-  },
-  dialogTitle: {
-    fontWeight: 'bold',
-    backgroundColor: 'teal',
-    color: '#DDDBF1',
-    textAlign: 'center'
-  },
   col: {
     marginBottom: 20,
     marginRight: -20,
@@ -54,24 +43,7 @@ const styles = {
   },
   grid: {
     width: '100%'
-  },
-  deleteDialog: {
-    backgroundColor: '#DDDBF1',
-    border: '10px solid teal'
-  },
-  actionsContainer: {
-    backgroundColor: 'teal',
-    borderTop: '0px',
-    marginTop: '0px'
-  },
-  actionButton: {
-    backgroundColor: '#DDDBF1',
-    width: '50%',
-    color: 'teal',
-    border: '1px solid teal',
-    height: '100%'
   }
-
 };
 
 export default class ProjectCard extends React.Component {
@@ -199,12 +171,12 @@ export default class ProjectCard extends React.Component {
       detail = this.state.project.version[this.state.selectedVersionIndex].addedBy + ' added ' + this.formatDate(this.state.project.version[this.state.selectedVersionIndex].addedOn)
     }
     const deleteDialogActions = [ < FlatButton label = 'Cancel' style = {
-        styles.actionButton
+        dialog.actionButton
       }
       onTouchTap = {
         this.closeDeleteDialog
       } />, < FlatButton label = 'Delete' style = {
-        styles.actionButton
+        dialog.actionButton
       }
       onClick = {
         this.handleDeleteProject
@@ -256,7 +228,7 @@ export default class ProjectCard extends React.Component {
           </IconButton>
         </Card>
         {this.state.dialog && th.getCadets(this.props.project.version[this.state.selectedVersionIndex].name)}
-        <Dialog bodyStyle={styles.dialog} title='TEAM MEMBERS' titleStyle={styles.dialogTitle} open={this.state.dialogOpen} autoScrollBodyContent={true} onRequestClose={this.handleClose}>
+        <Dialog bodyStyle={dialog.body} title='TEAM MEMBERS' titleStyle={dialog.title} open={this.state.dialogOpen} autoScrollBodyContent={true} onRequestClose={this.handleClose}>
           <Grid style={styles.grid}>
             <Row>
               {this.state.cadets.length > 0
@@ -273,8 +245,8 @@ export default class ProjectCard extends React.Component {
 }
         {this.state.newVersionDialog && <ProjectDialog project={this.props.project} version={th.state.selectedVersionIndex} showAddVersion={false} openDialog={this.state.newVersionDialog} handleAddVersion={this.addVersion} handleClose={this.handleClose} dialogTitle={'ADD VERSION'}/>
 }
-        <Dialog bodyStyle={styles.deleteDialog} actions={deleteDialogActions} modal={false} actionsContainerStyle={styles.actionsContainer} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
-          Wanna delete the whole project or this particular version?
+        <Dialog bodyStyle={dialog.confirmBox} actions={deleteDialogActions} modal={false} actionsContainerStyle={dialog.actionsContainer} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
+          Wanna delete the whole product or this particular version?
           <p>
           <RadioButtonGroup
             name="selected"
@@ -284,12 +256,12 @@ export default class ProjectCard extends React.Component {
           >
             <RadioButton
               value="Project"
-              label={<span>Project:<b>{th.state.project.product}</b></span>}
+              label={<span>Product:&nbsp<b>{th.state.project.product}</b></span>}
               style={{paddingBottom:'10px'}}
             />
             <RadioButton
               value="Version"
-              label={<span>Current Version:<b>{th.state.versionName[th.state.selectedVersionIndex]}</b></span>}
+              label={<span>Current Version:&nbsp<b>{th.state.versionName[th.state.selectedVersionIndex]}</b></span>}
             />
           </RadioButtonGroup></p>
         </Dialog>
