@@ -115,13 +115,13 @@ function setupMongooseConnections() {
     let saveRole = new RoleModel(CONFIG.BASEDATA.ADMIN_ROLE);
     saveRole.save(function(err, role) {
       if(!err)
-          logger.info('Role added', role.name);
-    })
+          {logger.info('Role added', role.name);}
+    });
     let saveUser = new UserModel(CONFIG.BASEDATA.ADMIN_USER);
     saveUser.save(function(err, user) {
       if(!err)
-          logger.info('User added', user.name);
-    })
+          {logger.info('User added', user.name);}
+    });
   });
 
   mongoose.connection.on('error', function(err) {
