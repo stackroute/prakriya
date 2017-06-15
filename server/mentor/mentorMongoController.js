@@ -8,9 +8,10 @@ const WaveModel = require('../../models/waves.js');
 
 let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 	console.log('candidate obj from client side', candidateObj);
-	CandidateModel.update({EmployeeID: candidateObj.EmployeeID}, candidateObj, function(err, status) {
-		if(err)
-			{errorCB(err);}
+	CandidateModel.update({EmployeeID: candidateObj.EmployeeID}, candidateObj, function (err, status) {
+		if(err) {
+errorCB(err);
+}
 		successCB(status);
 	});
 };
@@ -20,10 +21,11 @@ let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 ****************************************************/
 
 
-let getCourses = function(successCB, errorCB) {
-	CourseModel.find({}, function(err, result) {
-		if (err)
-				{errorCB(err);}
+let getCourses = function (successCB, errorCB) {
+	CourseModel.find({}, function (err, result) {
+		if (err) {
+errorCB(err);
+}
 		successCB(result);
 	});
 };
@@ -36,9 +38,10 @@ let updateCourse = function (CourseObj, successCB, errorCB) {
 			AssessmentCategories: CourseObj.AssessmentCategories,
 			Duration: CourseObj.Duration, History: CourseObj.History}
 		},
-		function(err, status) {
-		if(err)
-			{errorCB(err);}
+		function (err, status) {
+		if(err) {
+errorCB(err);
+}
 		successCB(status);
 	});
 };
@@ -46,32 +49,35 @@ let updateCourse = function (CourseObj, successCB, errorCB) {
 let addCourse = function (CourseObj, successCB, errorCB) {
 	console.log(CourseObj);
 	let CourseModelObj = new CourseModel(CourseObj);
-	CourseModelObj.save(function(err, status) {
-		if(err)
-			{errorCB(err);}
+	CourseModelObj.save(function (err, status) {
+		if(err) {
+errorCB(err);
+}
 		successCB(status);
 	});
 };
 
-let deleteCourse = function(courseObj, successCB, errorCB) {
+let deleteCourse = function (courseObj, successCB, errorCB) {
 	CourseModel.
-	update({CourseID: courseObj.CourseID}, {$set: {Removed: true}}, function(err, status) {
-		if(err)
-			{errorCB(err);}
+	update({CourseID: courseObj.CourseID}, {$set: {Removed: true}}, function (err, status) {
+		if(err) {
+errorCB(err);
+}
 		successCB(status);
 	});
 };
 
-let restoreCourse = function(restoreObj, successCB, errorCB) {
+let restoreCourse = function (restoreObj, successCB, errorCB) {
 	CourseModel.
-	updateMany({CourseName: {$in: restoreObj}}, {$set: {Removed: false}}, function(err, status) {
-		if(err)
-			{errorCB(err);}
+	updateMany({CourseName: {$in: restoreObj}}, {$set: {Removed: false}}, function (err, status) {
+		if(err) {
+errorCB(err);
+}
 		successCB(status);
 	});
 };
 
-let addCategory = function(object, successCB, errorCB) {
+let addCategory = function (object, successCB, errorCB) {
 	let categoryObj = object.Categories;
 	CourseModel.
 	update({CourseID: object.CourseID},
@@ -88,14 +94,15 @@ let addCategory = function(object, successCB, errorCB) {
 				}
 			}
 		},
-		function(err, status) {
-			if(err)
-				{errorCB(err);}
+		function (err, status) {
+			if(err) {
+errorCB(err);
+}
 			successCB(status);
 		});
 };
 
-let deleteCategory = function(object, successCB, errorCB) {
+let deleteCategory = function (object, successCB, errorCB) {
 	let categoryObj = object.Categories;
 	CourseModel.
 	update(
@@ -113,9 +120,10 @@ let deleteCategory = function(object, successCB, errorCB) {
 				}
 			}
 		},
-		function(err, status) {
-			if(err)
-				{errorCB(err);}
+		function (err, status) {
+			if(err) {
+errorCB(err);
+}
 			successCB(status);
 		}
 	);
@@ -125,8 +133,8 @@ let deleteCategory = function(object, successCB, errorCB) {
 *******          Program Flow           ********
 ***********************************************/
 
-let getWaveObject = function(trainingTrack, waveNumber, successCB, errorCB) {
-	WaveModel.findOne({TrainingTrack: trainingTrack, WaveNumber: waveNumber}, function(err, result) {
+let getWaveObject = function (trainingTrack, waveNumber, successCB, errorCB) {
+	WaveModel.findOne({TrainingTrack: trainingTrack, WaveNumber: waveNumber}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
@@ -134,7 +142,7 @@ let getWaveObject = function(trainingTrack, waveNumber, successCB, errorCB) {
 	});
 };
 
-let addNewSession = function(object, successCB, errorCB) {
+let addNewSession = function (object, successCB, errorCB) {
 	let timeStamp = new Date().getTime();
 	console.log('addNewSession: ' + JSON.stringify(object));
 	WaveModel.findOneAndUpdate(
@@ -153,7 +161,7 @@ let addNewSession = function(object, successCB, errorCB) {
 					Remarks: object.session.Remarks
 				}
 			}
-		}, function(err, result) {
+		}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
@@ -161,7 +169,7 @@ let addNewSession = function(object, successCB, errorCB) {
 	});
 };
 
-let updateSession = function(object, successCB, errorCB) {
+let updateSession = function (object, successCB, errorCB) {
 	console.log('updateSession: ', JSON.stringify(object));
 	WaveModel.findOneAndUpdate(
 		{
@@ -172,7 +180,7 @@ let updateSession = function(object, successCB, errorCB) {
 			$set: {
 				'Sessions.$': object.session
 			}
-		}, function(err, result) {
+		}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
@@ -180,7 +188,7 @@ let updateSession = function(object, successCB, errorCB) {
 	});
 };
 
-let deleteSession = function(object, successCB, errorCB) {
+let deleteSession = function (object, successCB, errorCB) {
 	console.log('deleteSession: ', JSON.stringify(object));
 	WaveModel.update(
 		{
@@ -191,7 +199,7 @@ let deleteSession = function(object, successCB, errorCB) {
 			$pull: {
 				Sessions: object.session
 			}
-		}, function(err, result) {
+		}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		}

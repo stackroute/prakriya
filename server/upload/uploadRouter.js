@@ -9,9 +9,9 @@ const dashboardMongoController = require('../dashboard/dashboardMongoController'
 let auth = require('../auth')();
 let CONFIG = require('../../config');
 
-router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 	let form = new formidable.IncomingForm();
-	form.parse(req, function(err1, fields, files) {
+	form.parse(req, function (err1, fields, files) {
 		fs.readFile(files.file.path, 'utf8', (err2, data) => {
 			try {
 				let fileObj = {};
@@ -21,15 +21,15 @@ router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) 
 				fileObj.submittedOn = Date.now();
 				fileObj.status = 'processing';
 				fileObj.addedBy = req.user.name;
-				console.log('FileObj created', fileObj);
+				logger.debug('FileObj created', fileObj);
 				uploadMongoController.addFile(fileObj, function (file) {
 					client.rpush('fileImport', file.fileId);
 					res.status(200).json(file);
 				}, function (err3) {
-					res.status(500).json({ error: 'Cannot add role in db...!' });
+					logger.error(err3)
+					res.status(500).json({error: 'Cannot add role in db...!'});
 				});
-			}
-			catch(err4) {
+			} catch(err4) {
 				res.status(500).json({
 				error: 'Internal error occurred, please report...!'
 				});
@@ -38,10 +38,9 @@ router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) 
 	});
 });
 
-router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
-	console.log('API HIT...');
+router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 	let form = new formidable.IncomingForm();
-	form.parse(req, function(err1, fields, files) {
+	form.parse(req, function (err1, fields, files) {
 		fs.readFile(files.file.path, 'utf8', (err2, data) => {
 			try {
 				let lines = data.split('\n');
@@ -53,25 +52,25 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res)
 						let cadetObj = {};
 						headers.map(function (head, key) {
 							if(key > 0) {
-								if(lineCol[key] !== '')
-									{cadetObj[head] = lineCol[key];}
+								if(lineCol[key] !== '') {
+cadetObj[head] = lineCol[key];
+}
 							}
 						});
 						cadetColln.push(cadetObj);
 					}
 				});
-				console.log('Uploaded Cadets', cadetColln);
-				cadetColln.map(function (cadet, i) {
+				cadetColln.map(function (cadet) {
 					dashboardMongoController.updateCadet(cadet, function (status) {
+						logger.debug('Status of the update cadet', status);
 						logger.info('Remarks updated for ', cadet.EmployeeID);
 					}, function (err3) {
 						logger.error('Error while saving remarks', err3);
 					});
 				});
 				res.status(200).json({status: 'Remarks updated'});
-			}
-			catch(err4) {
-				console.log('Error', err4);
+			} catch(err4) {
+				logger.error('Error', err4);
 				res.status(500).json({
 					error: 'Internal error occurred, please report...!'
 				});
