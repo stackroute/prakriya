@@ -9,6 +9,7 @@ import {lightBlack} from 'material-ui/styles/colors'
 import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
+import app from '../../styles/app.json';
 
 const styles = {
 	dialog: {
@@ -260,6 +261,10 @@ export default class Session extends React.Component {
 			this.setState({
 				ActivitiesErrorText: 'This field cannot be empty'
 			})
+		} else if(this.state.session.ContextSetSession.trim().length == 0) {
+			this.setState({
+				ContextSetSessionErrorText: 'This field cannot be empty'
+			})
 		} else if(this.state.session.SessionBy.trim().length == 0) {
 			this.setState({
 				SessionByErrorText: 'This field cannot be empty'
@@ -339,16 +344,18 @@ export default class Session extends React.Component {
 			<div>
 				<div style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', display: 'inline-block'}}>
 	      <TextField
-								floatingLabelText='Week Number'
-								value={th.state.session.Week}
+								floatingLabelText='Week Number *'
+								floatingLabelStyle={app.mandatoryField}
+				    		value={th.state.session.Week}
 								onChange={th.handleWeek}
 								onBlur={th.enableSave}
 								errorText={this.state.WeekErrorText}
 				/></div>
 				<div style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', display: 'inline-block'}}>
 				<TextField
-								floatingLabelText='Status'
-								value={th.state.session.Status}
+								floatingLabelText='Status *'
+								floatingLabelStyle={app.mandatoryField}
+				    		value={th.state.session.Status}
 								onChange={th.handleStatus}
 								onBlur={th.enableSave}
 								errorText={this.state.StatusErrorText}
@@ -357,8 +364,9 @@ export default class Session extends React.Component {
 			<div>
 				<div style={{width: '100%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', display: 'inline-block'}}>
 				<TextField
-								floatingLabelText='Activities'
-								value={th.state.session.Activities}
+								floatingLabelText='Activities *'
+								floatingLabelStyle={app.mandatoryField}
+				    		value={th.state.session.Activities}
 								onChange={th.handleActivities}
 								onBlur={th.enableSave}
 								errorText={this.state.ActivitiesErrorText}
@@ -368,8 +376,9 @@ export default class Session extends React.Component {
 			<div>
 				<div style={{width: '33%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', display: 'inline-block'}}>
 					<TextField
-									floatingLabelText='ContextSetSession'
-									value={th.state.session.ContextSetSession}
+									floatingLabelText='ContextSetSession *'
+									floatingLabelStyle={app.mandatoryField}
+					    		value={th.state.session.ContextSetSession}
 									onChange={th.handleContextSetSession}
 									onBlur={th.enableSave}
 									errorText={this.state.ContextSetSessionErrorText}
@@ -377,11 +386,12 @@ export default class Session extends React.Component {
 				</div>
 				<div style={{width: '34%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', display: 'inline-block'}}>
 					<TextField
-								floatingLabelText='SessionBy'
-								value={th.state.session.SessionBy}
+								floatingLabelText='SessionBy *'
+								floatingLabelStyle={app.mandatoryField}
+				    		value={th.state.session.SessionBy}
 								onChange={th.handleSessionBy}
 								onBlur={th.enableSave}
-								errorText={this.state.SetSessionByErrorText}
+								errorText={this.state.SessionByErrorText}
 					/>
 				</div>
 				<div style={{width: '33%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', display: 'inline-block'}}>

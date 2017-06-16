@@ -137,7 +137,7 @@ module.exports = {
     "no-shadow-restricted-names": 2, // disallow shadowing of names such as arguments
     "no-undef": 2, // disallow use of undeclared variables unless mentioned in a /*global */ block
     "no-undef-init": 2, // disallow use of undefined when initializing variables
-    "no-undefined": 2, // disallow use of undefined variable (off by default)
+    // "no-undefined": 2, // disallow use of undefined variable (off by default)
     "no-unused-vars": 2, // disallow declaration of variables that are not used in the code
     "no-use-before-define": 2, // disallow use of variables before they are defined
     //
@@ -206,7 +206,7 @@ module.exports = {
     //
     "max-depth": [2, 3], // specify the maximum depth that blocks can be nested (off by default)
     "max-len": [2, 100, 2], // specify the maximum length of a line in your program (off by default)
-    "max-params": [2, 5], // limits the number of parameters that can be used in the function declaration. (off by default)
+    // "max-params": [2, 5], // limits the number of parameters that can be used in the function declaration. (off by default)
     "max-statements": 0, // specify the maximum number of statement allowed in a function (off by default)
     "no-bitwise": 0, // disallow use of bitwise operators (off by default)
     "no-plusplus": 2, // disallow use of unary operators, ++ and -- (off by default)

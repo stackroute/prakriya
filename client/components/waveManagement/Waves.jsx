@@ -55,17 +55,15 @@ export default class Waves extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			tab: 'All',
+			tab: 'Ongoing',
 			currentPage: 1,
 			cadets: [],
 			waves : [],
 			displayWaves: [],
-			filteredWaves: [],
-			activeWaves: []
+			filteredWaves: []
 		}
 		this.getCadets = this.getCadets.bind(this);
 		this.getWaves = this.getWaves.bind(this);
-		this.getActiveWaves = this.getActiveWaves.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
 		this.handleUpdate = this.handleUpdate.bind(this);
 		this.addWave = this.addWave.bind(this);
@@ -74,7 +72,6 @@ export default class Waves extends React.Component {
 	}
 
 	componentWillMount() {
-		this.getActiveWaves();
 		this.getCadets();
 		this.getWaves();
 	}
@@ -99,23 +96,6 @@ export default class Waves extends React.Component {
 		  })
 	}
 
-	getActiveWaves() {
-		let th = this
-		Request
-			.get('/dashboard/activewaves')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res) {
-				if(err)
-					console.log(err);
-				else {
-					console.log('Successfully fetched all active waves', res.body)
-					th.setState({
-						activeWaves: res.body
-					})
-				}
-			})
-	}
-
 	getWaves() {
 		let th = this;
 		Request
@@ -126,18 +106,16 @@ export default class Waves extends React.Component {
 		    	console.log(err);
 		    else {
 		    	console.log('Successfully fetched all waves', res.body)
-		    	function compare(a,b) {
-					  if (a.StartDate < b.StartDate)
-					    return -1;
-					  if (a.StartDate > b.StartDate)
-					    return 1;
-					  return 0;
-					}
-					res.body.sort(compare);
+					let filteredWaves = [];
+					res.body.map(function(wave, key) {
+						let today = Date.now();
+							if(new Date(wave.StartDate) <= today && new Date(wave.EndDate) >= today)
+								filteredWaves.push(wave)
+					});
 		    	th.setState({
 		    		waves: res.body,
-						filteredWaves: res.body,
-						displayWaves: res.body.slice(0, 3)
+						filteredWaves: filteredWaves,
+						displayWaves: filteredWaves.slice(0, 3)
 		    	})
 		    }
 			})
@@ -194,7 +172,6 @@ export default class Waves extends React.Component {
 		    	})
 		    	th.getCadets();
 		    	th.getWaves();
-		    	th.getActiveWaves();
 		    }
 			});
 	}
@@ -204,7 +181,8 @@ export default class Waves extends React.Component {
 		let filteredWaves = [];
 		if(tab === 'Ongoing') {
 			this.state.waves.map(function(wave, key) {
-				if(th.state.activeWaves.indexOf(wave.WaveID) >= 0)
+				let today = Date.now();
+				if(new Date(wave.StartDate) <= today && new Date(wave.EndDate) >= today)
 					filteredWaves.push(wave)
 			});
 			this.setState({
@@ -215,7 +193,7 @@ export default class Waves extends React.Component {
 			console.log('Ongoing: ', filteredWaves);
 		} else if(tab === 'Upcoming') {
 			this.state.waves.map(function(wave, key) {
-				if(new Date(wave.StartDate) > Date.now())
+				if(new Date(wave.StartDate) > Date.now() || wave.StartDate === null)
 					filteredWaves.push(wave)
 			});
 			this.setState({
@@ -224,13 +202,17 @@ export default class Waves extends React.Component {
 				pageNumber: 1
 			});
 			console.log('Upcoming: ', filteredWaves);
-		} else if(tab === 'All') {
+		} else if(tab === 'Completed') {
+			this.state.waves.map(function(wave, key) {
+				if(new Date(wave.EndDate) < Date.now()  && wave.StartDate !== null)
+					filteredWaves.push(wave)
+			});
 			this.setState({
-				filteredWaves: th.state.waves,
-				displayWaves: th.state.waves.slice(0, 3),
+				filteredWaves: filteredWaves,
+				displayWaves: filteredWaves.slice(0, 3),
 				pageNumber: 1
 			});
-			console.log('All: ', th.state.waves);
+			console.log('Completed: ', filteredWaves);
 		}
 		this.setState({
 			tab: tab
@@ -293,7 +275,7 @@ export default class Waves extends React.Component {
 					<Tab label='Upcoming Waves' style={styles.tab} value='Upcoming'>
 						{displayPage}
 					</Tab>
-					<Tab label='All Waves' style={styles.tab}  value='All'>
+					<Tab label='Completed Waves' style={styles.tab}  value='Completed'>
 						{displayPage}
 					</Tab>
 				</Tabs></Row></Grid>

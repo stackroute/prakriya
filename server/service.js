@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const flash = require('connect-flash');
 const auth = require('./auth')();
 const CONFIG = require('../config');
-
 const logger = require('./../applogger');
 
 function createApp() {

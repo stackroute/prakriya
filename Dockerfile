@@ -1,5 +1,9 @@
 FROM mhart/alpine-node
 
+RUN apk update && \
+    apk add git && \
+    apk add python build-base
+
 # Create app directory
 RUN mkdir -p /usr/src/app && echo "Prakriya"
 WORKDIR /usr/src/app

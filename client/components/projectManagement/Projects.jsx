@@ -4,7 +4,6 @@ import {Grid, Row, Col} from 'react-flexbox-grid'
 import ProjectDialog from './ProjectDialog.jsx'
 import ProjectCard from './ProjectCard.jsx'
 import Masonry from 'react-masonry-component'
-import {Tabs, Tab} from 'material-ui/Tabs'
 
 const styles = {
 	heading: {
@@ -12,21 +11,6 @@ const styles = {
 	},
 	col: {
 		marginBottom: 20
-	},
-	tabs: {
-		border: '2px solid teal'
-	},
-	tab: {
-		color: '#DDDBF1',
-		fontWeight: 'bold'
-	},
-	inkBar: {
-		backgroundColor: '#DDDBF1',
-		height: '5px',
-		bottom: '5px'
-	},
-	tabItemContainer: {
-		backgroundColor: 'teal'
 	},
 	masonry: {
 		width: '1200px'
@@ -50,38 +34,19 @@ export default class Projects extends React.Component {
 				product: " ",
 				description: " ",
 				version:[]
-			},
-			activeWaves: []
+			}
 		}
 		this.getProjects = this.getProjects.bind(this)
-		this.getActiveWaves = this.getActiveWaves.bind(this)
 		this.addProject = this.addProject.bind(this)
 		this.handleUpdate = this.handleUpdate.bind(this)
 		this.handleDelete = this.handleDelete.bind(this)
 		this.addVersion = this.addVersion.bind(this)
 	}
 	componentWillMount() {
-		this.getActiveWaves()
 		 this.getProjects()
 
 	}
 
-	getActiveWaves() {
-		let th = this
-		Request
-			.get('/dashboard/activewaves')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	console.log('Successfully fetched all active waves')
-		    	th.setState({
-		    		activeWaves: res.body
-		    	})
-		    }
-			})
-	}
 	getProjects() {
 		console.log("inside getproj in proj")
     let th = this
@@ -171,17 +136,12 @@ export default class Projects extends React.Component {
 	}
 
 	render() {
-
 		let th = this;
 				return(
 			<div>
 				<h2 style={styles.heading}>Product Management</h2>
 				<ProjectDialog addProject={this.addProject} dialogTitle={'ADD PRODUCT'}/>
-				<Grid><Row md={10}><Tabs
-					style={styles.tabs}
-					tabItemContainerStyle={styles.tabItemContainer}
-					inkBarStyle={styles.inkBar}>
-					<Tab label='Ongoing Products' style={styles.tab}>
+				<Grid><Row md={10}>
 						<Masonry
 							className={'my-class'}
 							elementType={'ul'}
@@ -191,7 +151,6 @@ export default class Projects extends React.Component {
 								{
 									this.state.projects.length > 0 ?
 									th.state.projects.map(function (project, key) {
-										if(th.state.activeWaves.indexOf(project.wave) >= 0) {
 											return (
 												<ProjectCard
 													key={key}
@@ -202,65 +161,10 @@ export default class Projects extends React.Component {
 													bgColor={backgroundColors[key%4]}
 												/>
 											)
-										}
 									}):
 									<span>No projects to display</span>
 								}
-						</Masonry>
-					</Tab>
-					<Tab label='Completed Products' style={styles.tab}>
-						<Masonry
-							className={'my-class'}
-							elementType={'ul'}
-							options={masonryOptions}
-							style={styles.masonry}
-						>
-								{
-									this.state.projects.length > 0 ?
-									this.state.projects.map(function (project, key) {
-										if(th.state.activeWaves.indexOf(project.wave) < 0) {
-											return (
-												<ProjectCard
-													key={key}
-													project={project}
-													handleUpdate={th.handleUpdate}
-													handleDelete={th.handleDelete}
-													handleAddVersion={th.addVersion}
-													bgColor={backgroundColors[key%4]}
-												/>
-											)
-										}
-									}):
-									<span>No projects to display</span>
-								}
-						</Masonry>
-					</Tab>
-					<Tab label='All Products' style={styles.tab}>
-						<Masonry
-							className={'my-class'}
-							elementType={'ul'}
-							options={masonryOptions}
-							style={styles.masonry}
-						>
-								{
-									this.state.projects.length > 0 ?
-									this.state.projects.map(function (project, key) {
-										return (
-											<ProjectCard
-												key={key}
-												project={project}
-												handleUpdate={th.handleUpdate}
-												handleDelete={th.handleDelete}
-												handleAddVersion={th.addVersion}
-												bgColor={backgroundColors[key%4]}
-											/>
-										)
-									}):
-									<span>No projects to display</span>
-								}
-						</Masonry>
-					</Tab>
-				</Tabs></Row></Grid>
+						</Masonry></Row></Grid>
 			</div>
 		)
 	}

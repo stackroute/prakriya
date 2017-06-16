@@ -1,16 +1,20 @@
 const CandidateModel = require('../../models/candidates.js');
 const CourseModel = require('../../models/courses.js');
 const WaveModel = require('../../models/waves.js');
+const logger = require('./../../applogger');
 
 /** ************************************************
 *******          AssessmentTrack           ********
 ***************************************************/
 
 let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
-	console.log('candidate obj from client side', candidateObj);
-	CandidateModel.update({EmployeeID: candidateObj.EmployeeID}, candidateObj, function (err, status) {
+	logger.info('candidate obj from client side', candidateObj);
+	CandidateModel.
+		update({EmployeeID: candidateObj.EmployeeID},
+		candidateObj,
+		function (err, status) {
 		if(err) {
-errorCB(err);
+				errorCB(err);
 }
 		successCB(status);
 	});
@@ -47,7 +51,7 @@ errorCB(err);
 };
 
 let addCourse = function (CourseObj, successCB, errorCB) {
-	console.log(CourseObj);
+	logger.info(CourseObj);
 	let CourseModelObj = new CourseModel(CourseObj);
 	CourseModelObj.save(function (err, status) {
 		if(err) {
@@ -144,7 +148,7 @@ let getWaveObject = function (trainingTrack, waveNumber, successCB, errorCB) {
 
 let addNewSession = function (object, successCB, errorCB) {
 	let timeStamp = new Date().getTime();
-	console.log('addNewSession: ' + JSON.stringify(object));
+	logger.info('addNewSession: ' + JSON.stringify(object));
 	WaveModel.findOneAndUpdate(
 		{WaveID: object.waveID},
 		{$push:
@@ -170,7 +174,7 @@ let addNewSession = function (object, successCB, errorCB) {
 };
 
 let updateSession = function (object, successCB, errorCB) {
-	console.log('updateSession: ', JSON.stringify(object));
+	logger.info('updateSession: ', JSON.stringify(object));
 	WaveModel.findOneAndUpdate(
 		{
 			WaveID: object.waveID,
@@ -189,7 +193,7 @@ let updateSession = function (object, successCB, errorCB) {
 };
 
 let deleteSession = function (object, successCB, errorCB) {
-	console.log('deleteSession: ', JSON.stringify(object));
+	logger.info('deleteSession: ', JSON.stringify(object));
 	WaveModel.update(
 		{
 			WaveID: object.waveID,
