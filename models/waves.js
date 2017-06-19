@@ -13,7 +13,7 @@ const sessionSchema = new Schema({
   Remarks: String
 })
 
-const cadetSchema = newSchema({
+const cadetSchema = new Schema({
   CadetID: Number,
   Course: String
 })

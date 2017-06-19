@@ -10,6 +10,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import app from '../../styles/app.json';
 import dialog from '../../styles/dialog.json';
 import select from '../../styles/select.json';
+import CONFIG from '../../config';
 
 export default class AddWave extends React.Component {
 	constructor(props) {
@@ -17,6 +18,7 @@ export default class AddWave extends React.Component {
 		this.state = {
 			open: false,
 			cadets: [],
+			Mode: '',
 			WaveNumber: '',
 			WaveNumberErrorText: '',
 			Location: '',
@@ -27,6 +29,7 @@ export default class AddWave extends React.Component {
 		this.handleOpen = this.handleOpen.bind(this)
 		this.handleClose = this.handleClose.bind(this)
 		this.handleWaveNumberChange = this.handleWaveNumberChange.bind(this)
+		this.handleModeChange = this.handleModeChange.bind(this)
 		this.handleLocationChange = this.handleLocationChange.bind(this)
 		this.handleStartDateChange = this.handleStartDateChange.bind(this)
 		this.handleEndDateChange = this.handleEndDateChange.bind(this)
@@ -56,6 +59,12 @@ export default class AddWave extends React.Component {
 				this.handleSubmit()
 			}
 		}
+	}
+
+	handleModeChange(event, key, val) {
+		this.setState({
+			Mode: val
+		})
 	}
 
 	handleWaveNumberChange(event) {
@@ -166,6 +175,32 @@ export default class AddWave extends React.Component {
           autoScrollBodyContent={true}
         >
 				<div>
+					<div style={dialog.box50}>
+						<SelectField
+		          floatingLabelText="Mode"
+		          value={this.state.Mode}
+		          onChange={this.handleModeChange}
+		        >
+		        	{
+		        		CONFIG.MODES.map(function(mode, i) {
+		        			return <MenuItem value={mode} primaryText={mode} key={i}/>
+		        		})
+		        	}
+		        </SelectField>
+					</div>
+					<div style={dialog.box50}>
+						<SelectField
+		          floatingLabelText="Course"
+		          value={this.state.Course}
+		          onChange={this.handleModeChange}
+		        >
+		        	{
+		        		CONFIG.MODES.map(function(mode, i) {
+		        			return <MenuItem value={mode} primaryText={mode} key={i}/>
+		        		})
+		        	}
+		        </SelectField>
+					</div>
 					<div style={dialog.box100}>
 			    <TextField
 			      hintText="Provide some name to the wave"

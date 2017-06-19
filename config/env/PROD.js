@@ -146,18 +146,6 @@ let email = {
   SERVICE_PROVIDER: 'Gmail'
 }
 
-let locations = [
-  'Koramangala',
-  'RO',
-  'Gharebavipalya'
-];
-
-let modes = [
-  'Hybrid',
-  'Immersive',
-  'Online'
-];
-
 let config = {
   PRAKRIYA: prakriya,
   MONGO: mongo,
@@ -167,8 +155,6 @@ let config = {
   CANDIDATE_TEMPLATE: candidate_template,
   REMARKS_TEMPLATE: remarks_template,
   EMAIL: email,
-  MODES: modes,
-  LOCATIONS: locations,
   jwtSecret: 'MyS3cr3tK3Y',
   jwtSession: {
     session: false
