@@ -108,27 +108,27 @@ let basedata = {
 
 let candidate_template = [[
   "Sl. No.",
-  "EmployeeID", 
-  "EmployeeName", 
-  "EmailID", 
+  "EmployeeID",
+  "EmployeeName",
+  "EmailID",
   "DigiThonQualified",
-  "Selected", 
-  "Remarks", 
-  "CareerBand", 
+  "Selected",
+  "Remarks",
+  "CareerBand",
   "RevisedBU",
-  "DigiThonPhase", 
-  "DigiThonScore", 
-  "TrainingStatus", 
-  "TrainingsUndergone", 
-  "WorkExperience", 
-  "MentorTrack", 
-  "TrainingTrack", 
-  "Wave", 
-  "CourseName", 
-  "AcademyTrainingSkills", "StartDate", "EndDate", "CostCenter", "PrimarySupervisor", 
-  "ProjectSupervisor", 
-  "College", 
-  "CGPA", 
+  "DigiThonPhase",
+  "DigiThonScore",
+  "TrainingStatus",
+  "TrainingsUndergone",
+  "WorkExperience",
+  "MentorTrack",
+  "TrainingTrack",
+  "Wave",
+  "CourseName",
+  "AcademyTrainingSkills", "StartDate", "EndDate", "CostCenter", "PrimarySupervisor",
+  "ProjectSupervisor",
+  "College",
+  "CGPA",
   "Date"
 ]]
 
@@ -146,6 +146,18 @@ let email = {
   SERVICE_PROVIDER: 'Gmail'
 }
 
+let locations = [
+  'Koramangala',
+  'RO',
+  'Gharebavipalya'
+];
+
+let modes = [
+  'Hybrid',
+  'Immersive',
+  'Online'
+];
+
 let config = {
   PRAKRIYA: prakriya,
   MONGO: mongo,
@@ -155,7 +167,9 @@ let config = {
   CANDIDATE_TEMPLATE: candidate_template,
   REMARKS_TEMPLATE: remarks_template,
   EMAIL: email,
-  jwtSecret: "MyS3cr3tK3Y",
+  MODES: modes,
+  LOCATIONS: locations,
+  jwtSecret: 'MyS3cr3tK3Y',
   jwtSession: {
     session: false
   },
