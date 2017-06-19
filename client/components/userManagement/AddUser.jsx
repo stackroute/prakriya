@@ -21,13 +21,7 @@ const items = [
 ];
 
 const styles = {
-    addButton: {
-      position:'fixed',
-      bottom: '60px',
-      right: '15px',
-      zIndex: 1
-    },
-  	dialog: {
+    dialog: {
   		backgroundColor: '#DDDBF1',
   		borderLeft: '10px solid teal',
       borderRight: '10px solid teal',
@@ -276,7 +270,7 @@ export default class AddUser extends React.Component {
 		}
 		return(
 			<div>
-					<FloatingActionButton style={styles.addButton} mini={true} onTouchTap={this.handleOpen} >
+					<FloatingActionButton style={app.fab} mini={true} onTouchTap={this.handleOpen} >
 			      <ContentAdd />
 			    </FloatingActionButton>
 		    <Dialog

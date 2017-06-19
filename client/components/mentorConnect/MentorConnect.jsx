@@ -30,8 +30,8 @@ const styles = {
 		marginBottom: 20
 	},
 	sliderVal: {
-		textAlign: 'left', 
-		marginTop: -20, 
+		textAlign: 'left',
+		marginTop: -20,
 		marginBottom: 40
 	}
 }
@@ -143,7 +143,7 @@ export default class MentorConnect extends React.Component {
 		    	console.log('After slider selected')
 		    }
 			});
-	}  
+	}
 	addWave(wave) {
 		let th = this;
 		Request
@@ -205,6 +205,7 @@ export default class MentorConnect extends React.Component {
 	}
 
 	render() {
+		console.log(this.state.user.role+"role"+this.state.cadets.length+"length")
 		let th = this;
 		let cadetsName = [];
 		this.state.cadets.map(function (cadet, i) {

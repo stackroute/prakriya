@@ -537,7 +537,7 @@ export default class ProjectDialog extends React.Component {
 
 		return(
 		<div>
-			<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen}>
+			<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen}>
 	      <ContentAdd />
 	    </FloatingActionButton>
 	    <Dialog
