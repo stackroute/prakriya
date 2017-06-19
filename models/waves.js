@@ -1,7 +1,7 @@
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-var subSchema = new Schema({
+const sessionSchema = new Schema({
   SessionID: Number,
   CourseName: String,
   Week: Number,
@@ -13,16 +13,20 @@ var subSchema = new Schema({
   Remarks: String
 })
 
-var wave = new Schema({
+const cadetSchema = newSchema({
+  CadetID: Number,
+  Course: String
+})
+
+const wave = new Schema({
   WaveID: {type: String, unique: true},
-  WaveNumber: String,
-  TrainingTrack: String,
+  Mode: String,
   CourseNames: [String],
   StartDate: Date,
   EndDate: Date,
   Location: String,
-  Cadets: [Number],
-  Sessions: [subSchema]
+  Cadets: [cadetSchema],
+  Sessions: [sessionSchema]
 });
 
 module.exports = mongoose.model('Wave', wave);
