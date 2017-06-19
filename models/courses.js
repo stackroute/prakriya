@@ -23,7 +23,7 @@ let Session = new Schema({
 // ID: Name_Mode
 // Duration is in number of weeks
 let courses = new Schema({
-  ID: {type: Number, unique: true},
+  ID: {type: String, unique: true},
   Name: String,
   Mode: String,
   Duration: Number,
