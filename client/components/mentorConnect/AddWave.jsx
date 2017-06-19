@@ -178,7 +178,6 @@ export default class AddWave extends React.Component {
 
 	render() {
 		let th = this;
-		console.log('here')
 		const dialogActions = [
       <FlatButton
         label="Cancel"

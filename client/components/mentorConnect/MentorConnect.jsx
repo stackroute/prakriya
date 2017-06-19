@@ -205,7 +205,6 @@ export default class MentorConnect extends React.Component {
 	}
 
 	render() {
-		console.log(this.state.user.role+"role"+this.state.cadets.length+"length")
 		let th = this;
 		let cadetsName = [];
 		this.state.cadets.map(function (cadet, i) {
