@@ -60,25 +60,12 @@ export default class MentorConnect extends React.Component {
 	}
 
 	componentWillMount() {
-		this.getUser();
+		this.setState({
+			user: this.props.user
+		})
 		this.getCadets();
 	}
 
-	getUser() {
-		let th = this
-		Request
-			.get('/dashboard/user')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res){
-				if(err)
-					console.log(err)
-				else {
-					th.setState({
-						user: res.body
-					})
-				}
-			})
-	}
 	getCadets() {
 		let th = this;
 		Request
