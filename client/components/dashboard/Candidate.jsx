@@ -8,7 +8,6 @@ export default class Candidate extends React.Component {
 	render() {
 		return (
 			<div>
-				Hello
 			</div>
 		)
 	}
