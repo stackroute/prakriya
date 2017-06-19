@@ -539,6 +539,15 @@ let saveCandidate = function (candidate, successCB, errorCB) {
 	});
 };
 
+let getCourses = function (successCB, errorCB) {
+	CourseModel.find({}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
+
 let getCoursesForWave = function (waveID, successCB, errorCB) {
 	WaveModel.findOne({WaveID: waveID}, 'CourseNames', function (err, result) {
 		if(err) {
@@ -745,6 +754,7 @@ module.exports = {
 	getWaveSpecificCandidates,
 	updateAbsentees,
 	saveCandidate,
+	getCourses,
 	getCoursesForWave,
 	getCandidates,
 	getAssesmentTrack,

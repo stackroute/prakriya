@@ -18,6 +18,7 @@ export default class AddWave extends React.Component {
 		this.state = {
 			open: false,
 			cadets: [],
+			courses: [],
 			Mode: '',
 			WaveNumber: '',
 			WaveNumberErrorText: '',
@@ -41,7 +42,8 @@ export default class AddWave extends React.Component {
 
 	componentWillMount() {
 		this.setState({
-			cadets: this.props.cadets
+			cadets: this.props.cadets,
+			courses: this.props.courses
 		})
 	}
 
@@ -104,7 +106,6 @@ export default class AddWave extends React.Component {
 	handleSubmit() {
 		let wave = {}
 		wave.WaveID = this.state.WaveNumber.replace(' ', '');
-		wave.WaveNumber = this.state.WaveNumber
 		wave.Location = this.state.Location
 		wave.StartDate = this.state.StartDate
 		wave.EndDate = this.state.EndDate
@@ -190,9 +191,15 @@ export default class AddWave extends React.Component {
 					</div>
 					<div style={dialog.box50}>
 						<SelectField
+							hintText="Select Courses"
 		          floatingLabelText="Course"
 		          value={this.state.Course}
-		          onChange={this.handleModeChange}
+		          onChange={this.handleCourseChange}
+		          menuItemStyle={select.menu}
+							listStyle={select.list}
+							style={{width: '100%'}}
+							selectedMenuItemStyle={select.selectedMenu}
+							maxHeight={600}
 		        >
 		        	{
 		        		CONFIG.MODES.map(function(mode, i) {

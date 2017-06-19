@@ -58,10 +58,12 @@ export default class Waves extends React.Component {
 			tab: 'Ongoing',
 			currentPage: 1,
 			cadets: [],
+			courses: [],
 			waves : [],
 			displayWaves: [],
 			filteredWaves: []
 		}
+		this.getCourses = this.getCourses.bind(this);
 		this.getCadets = this.getCadets.bind(this);
 		this.getWaves = this.getWaves.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
@@ -72,6 +74,7 @@ export default class Waves extends React.Component {
 	}
 
 	componentWillMount() {
+		this.getCourses();
 		this.getCadets();
 		this.getWaves();
 	}
@@ -105,7 +108,6 @@ export default class Waves extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully fetched all waves', res.body)
 					let filteredWaves = [];
 					res.body.map(function(wave, key) {
 						let today = Date.now();
@@ -119,6 +121,23 @@ export default class Waves extends React.Component {
 		    	})
 		    }
 			})
+	}
+
+	getCourses() {
+		let th = this;
+		Request
+			.get('/dashboard/courses')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	th.setState({
+		    		courses: res.body
+		    	})
+		    	console.log('Courses', res.body)
+		    }
+		  })
 	}
 
 	handleUpdate(wave) {
