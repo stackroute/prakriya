@@ -26,7 +26,7 @@ router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res)
 					client.rpush('fileImport', file.fileId);
 					res.status(200).json(file);
 				}, function (err3) {
-					logger.error(err3)
+					logger.error(err3);
 					res.status(500).json({error: 'Cannot add role in db...!'});
 				});
 			} catch(err4) {

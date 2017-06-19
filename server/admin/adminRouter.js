@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const users = require('../../models/users.js');
 const adminMongoController = require('./adminMongoController');
 let auth = require('../auth')();
 let CONFIG = require('../../config');
+const logger = require('./../../applogger');
 
 /** **************************************
 *******          Users           ********
@@ -10,11 +10,11 @@ let CONFIG = require('../../config');
 
 // Get all the users
 router.get('/users', auth.canAccess(CONFIG.ADMIN), function (req, res) {
-  console.log('API HIT!!!');
   try{
     adminMongoController.getUsers(function (userColl) {
       res.status(201).json(userColl);
     }, function (err) {
+      logger.error('Error', err);
       res.status(500).json({error: 'Cannot get all users from db...!'});
     });
   } catch(err) {
@@ -31,6 +31,7 @@ router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
     adminMongoController.addUser(userObj, function (user) {
       res.status(200).json(user);
     }, function (err) {
+      logger.error('Error', err);
       res.status(500).json({error: 'Cannot add user in db...!'});
     });
   } catch(err) {
@@ -41,11 +42,11 @@ router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
 });
 
 router.delete('/deleteuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
-  console.log(req.body);
   try {
     adminMongoController.deleteUser(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
+      logger.error('Error', err);
       res.status(500).json({error: 'Cannot delete user in db...!'});
     });
   } catch(err) {
@@ -60,6 +61,7 @@ router.post('/updateuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
     adminMongoController.updateUser(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
+      logger.error('Error', err);
       res.status(500).json({error: 'Cannot update user in db...!'});
     });
   } catch(err) {
@@ -74,6 +76,7 @@ router.post('/lockuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
     adminMongoController.lockUser(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
+      logger.error('Error', err);
       res.status(500).json({error: 'Cannot lock user account in db...!'});
     });
   } catch(err) {
@@ -88,6 +91,7 @@ router.post('/unlockuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
     adminMongoController.unlockUser(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
+      logger.error('Error', err);
       res.status(500).json({error: 'Cannot unlock user account in db...!'});
     });
   } catch(err) {
@@ -107,6 +111,7 @@ router.get('/roles', auth.canAccess(CONFIG.ADMIN), function (req, res) {
     adminMongoController.getRoles(function (roles) {
       res.status(201).json(roles);
     }, function (err) {
+      logger.error('Error', err);
       res.status(500).json({error: 'Cannot get all roles from db...!'});
     });
   } catch(err) {
@@ -122,6 +127,7 @@ router.post('/addrole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
       adminMongoController.addRole(req.body, function (role) {
         res.status(200).json(role);
       }, function (err) {
+        logger.error('Error', err);
         res.status(500).json({error: 'Cannot add role in db...!'});
       });
     } catch(err) {
@@ -138,6 +144,7 @@ router.post('/updaterole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
       adminMongoController.updateRole(req.body, function (status) {
         res.status(200).json(status);
       }, function (err) {
+        logger.error('Error', err);
         res.status(500).json({error: 'Cannot update role in db...!'});
       });
     } catch(err) {
@@ -154,6 +161,7 @@ router.delete('/deleterole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
       adminMongoController.deleteRole(req.body, function (status) {
         res.status(200).json(status);
       }, function (err) {
+        logger.error('Error', err);
         res.status(500).json({error: 'Cannot delete role in db...!'});
       });
     } catch(err) {
@@ -174,6 +182,7 @@ router.get('/accesscontrols', auth.canAccess(CONFIG.ADMIN), function (req, res) 
     adminMongoController.getAccessControls(function (controls) {
       res.status(201).json(controls);
     }, function (err) {
+      logger.error('Error', err);
       res.status(500).json({error: 'Cannot get all access controls from db...!'});
     });
   } catch(err) {

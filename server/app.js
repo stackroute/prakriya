@@ -1,6 +1,4 @@
-const path = require('path');
-const logger = require('./../applogger');
-
+// const logger = require('./../applogger');
 let auth = require('./auth')();
 const loginRoutes = require('./login');
 const dashboardRoutes = require('./dashboard');
@@ -23,7 +21,7 @@ function welcome() {
 }
 
 // App Constructor function is exported
-module.exports = function() {
+module.exports = function () {
   welcome();
 
   let app = service.createApp();
