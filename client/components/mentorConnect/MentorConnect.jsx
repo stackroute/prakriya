@@ -227,7 +227,7 @@ export default class MentorConnect extends React.Component {
 				          onChange={this.handleSliderChange}
 				        />
 				        <div style={styles.sliderVal}>
-				        	<span>Digihon Score above {this.state.slider}</span>
+				        	<span>Digithon Score above {this.state.slider}</span>
 				        	<span style={{float: 'right'}}>
 				        		<FlatButton
 				        			label="Select Cadets"
