@@ -192,8 +192,11 @@ export default class AddWave extends React.Component {
     ];
 		return(
 			<div>
+				<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen} >
+		      <ContentAdd/>
+		    </FloatingActionButton>
 				<Dialog
-					bodyStyle={styles.dialog}
+					bodyStyle={app.dialog}
           title="ADD A NEW WAVE"
 					titleStyle={dialog.title}
           actions={dialogActions}
@@ -291,9 +294,6 @@ export default class AddWave extends React.Component {
 		      </SelectField>
 				</div>
         </Dialog>
-				<FloatingActionButton mini={true} style={dialog.fab} onTouchTap={this.handleOpen} >
-		      <ContentAdd />
-		    </FloatingActionButton>
 			</div>
 		)
 	}

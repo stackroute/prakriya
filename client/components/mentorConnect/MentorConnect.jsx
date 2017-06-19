@@ -30,8 +30,8 @@ const styles = {
 		marginBottom: 20
 	},
 	sliderVal: {
-		textAlign: 'left', 
-		marginTop: -20, 
+		textAlign: 'left',
+		marginTop: -20,
 		marginBottom: 40
 	}
 }
@@ -130,7 +130,7 @@ export default class MentorConnect extends React.Component {
 		    	console.log('After slider selected')
 		    }
 			});
-	}  
+	}
 	addWave(wave) {
 		let th = this;
 		Request

@@ -10,7 +10,7 @@ const styles = {
 		marginTop: 2
 	},
 	radioBtn: {
-		display: 'flex', 
+		display: 'flex',
 		width: 100
 	}
 }
@@ -67,6 +67,8 @@ export default class CadetItem extends React.Component {
 
 	render() {
 		let color = this.state.cadet.Selected == 'Yes' ? '#9effa6' : '#ffd1d1'
+		let skills = (<span><strong>Skills: </strong>
+		{this.state.cadet.AcademyTrainingSkills}</span>);
 		if(this.state.cadet.Selected == 'Yes')
 			color = '#f0ff93'
 		else if(this.state.cadet.Selected == 'DS')
@@ -129,6 +131,8 @@ export default class CadetItem extends React.Component {
 								<br/>
 								<strong>Work Exp: </strong>
 								{this.state.cadet.WorkExperience}
+								<br/>
+								{ this.state.cadet.AcademyTrainingSkills && skills }
 							</div>
 						}
 					</Col>

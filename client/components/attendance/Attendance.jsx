@@ -26,29 +26,12 @@ import Calendar from './Calendar.jsx';
 
 const styles = {
   content: {
-    marginLeft: '25%'
+    marginLeft: '30%'
   },
   row: {
     wordWrap: 'break-word'
   }
 }
-
-const events = [
-    {
-        start: '2015-07-20',
-        end: '2015-07-02',
-        eventClasses: 'optionalEvent',
-        title: 'test event',
-        description: 'This is a test description of an event',
-    },
-    {
-        start: '2015-07-19',
-        end: '2015-07-25',
-        title: 'test event',
-        description: 'This is a test description of an event',
-        data: 'you can add what ever random data you may want to use later',
-    },
-];
 
 export default class Attendance extends React.Component {
   constructor(props) {
@@ -71,7 +54,9 @@ export default class Attendance extends React.Component {
       WaveIds: [],
       cadetsOfWave: [],
       WaveID: '',
-      Date: ''
+      Date: '',
+      startDate: '',
+      endDate: ''
     }
     this.handleSelect = this.handleSelect.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -94,6 +79,7 @@ export default class Attendance extends React.Component {
     this.updatePresent = this.updatePresent.bind(this);
     this.handlePresent = this.handlePresent.bind(this);
     this.updateAbsent = this.updateAbsent.bind(this);
+    this.getWave = this.getWave.bind(this);
   }
 
   componentWillMount() {
@@ -184,6 +170,22 @@ export default class Attendance extends React.Component {
         console.log(err);
       else {
         th.setState({cadet: res.body})
+        th.getWave(res.body.Wave);
+      }
+    })
+  }
+
+  getWave(waveID) {
+    let th = this;
+    Request.get(`/dashboard/wave?waveid=${waveID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log(res.body);
+        th.setState({
+          startDate: res.body.StartDate,
+          endDate: res.body.EndDate
+        })
       }
     })
   }
@@ -333,7 +335,10 @@ export default class Attendance extends React.Component {
       const {finished, stepIndex} = this.state;
       if (th.state.cadet != null) {
         let attendance = '';
+        let mark = true;
         let today = this.formatDate(new Date());
+        if((new Date() > new Date(th.state.startDate)) && (new Date() < new Date(th.state.endDate)))
+        {
         let todayAttendance = false;
         this.state.cadet.DaysPresent.map(function(date) {
           if (today === th.formatDate(date))
@@ -360,10 +365,16 @@ export default class Attendance extends React.Component {
             )
           }
         }
+        }
+        else {
+          mark = false;
+          attendance = (<h2 style={{marginLeft:'100px', color: 'green'}}><br/>Attendance can be marked only during the training.</h2>)
+        }
         return (
           <div>
             <h1 style={styles.content}>ATTENDANCE</h1>
-            <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
+            {!mark && attendance}
+            {mark && <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
               <Tab label="Apply Leave" value={0}>
                 <Stepper activeStep={stepIndex} orientation="vertical" style={styles.content}>
                   <Step>
@@ -435,7 +446,7 @@ export default class Attendance extends React.Component {
                 {attendance}
               </Tab>
             </Tabs>
-
+          }
           </div>
         )
       } else {
