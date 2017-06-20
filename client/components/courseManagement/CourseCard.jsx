@@ -131,14 +131,17 @@ export default class CourseCard extends React.Component {
     	let date = history[1].split(' : ');
     	history[1] = date[0];
     }
+		console.log(this.props.course.Mode);
+    let bgColor = this.props.bgColor;
+		let bgIcon = this.props.bgIcon;
 		return (
 			<div>
-				<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style = {{width:'300px', marginRight:'20px', marginBottom:'20px'}}>
+				<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style = {{width:'300px', marginRight:'20px', marginBottom:'20px',background: bgColor}}>
 					<CardHeader
 			      title={`${this.props.course.Name} - ${this.props.course.Mode}`}
 			      subtitle={`(${this.props.course.Duration} weeks)`}
 			      avatar={
-			      	<Avatar>
+			      	<Avatar backgroundColor={bgIcon}>
 			      		{this.props.course.Mode.charAt(0).toUpperCase()}
 			      	</Avatar>
 			      }
