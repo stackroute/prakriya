@@ -8,13 +8,15 @@ import {Link} from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import Footer from '../../views/Footer.jsx';
 import {Card, CardMedia, CardText} from 'material-ui/Card';
-
+import VisibilityIcon from 'material-ui/svg-icons/action/visibility';
+import VisibilityOffIcon from 'material-ui/svg-icons/action/visibility-off';
 
 export default class ChangePassword extends React.Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
+			passwordType: "password",
 			newPassword: "",
 			confirmPassword: "",
 			errMsg: "",
@@ -24,6 +26,7 @@ export default class ChangePassword extends React.Component {
 		this.onChangeNewPassword = this.onChangeNewPassword.bind(this)
 		this.onChangeConfirmPassword = this.onChangeConfirmPassword.bind(this)
 		this.changePassword = this.changePassword.bind(this)
+		this.toggleShowPassword = this.toggleShowPassword.bind(this)
 	}
 
 	onChangeNewPassword(e) {
@@ -86,6 +89,13 @@ export default class ChangePassword extends React.Component {
 		}
 	}
 
+	toggleShowPassword() {
+		let passwordType = this.state.passwordType == 'password' ? 'text' : 'password';
+		this.setState({
+			passwordType: passwordType
+		})
+	}
+
 	render() {
 
 		return(
@@ -94,15 +104,22 @@ export default class ChangePassword extends React.Component {
 						 <img src="./assets/images/login_head.png"/>
 				 </CardMedia>
 				 <CardText>
-					 <TextField
-					 	floatingLabelText="New Password"
-						type="password"
-					 	onChange={this.onChangeNewPassword}
-						style={{width: '100%'}}
-						errorText={this.state.newPasswordErrorText}/> <br />
+					 <div style={{position: 'relative', display: 'inline-block', width: '100%'}}>
+						 {
+							 this.state.passwordType == 'password' ?
+							 <VisibilityIcon style={{position: 'absolute', right: 0, top: 35, width: 20, height: 20, zIndex: 1, cursor: 'pointer'}} onTouchTap={this.toggleShowPassword}/> :
+							 <VisibilityOffIcon style={{position: 'absolute', right: 0, top: 35, width: 20, height: 20, zIndex: 1, cursor: 'pointer'}} onTouchTap={this.toggleShowPassword}/>
+						 }
+						 <TextField
+						 	floatingLabelText="New Password"
+							type={this.state.passwordType}
+						 	onChange={this.onChangeNewPassword}
+							style={{width: '100%'}}
+							errorText={this.state.newPasswordErrorText}/> <br />
+					 </div>
 					 <TextField
 					 	floatingLabelText="Confirm Password"
-						type="password"
+						type={this.state.passwordType}
 						onChange={this.onChangeConfirmPassword}
 						style={{width: '100%'}}
 						errorText={this.state.confirmPasswordErrorText}/>

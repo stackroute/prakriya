@@ -5,7 +5,7 @@ let Schema = mongoose.Schema;
 // Description is same as Problem Statement
 // Duration is in number of days
 let Assignment = new Schema({
-  Name: {type: String, unique: true},
+  Name: {type: String},
   Description: String,
   Week: Number,
   Skills: [String],
@@ -14,7 +14,7 @@ let Assignment = new Schema({
 
 // Example: Day - 4 (The session happens on the fourth day from the commencement of the training)
 let Session = new Schema({
-  Name: {type: String, unique: true},
+  Name: {type: String},
   Description: String,
   Day: Number,
   Skills: [String]
