@@ -5,54 +5,32 @@ import Dialog from 'material-ui/Dialog';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
-import Chip from 'material-ui/Chip';
 import FlatButton from 'material-ui/FlatButton';
-import SaveIcon from 'material-ui/svg-icons/content/save';
-import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
-import IconButton from 'material-ui/IconButton';
 import app from '../../styles/app.json';
+import select from '../../styles/select.json';
 import dialog from '../../styles/dialog.json';
-
-const styles = {
-	paper: {
-		margin: '5px',
-		padding: '5px',
-		width: 'auto',
-		height: '120px',
-		borderRadius: '2px'
-	},
-	wrapper: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-	chip: {
-    margin: '4px',
-    background: '#eee'
-  }
-}
+import CONFIG from '../../config/index';
 
 export default class AddCourse extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			showDialog: false,
-			CourseName: '',
-			AssessmentName: '',
-			AssessmentCategories: [],
+			Name: '',
+			Mode: '',
 			Duration: '',
-			key: -1,
-			CourseNameErrorText: '',
-			DurationErrorText: ''
+			NameErrorText: '',
+			ModeErrorText: '',
+			DurationErrorText: '',
+			key: -1
 		}
 
 		this.handleOpen = this.handleOpen.bind(this);
 		this.handleClose = this.handleClose.bind(this);
 		this.onChangeName = this.onChangeName.bind(this);
+		this.onChangeMode = this.onChangeMode.bind(this);
 		this.onChangeDuration = this.onChangeDuration.bind(this);
 		this.handleCourseDelete = this.handleCourseDelete.bind(this);
-		this.onChangeAssessmentCategory = this.onChangeAssessmentCategory.bind(this);
-		this.onChangeAssessment = this.onChangeAssessment.bind(this);
 		this.handleUpdate = this.handleUpdate.bind(this);
 		this.resetFields = this.resetFields.bind(this);
 		this.handleAdd = this.handleAdd.bind(this);
@@ -63,18 +41,25 @@ export default class AddCourse extends React.Component {
 		if(this.props.openDialog) {
 			this.setState({
 				showDialog: true,
-				CourseName: this.props.course.CourseName,
-				AssessmentCategories: this.props.course.AssessmentCategories,
-				Duration: this.props.course.Duration,
-				disableSave: true,
+				Name: this.props.course.Name,
+				Mode: this.props.course.Mode,
+				Duration: this.props.course.Duration
 			})
 		}
 	}
 
 	onChangeName(e) {
 		this.setState({
-			CourseName: e.target.value,
-			CourseNameErrorText: ''
+			Name: e.target.value,
+			NameErrorText: ''
+		})
+	}
+
+	onChangeMode(e, key, value) {
+		console.log('mode e: ', value)
+		this.setState({
+			Mode: value,
+			ModeErrorText: ''
 		})
 	}
 
@@ -82,25 +67,6 @@ export default class AddCourse extends React.Component {
 		this.setState({
 			Duration: e.target.value,
 			DurationErrorText: ''
-		})
-	}
-
-	onChangeAssessmentCategory() {
-		if(this.state.AssessmentName.trim().length != 0) {
-			let assessment = this.state.AssessmentCategories
-			assessment.push(this.state.AssessmentName)
-			this.setState({
-				AssessmentCategories: assessment,
-				AssessmentName: '',
-				disableSave: true
-			})
-		}
-	}
-
-	onChangeAssessment(e) {
-		this.setState({
-			AssessmentName: e.target.value,
-			disableSave: false
 		})
 	}
 
@@ -151,10 +117,11 @@ export default class AddCourse extends React.Component {
 
 	resetFields() {
 		this.setState({
-			CourseName : '',
-			AssessmentCategories : [],
+			Name : '',
+			Mode: '',
 			Duration: '',
-			CourseNameErrorText: '',
+			NameErrorText: '',
+			ModeErrorText: '',
 			DurationErrorText: ''
 		})
 	}
@@ -173,10 +140,13 @@ export default class AddCourse extends React.Component {
 	handleAdd() {
 		let th = this
 		let course = {}
-		course.CourseID = 0;
-		course.CourseName = this.state.CourseName;
-		course.AssessmentCategories = this.state.AssessmentCategories;
-		course.Categories = [];
+		console.log('id: ' + th.state.Name + '_' + th.state.Mode);
+		course.ID = th.state.Name + '_' + th.state.Mode;
+		course.Name = this.state.Name;
+		course.Mode = this.state.Mode;
+		course.Skills = [];
+		course.Assignments = [];
+		course.Schedule = [];
 		course.Removed = false;
 		course.Duration = this.state.Duration;
 		course.History = '';
@@ -184,13 +154,22 @@ export default class AddCourse extends React.Component {
 	}
 
 	validationSuccess() {
-		if(this.state.CourseName.trim().length == 0) {
+		let durationPattern = /[0-9]{1,}/
+		if(this.state.Name.trim().length == 0) {
 			this.setState({
-				CourseNameErrorText: 'This field cannot be empty'
+				NameErrorText: 'This field cannot be empty.'
+			})
+		} else if(this.state.Mode.trim().length == 0) {
+			this.setState({
+				ModeErrorText: 'This field cannot be empty.'
 			})
 		} else if(this.state.Duration.trim().length == 0) {
 			this.setState({
-				DurationErrorText: 'This field cannot be empty'
+				DurationErrorText: 'This field cannot be empty.'
+			})
+		} else if(!durationPattern.test(this.state.Duration)) {
+			this.setState({
+				DurationErrorText: 'Invalid input! Enter the number of weeks.'
 			})
 		} else {
 			return true
@@ -246,20 +225,53 @@ export default class AddCourse extends React.Component {
 					actions={actions}
 	        >
 					<div>
-						<div style={dialog.box50}>
+						<div style={dialog.box100}>
 			        <TextField
+								style={{width: '100%'}}
 				    		hintText="Course Name"
 				    		floatingLabelText="Name *"
 								floatingLabelStyle={app.mandatoryField}
-				    		value={this.state.CourseName}
+				    		value={this.state.Name}
 				    		onChange={this.onChangeName}
-								errorText={this.state.CourseNameErrorText}
+								errorText={this.state.NameErrorText}
 				    	/>
 						</div>
-						<div style={dialog.box50}>
+					</div>
+					<div>
+						<div style={dialog.box100}>
+							<SelectField
+								style={{width: '100%'}}
+								hintText="Mode"
+								floatingLabelText='Mode *'
+								floatingLabelStyle={app.mandatoryField}
+								value={this.state.Mode}
+								onChange={this.onChangeMode}
+								errorText={this.state.ModeErrorText}
+								menuItemStyle={select.menu}
+								listStyle={select.list}
+								selectedMenuItemStyle={select.selectedMenu}
+								maxHeight={600}
+							>
+							{
+								CONFIG.MODES.map(function(mode, key) {
+									return (
+										<MenuItem
+							        key={key}
+							        value={mode}
+							        primaryText={mode}
+							      />
+									)
+								})
+							}
+							</SelectField>
+						</div>
+					</div>
+					<div>
+						<div style={dialog.box100}>
 							<TextField
-								hintText="In Weeks"
-								floatingLabelText="Duration *"
+								style={{width: '100%'}}
+								hintText="Duration"
+								floatingLabelText="Duration (in weeks) *"
 								floatingLabelStyle={app.mandatoryField}
 				    		value={this.state.Duration}
 								onChange={this.onChangeDuration}
@@ -267,34 +279,6 @@ export default class AddCourse extends React.Component {
 							/>
 						</div>
 					</div>
-					<div  style={dialog.box100}>
-			    	<TextField
-			    		hintText="assessment"
-			    		floatingLabelText="Assessment Category"
-							value={this.state.AssessmentName}
-			    		onChange={this.onChangeAssessment}
-			    	/>
-			    	<IconButton tooltip="Add Assessment" onClick={this.onChangeAssessmentCategory} disabled={this.state.disableSave}>
-				      <AddIcon/>
-				    </IconButton>
-						<Paper style={styles.paper} zDepth={1} >
-							<div style={styles.wrapper}>
-								{
-									this.state.AssessmentCategories.map(function (category, index) {
-										return(
-											<Chip
-												onRequestDelete={()=>th.handleCourseDelete(category)}
-							          style={styles.chip}
-							          key={index}
-							        >
-							          <span style={styles.chipName}>{category}</span>
-							        </Chip>
-						        )
-									})
-								}
-							</div>
-						</Paper>
-						</div>
 					</Dialog>
 					</div>
 			)

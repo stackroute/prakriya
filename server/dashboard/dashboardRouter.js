@@ -319,7 +319,7 @@ router.get('/candidatetemplate', auth.canAccess(CONFIG.ADMINISTRATOR), function 
 });
 
 // Get the remarks template
-router.get('/remarkstemplate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.get('/remarkstemplate', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   res.send(CONFIG.REMARKS_TEMPLATE);
 });
 
@@ -680,6 +680,22 @@ router.get('/getabsentees', auth.canAccess(CONFIG.ADMINISTRATOR), function (req,
   }
 });
 
+// Gett all courses
+router.get('/courses', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+  try {
+    dashboardMongoController.getCourses(function(courses) {
+      res.status(201).json({courses: courses});
+    }, function(err) {
+      logger.error('Get Courses For Wave Error: ', err);
+      res.status(500).json({error: 'Cannot get all courses from db...!'});
+    })
+  } catch(err) {
+    logger.error('Get Courses Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
 
 // Get all courses for specific wave
 router.get('/coursesforwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
@@ -688,7 +704,7 @@ router.get('/coursesforwave', auth.canAccess(CONFIG.ADMMEN), function (req, res)
       res.status(201).json({courses: data.CourseNames});
     }, function (err) {
       logger.error('Get Courses For Wave Error: ', err);
-      res.status(500).json({error: 'Cannot get all candidate for specific wave from db...!'});
+      res.status(500).json({error: 'Cannot get course for specific wave from db...!'});
     });
   } catch(err) {
     logger.error('Get Courses For Wave Exception: ', err);

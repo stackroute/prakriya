@@ -13,6 +13,6 @@ let modes = [
 const config = {
 	MODES: modes,
   LOCATIONS: locations
-}
+};
 
 module.exports = config;
