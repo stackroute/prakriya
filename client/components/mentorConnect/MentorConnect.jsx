@@ -30,8 +30,8 @@ const styles = {
 		marginBottom: 20
 	},
 	sliderVal: {
-		textAlign: 'left', 
-		marginTop: -20, 
+		textAlign: 'left',
+		marginTop: -20,
 		marginBottom: 40
 	}
 }
@@ -143,7 +143,7 @@ export default class MentorConnect extends React.Component {
 		    	console.log('After slider selected')
 		    }
 			});
-	}  
+	}
 	addWave(wave) {
 		let th = this;
 		Request
@@ -240,7 +240,7 @@ export default class MentorConnect extends React.Component {
 				          onChange={this.handleSliderChange}
 				        />
 				        <div style={styles.sliderVal}>
-				        	<span>Digihon Score above {this.state.slider}</span>
+				        	<span>Digithon Score above {this.state.slider}</span>
 				        	<span style={{float: 'right'}}>
 				        		<FlatButton
 				        			label="Select Cadets"

@@ -3,7 +3,7 @@ import WaveDetails from './WaveDetails.jsx';
 
 export default class SRAdmin extends React.Component {
 	constructor(props) {
-		super(props);	
+		super(props);
 	}
 
 	render() {

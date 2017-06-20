@@ -5,6 +5,16 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Snackbar from 'material-ui/Snackbar';
 import TextField from 'material-ui/TextField';
 import {Grid, Row, Col} from 'react-flexbox-grid';
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
+import IconButton from 'material-ui/IconButton';
+import StarIcon from 'material-ui/svg-icons/toggle/star';
 
 const styles = {
 	heading: {
@@ -18,6 +28,11 @@ const styles = {
 	submit: {
 		textAlign: 'center',
 		marginBottom: 20
+	},
+	table:{
+			 border:'3px solid black',
+			 marginLeft:'200px',
+			 width: '820px'
 	}
 }
 
@@ -107,12 +122,12 @@ export default class Feedback extends React.Component {
 	componentWillMount() {
 		this.getCadet();
 		this.setState({
-			relevance: {'1':1, '2':1, '3':1, '4':1, '5':1},
-			training: {'1':1, '2':1, '3':1, '4':1},
-			confidence: {'1':1, '2':1, '3':1, '4':1, '5':1, '6':1},
-			mentors: {'1':1, '2':1, '3':1, '4':1, '5':1},
-			facilities: {'1':1, '2':1, '3':1, '4':1},
-			overall: {'1':1, '2':1, '3':1}
+			relevance: {'1':0, '2':0, '3':0, '4':0, '5':0},
+			training: {'1':0, '2':0, '3':0, '4':0},
+			confidence: {'1':0, '2':0, '3':0, '4':0, '5':0, '6':0},
+			mentors: {'1':0, '2':0, '3':0, '4':0, '5':0},
+			facilities: {'1':0, '2':0, '3':0, '4':0},
+			overall: {'1':0, '2':0, '3':0}
 		});
 	}
 	getCadet() {
@@ -156,7 +171,7 @@ export default class Feedback extends React.Component {
 
  	componentWillUpdate(nextProps, nextState) {
 	 	nextState.invalidData = !(
-	 		nextState.mostLiked.trim() != '' && 
+	 		nextState.mostLiked.trim() != '' &&
 	 		nextState.leastLiked.trim() != ''
 	 	);
  	}
@@ -210,6 +225,70 @@ export default class Feedback extends React.Component {
 							<h3>{this.state.cadet.EmployeeName}</h3>
 						</Col>
 					</Row>
+					<br/>
+					<Table selectable={false} multiSelectable={false} style={styles.table}  fixedHeader={false}>
+    			<TableHeader displaySelectAll={false}
+            adjustForCheckbox={false}
+            enableSelectAll={false} style={{textAlign: 'center'}}>
+      <TableRow style={{textAlign: 'center'}} >
+        <TableHeaderColumn style={{width:'50px', textAlign:'center'}}>Worst</TableHeaderColumn>
+        <TableHeaderColumn style={{width:'80px', textAlign:'center'}}>Bad</TableHeaderColumn>
+        <TableHeaderColumn style={{width:'110px', textAlign:'center'}}>Fair</TableHeaderColumn>
+				<TableHeaderColumn style={{width:'120px', textAlign:'center'}}>Good</TableHeaderColumn>
+				<TableHeaderColumn style = {{textAlign:'center'}}>Excellent</TableHeaderColumn>
+      </TableRow>
+    </TableHeader>
+		<TableBody  displayRowCheckbox={false}>
+		 <TableRow>
+			 <TableRowColumn  style = {{textAlign:'center'}}><IconButton >
+              <StarIcon color='#FFE900'/>
+                </IconButton></TableRowColumn>
+			 <TableRowColumn style = {{textAlign:'center'}} >    <IconButton  >
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton  style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton></TableRowColumn>
+			 <TableRowColumn style = {{textAlign:'center'}}>   <IconButton >
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton  style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton></TableRowColumn>
+			 <TableRowColumn style = {{textAlign:'center'}}>  <IconButton >
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton  style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton  style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton></TableRowColumn>
+			 <TableRowColumn style = {{textAlign:'center'}}> <IconButton>
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton  style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton  style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton>
+                <IconButton  style={{marginLeft:'-20px'}}>
+                            <StarIcon color='#FFE900'/>
+                </IconButton></TableRowColumn>
+			  </TableRow>
+					</TableBody>
+					</Table>
+
 					{
 						feedback.map(function(item, key) {
 							return (
