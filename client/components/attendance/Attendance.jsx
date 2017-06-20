@@ -26,29 +26,12 @@ import Calendar from './Calendar.jsx';
 
 const styles = {
   content: {
-    marginLeft: '25%'
+    marginLeft: '30%'
   },
   row: {
     wordWrap: 'break-word'
   }
 }
-
-const events = [
-    {
-        start: '2015-07-20',
-        end: '2015-07-02',
-        eventClasses: 'optionalEvent',
-        title: 'test event',
-        description: 'This is a test description of an event',
-    },
-    {
-        start: '2015-07-19',
-        end: '2015-07-25',
-        title: 'test event',
-        description: 'This is a test description of an event',
-        data: 'you can add what ever random data you may want to use later',
-    },
-];
 
 export default class Attendance extends React.Component {
   constructor(props) {
@@ -71,7 +54,9 @@ export default class Attendance extends React.Component {
       WaveIds: [],
       cadetsOfWave: [],
       WaveID: '',
-      Date: ''
+      Date: '',
+      startDate: '',
+      endDate: ''
     }
     this.handleSelect = this.handleSelect.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -93,7 +78,7 @@ export default class Attendance extends React.Component {
     this.handleDateChange = this.handleDateChange.bind(this);
     this.updatePresent = this.updatePresent.bind(this);
     this.handlePresent = this.handlePresent.bind(this);
-    this.updateAbsent = this.updateAbsent.bind(this);
+    this.getWave = this.getWave.bind(this);
   }
 
   componentWillMount() {
@@ -116,9 +101,10 @@ export default class Attendance extends React.Component {
     })
   }
 
-  updatePresent(EmpID, details) {
+  updatePresent(EmpID, date, type) {
+    if(type === 'present') {
     let th = this
-    Request.post('/dashboard/present').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID, id: details, Date: th.state.Date}).end(function(err, res) {
+    Request.post('/dashboard/present').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID, id: date, Date: th.state.Date}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
@@ -127,14 +113,13 @@ export default class Attendance extends React.Component {
         });
         cadet[0].DaysPresent.push(th.state.Date);
         cadet[0].DaysAbsent = cadet[0].DaysAbsent.filter(function(cadets, key) {
-          return details != cadets._id
+          return date != cadets._id
         })
         th.setState({cadet: cadet[0]})
       }
     })
   }
-
-  updateAbsent(EmpID, date) {
+  else if(type === 'absent') {
     let th = this
     let details = {
       fromDate: th.state.Date,
@@ -151,6 +136,7 @@ export default class Attendance extends React.Component {
       }
     })
   }
+}
 
   onWaveIdChange(e) {
     this.setState({WaveId: e.target.textContent})
@@ -184,6 +170,22 @@ export default class Attendance extends React.Component {
         console.log(err);
       else {
         th.setState({cadet: res.body})
+        th.getWave(res.body.Wave);
+      }
+    })
+  }
+
+  getWave(waveID) {
+    let th = this;
+    Request.get(`/dashboard/wave?waveid=${waveID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log(res.body);
+        th.setState({
+          startDate: res.body.StartDate,
+          endDate: res.body.EndDate
+        })
       }
     })
   }
@@ -333,7 +335,10 @@ export default class Attendance extends React.Component {
       const {finished, stepIndex} = this.state;
       if (th.state.cadet != null) {
         let attendance = '';
+        let mark = true;
         let today = this.formatDate(new Date());
+        if((new Date() > new Date(th.state.startDate)) && (new Date() < new Date(th.state.endDate)))
+        {
         let todayAttendance = false;
         this.state.cadet.DaysPresent.map(function(date) {
           if (today === th.formatDate(date))
@@ -360,10 +365,16 @@ export default class Attendance extends React.Component {
             )
           }
         }
+        }
+        else {
+          mark = false;
+          attendance = (<h2 style={{marginLeft:'100px', color: 'green'}}><br/>Attendance can be marked only during the training.</h2>)
+        }
         return (
           <div>
             <h1 style={styles.content}>ATTENDANCE</h1>
-            <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
+            {!mark && attendance}
+            {mark && <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
               <Tab label="Apply Leave" value={0}>
                 <Stepper activeStep={stepIndex} orientation="vertical" style={styles.content}>
                   <Step>
@@ -435,7 +446,7 @@ export default class Attendance extends React.Component {
                 {attendance}
               </Tab>
             </Tabs>
-
+          }
           </div>
         )
       } else {
@@ -523,21 +534,24 @@ export default class Attendance extends React.Component {
                 </TableHeader>
                 <TableBody displayRowCheckbox={false} showRowHover={true}>
                   {th.state.cadetsOfWave.map(function(cadet, index) {
-                    let absent = false;
-                    let present = true;
+                    let absent = "red";
+                    let present = "grey";
                     let date = '';
+                    let value = "present"
                     cadet.DaysAbsent.map(function(details) {
                       if ((th.formatDate(new Date(details.fromDate)) <= th.formatDate(new Date(th.state.Date))) && ((new Date(details.toDate) >= new Date(th.state.Date)) || (th.formatDate(new Date(details.fromDate)) === (th.formatDate(new Date(details.toDate)))))) {
-                        absent = false
-                        present = true
+                        present = "grey"
+                        absent = "red"
                         date = details._id
+                        value = "present"
                       }
                     })
                     cadet.DaysPresent.filter(function(detail) {
                       if (th.formatDate(detail) === th.formatDate(th.state.Date)) {
-                        present = false
-                        absent = true
+                      absent = "grey"
+                        present = "green"
                         date = detail
+                        value = "absent"
                       }
                     })
                     return (
@@ -546,13 +560,13 @@ export default class Attendance extends React.Component {
                           {cadet.EmployeeName}
                         </TableRowColumn>
                         <TableRowColumn>
-                          <IconButton tooltip="Present" disabled={absent} onClick={th.updatePresent.bind(this, cadet.EmployeeID, date)}>
-                            <ApproveIcon color={green500}/>
+                          <IconButton tooltip="Present" onClick={th.updatePresent.bind(this, cadet.EmployeeID, date, value)}>
+                            <ApproveIcon color={present} viewBox='0 0 20 20'/>
                           </IconButton>
                         </TableRowColumn>
                         <TableRowColumn>
-                          <IconButton tooltip="Reject" disabled={present} onClick={th.updateAbsent.bind(this, cadet.EmployeeID, date)}>
-                            <RejectIcon color={red500}/>
+                          <IconButton tooltip="Reject" onClick={th.updatePresent.bind(this, cadet.EmployeeID, date, value)}>
+                            <RejectIcon color={absent}  viewBox='0 0 20 20'/>
                           </IconButton>
                         </TableRowColumn>
                       </TableRow>

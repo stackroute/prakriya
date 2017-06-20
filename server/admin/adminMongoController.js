@@ -1,6 +1,7 @@
 const UserModel = require('../../models/users.js');
 const RoleModel = require('../../models/roles.js');
 const AccessControlModel = require('../../models/accesscontrols.js');
+const logger = require('./../../applogger');
 
 let getUsers = function (successCB, errorCB) {
 	UserModel.find({role: {$nin: ['admin', 'candidate']}}, function (err, result) {
@@ -16,8 +17,8 @@ let addUser = function (userObj, successCB, errorCB) {
 	let saveUser = new UserModel(userObj);
 	saveUser.save(userObj, function (err, result) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
@@ -27,48 +28,48 @@ let deleteUser = function (userObj, successCB, errorCB) {
 		.find(userObj)
 		.remove(function (err, status) {
 			if(err) {
-errorCB(err);
-}
+				errorCB(err);
+			}
 			successCB(status);
 		});
 };
 
 let updateUser = function (userObj, successCB, errorCB) {
-	console.log('User obj from server', userObj);
-	console.log(userObj.username);
+	logger.debug('User obj from server', userObj);
+	logger.debug(userObj.username);
 	UserModel.update({username: userObj.username}, userObj, function (err, status) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(status);
 	});
 };
 
 let lockUser = function (userObj, successCB, errorCB) {
-	console.log('User obj from server', userObj);
-	console.log(userObj.username);
+	logger.debug('User obj from server', userObj);
+	logger.debug(userObj.username);
 	UserModel.update(
 		{username: userObj.username},
 		{$pull: {actions: 'login'}},
 		function (err, status) {
 			if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 			successCB(status);
 		}
 	);
 };
 
 let unlockUser = function (userObj, successCB, errorCB) {
-	console.log('User obj from server', userObj);
-	console.log(userObj.username);
+	logger.debug('User obj from server', userObj);
+	logger.debug(userObj.username);
 	UserModel.update(
 		{username: userObj.username},
 		{$push: {actions: 'login'}},
 		function (err, status) {
 			if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 			successCB(status);
 		}
 	);
@@ -77,8 +78,8 @@ errorCB(err);
 let getRoles = function (successCB, errorCB) {
 	RoleModel.find({name: {$ne: 'admin'}}, function (err, result) {
 		if (err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
@@ -87,20 +88,20 @@ let addRole = function (roleObj, successCB, errorCB) {
 	let saveRole = new RoleModel(roleObj);
 	saveRole.save(roleObj, function (err, result) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
 let updateRole = function (roleObj, successCB, errorCB) {
-	console.log('Role obj in Mongo', roleObj);
-	console.log(roleObj.name);
+	logger.debug('Role obj in Mongo', roleObj);
+	logger.debug(roleObj.name);
 	roleObj.lastModified = new Date();
 	RoleModel.update({name: roleObj.name}, roleObj, function (err, status) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(status);
 	});
 };
@@ -110,8 +111,8 @@ let deleteRole = function (roleObj, successCB, errorCB) {
 		.find(roleObj)
 		.remove(function (err, status) {
 			if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 			successCB(status);
 		});
 };
@@ -119,8 +120,8 @@ errorCB(err);
 let getAccessControls = function (successCB, errorCB) {
 	AccessControlModel.find({}, function (err, result) {
 		if (err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };

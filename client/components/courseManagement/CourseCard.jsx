@@ -45,8 +45,7 @@ export default class CourseCard extends React.Component {
 			hide: 'inline',
 			show:'none',
 			showDeleteDialog: false,
-			openDialog:false,
-			showAddCategoryDialog: false
+			openDialog:false
 		}
 			this.handleExpandChange = this.handleExpandChange.bind(this);
 			this.handleEditCourse = this.handleEditCourse.bind(this);
@@ -55,20 +54,14 @@ export default class CourseCard extends React.Component {
 			this.handleDeleteCourse = this.handleDeleteCourse.bind(this);
 			this.openDeleteDialog = this.openDeleteDialog.bind(this);
 			this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-			this.handleAddCategory = this.handleAddCategory.bind(this);
-			this.openAddCategoryDialog = this.openAddCategoryDialog.bind(this);
-			this.handleDeleteCategory = this.handleDeleteCategory.bind(this);
 			this.formatDate = this.formatDate.bind(this);
 	}
 
 	handleExpandChange = (expanded) => {
     this.setState({expanded: expanded});
-    if(this.state.expanded)
-  	{
+    if(this.state.expanded) {
     	this.setState({expanded: false,hide:'inline',show:'none'});
-    }
-    else
-    {
+    } else {
     	this.setState({expanded: true,hide:'none',show:'inline'});
     }
   };
@@ -91,14 +84,10 @@ export default class CourseCard extends React.Component {
 			showDeleteDialog: true
 		})
 	}
+
 	closeDeleteDialog() {
 		this.setState({
 			showDeleteDialog: false
-		})
-	}
-	openAddCategoryDialog() {
-		this.setState({
-			showAddCategoryDialog: true
 		})
 	}
 
@@ -107,19 +96,8 @@ export default class CourseCard extends React.Component {
 		this.props.updateCourse(course);
 	}
 
-	handleAddCategory(category) {
-		category.History = this.props.course.History;
-		this.props.addCategory(category);
-		this.handleClose();
-	}
-
 	handleDeleteCourse(course) {
 		this.props.deleteCourse(this.props.course);
-	}
-
-	handleDeleteCategory(category) {
-		category.History = this.props.course.History;
-		this.props.deleteCategory(category);
 	}
 
 	formatDate(date) {
@@ -157,42 +135,28 @@ export default class CourseCard extends React.Component {
 			<div>
 				<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style = {{width:'300px', marginRight:'20px', marginBottom:'20px'}}>
 					<CardHeader
-			      title={this.props.course.CourseName}
-			      subtitle={this.props.course.Duration}
+			      title={`${this.props.course.Name} - ${this.props.course.Mode}`}
+			      subtitle={`(${this.props.course.Duration} weeks)`}
 			      avatar={
 			      	<Avatar>
-			      		{this.props.course.CourseName.charAt(0).toUpperCase()}
+			      		{this.props.course.Mode.charAt(0).toUpperCase()}
 			      	</Avatar>
 			      }
 			      actAsExpander={true}
       			showExpandableButton={true}/>
-			    <CardText expandable={true}>
-			    	{
-			    		this.props.course.Categories.map(function(category, key) {
-			    			return (<CourseSubCard category={category} key={key} deleteCategory={th.handleDeleteCategory} courseID={th.props.course.CourseID}/>)
-			    		})
-			    	}
 
-			    </CardText>
 			    <h4 style={{display:this.state.hide,marginLeft:'20px'}}>{history[0]}</h4><br/>
 					<h5 style={{display:this.state.hide,marginLeft:'20px',color:'grey'}}>{th.formatDate(history[1])}</h5><br/>
 					<IconButton tooltip="Edit Course" onClick={this.handleEditCourse} style={{display:this.state.hide,marginLeft:'10px'}}>
-					      <EditIcon/>
-					    </IconButton>
-					    <IconButton tooltip="Delete Course" style={{display:this.state.hide}} onClick={this.openDeleteDialog}>
-					      <DeleteIcon/>
-					    </IconButton>
-					    <IconButton tooltip="Add another Category" style={{display:this.state.show}} onClick={this.openAddCategoryDialog}>
-					      <AddIcon/>
-					    </IconButton>
-					    {
-							this.state.openDialog &&
-							<AddCourse course={this.props.course} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateCourse} handleClose={this.handleClose}/>
-						}
-						{
-							this.state.showAddCategoryDialog &&
-							<CourseSubCard handleAddCategory={this.handleAddCategory} courseID={this.props.course.CourseID} openDialog = {this.state.showAddCategoryDialog}  handleClose={this.handleClose}/>
-						}
+			      <EditIcon/>
+			    </IconButton>
+			    <IconButton tooltip="Delete Course" style={{display:this.state.hide}} onClick={this.openDeleteDialog}>
+			    	<DeleteIcon/>
+			    </IconButton>
+			   {
+						this.state.openDialog &&
+						<AddCourse course={this.props.course} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateCourse} handleClose={this.handleClose}/>
+				 }
 				</Card>
 				<Dialog
 					bodyStyle={styles.deleteDialog}

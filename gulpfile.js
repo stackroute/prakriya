@@ -8,20 +8,20 @@ const uglify = require('gulp-uglify');
 const rev = require('gulp-rev');
 const minifyCss = require('gulp-minify-css');
 const clean = require('gulp-clean');
-const flatten = require('gulp-flatten');
+// const flatten = require('gulp-flatten');
 const eslint = require('gulp-eslint');
 const htmlhint = require('gulp-htmlhint');
 const gulpWebpack = require('gulp-webpack');
-const mocha = require('gulp-mocha');
+// const mocha = require('gulp-mocha');
 
-gulp.task('webpack', ['clean'], function() {
+gulp.task('webpack', ['clean'], function () {
   const webPackConfig = require('./webpack.config.js');
   return gulp.src(path.resolve(__dirname, 'client', 'Route.jsx'))
   .pipe(gulpWebpack(webPackConfig))
   .pipe(gulp.dest(path.resolve(__dirname, 'client', 'assets')));
 });
 
-gulp.task('usemin', ['clean', 'webpack'], function() {
+gulp.task('usemin', ['clean', 'webpack'], function () {
   return gulp.src(['client/*.html'])
   .pipe(usemin({
     html: [minifyHtml({
@@ -40,24 +40,24 @@ gulp.task('usemin', ['clean', 'webpack'], function() {
 //   .pipe(gulp.dest('dist/server/public/fonts'));
 // });
 
-gulp.task('copy:package.json', ['clean'], function() {
+gulp.task('copy:package.json', ['clean'], function () {
   return gulp.src('package.json')
   .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('copy:server', ['clean'], function() {
+gulp.task('copy:server', ['clean'], function () {
   gulp.src(['server/**/*'])
   .pipe(gulp.dest('dist/server/'));
 });
 
-gulp.task('clean', function() {
+gulp.task('clean', function () {
   return gulp.src('dist', {
     read: false
   })
   .pipe(clean());
 });
 
-gulp.task('eslint', function() {
+gulp.task('eslint', function () {
   return gulp.src([
     'gulpfile.js', 'webpack.config.js', '.eslintrc.js', 'server/**/*',
     'webclient/**/*.jsx', '!dist/**/*'
@@ -90,7 +90,7 @@ gulp.task('eslint', function() {
   // }));
 });
 
-gulp.task('htmlhint', function() {
+gulp.task('htmlhint', function () {
   return gulp.src(['webclient/**/*.html', '!node_modules/**/*',
     '!bower_components/**/*', '!dist/**/*'
     ])

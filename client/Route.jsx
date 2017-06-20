@@ -77,7 +77,7 @@ ReactDOM.render(
 				<Route path="/users" component={Users} />
 				<Route path="/candidates" component={Candidates} />
 				<Route path="/bulkupload" component={() => <BulkUpload user={user}/>} />
-				<Route path="/mentorconnect" component={MentorConnect} />
+				<Route path="/mentorconnect" component={() => <MentorConnect user={user}/>} />
 				<Route path="/courses" component={Courses} />
 				<Route path="/assessmenttracker" component={AssessmentTracker} />
 				<Route path="/programflow" component={ProgramFlow} />

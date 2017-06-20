@@ -75,7 +75,8 @@ export default class Header extends React.Component {
         name: '',
         username: ''
       },
-      notifications: []
+      notifications: [],
+      imageURL: "../assets/images/avt-default.jpg"
 		}
 		this.logout = this.logout.bind(this);
     this.toggleChangePasswordDialog = this.toggleChangePasswordDialog.bind(this)
@@ -91,7 +92,7 @@ export default class Header extends React.Component {
   componentWillMount() {
 		if(localStorage.getItem('token')) {
 			this.getActions()
-      this.getNotifications(this.props.username)
+      this.getNotifications(this.props.user.username)
 		}
     let th = this
     let socket = io()
@@ -222,7 +223,7 @@ export default class Header extends React.Component {
                 <CardHeader
                   subtitle={this.state.user.username}
                   title={this.state.user.name}
-					        avatar="../assets/images/avt-default.jpg"
+					        avatar={this.state.imageURL}
 					      />
               }
              >
@@ -307,7 +308,7 @@ export default class Header extends React.Component {
           open={th.state.openDialog}
           onRequestClose={th.toggleChangePasswordDialog}
         >
-          <ChangePassword username={this.props.username} handleClose={th.handleClose}/>
+          <ChangePassword username={this.props.user.username} handleClose={th.handleClose}/>
         </Dialog>
       </div>
 		)

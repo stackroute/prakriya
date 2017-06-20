@@ -14,6 +14,7 @@ import Snackbar from 'material-ui/Snackbar'
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline'
 import IconButton from 'material-ui/IconButton'
 import {Grid, Row, Col} from 'react-flexbox-grid'
+import app from '../../styles/app.json';
 
 const styles = {
 	addButton: {
@@ -536,7 +537,7 @@ export default class ProjectDialog extends React.Component {
 
 		return(
 		<div>
-			<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen}>
+			<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen}>
 	      <ContentAdd />
 	    </FloatingActionButton>
 	    <Dialog
@@ -551,8 +552,9 @@ export default class ProjectDialog extends React.Component {
       >
 				<div>
 				 <TextField
-			      floatingLabelText='Name'
-			      value={this.state.projectName}
+			      floatingLabelText='Name *'
+						floatingLabelStyle={app.mandatoryField}
+						value={this.state.projectName}
 			      onChange={this.handleNameChange}
 						errorText={this.state.projectNameErrorText}
 						disabled={this.props.openDialog}
@@ -561,7 +563,8 @@ export default class ProjectDialog extends React.Component {
 			    />
 					<br/>
 					<TextField
-					floatingLabelText='Version'
+					floatingLabelText='Version *'
+					floatingLabelStyle={app.mandatoryField}
 					value={this.state.versionName}
 					onChange={this.handleVersionChange}
 					errorText={this.state.projectVersionErrorText}

@@ -18,9 +18,9 @@ let mongoose = require('mongoose');
 ****************************************************/
 
 // Adding a new notification
-let addNotification = function(email, message, successCB, errorCB) {
-	console.log('adding notification: ', email, ' -- ', message);
-	UserModel.update({email: email}, {$push: {notifications: message}}, function(err, result) {
+let addNotification = function (email, message, successCB, errorCB) {
+	logger.info('adding notification: ', email, ' -- ', message);
+	UserModel.update({email: email}, {$push: {notifications: message}}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
@@ -30,51 +30,47 @@ let addNotification = function(email, message, successCB, errorCB) {
 };
 
 // Deleting a new notification
-let deleteNotification = function(email, message, successCB, errorCB) {
-	console.log('Deleting notification: ', email, ' -- ', message);
-	UserModel.update({email: email}, {$pull: {notifications: message}}, function(err, result) {
+let deleteNotification = function (email, message, successCB, errorCB) {
+	logger.info('Deleting notification: ', email, ' -- ', message);
+	UserModel.update({email: email}, {$pull: {notifications: message}}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
-		console.log(result);
 		successCB(result);
 	});
 };
 
 // Getting all notifications
-let getNotifications = function(username, successCB, errorCB) {
-	UserModel.findOne({username: username}, 'notifications', function(err, result) {
+let getNotifications = function (username, successCB, errorCB) {
+	UserModel.findOne({username: username}, 'notifications', function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
-		console.log(result);
 		successCB(result);
 	});
 };
 
-let updateLastLogin = function(user, successCB, errorCB) {
+let updateLastLogin = function (user, successCB, errorCB) {
 	UserModel.
-	update({username: user.username}, {$set: {lastLogin: user.lastLogin}}, function(err, result) {
+	update({username: user.username}, {$set: {lastLogin: user.lastLogin}}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
-		console.log(result);
 		successCB(result);
 	});
 };
 
-let changePassword = function(user, successCB, errorCB) {
+let changePassword = function (user, successCB, errorCB) {
 	UserModel.
-	update({username: user.username}, {$set: {password: user.password}}, function(err, result) {
+	update({username: user.username}, {$set: {password: user.password}}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
-		console.log(result);
 		successCB(result);
 	});
 };
-let getPermissions = function(role, successCB, errorCB) {
-	RoleModel.findOne({name: role}, function(err, result) {
+let getPermissions = function (role, successCB, errorCB) {
+	RoleModel.findOne({name: role}, function (err, result) {
 		if (err) {
 			errorCB(err);
 		}
@@ -86,16 +82,16 @@ let addWave = function (waveObj, successCB, errorCB) {
 	let userObj = {};
 	let saveWave = new WaveModel(waveObj);
 	saveWave.save(function (err, result) {
-		if(err)
-			{errorCB(err);}
-		else {
+		if(err) {
+			errorCB(err);
+		} else {
 			async.each(result.Cadets,
-				function(cadetID, callback) {
+				function (cadetID, callback) {
 					CandidateModel.
 					findOneAndUpdate(
 						{EmployeeID: cadetID},
 						{$set: {Wave: result.WaveID}},
-						function(err1, user) {
+						function (err1, user) {
 						if(err1) {
 							errorCB(err1);
 						} else {
@@ -105,7 +101,7 @@ let addWave = function (waveObj, successCB, errorCB) {
 							userObj.password = CONFIG.DEFAULT_PASS;
 							userObj.role = 'candidate';
 							adminMongoController.addUser(userObj, function (savedUser) {
-								logger.info('User created', user.EmployeeName);
+								logger.info('New User Created: ', savedUser);
 								callback();
 							}, function (err2) {
 								logger.error('Error in creating user', err2);
@@ -113,7 +109,10 @@ let addWave = function (waveObj, successCB, errorCB) {
 						}
 					});
 				},
-				function(err3) {
+				function (err3) {
+					if(err3) {
+						logger.error('Error in creating user', err3);
+					}
 					successCB(result);
 				}
 			);
@@ -124,23 +123,26 @@ let addWave = function (waveObj, successCB, errorCB) {
 let getWave = function (waveID, successCB, errorCB) {
 	logger.debug('In get Wave', waveID);
 	WaveModel.findOne({WaveID: waveID}, function (err, result) {
-		if(err)
-			{errorCB(err);}
+		if(err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
-let getActiveWaves = function(successCB, errorCB) {
+let getActiveWaves = function (successCB, errorCB) {
 	let today = new Date();
 	WaveModel.aggregate(
 		{$match: {$and: [{StartDate: {$lte: today}}, {EndDate: {$gte: today}}]}},
-		{ $project: { _id: 0, WaveID: 1 }},
-		function(err, result) {
+		{$project: {_id: 0, WaveID: 1}},
+		function (err, result) {
 			if (err) {
-					console.log('Date Error: ', err);
+					logger.error('Date Error: ', err);
 					errorCB(err);
 			}
 			// change successCB for an empty result array -- !to_be_done
-			successCB(result.map(function(obj) {return obj.WaveID;}));
+			successCB(result.map(function (obj) {
+				return obj.WaveID;
+			}));
 		}
 	);
 };
@@ -150,11 +152,11 @@ let getActiveWaves = function(successCB, errorCB) {
 *******              Projects                ********
 ****************************************************/
 
-let getProjects = function(successCB, errorCB) {
-	console.log('inside getproj in cntrlr');
-	ProjectModel.find({}, function(err, result) {
-		if (err)
-			{errorCB(err);}
+let getProjects = function (successCB, errorCB) {
+	ProjectModel.find({}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
@@ -163,13 +165,10 @@ let addProject = function (projectObj, successCB, errorCB) {
 	let saveProject = new ProjectModel(projectObj);
 	let length = projectObj.version.length;
 	saveProject.save(function (err, result) {
-		if(err)
-			{
-				console.log(err);
-				errorCB(err);}
-		else
-		{
-			projectObj.version[length - 1].members.map(function(member) {
+		if(err) {
+				errorCB(err);
+		} else {
+			projectObj.version[length - 1].members.map(function (member) {
 				CandidateModel.
 				update(
 					{EmployeeID: member.EmployeeID},
@@ -180,11 +179,11 @@ let addProject = function (projectObj, successCB, errorCB) {
 							ProjectSkills: projectObj.version[length - 1].skills
 						}
 					},
-					function(updateError, updateResult) {
+					function (updateError, updateResult) {
 						if(updateError) {
 							errorCB(updateError);
 						}
-						console.log(updateResult);
+						logger.info('Update Result: ', updateResult);
 					}
 				);
 			},
@@ -194,12 +193,11 @@ let addProject = function (projectObj, successCB, errorCB) {
 };
 
 let addVersion = function (name, versionObj, successCB, errorCB) {
-	console.log(versionObj, 'versionObj');
 	ProjectModel.update({product: name}, {$push: {version: versionObj}}, function (err, result) {
 		if(err) {
 			errorCB(err);
 		} else {
-			versionObj.members.map(function(member) {
+			versionObj.members.map(function (member) {
 				CandidateModel.
 				update(
 					{EmployeeID: member.EmployeeID},
@@ -210,10 +208,11 @@ let addVersion = function (name, versionObj, successCB, errorCB) {
 							ProjectSkills: versionObj.skills
 						}
 					},
-					function(updateError2, updateResult2) {
+					function (updateError2, updateResult2) {
 						if(err) {
 							errorCB(err);
 						}
+						logger.info('Update Result2: ', updateResult2);
 					}
 				);
 			},
@@ -224,7 +223,6 @@ let addVersion = function (name, versionObj, successCB, errorCB) {
 
 let updateProject = function (projectObj, delList, prevWave, version, successCB, errorCB) {
 	let proj = projectObj.version[version];
-	console.log(proj);
 	ProjectModel.
 	findOneAndUpdate(
 		{version: {$elemMatch: {name: proj.name}}},
@@ -232,8 +230,9 @@ let updateProject = function (projectObj, delList, prevWave, version, successCB,
 		function (err, result) {
 		if(err) {
 			errorCB(err);
+			logger.error('Update Project Error Object: ', result);
 		} else {
-			projectObj.version[version].members.map(function(member) {
+			projectObj.version[version].members.map(function (member) {
 				CandidateModel.
 				update(
 					{EmployeeID: member.EmployeeID},
@@ -244,22 +243,22 @@ let updateProject = function (projectObj, delList, prevWave, version, successCB,
 							ProjectSkills: projectObj.version[version].skills
 						}
 					},
-					function(updateError3, updateResult3) {
-					if(err) {
-						errorCB(err);
+					function (updateError3, updateResult3) {
+					if(updateError3) {
+						errorCB(updateError3);
 					}
-					console.log(result);
+					logger.info('Update Result3: ', updateResult3);
 				});
 			},
 			CandidateModel.
 			updateMany(
 				{EmployeeID: {$in: delList}},
 				{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
-				function(updateManyError, updateManyResult) {
-					if(err) {
-						errorCB(err);
+				function (updateManyError, updateManyResult) {
+					if(updateManyError) {
+						errorCB(updateManyError);
 					}
-					console.log(result);
+					logger.info('Update ManyResult: ', updateManyResult);
 				},
 				CandidateModel.
 				updateMany(
@@ -270,7 +269,7 @@ let updateProject = function (projectObj, delList, prevWave, version, successCB,
 						]
 					},
 					{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
-					function(updateManyError2, updateManyResult2) {
+					function (updateManyError2, updateManyResult2) {
 					if(updateManyError2) {
 						errorCB(updateManyError2);
 					}
@@ -283,19 +282,19 @@ let updateProject = function (projectObj, delList, prevWave, version, successCB,
 };
 
 let deleteVersion = function (versionObj, successCB, errorCB) {
-	console.log('version' + versionObj);
 	ProjectModel.update(
 		{version: {$elemMatch: {name: versionObj.name}}},
 		{$pull: {version: {name: versionObj.name}}},
 		function (err, result) {
 		if(err) {
-			console.log(err, 'err');
+			logger.error('Project Update Error: ', err);
+			logger.error('Result: ', result);
 		} else {
 			CandidateModel.
 			updateMany(
 				{ProjectName: versionObj.name},
 				{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
-				function(updateManyError3, updateManyResult3) {
+				function (updateManyError3, updateManyResult3) {
 					if(updateManyError3) {
 						errorCB(updateManyError3);
 					}
@@ -308,9 +307,9 @@ let deleteVersion = function (versionObj, successCB, errorCB) {
 let deleteProject = function (projectObj, successCB, errorCB) {
 	ProjectModel.remove({product: projectObj.product}, function (err, result) {
 		if(err) {
-			console.log(err, 'err');
+			logger.error('Prject Delete Error: ', err);
 		} else {
-			projectObj.version.map(function(version) {
+			projectObj.version.map(function (version) {
 				CandidateModel.
 				updateMany(
 					{ProjectName: version.name},
@@ -321,80 +320,85 @@ let deleteProject = function (projectObj, successCB, errorCB) {
 							ProjectSkills: []
 						}
 					},
-					function(updateManyError4, updateManyResult4) {
+					function (updateManyError4, updateManyResult4) {
 						if(updateManyError4) {
 							errorCB(updateManyError4);
 						}
+						logger.info('Update ManyResult4: ', updateManyResult4);
 					});
 			}, successCB(result));
 		}
 	});
 };
 
-let getCadetsOfProj = function(name, successCB, errorCB) {
-	console.log('inside getcadetsproj');
-	CandidateModel.find({ProjectName: name}, function(err, result) {
-		if (err)
-				{errorCB(err);}
+let getCadetsOfProj = function (name, successCB, errorCB) {
+	CandidateModel.find({ProjectName: name}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
-let getCadet = function(email, successCB, errorCB) {
-	console.log();
-	CandidateModel.findOne({EmailID: email}, function(err, result) {
-		if (err)
-				{errorCB(err);}
+let getCadet = function (email, successCB, errorCB) {
+	CandidateModel.findOne({EmailID: email}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
-let getUserRole = function(email, successCB, errorCB) {
-	console.log(email);
-	UserModel.findOne({email: email}, function(err, result) {
-		if (err)
-				{errorCB(err);}
+let getUserRole = function (email, successCB, errorCB) {
+	UserModel.findOne({email: email}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
-let getCadets = function(successCB, errorCB) {
-	CandidateModel.find({}, function(err, result) {
-		if (err)
-				{errorCB(err);}
+let getCadets = function (successCB, errorCB) {
+	CandidateModel.find({}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
 let updateCadet = function (cadetObj, successCB, errorCB) {
-	CandidateModel.update({EmployeeID: cadetObj.EmployeeID}, cadetObj, function(err, status) {
-		if(err)
-			{errorCB(err);}
+	CandidateModel.update({EmployeeID: cadetObj.EmployeeID}, cadetObj, function (err, status) {
+		if(err) {
+			errorCB(err);
+		}
 		successCB(status);
 	});
 };
 
 let updateCadets = function (cadetArr, successCB, errorCB) {
 	let count = 0;
-	cadetArr.forEach(function(cadetObj) {
-		CandidateModel.update({EmployeeID: cadetObj.EmployeeID}, cadetObj, function(err, status) {
-			if(err)
-				{errorCB(err);}
+	cadetArr.forEach(function (cadetObj) {
+		CandidateModel.update({EmployeeID: cadetObj.EmployeeID}, cadetObj, function (err, status) {
+			if(err) {
+				errorCB(err);
+			}
 			count = count + 1;
-			if(count === cadetArr.length)
-				{successCB(status);}
+			if(count === cadetArr.length) {
+				successCB(status);
+			}
 		});
 	});
 };
 
-let deleteCadet = function(cadetObj, successCB, errorCB) {
-	console.log('cadetObj to delete', cadetObj);
+let deleteCadet = function (cadetObj, successCB, errorCB) {
 	CandidateModel
 		.find(cadetObj)
 		.remove(function (err, status) {
-			if(err)
-				{errorCB(err);}
-			else {
+			if(err) {
+				errorCB(err);
+				logger.error('DeleteCadet Error Object: ', status);
+			} else {
 				let user = {};
 				user.name = cadetObj.EmployeeName;
 				user.email = cadetObj.EmailID;
@@ -407,6 +411,7 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
 						function (errr, resultt) {
 							if(errr) {
 							errorCB(errr);
+							logger.error('UpdateWave in Delete Cadet Error Object: ', resultt);
 						} else {
 							ProjectModel.
 							update(
@@ -421,6 +426,7 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
 							});
 						}
 					});
+					logger.info('Delete User Status: ', deleteUserStatus);
 				},
 				function (erR) {
 					errorCB(erR);
@@ -429,30 +435,31 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
 		});
 };
 
-let getFiles = function(successCB, errorCB) {
-	FileModel.find({}, function(err, result) {
-		if (err)
-				{errorCB(err);}
+let getFiles = function (successCB, errorCB) {
+	FileModel.find({}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
-let saveFeedback = function(feedbackObj, successCB, errorCB) {
+let saveFeedback = function (feedbackObj, successCB, errorCB) {
 	let saveFeedbackObj = new FeedbackModel(feedbackObj);
 	saveFeedbackObj.save(function (err, result) {
-		console.log(err);
-		if(err)
-			{errorCB(err);}
+		if(err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
-let saveEvaluation = function(evaluationObj, successCB, errorCB) {
+let saveEvaluation = function (evaluationObj, successCB, errorCB) {
 	let saveEvaluationObj = new EvaluationModel(evaluationObj);
 	saveEvaluationObj.save(function (err, result) {
-		console.log(err);
-		if(err)
-			{errorCB(err);}
+		if(err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
@@ -463,63 +470,54 @@ let saveEvaluation = function(evaluationObj, successCB, errorCB) {
 ****************************************************/
 
 // get all candidates of specific wave
-let getWaveSpecificCandidates = function(waveID, successCB, errorCB) {
-	console.log('insidemongo controller' + waveID);
-	CandidateModel.find({Wave: waveID}, function(err, result) {
+let getWaveSpecificCandidates = function (waveID, successCB, errorCB) {
+	CandidateModel.find({Wave: waveID}, function (err, result) {
 		if(err) {
-			console.log('error');
 			errorCB(err);
 		}
-		console.log(result);
 		successCB(result);
 	});
 };
 
 // update absentees
-let updateAbsentees = function(Absentees, successCB, errorCB) {
+let updateAbsentees = function (Absentees, successCB, errorCB) {
 	CandidateModel.
 	updateMany(
 		{EmployeeID: Absentees.absentee},
 		{$push: {DaysAbsent: Absentees.details}},
-		function(err, result) {
+		function (err, result) {
 			if(err) {
-				console.log('error' + err);
 				errorCB(err);
 			}
-			console.log(result);
 			successCB(result);
 		}
 	);
 };
 
 // cancel Leave
-let cancelLeave = function(details, successCB, errorCB) {
+let cancelLeave = function (details, successCB, errorCB) {
 	if(details.id !== '') {
 	let id = new mongoose.mongo.ObjectId(details.id);
 	CandidateModel.
-	update({'DaysAbsent._id': id}, {$pull: {DaysAbsent: {_id: id}}}, function(err, result) {
+	update({'DaysAbsent._id': id}, {$pull: {DaysAbsent: {_id: id}}}, function (err, result) {
 		if(err) {
-			console.log('error' + err);
 			errorCB(err);
 		}
-		console.log(result);
 		successCB(result);
 	});
-}
-else {
+} else {
 	successCB();
 }
 };
 
-let updateApproval = function(Approval, successCB, errorCB) {
+let updateApproval = function (Approval, successCB, errorCB) {
 	let id = new mongoose.mongo.ObjectId(Approval.id);
 	CandidateModel.
 	update(
 		{'DaysAbsent._id': id},
 		{$set: {'DaysAbsent.$.approved': Approval.approval}},
-		function(err, result) {
+		function (err, result) {
 			if(err) {
-				console.log('error' + err);
 				errorCB(err);
 			}
 			successCB(result);
@@ -527,32 +525,13 @@ let updateApproval = function(Approval, successCB, errorCB) {
 	);
 };
 
-
 /** **************************************************
 *******          Candidates                 ********
 ****************************************************/
 
-let saveCandidate = function(candidate, successCB, errorCB) {
+let saveCandidate = function (candidate, successCB, errorCB) {
 	let newCadet = new CandidateModel(candidate);
 	newCadet.save(function (err, result) {
-		if(err)
-			{errorCB(err);}
-		successCB(result);
-	});
-};
-
-let getCoursesForWave = function(waveID, successCB, errorCB) {
-	console.log('getCoursesForWave: ', waveID);
-	WaveModel.findOne({WaveID: waveID}, 'CourseNames', function(err, result) {
-		if(err)
-			{errorCB(err);}
-		console.log('Result for getCoursesForWave: ', result);
-		successCB(result);
-	});
-};
-
-let getCandidates = function(waveID, courseName, successCB, errorCB) {
-	CandidateModel.find({Wave: waveID, CourseName: courseName}, function(err, result) {
 		if(err) {
 			errorCB(err);
 		}
@@ -560,8 +539,17 @@ let getCandidates = function(waveID, courseName, successCB, errorCB) {
 	});
 };
 
-let getAssesmentTrack = function(courseName, successCB, errorCB) {
-	CourseModel.findOne({CourseName: courseName}, 'AssessmentCategories', function(err, result) {
+let getCourses = function (successCB, errorCB) {
+	CourseModel.find({}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
+
+let getCoursesForWave = function (waveID, successCB, errorCB) {
+	WaveModel.findOne({WaveID: waveID}, 'CourseNames', function (err, result) {
 		if(err) {
 			errorCB(err);
 		}
@@ -569,66 +557,82 @@ let getAssesmentTrack = function(courseName, successCB, errorCB) {
 	});
 };
 
+let getCandidates = function (waveID, courseName, successCB, errorCB) {
+	CandidateModel.find({Wave: waveID, CourseName: courseName}, function (err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
+
+let getAssesmentTrack = function (courseName, successCB, errorCB) {
+	CourseModel.findOne({CourseName: courseName}, 'AssessmentCategories', function (err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
 
 /** **************************************************
 *******             Common Functions         ********
 ****************************************************/
 
-let getWaveIDs = function(successCB, errorCB) {
-	WaveModel.find().distinct('WaveID', function(err, result) {
+let getWaveIDs = function (successCB, errorCB) {
+	WaveModel.find().distinct('WaveID', function (err, result) {
 		if(err) {
-			console.log('error');
 			errorCB(err);
 		}
 		successCB(result);
 	});
 };
 
-let getWaveObject = function(waveID, successCB, errorCB) {
-	WaveModel.findOne({WaveID: waveID}, function(err, result) {
+let getWaveObject = function (waveID, successCB, errorCB) {
+	WaveModel.findOne({WaveID: waveID}, function (err, result) {
 		if(err) {
-			console.log('error');
 			errorCB(err);
 		}
 		successCB(result);
 	});
 };
 
-let getWaves = function(successCB, errorCB) {
-	WaveModel.find({}, function(err, result) {
-		if (err)
-				{errorCB(err);}
-			console.log(result);
+let getWaves = function (successCB, errorCB) {
+	WaveModel.find({}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
-let getCadetsOfWave = function(cadets, successCB, errorCB) {
-	CandidateModel.find({EmployeeID: {$in: cadets}}, function(err, result) {
-		if (err)
-				{errorCB(err);}
-			console.log(result);
+let getCadetsOfWave = function (waveID, successCB, errorCB) {
+	CandidateModel.find({Wave: waveID}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
 let deleteWave = function (waveObj, successCB, errorCB) {
 	WaveModel.remove({WaveID: waveObj.WaveID}, function (err, result) {
-		if(err)
-			{errorCB(err);}
-		else
-		{
-			CandidateModel.find({EmployeeID: {$in: waveObj.Cadets}}, function(ERR, cadets) {
-				cadets.map(function(cadetObj) {
+		if(err) {
+			errorCB(err);
+			logger.error('Delete Wave Error: ', err);
+			logger.error('Delete Wave Error Object: ', result);
+		} else {
+			CandidateModel.find({EmployeeID: {$in: waveObj.Cadets}}, function (ERR, cadets) {
+				cadets.map(function (cadetObj) {
 				let user = {};
 				user.name = cadetObj.EmployeeName;
 				user.email = cadetObj.EmailID;
 				user.username = cadetObj.EmailID.split('@')[0];
 				adminMongoController.deleteUser(user, function (status) {
 					if(err) {
-						console.log(err);
+						logger.error('Delete Wave - Delete User Error: ', err);
 					}
-					console.log('...........' + status);
+					logger.debug('Delete Wave - Delete User Status: ', status);
 				});
 			});
 			},
@@ -636,11 +640,11 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 				updateMany(
 					{EmployeeID: {$in: waveObj.Cadets}},
 					{$set: {Wave: undefined}},
-					function(eRR, res) {
+					function (eRR, res) {
 					if(eRR) {
-						console.log(eRR);
+						logger.error('Delete Wave - Update Canidate Error: ', err);
 					}
-					successCB(result);
+					successCB(res);
 				})
 			);
 		}
@@ -649,27 +653,30 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 
 let updateWave = function (waveObj, successCB, errorCB) {
 	WaveModel.update({WaveID: waveObj.WaveID}, waveObj, function (err, result) {
-		if(err)
-			{errorCB(err);}
+		if(err) {
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
 
 let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 	let userObj = {};
-	cadets.map(function(cadet) {
-	CandidateModel.findOneAndUpdate({EmployeeID: cadet}, {$set: {Wave: waveID}}, function(err, user) {
-						if(err)
-							{errorCB(err);}
-						else
-						{
+	cadets.map(function (cadet) {
+	CandidateModel.findOneAndUpdate(
+		{EmployeeID: cadet},
+		{$set: {Wave: waveID}},
+		function (err, user) {
+						if(err) {
+							errorCB(err);
+						} else {
 							userObj.name = user.EmployeeName;
 							userObj.email = user.EmailID;
 							userObj.username = user.EmailID.split('@')[0];
 							userObj.password = CONFIG.DEFAULT_PASS;
 							userObj.role = 'candidate';
 							adminMongoController.addUser(userObj, function (savedUser) {
-								logger.info('User created', user.EmployeeName);
+								logger.info('New User created: ', savedUser);
 							}, function (Err) {
 								logger.error('Error in creating user', Err);
 							});
@@ -678,13 +685,14 @@ let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 				});
 };
 
-let getAbsentees = function(successCB, errorCB) {
+let getAbsentees = function (successCB, errorCB) {
 	CandidateModel.
 	find(
 		{DaysAbsent: {$elemMatch: {$or: [{approved: 'no'}, {approved: 'rejected'}]}}},
-		function(err, cadets) {
-			if(err)
-				{errorCB(err);}
+		function (err, cadets) {
+			if(err) {
+				errorCB(err);
+			}
 			successCB(cadets);
 		}
 	);
@@ -694,29 +702,31 @@ let getAbsentees = function(successCB, errorCB) {
 *********          Candidate Filter         *********
 ****************************************************/
 
-let getFilteredCandidates = function(filterQuery, successCB, errorCB) {
-	CandidateModel.find(filterQuery, function(err, candidates) {
-		if(err)
-			{errorCB(err);}
+let getFilteredCandidates = function (filterQuery, successCB, errorCB) {
+	CandidateModel.find(filterQuery, function (err, candidates) {
+		if(err) {
+			errorCB(err);
+		}
 		successCB(candidates);
 	});
 };
 
-let updatePresent = function(EmpID, present, successCB, errorCB) {
+let updatePresent = function (EmpID, present, successCB, errorCB) {
 	CandidateModel.
-	update({EmployeeID: EmpID}, {$push: {DaysPresent: present}}, function(err, candidates) {
-		if(err)
-			{errorCB(err);}
+	update({EmployeeID: EmpID}, {$push: {DaysPresent: present}}, function (err, candidates) {
+		if(err) {
+			errorCB(err);
+		}
 		successCB(candidates);
 	});
 };
 
-let cancelPresent = function(EmpID, date, successCB, errorCB) {
+let cancelPresent = function (EmpID, date, successCB, errorCB) {
 	CandidateModel.
-	update({EmployeeID: EmpID}, {$pull: {DaysPresent: date}}, function(err, candidates) {
-		if(err)
-			{errorCB(err);}
-		console.log(candidates);
+	update({EmployeeID: EmpID}, {$pull: {DaysPresent: date}}, function (err, candidates) {
+		if(err) {
+			errorCB(err);
+		}
 		successCB(candidates);
 	});
 };
@@ -744,6 +754,7 @@ module.exports = {
 	getWaveSpecificCandidates,
 	updateAbsentees,
 	saveCandidate,
+	getCourses,
 	getCoursesForWave,
 	getCandidates,
 	getAssesmentTrack,

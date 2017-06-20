@@ -8,13 +8,15 @@ import {Link} from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import Footer from '../../views/Footer.jsx';
 import {Card, CardMedia, CardText} from 'material-ui/Card';
-
+import VisibilityIcon from 'material-ui/svg-icons/action/visibility';
+import VisibilityOffIcon from 'material-ui/svg-icons/action/visibility-off';
 
 export default class Login extends React.Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
+			passwordType: "password",
 			username: "",
 			password: "",
 			errMsg: "",
@@ -24,6 +26,7 @@ export default class Login extends React.Component {
 		this.onChangeUsername = this.onChangeUsername.bind(this)
 		this.onChangePassword = this.onChangePassword.bind(this)
 		this.login = this.login.bind(this)
+		this.toggleShowPassword = this.toggleShowPassword.bind(this)
 	}
 
 	onChangeUsername(e) {
@@ -44,7 +47,6 @@ export default class Login extends React.Component {
 	onSubmit(e){
 	 this.onCommentSubmit(e)
 	 } ;
-
 
 	login() {
 		let th = this
@@ -84,6 +86,13 @@ export default class Login extends React.Component {
 		}
 	}
 
+	toggleShowPassword() {
+		let passwordType = this.state.passwordType == 'password' ? 'text' : 'password';
+		this.setState({
+			passwordType: passwordType
+		})
+	}
+
 	render() {
 
 		return(
@@ -98,12 +107,19 @@ export default class Login extends React.Component {
 					 	onChange={this.onChangeUsername}
 						style={{width: '100%'}}
 						errorText={this.state.usernameErrorText}/> <br />
-					 <TextField
-					 	floatingLabelText="Password"
-						type="password"
-						onChange={this.onChangePassword}
-						style={{width: '100%'}}
-						errorText={this.state.passwordErrorText}/>
+						<div style={{position: 'relative', display: 'inline-block', width: '100%'}}>
+							{
+								this.state.passwordType == 'password' ?
+								<VisibilityIcon style={{position: 'absolute', right: 0, top: 35, width: 20, height: 20, zIndex: 1, cursor: 'pointer'}} onTouchTap={this.toggleShowPassword}/> :
+								<VisibilityOffIcon style={{position: 'absolute', right: 0, top: 35, width: 20, height: 20, zIndex: 1, cursor: 'pointer'}} onTouchTap={this.toggleShowPassword}/>
+							}
+							<TextField
+	 					 	floatingLabelText="Password"
+	 						type={this.state.passwordType}
+	 						onChange={this.onChangePassword}
+	 						style={{width: '100%'}}
+	 						errorText={this.state.passwordErrorText}/>
+						</div>
 					 <br /><br />
 					 <RaisedButton
 					  type="submit"

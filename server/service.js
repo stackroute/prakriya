@@ -21,7 +21,7 @@ function setupRestRoutes(app) {
   //  MOUNT YOUR REST ROUTE HERE
   //  Eg: app.use('/resource', require(path.join(__dirname, './module')));
 
-  app.use(function(req, res) {
+  app.use(function (req, res) {
     let err = new Error('Resource not found');
     err.status = 404;
     return res.status(err.status).json({
@@ -29,7 +29,7 @@ function setupRestRoutes(app) {
     });
   });
 
-  app.use(function(err, req, res) {
+  app.use(function (err, req, res) {
     logger.error('Internal error in watch processor: ', err);
     return res.status(err.status || 500).json({
       error: err.message
@@ -55,7 +55,7 @@ function setupMiddlewares(app) {
 
   app.use(favicon(path.join(__dirname, '../', 'client', 'favicon.ico')));
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.urlencoded({extended: false}));
   app.use(expressSession({secret: 'prakriya'}));
   app.use(auth.initialize());
   app.use(flash());
@@ -98,41 +98,43 @@ function setupWebpack(app) {
 function setupMongooseConnections() {
   mongoose.connect(CONFIG.MONGO.mongoURL);
 
-  mongoose.connection.on('connected', function() {
+  mongoose.connection.on('connected', function () {
     logger.debug('Mongoose is now connected to ', CONFIG.MONGO.mongoURL);
     const ControlsModel = require('../models/accesscontrols.js');
     const RoleModel = require('../models/roles.js');
     const UserModel = require('../models/users.js');
-    CONFIG.BASEDATA.ACCESS_CONTROLS.map(function(controlObj) {
+    CONFIG.BASEDATA.ACCESS_CONTROLS.map(function (controlObj) {
       let saveControl = new ControlsModel(controlObj);
-      saveControl.save(function(err, control) {
+      saveControl.save(function (err, control) {
         if(!err) {
           logger.info('Access Control added', control.name);
         }
       });
     });
     let saveRole = new RoleModel(CONFIG.BASEDATA.ADMIN_ROLE);
-    saveRole.save(function(err, role) {
-      if(!err)
-          {logger.info('Role added', role.name);}
+    saveRole.save(function (err, role) {
+      if(!err) {
+        logger.info('Role added', role.name);
+      }
     });
     let saveUser = new UserModel(CONFIG.BASEDATA.ADMIN_USER);
-    saveUser.save(function(err, user) {
-      if(!err)
-          {logger.info('User added', user.name);}
+    saveUser.save(function (err, user) {
+      if(!err) {
+        logger.info('User added', user.name);
+      }
     });
   });
 
-  mongoose.connection.on('error', function(err) {
+  mongoose.connection.on('error', function (err) {
     logger.error('Error in Mongoose connection: ', err);
   });
 
-  mongoose.connection.on('disconnected', function() {
+  mongoose.connection.on('disconnected', function () {
     logger.debug('Mongoose is now disconnected..!');
   });
 
-  process.on('SIGINT', function() {
-    mongoose.connection.close(function() {
+  process.on('SIGINT', function () {
+    mongoose.connection.close(function () {
       logger.info(
         'Mongoose disconnected on process termination'
         );

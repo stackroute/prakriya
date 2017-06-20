@@ -100,11 +100,11 @@ export default class Attendance extends React.Component {
       let now = Moment(th.state.waveObject.EndDate);
       let daysOfYear = [];
       let day = new Date(th.state.waveObject.StartDate).getDay();
-      dayName = [ <TableHeaderColumn><b style={{fontSize:'20px'}}>Sunday</b></TableHeaderColumn>,
+      dayName = [ <TableHeaderColumn><b style={{fontSize:'20px'}}  disabled='true'>Sunday</b></TableHeaderColumn>,
               <TableHeaderColumn><b style={{fontSize:'20px'}}>Monday</b></TableHeaderColumn>,
-              <TableHeaderColumn><b style={{fontSize:'20px'}}> Tuesday </b></TableHeaderColumn>,
-              <TableHeaderColumn><b style={{fontSize:'20px'}}>Wednesday</b></TableHeaderColumn>, <TableHeaderColumn><b style={{fontSize:'20px'}}> Thursday </b></TableHeaderColumn>,
-              <TableHeaderColumn><b style={{fontSize:'20px'}}>Friday</b></TableHeaderColumn>, <TableHeaderColumn><b style={{fontSize:'20px'}}> Saturday </b></TableHeaderColumn>]
+              <TableHeaderColumn><b style={{fontSize:'20px'}}>Tuesday</b></TableHeaderColumn>,
+              <TableHeaderColumn><b style={{fontSize:'20px'}}>Wednesday</b></TableHeaderColumn>, <TableHeaderColumn><b style={{fontSize:'20px'}}>Thursday</b></TableHeaderColumn>,
+              <TableHeaderColumn><b style={{fontSize:'20px'}}>Friday</b></TableHeaderColumn>, <TableHeaderColumn><b style={{fontSize:'20px'}}>Saturday</b></TableHeaderColumn>]
               name = []
       for( let i = day; name.length < dayName.length;) {
         if(i === 6)
@@ -131,16 +131,20 @@ export default class Attendance extends React.Component {
           }
         })
         }
+        if(new Date(d).getDay() === 0 || new Date(d).getDay() === 6 )
+        {
+          color = '#F5F5F5'
+        }
         if(daysOfYear.length === 0)
         {
-            daysOfYear.push(<TableRowColumn style={{backgroundColor:color}}><sup>{th.formatMonth(d)}</sup>{th.formatDate(d)}</TableRowColumn>);
+            daysOfYear.push(<TableRowColumn style={{backgroundColor:color,fontSize:'17px'}}><sup>{th.formatMonth(d)}</sup>{th.formatDate(d)}</TableRowColumn>);
         }
         else if(th.formatDate(d) == "01")
         {
-            daysOfYear.push(<TableRowColumn style={{backgroundColor:color}}><sup>{th.formatMonth(d)}</sup>{th.formatDate(d)}</TableRowColumn>);
+            daysOfYear.push(<TableRowColumn style={{backgroundColor:color,fontSize:'17px'}}><sup>{th.formatMonth(d)}</sup>{th.formatDate(d)}</TableRowColumn>);
         }
         else {
-            daysOfYear.push(<TableRowColumn style={{backgroundColor:color}}>{th.formatDate(d)}</TableRowColumn>);
+            daysOfYear.push(<TableRowColumn style={{backgroundColor:color,fontSize:'17px'}}>{th.formatDate(d)}</TableRowColumn>);
         }
       }
       for (let j = 0; j < ((daysOfYear.length / 7) + 1); j++) {
@@ -170,7 +174,7 @@ export default class Attendance extends React.Component {
 }
         </SelectField>
         <Table fixedHeader={true} height='300px'>
-          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+          <TableHeader displaySelectAll={false} adjustForCheckbox={false} style={{backgroundColor:'#EFEBE9'}}>
             <TableRow>
               {name}
             </TableRow>

@@ -10,6 +10,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import app from '../../styles/app.json';
 import dialog from '../../styles/dialog.json';
 import select from '../../styles/select.json';
+import CONFIG from '../../config';
 
 export default class AddWave extends React.Component {
 	constructor(props) {
@@ -17,8 +18,8 @@ export default class AddWave extends React.Component {
 		this.state = {
 			open: false,
 			cadets: [],
-			WaveID: '',
-			WaveIDErrorText: '',
+			courses: [],
+			Mode: '',
 			WaveNumber: '',
 			WaveNumberErrorText: '',
 			Location: '',
@@ -28,8 +29,8 @@ export default class AddWave extends React.Component {
 		}
 		this.handleOpen = this.handleOpen.bind(this)
 		this.handleClose = this.handleClose.bind(this)
-		this.handleWaveIdChange = this.handleWaveIdChange.bind(this)
 		this.handleWaveNumberChange = this.handleWaveNumberChange.bind(this)
+		this.handleModeChange = this.handleModeChange.bind(this)
 		this.handleLocationChange = this.handleLocationChange.bind(this)
 		this.handleStartDateChange = this.handleStartDateChange.bind(this)
 		this.handleEndDateChange = this.handleEndDateChange.bind(this)
@@ -41,7 +42,8 @@ export default class AddWave extends React.Component {
 
 	componentWillMount() {
 		this.setState({
-			cadets: this.props.cadets
+			cadets: this.props.cadets,
+			courses: this.props.courses
 		})
 	}
 
@@ -61,10 +63,9 @@ export default class AddWave extends React.Component {
 		}
 	}
 
-	handleWaveIdChange(event) {
+	handleModeChange(event, key, val) {
 		this.setState({
-			WaveID: event.target.value,
-			WaveIDErrorText: ''
+			Mode: val
 		})
 	}
 
@@ -104,8 +105,7 @@ export default class AddWave extends React.Component {
 
 	handleSubmit() {
 		let wave = {}
-		wave.WaveID = this.state.WaveID
-		wave.WaveNumber = this.state.WaveNumber
+		wave.WaveID = this.state.WaveNumber.replace(' ', '');
 		wave.Location = this.state.Location
 		wave.StartDate = this.state.StartDate
 		wave.EndDate = this.state.EndDate
@@ -118,7 +118,6 @@ export default class AddWave extends React.Component {
 		this.setState({
 			open: false,
 			WaveID: '',
-			WaveIDErrorText: '',
 			WaveNumber: '',
 			WaveNumberErrorText: '',
 			Location: '',
@@ -129,16 +128,17 @@ export default class AddWave extends React.Component {
 	}
 
 	validationSuccess() {
-		let wavePattern = /[A-z]{2}-[0-9]{1,}/
-		if(this.state.WaveID.trim().length == 0) {
-			this.setState({
-				WaveIDErrorText: 'This field cannot be empty.'
-			})
-		} else if(!wavePattern.test(this.state.WaveID.trim())) {
-			this.setState({
-				WaveIDErrorText: 'Invalid WaveID! Valid Example: IM-27 (Immersive Wave 27).'
-			})
-		} else if(this.state.WaveNumber.trim().length == 0) {
+		// let wavePattern = /[A-z]{2}-[0-9]{1,}/
+		// if(this.state.WaveID.trim().length == 0) {
+		// 	this.setState({
+		// 		WaveIDErrorText: 'This field cannot be empty.'
+		// 	})
+		// } else if(!wavePattern.test(this.state.WaveID.trim())) {
+		// 	this.setState({
+		// 		WaveIDErrorText: 'Invalid WaveID! Valid Example: IM-27 (Immersive Wave 27).'
+		// 	})
+		// } else 
+		if(this.state.WaveNumber.trim().length == 0) {
 			this.setState({
 				WaveNumberErrorText: 'This field cannot be empty.'
 			})
@@ -177,17 +177,38 @@ export default class AddWave extends React.Component {
         >
 				<div>
 					<div style={dialog.box50}>
-        	<TextField
-			      hintText="It should be unique"
-			      floatingLabelText="Wave ID *"
-						floatingLabelStyle={app.mandatoryField}
-			      value={this.state.WaveID}
-			      onChange={this.handleWaveIdChange}
-			      fullWidth={true}
-						errorText={this.state.WaveIDErrorText}
-			    />
+						<SelectField
+		          floatingLabelText="Mode"
+		          value={this.state.Mode}
+		          onChange={this.handleModeChange}
+		        >
+		        	{
+		        		CONFIG.MODES.map(function(mode, i) {
+		        			return <MenuItem value={mode} primaryText={mode} key={i}/>
+		        		})
+		        	}
+		        </SelectField>
 					</div>
 					<div style={dialog.box50}>
+						<SelectField
+							hintText="Select Courses"
+		          floatingLabelText="Course"
+		          value={this.state.Course}
+		          onChange={this.handleCourseChange}
+		          menuItemStyle={select.menu}
+							listStyle={select.list}
+							style={{width: '100%'}}
+							selectedMenuItemStyle={select.selectedMenu}
+							maxHeight={600}
+		        >
+		        	{
+		        		CONFIG.MODES.map(function(mode, i) {
+		        			return <MenuItem value={mode} primaryText={mode} key={i}/>
+		        		})
+		        	}
+		        </SelectField>
+					</div>
+					<div style={dialog.box100}>
 			    <TextField
 			      hintText="Provide some name to the wave"
 			      floatingLabelText="Wave Name *"

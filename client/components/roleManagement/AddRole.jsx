@@ -6,14 +6,9 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import {Grid, Row, Col} from 'react-flexbox-grid';
+import app from '../../styles/app.json';
 
 const styles = {
-	addButton: {
-		position:'fixed',
-	  bottom: '60px',
-	  right: '15px',
-	  zIndex: 1
-	},
 	dialog: {
 		backgroundColor: '#DDDBF1',
 		borderBottom: '3px solid teal',
@@ -169,7 +164,7 @@ export default class AddRole extends React.Component {
 
 		return (
 			<div>
-				<FloatingActionButton mini={true} style={styles.addButton} onTouchTap={this.handleOpen} >
+				<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
 		    <Dialog
@@ -184,8 +179,9 @@ export default class AddRole extends React.Component {
 					actionsContainerStyle={styles.actionsContainer}
         >
           <TextField
-          	floatingLabelText='Role'
-          	hintText='Name a new role'
+          	floatingLabelText='Role *'
+						floatingLabelStyle={app.mandatoryField}
+						hintText='Name a new role'
 						errorText={this.state.roleErrorText}
           	onChange={this.onChangeRole}
 						style={{width: '100%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}

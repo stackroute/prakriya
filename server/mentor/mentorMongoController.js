@@ -73,7 +73,7 @@ errorCB(err);
 
 let restoreCourse = function (restoreObj, successCB, errorCB) {
 	CourseModel.
-	updateMany({CourseName: {$in: restoreObj}}, {$set: {Removed: false}}, function (err, status) {
+	updateMany({ID: {$in: restoreObj}}, {$set: {Removed: false}}, function (err, status) {
 		if(err) {
 errorCB(err);
 }

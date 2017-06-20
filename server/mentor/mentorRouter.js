@@ -15,7 +15,7 @@ router.get('/trainingtracks', auth.canAccess(CONFIG.MENTOR), function (req, res)
     mentorMongoController.getTrainingTracks(function (trainingtracks) {
       res.status(201).json({trainingtracks: trainingtracks});
     }, function (TrainingTrackerr) {
-      logger.err('Error in trainingTrack', TrainingTrackerr);
+      logger.error('Error in trainingTrack', TrainingTrackerr);
       res.status(500).json({error: 'Cannot get all training tracks from db...!'});
     });
   } catch(err) {
@@ -32,7 +32,7 @@ router.get('/waves/:trainingTrack', auth.canAccess(CONFIG.MENTOR), function (req
     mentorMongoController.getWaves(req.params.trainingTrack, function (waves) {
       res.status(201).json({waves: waves});
     }, function (Waveerr) {
-    logger.err('Error in wave trainingTrack', Waveerr);
+    logger.error('Error in wave trainingTrack', Waveerr);
       res.status(500).json({error: 'Cannot get all waves from db...!'});
     });
   } catch(err) {
@@ -49,7 +49,7 @@ logger.info('API HIT ===> GET Courses');
     mentorMongoController.getCoursesFrom(req.params.wave, function (courses) {
       res.status(201).json({courses: courses});
     }, function (CWerr) {
-      logger.err('Error in course from wave', CWerr);
+      logger.error('Error in course from wave', CWerr);
       res.status(500).json({error: 'Cannot get all courses from db...!'});
     });
   } catch(err) {
@@ -79,16 +79,16 @@ get('/candidatesandtracks/:trainingTrack/:wave/:course',
               });
            },
            function (Assessmenterr) {
-             logger.err('Error in assessmentTrack', Assessmenterr);
+             logger.error('Error in assessmentTrack', Assessmenterr);
               res.status(500).json({error: 'Cannot get the assessment track from db...!'});
            }
          );
     }, function (candidateerr) {
-      logger.err('Error in getting candidates', candidateerr);
+      logger.error('Error in getting candidates', candidateerr);
       res.status(500).json({error: 'Cannot get all candidates from db...!'});
     });
   } catch(err) {
-    logger.err('Caught: ', err);
+    logger.error('Caught: ', err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -102,7 +102,7 @@ router.post('/updatecandidateassessment', auth.canAccess(CONFIG.MENTOR), functio
     mentorMongoController.updateCandidateAssessment(req.body, function (status) {
       res.status(200).json(status);
     }, function (updatecanerr) {
-      logger.err('Error in update candidate', updatecanerr);
+      logger.error('Error in update candidate', updatecanerr);
       res.status(500).json({error: 'Cannot update candidate in db...!'});
     });
   } catch(err) {
@@ -122,7 +122,7 @@ router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
     mentorMongoController.getCourses(function (course) {
       res.status(201).json(course);
     }, function (gcourseerr) {
-      logger.err('error in get course', gcourseerr);
+      logger.error('error in get course', gcourseerr);
       res.status(500).json({error: 'Cannot get all courses from db...!'});
     });
   } catch(err) {
@@ -141,7 +141,7 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) 
     mentorMongoController.updateCourse(courseObj, function (courses) {
       res.status(201).json(courses);
     }, function (updateerr) {
-      logger.err('err in updateerr', updateerr);
+      logger.error('err in updateerr', updateerr);
       res.status(500).json({error: 'Cannot update course in db...!'});
     });
   } catch(err) {
@@ -160,11 +160,11 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
     mentorMongoController.addCourse(courseObj, function (courses) {
       res.status(201).json(courses);
     }, function (addcourseerr) {
-      logger.err('err in addcourseerr', addcourseerr);
+      logger.error('err in addcourseerr', addcourseerr);
       res.status(500).json({error: 'Cannot add course in db...!'});
     });
   } catch(err) {
-    logger.err(err);
+    logger.error(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -179,7 +179,7 @@ router.post('/deletecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) 
     mentorMongoController.deleteCourse(courseObj, function (status) {
       res.status(200).json(status);
     }, function (deletecourseerr) {
-      logger.err('err in deletecourseerr', deletecourseerr);
+      logger.error('err in deletecourseerr', deletecourseerr);
       res.status(500).json({error: 'Cannot delete course in db...!'});
     });
   } catch(err) {
@@ -197,7 +197,7 @@ router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function (req, res)
     mentorMongoController.restoreCourse(courseObj, function (status) {
       res.status(200).json(status);
     }, function (restorecourseerr) {
-      logger.err('err in restorecourseerr', restorecourseerr);
+      logger.error('err in restorecourseerr', restorecourseerr);
       res.status(500).json({error: 'Cannot restore course in db...!'});
     });
   } catch(err) {
@@ -216,7 +216,7 @@ router.post('/addcategory', auth.canAccess(CONFIG.MENCAN), function (req, res) {
     mentorMongoController.addCategory(categoryObj, function (status) {
       res.json(status);
     }, function (caterr) {
-      logger.err('err in caterr', caterr);
+      logger.error('err in caterr', caterr);
       res.status(500).json({error: 'Cannot add the category...!'});
     });
   } catch(err) {
@@ -235,7 +235,7 @@ router.post('/deletecategory', auth.canAccess(CONFIG.MENCAN), function (req, res
     mentorMongoController.deleteCategory(categoryObj, function (status) {
       res.json(status);
     }, function (delcaterr) {
-      logger.err('err in delcaterr', delcaterr);
+      logger.error('err in delcaterr', delcaterr);
       res.status(500).json({error: 'Cannot delete the category...!'});
     });
   } catch(err) {
@@ -259,7 +259,7 @@ get('/waveobject/:trainingTrack/:waveNumber', auth.canAccess(CONFIG.MENTOR), fun
       logger.info('Recieved: ', JSON.stringify(waveObject));
       res.status(201).json({waveObject: waveObject});
     }, function (err) {
-      logger.err('err in err', err);
+      logger.error('err in err', err);
       res.status(500).json({error: 'Cannot get the wave from db...!'});
     });
   } catch(err) {
@@ -276,11 +276,11 @@ router.post('/addnewsession', auth.canAccess(CONFIG.MENTOR), function (req, res)
     logger.info('Status: ', status);
       res.status(201).json(status);
     }, function (statuserr) {
-      logger.err('Error in adding new session', statuserr);
+      logger.error('Error in adding new session', statuserr);
       res.status(500).json({error: 'Cannot add new session...!'});
     });
   } catch(err) {
-    logger.err(err);
+    logger.error(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -294,11 +294,11 @@ router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
       logger.info('Status: ', status);
       res.status(201).json(status);
     }, function (sessionerr) {
-      logger.err('err in delete session', sessionerr);
+      logger.error('err in delete session', sessionerr);
       res.status(500).json({error: 'Cannot add new session...!'});
     });
   } catch(err) {
-    logger.err(err);
+    logger.error(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -312,11 +312,11 @@ router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
     logger.info('Status: ', status);
       res.status(201).json(status);
     }, function (uperr) {
-      logger.err('err in update seesion', uperr);
+      logger.error('err in update seesion', uperr);
       res.status(500).json({error: 'Cannot add new session...!'});
     });
   } catch(err) {
-    logger.err(err);
+    logger.error(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
