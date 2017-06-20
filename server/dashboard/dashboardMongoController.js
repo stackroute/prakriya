@@ -597,8 +597,8 @@ let getWaves = function (successCB, errorCB) {
 	});
 };
 
-let getCadetsOfWave = function (cadets, successCB, errorCB) {
-	CandidateModel.find({EmployeeID: {$in: cadets}}, function (err, result) {
+let getCadetsOfWave = function (waveID, successCB, errorCB) {
+	CandidateModel.find({Wave: waveID}, function (err, result) {
 		if (err) {
 			errorCB(err);
 		}

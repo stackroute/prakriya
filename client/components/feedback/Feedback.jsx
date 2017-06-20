@@ -156,7 +156,7 @@ export default class Feedback extends React.Component {
 
  	componentWillUpdate(nextProps, nextState) {
 	 	nextState.invalidData = !(
-	 		nextState.mostLiked.trim() != '' && 
+	 		nextState.mostLiked.trim() != '' &&
 	 		nextState.leastLiked.trim() != ''
 	 	);
  	}

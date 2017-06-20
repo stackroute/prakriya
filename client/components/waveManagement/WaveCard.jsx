@@ -231,7 +231,7 @@ export default class WaveCard extends React.Component {
 		Request
 			.post('/dashboard/cadetsofwave')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send({cadets:cadets})
+			.send({cadets:this.props.wave.WaveID})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
@@ -296,6 +296,7 @@ export default class WaveCard extends React.Component {
 		let enddate = new Date(this.props.wave.EndDate);
 		enddate = enddate.getFullYear() + '/' + (enddate.getMonth()+1) + '/' + enddate.getDate();
 		let th = this
+    let title = ('CADETS - (' + th.props.wave.Cadets.length + ')')
 
 		const deleteDialogActions = [
       <FlatButton
@@ -384,7 +385,7 @@ export default class WaveCard extends React.Component {
 		        	th.getCadets(this.props.wave.Cadets)}
 		        	<Dialog
 					    	style={styles.dialog}
-			          title='CADETS'
+			          title={title}
 			          open={this.state.dialog}
 			          autoScrollBodyContent={true}
 			          onRequestClose={this.handleClose}
