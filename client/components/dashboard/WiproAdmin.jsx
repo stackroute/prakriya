@@ -42,7 +42,7 @@ console.log(this.state.expandedSector,'expandedSector')
                     expandedSector={this.state.expandedSector}
                     onSectorHover={this.handleMouseEnterOnSector}
                     sectorStrokeWidth={2}
-                    expandOnHover={false}
+                    expandOnHover={true}
                     />
 
 							 {
