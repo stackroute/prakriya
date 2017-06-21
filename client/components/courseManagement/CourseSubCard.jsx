@@ -1,16 +1,15 @@
 import React from 'react';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
-import Avatar from 'material-ui/Avatar';
-import IconButton from 'material-ui/IconButton';
-import Moment from 'moment';
-import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import FlatButton from 'material-ui/FlatButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
-import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
-import RemoveIcon from 'material-ui/svg-icons/content/remove-circle-outline';
 import app from '../../styles/app.json';
+import select from '../../styles/select.json';
+import dialog from '../../styles/dialog.json';
+import Paper from 'material-ui/Paper';
+import Chip from 'material-ui/Chip';
+import AutoComplete from 'material-ui/AutoComplete';
 
 const styles = {
   dialog: {
@@ -43,6 +42,21 @@ const styles = {
   },
   link: {
       wordWrap: 'break-word'
+  },
+  paper: {
+    margin: '5px',
+    padding: '5px',
+    width: 'auto',
+    height: '120px',
+    borderRadius: '2px'
+  },
+  wrapper: {
+    display: 'flex',
+    flexWrap: 'wrap'
+  },
+  chip: {
+    margin: '4px',
+    background: '#eee'
   }
 }
 
@@ -50,534 +64,280 @@ export default class CourseCard extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			open: false,
-			AssessmentName: '',
-			AssessmentMentor: '',
-			AssessmentDuration: '',
-			AssessmentVideos: [''],
-			VideoUrl: '',
-			AssessmentBlogs: [''],
-			BlogUrl: '',
-			AssessmentDocs: [''],
-			DocUrl: '',
-			showDeleteDialog: false,
+      openDialog: false,
+      type: 'Assignment',
+      Name: '',
+      NameErrorText: '',
+      Description: '',
+      DescriptionErrorText: '',
+      Skills: [],
+      SkillErrorText: '',
+      Week: '',
+      WeekErrorText: '',
+      Duration: '',
+      DurationErrorText: '',
+      searchPerm: '',
+      Day: '',
+      DayErrorText: ''
 		}
-		this.handleOpen = this.handleOpen.bind(this);
-	  this.handleClose = this.handleClose.bind(this);
-	  this.handleSubmit = this.handleSubmit.bind(this);
-		this.resetFields = this.resetFields.bind(this);
-		this.onChangeAssessmentName = this.onChangeAssessmentName.bind(this);
-		this.onChangeAssessmentMentor = this.onChangeAssessmentMentor.bind(this);
-		this.onChangeAssessmentDuration = this.onChangeAssessmentDuration.bind(this);
-		this.onChangeAssessmentVideos = this.onChangeAssessmentVideos.bind(this);
-		this.onChangeAssessmentBlogs = this.onChangeAssessmentBlogs.bind(this);
-		this.onChangeAssessmentDocs = this.onChangeAssessmentDocs.bind(this);
-		this.openDeleteDialog = this.openDeleteDialog.bind(this);
-		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-		this.handleDeleteCategory = this.handleDeleteCategory.bind(this);
-		this.onChangeAddVideo = this.onChangeAddVideo.bind(this);
-		this.onChangeRemoveVideo = this.onChangeRemoveVideo.bind(this);
-		this.pushVideo = this.pushVideo.bind(this);
-		this.onChangeAddBlog = this.onChangeAddBlog.bind(this);
-		this.onChangeRemoveBlog = this.onChangeRemoveBlog.bind(this);
-		this.pushBlog = this.pushBlog.bind(this);
-		this.onChangeAddDoc = this.onChangeAddDoc.bind(this);
-		this.onChangeRemoveDoc = this.onChangeRemoveDoc.bind(this);
-		this.pushDoc = this.pushDoc.bind(this);
-
+  this.handleClose = this.handleClose.bind(this);
+  this.handleSubmit = this.handleSubmit.bind(this);
+  this.onChangeType = this.onChangeType.bind(this);
+  this.resetFields = this.resetFields.bind(this);
+  this.validationSuccess = this.validationSuccess.bind(this);
+  this.onChangeName = this.onChangeName.bind(this);
+  this.onChangeDescription = this.onChangeDescription.bind(this);
+  this.onChangeDuration = this.onChangeDuration.bind(this);
+  this.onChangeWeek = this.onChangeWeek.bind(this);
+  this.onChangeDay = this.onChangeDay.bind(this);
+  this.handleUpdateInputPerm = this.handleUpdateInputPerm.bind(this);
+  this.handleAddNewPerm = this.handleAddNewPerm.bind(this);
+  this.handleSkillDelete = this.handleSkillDelete.bind(this);
 	}
 
-	componentWillMount() {
-		if(this.props.openDialog) {
-			this.setState({
-					open: true,
-				})
-		}
-	}
-
-	handleOpen() {
-    this.setState({open: true});
+  componentWillMount() {
+    this.setState({
+      openDialog: this.props.openDialog
+    })
   }
 
-  handleClose() {
-    this.setState({open: false});
-    this.props.handleClose();
+  handleClose(e, action) {
+    if (action == 'ADD') {
+      if (this.validationSuccess()) {
+        this.handleSubmit()
+        this.setState({openDialog: false})
+        this.resetFields()
+      }
+    } else {
+      this.setState({openDialog: false})
+      if (this.props.openDialog)
+        this.props.handleClose()
+      this.resetFields()
+    }
   }
 
   resetFields() {
-		this.setState({name: '',
-			username: '',
-			email: '',
-			password: '',
-			cpassword: '',
-			role: ''
-		})
-	}
-
-	handleSubmit() {
-		this.pushVideo();
-		this.pushBlog();
-		this.pushDoc();
-		let th = this;
-		let course = {};
-		course.CourseID = this.props.courseID;
-		let category = {};
-		category.Name = this.state.AssessmentName;
-		category.Mentor= this.state.AssessmentMentor;
-		category.Duration= this.state.AssessmentDuration;
-		category.Videos= this.state.AssessmentVideos;
-		category.Blogs= this.state.AssessmentBlogs;
-		category.Docs= this.state.AssessmentDocs;
-		course.Categories = category;
-		course.History = '';
-		this.resetFields();
-		this.props.handleAddCategory(course);
-	}
-
-	onChangeAssessmentName(e) {
-		this.setState({
-			AssessmentName: e.target.value
-		})
-	}
-
-	onChangeAssessmentMentor(e) {
-		this.setState({
-			AssessmentMentor: e.target.value
-		})
-	}
-
-	onChangeAssessmentDuration(e) {
-		this.setState({
-			AssessmentDuration: e.target.value
-		})
-	}
-
-	onChangeAssessmentVideos(e, prevValue) {
-		let prevArray = this.state.AssessmentVideos;
-		if(prevArray.indexOf(prevValue)>-1) {
-			let newVideoArray = prevArray;
-			let index = prevArray.indexOf(prevValue);
-			newVideoArray[index] = e.target.value;
-			this.setState({
-				AssessmentVideos: newVideoArray
-			})
-		} else {
-			this.setState({
-				VideoUrl: e.target.value
-			})
-		}
-	}
-
-	onChangeAssessmentBlogs(e, prevValue) {
-		let prevArray = this.state.AssessmentBlogs;
-		if(prevArray.indexOf(prevValue)>-1) {
-			let newBlogArray = prevArray;
-			let index = prevArray.indexOf(prevValue);
-			newBlogArray[index] = e.target.value;
-			this.setState({
-				AssessmentBlogs: newBlogArray
-			})
-		} else {
-			this.setState({
-				BlogUrl: e.target.value
-			})
-		}
-	}
-	onChangeAssessmentDocs(e, prevValue) {
-		let prevArray = this.state.AssessmentDocs;
-		if(prevArray.indexOf(prevValue)>-1) {
-			let newDocArray = prevArray;
-			let index = prevArray.indexOf(prevValue);
-			newDocArray[index] = e.target.value;
-			this.setState({
-				AssessmentDocs: newDocArray
-			})
-		} else {
-			this.setState({
-				DocUrl: e.target.value
-			})
-		}
-	}
-
-	openDeleteDialog() {
-		this.setState({
-			showDeleteDialog: true
-		})
-	}
-
-	closeDeleteDialog() {
-		this.setState({
-			showDeleteDialog: false
-		})
-	}
-
-	handleDeleteCategory() {
-		let course = {};
-		let category = this.props.category;
-		course.CourseID = this.props.courseID;
-		course.Categories = category;
-		course.History = '';
-		this.props.deleteCategory(course);
-	}
-
-	pushVideo() {
-		if(this.state.VideoUrl !== '')
-		{
-			let video = this.state.AssessmentVideos;
-			video.push(this.state.VideoUrl);
-			this.setState({
-				AssessmentVideos: video,
-				VideoUrl: ''
-			})
-		}
-	}
-
-	pushDoc() {
-		if(this.state.DocUrl !== '')
-		{
-			let doc = this.state.AssessmentDocs;
-			doc.push(this.state.DocUrl);
-			this.setState({
-				AssessmentDocs: doc,
-				DocUrl: ''
-			})
-		}
-	}
-
-	pushBlog() {
-		if(this.state.BlogUrl !== '')
-		{
-			let blog = this.state.AssessmentBlogs;
-			blog.push(this.state.BlogUrl);
-			this.setState({
-				AssessmentBlogs: blog,
-				BlogUrl: ''
-			})
-		}
-	}
-
-	onChangeAddVideo() {
-		this.pushVideo();
-		let a = this.state.AssessmentVideos;
-		a = a.concat('');
-		this.setState({
-			AssessmentVideos: a
-		})
-	}
-
-	onChangeAddBlog() {
-		this.pushBlog();
-		let a = this.state.AssessmentBlogs;
-		a = a.concat('');
-		this.setState({
-			AssessmentBlogs: a
-		})
-	}
-
-	onChangeAddDoc() {
-		this.pushDoc();
-		let a = this.state.AssessmentDocs;
-		a = a.concat('');
-		this.setState({
-			AssessmentDocs: a
-		})
-	}
-
-	onChangeRemoveVideo(id) {
-		let value = this.state.AssessmentVideos[id];
-		let th = this;
-		let a = this.state.AssessmentVideos;
-		a.splice(id,1);
-		this.pushVideo();
-		 this.setState({
-      AssessmentVideos: a
+    this.setState({
+      type: 'Assignment',
+      Name: '',
+      Description: '',
+      Skills: [],
+      Week: '',
+      Duration: '',
+      Day: ''
     })
+  }
+
+  validationSuccess() {
+    let durationPattern = /[0-9]{1,}/
+    if(this.state.type === 'Assignment') {
+      if (this.state.Name.trim().length == 0) {
+        this.setState({NameErrorText: 'This field cannot be empty.'})
+      } else if (this.state.Description.trim().length == 0) {
+        this.setState({DescriptionErrorText: 'This field cannot be empty.'})
+      } else if ((this.state.Duration + '').trim().length == 0) {
+        this.setState({DurationErrorText: 'This field cannot be empty.'})
+      } else if (!durationPattern.test(this.state.Duration)) {
+        this.setState({DurationErrorText: 'Invalid input! Enter the number of days.'})
+      } else if ((this.state.Week + '').trim().length == 0) {
+        this.setState({WeekErrorText: 'This field cannot be empty.'})
+      } else if (!durationPattern.test(this.state.Week)) {
+        this.setState({DurationErrorText: 'Invalid input! Enter the week number.'})
+      } else if (this.state.Skills.length == 0) {
+        this.setState({SkillErrorText: 'This field cannot be empty.'})
+      } else {
+        return true
+      }
+    }
+    else {
+      if (this.state.Name.trim().length == 0) {
+        this.setState({NameErrorText: 'This field cannot be empty.'})
+      } else if (this.state.Description.trim().length == 0) {
+        this.setState({DescriptionErrorText: 'This field cannot be empty.'})
+      } else if ((this.state.Day + '').trim().length == 0) {
+        this.setState({DayErrorText: 'This field cannot be empty.'})
+      } else if (!durationPattern.test(this.state.Day)) {
+        this.setState({DayErrorText: 'Invalid input! Enter the number of weeks.'})
+      } else {
+        return true
+      }
+    }
+    return false
+  }
+
+  onChangeType(e, key, value) {
+    console.log('mode e: ', e)
+    this.setState({type: value})
+  }
+
+  onChangeName(e) {
+    this.setState({Name: e.target.value, NameErrorText: ''})
+  }
+
+  onChangeDescription(e) {
+    this.setState({Description: e.target.value, DescriptionErrorText: ''})
+  }
+
+  onChangeDuration(e) {
+    this.setState({Duration: e.target.value, DurationErrorText: ''})
+  }
+
+  onChangeWeek(e) {
+    this.setState({Week: e.target.value, WeekErrorText: ''})
+  }
+
+  onChangeDay(e) {
+    this.setState({Day: e.target.value, DayErrorText: ''})
+  }
+
+  handleSubmit() {
+    let th = this
+    if(th.state.type === 'Assignment') {
+      let course = this.props.course;
+      let assignment = {};
+      assignment.Name = th.state.Name;
+      assignment.Description = th.state.Description;
+      assignment.Week = th.state.Week;
+      assignment.Skills = th.state.Skills;
+      assignment.Duration = th.state.Duration;
+      course.Assignments.push(assignment);
+      this.props.handleUpdate(course);
+      this.props.handleClose();
+    }
+    else {
+      let course = this.props.course;
+      let schedule = {};
+      schedule.Name = th.state.Name;
+      schedule.Description = th.state.Description;
+      schedule.Skills = th.state.Skills;
+      schedule.Day = th.state.Day;
+      course.Schedule.push(schedule);
+      this.props.handleUpdate(course);
+      this.props.handleClose();
+    }
+  }
+
+  handleUpdateInputPerm(searchPerm) {
+		this.setState({
+			searchPerm: searchPerm
+		})
 	}
 
-	onChangeRemoveBlog(id) {
-		let value = this.state.AssessmentBlogs[id];
-		let th = this;
-		let a = this.state.AssessmentBlogs;
-		a.splice(id,1);
-		this.pushBlog();
-		 this.setState({
-      AssessmentBlogs: a
+	handleAddNewPerm() {
+		let perms = this.state.Skills
+		perms.push(this.state.searchPerm)
+		this.setState({
+			Skills: perms,
+			searchPerm: '',
+      SkillErrorText: ''
+		})
+	}
+
+  handleSkillDelete(perm) {
+    let skill = this.state.Skills.filter(function(control) {
+      return perm != control
     })
-	}
+    this.setState({Skills: skill})
+  }
 
-	onChangeRemoveDoc(id) {
-		let value = this.state.AssessmentDocs[id];
-		let th = this;
-		let a = this.state.AssessmentDocs;
-		a.splice(id,1);
-		this.pushDoc();
-		 this.setState({
-      AssessmentDocs: a
-    })
-	}
-
-	render() {
-		let text = '';
-		let th = this;
-		const deleteDialogActions = [
-      <FlatButton
-        label="Cancel"
-        onTouchTap={this.closeDeleteDialog}
-        style={styles.actionButton}
-      />,
-      <FlatButton
-        label="Delete"
-        onTouchTap={this.closeDeleteDialog}
-        onClick={this.handleDeleteCategory}
-        style={styles.actionButton}
-      />
-    ]
-		const style = {
-			fontFamily: 'sans-serif',
-			margin: 'auto',
-			width: '500px'
-		}
-    if(this.props.openDialog) {
-      let title = "ADD CATEGORY"
-  		let actions = [
+  render() {
+    let th = this
+    let label = "Add " + this.state.type
+    let title = `ADD ${this.state.type.toUpperCase()}`
+  	let actions = [
         <FlatButton
           label="Cancel"
           style={styles.actionButton}
-          onTouchTap={this.handleClose}
+          onTouchTap={(e) => this.handleClose(e, 'CLOSE')}
         />,
         <FlatButton
-          label="Add Category"
-          onClick={this.handleSubmit}
+          label={label}
+          onClick={(e) => this.handleClose(e, 'ADD')}
           style={styles.actionButton}
         />
       ]
-			return(
-				<Dialog
-          bodyStyle={styles.dialog}
+      let duration = ''
+      if(th.state.type === 'Assignment') {
+        duration = (
+          <div><div>
+            <div style={dialog.box100}>
+              <TextField style={{
+                width: '100%'
+              }} hintText="Duration" floatingLabelText="Duration (in days) *" floatingLabelStyle={app.mandatoryField} value={this.state.Duration} onChange={this.onChangeDuration} errorText={this.state.DurationErrorText}/>
+            </div>
+          </div>
+          <div>
+            <div style={dialog.box100}>
+              <TextField style={{
+                width: '100%'
+              }} hintText="eg: 1 (denotes 1st week)" floatingLabelText="Week *" floatingLabelStyle={app.mandatoryField} value={this.state.Week} onChange={this.onChangeWeek} errorText={this.state.WeekErrorText}/>
+            </div>
+          </div></div>
+        )
+      }
+      else {
+        duration = (
+          <div>
+          <div>
+            <div style={dialog.box100}>
+              <TextField style={{
+                width: '100%'
+              }} hintText="eg: 14 (denotes the day on which session happened)" floatingLabelText="Day *" floatingLabelStyle={app.mandatoryField} value={this.state.Day} onChange={this.onChangeDay} errorText={this.state.DayErrorText}/>
+            </div>
+          </div></div>
+        )
+      }
+      return (
+        <Dialog bodyStyle={styles.dialog}
           title={title}
           titleStyle={styles.dialogTitle}
           modal={false}
-          open={this.state.open}
+          open={this.props.openDialog}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
           actionsContainerStyle={styles.actionsContainer}
-          actions={actions}
-        >
+          actions={actions}>
+          <SelectField style={{width: '100%'}} hintText="Category" floatingLabelText='Category' value={this.state.type} onChange={this.onChangeType} menuItemStyle={select.menu} listStyle={select.list} selectedMenuItemStyle={select.selectedMenu} maxHeight={600}>
+            <MenuItem key='1' value='Assignment' primaryText='Assignment'/>
+            <MenuItem key='2' value='Schedule' primaryText='Schedule'/>
+          </SelectField>
           <div>
-            <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
-            	<TextField
-    						    		hintText="Category Name"
-    						    		floatingLabelText="Category Name *"
-                        floatingLabelStyle={app.mandatoryField}
-          			    		value={this.state.AssessmentName}
-    						    		onChange={this.onChangeAssessmentName}
-    					/>
-					  </div>
-            <div style={{border: '2px solid white', width: '34%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
-              <TextField
-    						    		hintText="Duration"
-    						    		floatingLabelText="Duration *"
-                        floatingLabelStyle={app.mandatoryField}
-          			    		value={this.state.AssessmentDuration}
-    						    		onChange={this.onChangeAssessmentDuration}
-    					/>
-            </div>
-            <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
-              <TextField
-    		    		hintText="Mentor Name"
-    		    		floatingLabelText="Mentor *"
-                floatingLabelStyle={app.mandatoryField}
-  			    		value={this.state.AssessmentMentor}
-    		    		onChange={this.onChangeAssessmentMentor}
-    		    	/>
+            <div style={dialog.box100}>
+              <TextField style={{
+                width: '100%'
+              }} hintText="Name" floatingLabelText="Name *" floatingLabelStyle={app.mandatoryField} value={th.state.Name} onChange={th.onChangeName} errorText={th.state.NameErrorText}/>
             </div>
           </div>
           <div>
-            <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
-              <div style={{backgroundColor: '#49AAAA', textAlign: 'center'}}>
-                  <span>Videos</span>
-                  <IconButton
-                    tooltip="Add Video"
-                    onClick={this.onChangeAddVideo}
-                    disabled={this.state.disableSave}
-                    >
-                    <AddIcon/>
-                  </IconButton>
-              </div>
-              <div>
-              {
-                th.state.AssessmentVideos.map(function(video,index){
-                  text = "Video #"+(index + 1);
-                  return (
-                    <div style={{backgroundColor: '#DDDBF1', border: '2px solid #49AAAA', textAlign: 'center'}}>
-                      <TextField
-                        hintText="videos"
-                        floatingLabelText= {text}
-                        value={video}
-                        onChange={(event) => th.onChangeAssessmentVideos(event, video)}
-                        style={{display: 'inline-block', width: '80%'}}
-                        />
-                     <IconButton
-                        tooltip="Remove Video"
-                        onClick={th.onChangeRemoveVideo.bind(th,index)}
-                        style={{display: 'inline-block', width: '20%'}}>
-                        <RemoveIcon/>
-                     </IconButton>
-                   </div>
-                  )}
+            <div style={dialog.box100}>
+              <TextField style={{
+                width: '100%'
+              }} hintText="Description" floatingLabelText="Description *" floatingLabelStyle={app.mandatoryField} value={th.state.Description} onChange={th.onChangeDescription} errorText={th.state.DescriptionErrorText}/>
+            </div>
+          </div>
+          {duration}
+          <AutoComplete
+            floatingLabelText="Add Skills"
+            filter={AutoComplete.fuzzyFilter}
+            searchText={this.state.searchPerm}
+            onUpdateInput={this.handleUpdateInputPerm}
+            onNewRequest={this.handleAddNewPerm}
+            dataSource={this.props.course.Skills}
+            errorText={th.state.SkillErrorText}
+            maxSearchResults={5}
+          />
+          <Paper style={styles.paper} zDepth={1}>
+            <div style={styles.wrapper}>
+              {this.state.Skills.map(function(skill, index) {
+                return (
+                  <Chip onRequestDelete={() => th.handleSkillDelete(skill)} style={styles.chip} key={index}>
+                    <span>{skill}</span>
+                  </Chip>
                 )
-              }
-              </div>
+              })
+            }
             </div>
-            <div style={{border: '2px solid white', width: '34%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
-              <div style={{backgroundColor: '#49AAAA', textAlign: 'center'}}>
-                <span>Blogs</span>
-                <IconButton
-                  tooltip="Add Blog"
-                  onClick={this.onChangeAddBlog}
-                  disabled={this.state.disableSave}
-                  >
-      			      <AddIcon/>
-      			    </IconButton>
-              </div>
-              <div>
-                {
-                  th.state.AssessmentBlogs.map(function(blog,index){
-                    text = "Blogs #"+(index + 1);
-                    return (
-                      <div style={{backgroundColor: '#DDDBF1', border: '2px solid #49AAAA', textAlign: 'center'}}>
-                        <TextField
-                          hintText="blogs"
-                          floatingLabelText= {text}
-                          value={blog}
-                          onChange={(event) => th.onChangeAssessmentBlogs(event, blog)}
-                          style={{display: 'inline-block', width: '80%'}}
-                          />
-                        <IconButton
-                          tooltip="Remove blog"
-                          onClick={th.onChangeRemoveBlog.bind(th,index)}
-                          style={{display: 'inline-block', width: '20%'}}>
-                          <RemoveIcon/>
-                        </IconButton>
-                     </div>
-                   )
-                 })
-               }
-              </div>
-            </div>
-            <div style={{border: '2px solid white', width: '33%', display: 'inline-block', boxSizing: 'border-box', padding: '5px'}}>
-              <div  style={{backgroundColor: '#49AAAA', textAlign: 'center'}}>
-                <span>Documents</span>
-                <IconButton
-                  tooltip="Add Assessment"
-                  onClick={this.onChangeAddDoc}
-                  disabled={this.state.disableSave}
-                  >
-      			      <AddIcon/>
-      			    </IconButton>
-              </div>
-              <div>
-                {
-                  th.state.AssessmentDocs.map(function(doc,index){
-                    text = "Document #"+(index + 1);
-                    return (
-                      <div style={{backgroundColor: '#DDDBF1', border: '2px solid #49AAAA', textAlign: 'center'}}>
-                        <TextField
-                          hintText="document"
-                          floatingLabelText= {text}
-                          value={doc}
-                          onChange={(event) => th.onChangeAssessmentDocs(event, doc)}
-                          style={{display: 'inline-block', width: '80%'}}
-                          />
-                        <IconButton
-                          tooltip="Add Assessment"
-                          onClick={th.onChangeRemoveDoc.bind(th,index)}
-                          style={{display: 'inline-block', width: '20%'}}>
-                          <RemoveIcon/>
-                        </IconButton>
-                      </div>
-                    )
-                  })
-                }
-              </div>
-            </div>
-          </div>
-        </Dialog>
-        )
-		}
-		return (
-			<div>
-				<Card>
-					<CardHeader
-			      title={this.props.category.Name}
-			      subtitle={this.props.category.Duration}
-			      avatar={
-			      	<Avatar>
-			      		{this.props.category.Name.charAt(0).toUpperCase()}
-			      	</Avatar>
-			      }
-			      actAsExpander={true}
-      			showExpandableButton={true} >
-      				<IconButton tooltip="Delete category" style={{marginLeft:'-80px'}}  onClick={this.openDeleteDialog}>
-					      <DeleteIcon/>
-					    </IconButton>
-					 </CardHeader>
-			    <CardText expandable={true}>
-			    		{
-			    			this.props.category.Blogs.map(function(Blog,index) {
-					    		if(Blog !== '')
-					    		{
-										if(index === 0)
-										{
-											return(<div><h3>Blogs:</h3>{index+1} . <a href={Blog} target="_blank" style={styles.link}>{Blog}</a></div>);
-										}
-										return (<div>{index+1} . <a href={Blog} target="_blank" style={styles.link}>{Blog}</a></div>)
-									}
-					    })
-					    }
-					    {
-					    	this.props.category.Videos.map(function(Video,index) {
-					    		if(Video !== '')
-					    		{
-										if(index === 0)
-										{
-											return (<div><h3>Videos:</h3>{index+1} . <a href={Video} target="_blank" style={styles.link}>{Video}</a></div>);
-										}
-										return (<div>{index+1} . <a href={Video} target="_blank" style={styles.link}>{Video}</a></div>)
-									}
-					    })
-					    }
-					    {
-					    	this.props.category.Docs.map(function(Doc,index) {
-					    		if(Doc !== '')
-									{
-										if(index === 0)
-										{
-											return (<div><h3>Docs:</h3>{index+1} . <a href={Doc} target="_blank" style={styles.link}>{Doc}</a></div>);
-										}
-										return (<div>{index+1} . <a href={Doc} target="_blank" style={styles.link}>{Doc}</a></div>)
-					    		}
-					    })
-					    }
-					    <h3>Mentors:</h3>
-					    {
-					    	this.props.category.Mentor.map(function(mentors,index) {
-					    	return (<p>{mentors}</p>)
-					    })
-					    	}
-			    </CardText>
-				</Card>
-				<Dialog
-          bodyStyle={styles.deleteDialog}
-          actionsContainerStyle={styles.actionsContainer}
-          actions={deleteDialogActions}
-          modal={false}
-          open={this.state.showDeleteDialog}
-          onRequestClose={this.closeDeleteDialog}
-        >
-        	Are you sure you want to delete this category?
-        </Dialog>
-			</div>
-		)
-	}
+          </Paper>
+        </Dialog>)
+  }
 }

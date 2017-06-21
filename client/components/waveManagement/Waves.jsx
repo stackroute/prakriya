@@ -13,7 +13,8 @@ const styles = {
 		marginBottom: 20
 	},
 	tabs: {
-		border: '2px solid teal'
+		border: '2px solid teal',
+		width: '1250px'
 	},
 	tab: {
 		color: '#DDDBF1',
@@ -135,7 +136,6 @@ export default class Waves extends React.Component {
 		    	th.setState({
 		    		courses: res.body
 		    	})
-		    	console.log('Courses', res.body)
 		    }
 		  })
 	}
@@ -277,7 +277,7 @@ export default class Waves extends React.Component {
 					})
 				}
 			</Masonry> :
-			<span>No waves to display</span>
+			<h4 style={{textAlign: 'center', marginTop: '50px', color: 'teal'}}>NO WAVES TO DISPLAY</h4>
 		);
 		return (
 			<div>
@@ -315,8 +315,11 @@ export default class Waves extends React.Component {
 				}
 				{
 					this.props.user.role == "sradmin" &&
-					this.state.cadets.length > 0 &&
-					<AddWave  cadets={this.state.cadets} handleWaveAdd={this.addWave}/>
+					<AddWave
+						cadets={this.state.cadets}
+						courses={this.state.courses}
+						handleWaveAdd={this.addWave}
+					/>
 				}
 			</div>
 		)

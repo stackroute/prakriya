@@ -101,7 +101,7 @@ export default class WaveCard extends React.Component {
 		    	console.log('Successfully fetched all courses', res.body)
 		    	th.setState({
 		    		courses: res.body,
-		    		selectedCourse: th.state.wave.CourseNames
+		    		selectedCourse: th.state.wave.Courses
 		    	})
 		    }
 			})
@@ -157,7 +157,7 @@ export default class WaveCard extends React.Component {
 		if(this.state.openDialog)
 		{
 			wave = this.state.wave;
-			wave.CourseNames = this.state.selectedCourse;
+			wave.Courses = this.state.selectedCourse;
 		}
 		console.log(wave);
 		this.props.handleUpdate(wave);
@@ -363,7 +363,7 @@ export default class WaveCard extends React.Component {
 				    <IconButton  tooltip="Course">
 				      <CourseIcon/>
 				    </IconButton><span style={{position: 'absolute',top: '62%'}}>
-			    	{this.props.wave.CourseNames.map(function(course, index) {
+			    	{this.props.wave.Courses.map(function(course, index) {
 			    		if(course != '')
 			    			if(index != 0)
 			    				course = ', ' + course
