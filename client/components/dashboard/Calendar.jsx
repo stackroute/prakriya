@@ -135,7 +135,7 @@ export default class Attendance extends React.Component {
         {
             daysOfYear.push(<TableRowColumn style={{backgroundColor:color,fontSize:'17px', width:'5px'}}><sup style={{marginLeft:'-25px'}}>{th.formatMonth(d)}</sup>{th.formatDate(d)}</TableRowColumn>);
         }
-        if((th.format(d) === th.format(new Date())) && color === 'white')
+        else if((th.format(d) === th.format(new Date())) && color === 'white')
         {
             daysOfYear.push(<TableRowColumn style={{backgroundColor:color,fontSize:'17px', width:'5px', border: '2px dotted violet'}}><u style={{cursor: 'pointer'}} onClick={this.handlePresent.bind(this, this.state.Cadet.EmployeeID)}>{th.formatDate(d)}</u></TableRowColumn>);
         }
