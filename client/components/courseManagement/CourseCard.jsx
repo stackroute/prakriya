@@ -165,11 +165,11 @@ export default class CourseCard extends React.Component {
           } > {
             this.props.course.Mode.charAt(0).toUpperCase()
           } < /Avatar>}/>
-					<h4><IconButton tooltip="Duration">
+					<span style={{padding:'0px'}}><IconButton tooltip="Duration">
 						<DateIcon/>
 					</IconButton>
           {this.props.course.Duration}
-            weeks</h4><br/>
+            Weeks</span><br/>
 						<IconButton tooltip="Add Assessments or Schedule" style={{
 	            display: this.state.hide
 	          }} onClick={this.openDetailDialog}>

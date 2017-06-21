@@ -425,6 +425,7 @@ export default class Attendance extends React.Component {
                   </TableHeader>
                   <TableBody displayRowCheckbox={false} showRowHover={true}>
                     {th.state.cadet.DaysAbsent.map(function(dates, index) {
+                      if(new Date(dates.fromDate) > new Date())
                       return (
                           <TableRow>
                             <TableRowColumn>{th.formatDate(dates.fromDate)}</TableRowColumn>
@@ -441,9 +442,6 @@ export default class Attendance extends React.Component {
 }
                   </TableBody>
                 </Table>
-              </Tab>
-              <Tab label="Mark Attendance" value={2}>
-                {attendance}
               </Tab>
             </Tabs>
           }
