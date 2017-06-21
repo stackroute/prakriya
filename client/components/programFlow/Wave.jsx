@@ -138,8 +138,8 @@ export default class Wave extends React.Component {
 							value={th.state.course}
 						>
 							{
-								th.state.waveObject.CourseNames === undefined ? '' :
-								th.state.waveObject.CourseNames.map(function(val, key) {
+								th.state.waveObject.Course === undefined ? '' :
+								th.state.waveObject.Course.map(function(val, key) {
 									return <MenuItem key={key} value={val} primaryText={val} />
 								})
 							}

@@ -13,16 +13,11 @@ const sessionSchema = new Schema({
   Remarks: String
 })
 
-const cadetSchema = new Schema({
-  CadetID: Number,
-  Course: String
-})
-
 const wave = new Schema({
   WaveID: {type: String, unique: true},
   WaveNumber: String,
   Mode: String,
-  Courses: [String],
+  Course: String,
   StartDate: Date,
   EndDate: Date,
   Location: String,

@@ -362,14 +362,7 @@ export default class WaveCard extends React.Component {
 				    <span style={{position: 'absolute',top: '47%'}}>{this.formatDate(this.props.wave.StartDate)} - {this.formatDate(this.props.wave.EndDate)}</span><br/>
 				    <IconButton  tooltip="Course">
 				      <CourseIcon/>
-				    </IconButton><span style={{position: 'absolute',top: '62%'}}>
-			    	{this.props.wave.Courses.map(function(course, index) {
-			    		if(course != '')
-			    			if(index != 0)
-			    				course = ', ' + course
-			    			return <span key={index}>{course}</span>
-			    	})
-			    	}</span><br/>
+				    </IconButton><span style={{position: 'absolute',top: '62%'}}>{this.props.wave.Course}</span><br/>
 			    	<IconButton tooltip="Members" onClick={this.handleOpen}>
 				      <GroupIcon/>
 				    </IconButton>
