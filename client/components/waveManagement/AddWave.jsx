@@ -22,7 +22,7 @@ export default class AddWave extends React.Component {
 			Mode: '',
 			ModeErrorText: '',
 			Course: '',
-			CourseErrorText:'', 
+			CourseErrorText:'',
 			WaveNumber: '',
 			WaveNumberErrorText: '',
 			Location: '',
@@ -171,7 +171,7 @@ export default class AddWave extends React.Component {
 		// 	this.setState({
 		// 		WaveIDErrorText: 'Invalid WaveID! Valid Example: IM-27 (Immersive Wave 27).'
 		// 	})
-		// } else 
+		// } else
 		if(this.state.Mode.length == 0) {
 			this.setState({
 				ModeErrorText: 'Please select one mode'
