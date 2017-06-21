@@ -20,12 +20,13 @@ const cadetSchema = new Schema({
 
 const wave = new Schema({
   WaveID: {type: String, unique: true},
+  WaveNumber: String,
   Mode: String,
-  CourseNames: [String],
+  Courses: [String],
   StartDate: Date,
   EndDate: Date,
   Location: String,
-  Cadets: [cadetSchema],
+  Cadets: [Number],
   Sessions: [sessionSchema]
 });
 

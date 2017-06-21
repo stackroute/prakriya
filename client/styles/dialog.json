@@ -1,6 +1,6 @@
 module.exports = {
   'body': {
-    'backgroundColor': '#DDDBF1',
+    // 'backgroundColor': '#DDDBF1',
     'borderBottom': '10px solid teal',
     'borderRight': '10px solid teal',
     'borderLeft': '10px solid teal'

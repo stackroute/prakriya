@@ -20,17 +20,23 @@ export default class AddWave extends React.Component {
 			cadets: [],
 			courses: [],
 			Mode: '',
+			ModeErrorText: '',
+			Course: '',
+			CourseErrorText:'', 
 			WaveNumber: '',
 			WaveNumberErrorText: '',
 			Location: '',
 			StartDate: null,
 			EndDate: null,
-			selectedCadets: []
+			selectedCadets: [],
+			disableCourse: true,
+			disableAll: true
 		}
 		this.handleOpen = this.handleOpen.bind(this)
 		this.handleClose = this.handleClose.bind(this)
-		this.handleWaveNumberChange = this.handleWaveNumberChange.bind(this)
+		this.handleCourseChange = this.handleCourseChange.bind(this)
 		this.handleModeChange = this.handleModeChange.bind(this)
+		this.handleWaveNumberChange = this.handleWaveNumberChange.bind(this)
 		this.handleLocationChange = this.handleLocationChange.bind(this)
 		this.handleStartDateChange = this.handleStartDateChange.bind(this)
 		this.handleEndDateChange = this.handleEndDateChange.bind(this)
@@ -41,6 +47,13 @@ export default class AddWave extends React.Component {
 	}
 
 	componentWillMount() {
+		this.setState({
+			cadets: this.props.cadets,
+			courses: this.props.courses
+		})
+	}
+
+	componentWillReceiveProps(nextProps) {
 		this.setState({
 			cadets: this.props.cadets,
 			courses: this.props.courses
@@ -65,7 +78,17 @@ export default class AddWave extends React.Component {
 
 	handleModeChange(event, key, val) {
 		this.setState({
-			Mode: val
+			Mode: val,
+			disableCourse: false,
+			ModeErrorText: ''
+		})
+	}
+
+	handleCourseChange(event, key, val) {
+		this.setState({
+			Course: val,
+			disableAll: false,
+			CourseErrorText: ''
 		})
 	}
 
@@ -76,18 +99,25 @@ export default class AddWave extends React.Component {
 		})
 	}
 
-	handleLocationChange(event) {
+	handleLocationChange(event, key, val) {
 		this.setState({
-			Location: event.target.value
+			Location: val,
 		})
 	}
 
 	handleStartDateChange(event, date) {
+		let th = this;
+		let dur = 0;
 		let startDate = new Date(date);
-		let endDate = new Date(date.setDate(date.getDate() + 84));
+		this.state.courses.map(function (course, i) {
+			if(course.ID == th.state.Course) {
+				dur = course.Duration
+			}
+		})
+		let endDate = new Date(date.setDate(date.getDate() + dur*7));
 		this.setState({
 			StartDate: startDate,
-			EndDate: endDate
+			EndDate: endDate,
 		})
 	}
 
@@ -105,7 +135,11 @@ export default class AddWave extends React.Component {
 
 	handleSubmit() {
 		let wave = {}
-		wave.WaveID = this.state.WaveNumber.replace(' ', '');
+		let th = this;
+		wave.WaveID = this.state.Mode.substr(0, 1) + this.state.WaveNumber.split('-')[1];
+		wave.Mode = this.state.Mode;
+		wave.Courses = [this.state.Course];
+		wave.WaveNumber = this.state.WaveNumber
 		wave.Location = this.state.Location
 		wave.StartDate = this.state.StartDate
 		wave.EndDate = this.state.EndDate
@@ -128,7 +162,7 @@ export default class AddWave extends React.Component {
 	}
 
 	validationSuccess() {
-		// let wavePattern = /[A-z]{2}-[0-9]{1,}/
+		let wavePattern = /[A-z]{4}-[0-9]{1,}/
 		// if(this.state.WaveID.trim().length == 0) {
 		// 	this.setState({
 		// 		WaveIDErrorText: 'This field cannot be empty.'
@@ -138,11 +172,27 @@ export default class AddWave extends React.Component {
 		// 		WaveIDErrorText: 'Invalid WaveID! Valid Example: IM-27 (Immersive Wave 27).'
 		// 	})
 		// } else 
-		if(this.state.WaveNumber.trim().length == 0) {
+		if(this.state.Mode.length == 0) {
+			this.setState({
+				ModeErrorText: 'Please select one mode'
+			})
+		}
+		else if(this.state.Course.length == 0) {
+			this.setState({
+				CourseErrorText: 'Please select one course'
+			})
+		}
+		else if(this.state.WaveNumber.trim().length == 0) {
 			this.setState({
 				WaveNumberErrorText: 'This field cannot be empty.'
 			})
-		} else {
+		}
+		else if(!wavePattern.test(this.state.WaveNumber.trim())) {
+			this.setState({
+				WaveNumberErrorText: 'Invalid Wave Name! Valid Example: Wave-1.'
+			})
+		}
+		else {
 			return true
 		}
 		return false
@@ -181,6 +231,7 @@ export default class AddWave extends React.Component {
 		          floatingLabelText="Mode"
 		          value={this.state.Mode}
 		          onChange={this.handleModeChange}
+		          errorText={this.state.ModeErrorText}
 		        >
 		        	{
 		        		CONFIG.MODES.map(function(mode, i) {
@@ -200,24 +251,43 @@ export default class AddWave extends React.Component {
 							style={{width: '100%'}}
 							selectedMenuItemStyle={select.selectedMenu}
 							maxHeight={600}
+							disabled={this.state.disableCourse}
+							errorText={this.state.CourseErrorText}
 		        >
 		        	{
-		        		CONFIG.MODES.map(function(mode, i) {
-		        			return <MenuItem value={mode} primaryText={mode} key={i}/>
+		        		this.state.courses.map(function(course, i) {
+		        			return <MenuItem key={i} value={course.ID} primaryText={course.ID}/>
 		        		})
 		        	}
 		        </SelectField>
 					</div>
-					<div style={dialog.box100}>
-			    <TextField
-			      hintText="Provide some name to the wave"
-			      floatingLabelText="Wave Name *"
-			      value={this.state.WaveNumber}
-			      onChange={this.handleWaveNumberChange}
-						floatingLabelStyle={app.mandatoryField}
-			      fullWidth={true}
-						errorText={this.state.WaveNumberErrorText}
-			    />
+				</div>
+				<div>
+					<div style={dialog.box50}>
+						<TextField
+							hintText="Provide a number to the wave"
+							floatingLabelText="Wave Number"
+							value={this.state.WaveNumber}
+							onChange={this.handleWaveNumberChange}
+							disabled={this.state.disableAll}
+							errorText={this.state.WaveNumberErrorText}
+						/>
+					</div>
+					<div style={dialog.box50}>
+				    <SelectField
+				      hintText="Provide the base location"
+				      floatingLabelText="Location"
+				      value={this.state.Location}
+				      onChange={this.handleLocationChange}
+				      fullWidth={true}
+				      disabled={this.state.disableAll}
+				    >
+				    	{
+				    		CONFIG.LOCATIONS.map(function (loc, i) {
+				    			return <MenuItem key={i} value={loc} primaryText={loc}/>
+				    		})
+				    	}
+				    </SelectField>
 					</div>
 				</div>
 				<div>
@@ -227,6 +297,7 @@ export default class AddWave extends React.Component {
 						floatingLabelText='Start Date'
 			    	value={this.state.StartDate}
 			    	onChange={this.handleStartDateChange}
+			    	disabled={this.state.disableAll}
 			    />
 					</div>
 					<div style={dialog.box50}>
@@ -235,19 +306,11 @@ export default class AddWave extends React.Component {
 						floatingLabelText='End Date'
 			    	value={this.state.EndDate}
 			    	onChange={this.handleEndDateChange}
+			    	disabled={this.state.disableAll}
 			    />
 					</div>
 				</div>
-					<div style={dialog.box100}>
-			    <TextField
-			      hintText="Provide the base location"
-			      floatingLabelText="Location"
-			      value={this.state.Location}
-			      onChange={this.handleLocationChange}
-			      fullWidth={true}
-			    />
-					</div>
-					<div style={dialog.box100}>
+				<div style={dialog.box100}>
 			    <SelectField
 		        multiple={true}
 		        hintText="Select Cadets"
@@ -259,6 +322,7 @@ export default class AddWave extends React.Component {
 						style={{width: '100%'}}
 						selectedMenuItemStyle={select.selectedMenu}
 						maxHeight={600}
+						disabled={this.state.disableAll}
 		      >
 		        {
 		        	this.state.cadets.map(function(cadet, i) {

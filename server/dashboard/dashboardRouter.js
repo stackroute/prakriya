@@ -684,7 +684,7 @@ router.get('/getabsentees', auth.canAccess(CONFIG.ADMINISTRATOR), function (req,
 router.get('/courses', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
   try {
     dashboardMongoController.getCourses(function(courses) {
-      res.status(201).json({courses: courses});
+      res.status(201).json(courses);
     }, function(err) {
       logger.error('Get Courses For Wave Error: ', err);
       res.status(500).json({error: 'Cannot get all courses from db...!'});
