@@ -53,7 +53,9 @@ export default class CourseCard extends React.Component {
       hide: 'inline',
       show: 'none',
       showDeleteDialog: false,
-      openDialog: false
+      openDialog: false,
+			edit: false,
+			showDetailDialog: false
     }
     this.handleExpandChange = this.handleExpandChange.bind(this);
     this.handleEditCourse = this.handleEditCourse.bind(this);
@@ -63,6 +65,9 @@ export default class CourseCard extends React.Component {
     this.openDeleteDialog = this.openDeleteDialog.bind(this);
     this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
     this.formatDate = this.formatDate.bind(this);
+		this.handleEditDetail = this.handleEditDetail.bind(this);
+		this.openDetailDialog = this.openDetailDialog.bind(this);
+		this.closeDetailDialog = this.closeDetailDialog.bind(this);
   }
 
   handleExpandChange = (expanded) => {
@@ -73,6 +78,12 @@ export default class CourseCard extends React.Component {
       this.setState({expanded: true, hide: 'none', show: 'inline'});
     }
   };
+
+	handleEditDetail() {
+		this.setState({
+			edit: true
+		})
+	}
 
   handleEditCourse() {
     this.setState({openDialog: true})
@@ -89,6 +100,14 @@ export default class CourseCard extends React.Component {
   closeDeleteDialog() {
     this.setState({showDeleteDialog: false})
   }
+
+	openDetailDialog() {
+		this.setState({showDetailDialog: true})
+	}
+
+	closeDetailDialog() {
+		this.setState({showDetailDialog: false})
+	}
 
   handleUpdateCourse(course) {
     course.History = this.props.course.History;
@@ -133,29 +152,32 @@ export default class CourseCard extends React.Component {
     console.log(this.props.course.Mode);
     let bgColor = this.props.bgColor;
     let bgIcon = this.props.bgIcon;
-		let subTitle = <h5>{history[0]}-<br/>{th.formatDate(history[1])}</h5>
     return (
       <div>
-        <Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={{
+        <Card style={{
           width: '300px',
           marginRight: '20px',
           marginBottom: '20px',
           background: bgColor
         }}>
-          <CardHeader title={`${this.props.course.Name} - ${this.props.course.Mode}`} subtitle={`${subtitle}`} avatar={< Avatar backgroundColor = {
+          <CardHeader title={`${this.props.course.Name} - ${this.props.course.Mode}`} subtitle={`${history[0]} ${th.formatDate(history[1])}`} avatar={< Avatar backgroundColor = {
             bgIcon
           } > {
             this.props.course.Mode.charAt(0).toUpperCase()
-          } < /Avatar>} actAsExpander={true} showExpandableButton={true}/>
-					<IconButton tooltip="Date">
+          } < /Avatar>}/>
+					<h4><IconButton tooltip="Duration">
 						<DateIcon/>
 					</IconButton>
-          <h4 style={{marginTop
-          }}>{this.props.course.Duration}
+          {this.props.course.Duration}
             weeks</h4><br/>
+						<IconButton tooltip="Add Assessments or Schedule" style={{
+	            display: this.state.hide
+	          }} onClick={this.openDetailDialog}>
+	            <AddIcon/>
+	          </IconButton>
           <IconButton tooltip="Edit Course" onClick={this.handleEditCourse} style={{
             display: this.state.hide,
-            marginLeft: '10px'
+            marginLeft: '150px'
           }}>
             <EditIcon/>
           </IconButton>
@@ -166,6 +188,9 @@ export default class CourseCard extends React.Component {
           </IconButton>
           {this.state.openDialog && <AddCourse course={this.props.course} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateCourse} handleClose={this.handleClose}/>
 }
+					{this.state.showDetailDialog && <CourseSubCard course={this.props.course} openDialog={this.state.showDetailDialog} handleUpdate={this.handleUpdateCourse} handleClose={this.closeDetailDialog} title="ADD"
+
+          />}
         </Card>
         <Dialog bodyStyle={styles.deleteDialog} actionsContainerStyle={styles.actionsContainer} actions={deleteDialogActions} modal={false} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
           Are you sure you want to delete this course?
