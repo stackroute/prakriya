@@ -135,7 +135,6 @@ export default class Waves extends React.Component {
 		    	th.setState({
 		    		courses: res.body
 		    	})
-		    	console.log('Courses', res.body)
 		    }
 		  })
 	}
@@ -316,7 +315,11 @@ export default class Waves extends React.Component {
 				{
 					this.props.user.role == "sradmin" &&
 					this.state.cadets.length > 0 &&
-					<AddWave  cadets={this.state.cadets} handleWaveAdd={this.addWave}/>
+					<AddWave 
+						cadets={this.state.cadets} 
+						courses={this.state.courses}
+						handleWaveAdd={this.addWave}
+					/>
 				}
 			</div>
 		)
