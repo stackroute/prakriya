@@ -228,7 +228,8 @@ export default class CourseCard extends React.Component {
 		perms.push(this.state.searchPerm)
 		this.setState({
 			Skills: perms,
-			searchPerm: ''
+			searchPerm: '',
+      SkillErrorText: ''
 		})
 	}
 
@@ -241,7 +242,8 @@ export default class CourseCard extends React.Component {
 
   render() {
     let th = this
-    let title = 'ADD ASSIGNMENT/SCHEDULE'
+    let label = "Add " + this.state.type
+    let title = `ADD ${this.state.type.toUpperCase()}`
   	let actions = [
         <FlatButton
           label="Cancel"
@@ -249,7 +251,7 @@ export default class CourseCard extends React.Component {
           onTouchTap={(e) => this.handleClose(e, 'CLOSE')}
         />,
         <FlatButton
-          label="Add Assignment/Schedule"
+          label={label}
           onClick={(e) => this.handleClose(e, 'ADD')}
           style={styles.actionButton}
         />
