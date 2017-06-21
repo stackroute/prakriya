@@ -21,6 +21,20 @@ const styles = {
 	}
 }
 
+const backgroundColors = [
+	'#F5DEBF',
+	'#DDDBF1',
+	'#CAF5B3',
+	'#C6D8D3'
+	]
+
+const backgroundIcons = [
+	'#847662',
+	'#666682',
+	'#4e5f46',
+	'#535f5b'
+	]
+
 export default class Courses extends React.Component {
 	constructor(props) {
 		super(props);
@@ -95,7 +109,7 @@ export default class Courses extends React.Component {
 		    }
 		  });
 	}
-	
+
 	updateCourse(course){
 		let th = this
 		Request
@@ -187,7 +201,9 @@ export default class Courses extends React.Component {
 								{
 									return (
 											<Col md={3} key={key} style={styles.col}>
-												<CourseCard course={course} updateCourse={th.updateCourse} deleteCourse={th.deleteCourse} addCategory={th.addCategory} deleteCategory={th.deleteCategory}/>
+												<CourseCard course={course} updateCourse={th.updateCourse} deleteCourse={th.deleteCourse} addCategory={th.addCategory} deleteCategory={th.deleteCategory}
+												bgColor={backgroundColors[key%4]}
+												bgIcon={backgroundIcons[key%4]}/>
 											</Col>
 											)
 								}

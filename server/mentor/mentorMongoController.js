@@ -37,10 +37,7 @@ errorCB(err);
 let updateCourse = function (CourseObj, successCB, errorCB) {
 	CourseModel.
 	update({CourseID: CourseObj.CourseID},
-		{$set: {
-			CourseName: CourseObj.CourseName,
-			AssessmentCategories: CourseObj.AssessmentCategories,
-			Duration: CourseObj.Duration, History: CourseObj.History}
+		{$set: CourseObj
 		},
 		function (err, status) {
 		if(err) {
@@ -73,7 +70,7 @@ errorCB(err);
 
 let restoreCourse = function (restoreObj, successCB, errorCB) {
 	CourseModel.
-	updateMany({CourseName: {$in: restoreObj}}, {$set: {Removed: false}}, function (err, status) {
+	updateMany({ID: {$in: restoreObj}}, {$set: {Removed: false}}, function (err, status) {
 		if(err) {
 errorCB(err);
 }

@@ -8,7 +8,7 @@ import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import Dialog from 'material-ui/Dialog';
 import DatePicker from 'material-ui/DatePicker';
 import {grey50} from 'material-ui/styles/colors';
-import Request from 'superagent'; 
+import Request from 'superagent';
 import Moment from 'moment';
 import CandidateEdit from './CandidateEdit.jsx';
 import PerformanceMatrix from './PerformanceMatrix.jsx';
@@ -173,17 +173,17 @@ export default class CandidateHome extends React.Component {
 				<Grid>
 					<Row>
 						<Col md={2} mdOffset={10}>
-							<FlatButton 
-								label="<< Go Back" 
-								primary={true} 
-								onClick={this.handleBack} 
+							<FlatButton
+								label="<< Go Back"
+								primary={true}
+								onClick={this.handleBack}
 							/>
 						</Col>
 					</Row>
 					<div style={styles.container}>
 						{
 							this.state.showEditDialog &&
-							<CandidateEdit 
+							<CandidateEdit
 								candidate={this.props.candidate}
 								updateCandidate={this.handleUpdate}
 							/>
@@ -197,15 +197,15 @@ export default class CandidateHome extends React.Component {
 											<h3>
 												{this.props.candidate.EmployeeName}
 												<span style={styles.iconWrapper}>
-													<DownloadProfile 
-														color={grey50} 
+													<DownloadProfile
+														color={grey50}
 														style={styles.actionIcon}
 														candidate={this.props.candidate}
 													/>
 													<EditIcon style={styles.actionIcon} color={grey50} onClick={this.openEditDialog}/>
-													<DeleteIcon 
-														style={styles.actionIcon} 
-														color={grey50} 
+													<DeleteIcon
+														style={styles.actionIcon}
+														color={grey50}
 														onClick={this.openDeleteDialog}
 														imageURL={this.state.imageURL}
 													/>
@@ -227,7 +227,11 @@ export default class CandidateHome extends React.Component {
 										</p>
 									</Col>
 									<Col md={6} mdOffset={1}>
-
+										<h4>Personal Details</h4>
+										<p style={styles.details}>
+											EmailID: {this.props.candidate.EmailID} <br/>
+											Alternate EmailID: {this.props.candidate.AltEmail}<br/>
+											Contact Number: {this.props.candidate.Contact} </p>
 										<h4>Experience</h4>
 			 							<p style={styles.details}>
 											Work Experience: {this.props.candidate.WorkExperience}
@@ -268,7 +272,12 @@ export default class CandidateHome extends React.Component {
 											</p>
 											</div>
 										}
-
+										<h4>Project Details</h4>
+										<p style={styles.details}>
+											Project Name: {this.props.candidate.ProjectName}<br/>
+											Project Description: {this.props.candidate.ProjectDescription}<br/>
+											Project Skills: {this.props.candidate.ProjectSkills}
+										</p>
 										<h4>Manager Details</h4>
 										<p style={styles.details}>
 											Primary Supervisor: {this.props.candidate.PrimarySupervisor}<br/>
