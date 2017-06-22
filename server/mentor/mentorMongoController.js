@@ -36,13 +36,13 @@ errorCB(err);
 
 let updateCourse = function (CourseObj, successCB, errorCB) {
 	CourseModel.
-	update({CourseID: CourseObj.CourseID},
+	update({ID: CourseObj.ID},
 		{$set: CourseObj
 		},
 		function (err, status) {
-		if(err) {
-errorCB(err);
-}
+			if(err) {
+				errorCB(err);
+			}
 		successCB(status);
 	});
 };

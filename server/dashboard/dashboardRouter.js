@@ -697,11 +697,28 @@ router.get('/courses', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) 
   }
 })
 
+// Get course
+router.get('/course/:courseID', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardMongoController.getCourse(req.params.courseID, function (data) {
+      res.status(201).json(data);
+    }, function (err) {
+      logger.error('Get Course:', err);
+      res.status(500).json({error: 'Cannot get course for specific course id from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get Course Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // Get all courses for specific wave
 router.get('/coursesforwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
     dashboardMongoController.getCoursesForWave(req.query.waveID, function (data) {
-      res.status(201).json({courses: data.CourseNames});
+      res.status(201).json({courses: data.Course});
     }, function (err) {
       logger.error('Get Courses For Wave Error: ', err);
       res.status(500).json({error: 'Cannot get course for specific wave from db...!'});

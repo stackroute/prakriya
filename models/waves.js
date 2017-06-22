@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const sessionSchema = new Schema({
   SessionID: Number,
   CourseName: String,
-  Week: Number,
+  Day: Number,
   Activities: String,
   Status: String,
   ContextSetSession: String,
