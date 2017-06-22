@@ -54,7 +54,7 @@ export default class WaveCard extends React.Component {
 			openDialog: false,
 			wave: {},
 			courses: [],
-			selectedCourse: [],
+			selectedCourse: '',
 			addCadet: false,
 			newCadets: [],
 			selectedCadets: [],
@@ -71,7 +71,7 @@ export default class WaveCard extends React.Component {
 		this.handleUpdateWave = this.handleUpdateWave.bind(this);
 		this.closeUpdateDialog = this.closeUpdateDialog.bind(this);
 		this.getCourses = this.getCourses.bind(this);
-		this.handleCoursesChange = this.handleCoursesChange.bind(this);
+		this.handleCourseChange = this.handleCourseChange.bind(this);
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleStartDateChange = this.handleStartDateChange.bind(this);
 		this.handleEndDateChange = this.handleEndDateChange.bind(this);
@@ -101,7 +101,7 @@ export default class WaveCard extends React.Component {
 		    	console.log('Successfully fetched all courses', res.body)
 		    	th.setState({
 		    		courses: res.body,
-		    		selectedCourse: th.state.wave.Courses
+		    		selectedCourse: th.state.wave.Course
 		    	})
 		    }
 			})
@@ -157,7 +157,7 @@ export default class WaveCard extends React.Component {
 		if(this.state.openDialog)
 		{
 			wave = this.state.wave;
-			wave.Courses = this.state.selectedCourse;
+			wave.Course = this.state.selectedCourse;
 		}
 		console.log(wave);
 		this.props.handleUpdate(wave);
@@ -276,7 +276,7 @@ export default class WaveCard extends React.Component {
 			wave: wave
 		})
 	}
-	handleCoursesChange(event, key, val) {
+	handleCourseChange(event, key, val) {
 		console.log(this.state.selectedCourse+'selected');
 		this.setState({
 			selectedCourse: val
@@ -352,26 +352,26 @@ export default class WaveCard extends React.Component {
 			      	</Avatar>
 			      }/>
 			    	<CardText style={styles.text}>
-			    	<IconButton tooltip="Location">
-				      <LocationIcon/>
-				    </IconButton>
-				    <span style={{position: 'absolute',top: '33%'}}>{this.props.wave.Location}</span><br/>
-				    <IconButton tooltip="Date">
-				      <DateIcon/>
-				    </IconButton>
-				    <span style={{position: 'absolute',top: '47%'}}>{this.formatDate(this.props.wave.StartDate)} - {this.formatDate(this.props.wave.EndDate)}</span><br/>
-				    <IconButton  tooltip="Course">
-				      <CourseIcon/>
-				    </IconButton><span style={{position: 'absolute',top: '62%'}}>{this.props.wave.Course}</span><br/>
-			    	<IconButton tooltip="Members" onClick={this.handleOpen}>
-				      <GroupIcon/>
-				    </IconButton>
-				  	<IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{float:'right'}}>
-				      <DeleteIcon/>
-				    </IconButton>
-				  	<IconButton tooltip="Edit Wave" onClick={this.handleEditWave} style={{float:'right'}}>
-				      <EditIcon/>
-				    </IconButton>
+				    	<IconButton tooltip="Location">
+					      <LocationIcon/>
+					    </IconButton>
+					    <span style={{position: 'absolute',top: '33%'}}>{this.props.wave.Location}</span><br/>
+					    <IconButton tooltip="Date">
+					      <DateIcon/>
+					    </IconButton>
+					    <span style={{position: 'absolute',top: '47%'}}>{this.formatDate(this.props.wave.StartDate)} - {this.formatDate(this.props.wave.EndDate)}</span><br/>
+					    <IconButton  tooltip="Course">
+					      <CourseIcon/>
+					    </IconButton><span style={{position: 'absolute',top: '62%'}}>{this.props.wave.Course}</span><br/>
+				    	<IconButton tooltip="Members" onClick={this.handleOpen}>
+					      <GroupIcon/>
+					    </IconButton>
+					  	<IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{float:'right'}}>
+					      <DeleteIcon/>
+					    </IconButton>
+					  	<IconButton tooltip="Edit Wave" onClick={this.handleEditWave} style={{float:'right'}}>
+					      <EditIcon/>
+					    </IconButton>
 				    </CardText>
 			    	</Card>
 				  	{this.state.cadetFetch &&
@@ -501,15 +501,10 @@ export default class WaveCard extends React.Component {
               </div>
               <div style={dialog.box100}>
 						    <SelectField
-					        multiple={true}
 					        hintText="Select Courses"
                   floatingLabelText='Courses'
 					        value={this.state.selectedCourse}
-					        onChange={this.handleCoursesChange}
-                  menuItemStyle={select.menu}
-                  listStyle={select.list}
-                  selectedMenuItemStyle={select.selectedMenu}
-                  maxHeight={600}
+					        onChange={this.handleCourseChange}
                   style={{width: '100%'}}
 					      >
 					        {
@@ -519,11 +514,10 @@ export default class WaveCard extends React.Component {
 									        key={i}
 									        insetChildren={true}
 									        checked={
-									        	th.state.selectedCourse && th.state.selectedCourse.includes(course.CourseName)
+									        	th.state.selectedCourse && th.state.selectedCourse.includes(course.ID)
 									       	}
-									        value={course.CourseName}
-									        primaryText={course.CourseName}
-
+									        value={course.ID}
+									        primaryText={course.ID}
 									      />
 					        		)
 					        	})
