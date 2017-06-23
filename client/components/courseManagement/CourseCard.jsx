@@ -14,6 +14,9 @@ import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import HistoryIcon from 'material-ui/svg-icons/action/history';
+import AssignmentIcon from 'material-ui/svg-icons/action/assignment';
+import ScheduleIcon from 'material-ui/svg-icons/action/schedule';
+import SkillsIcon from 'material-ui/svg-icons/action/stars';
 import CourseSubCard from './CourseSubCard.jsx';
 import AddCourse from './AddCourse.jsx';
 import FlatButton from 'material-ui/FlatButton';
@@ -165,17 +168,45 @@ export default class CourseCard extends React.Component {
           } > {
             this.props.course.Mode.charAt(0).toUpperCase()
           } < /Avatar>}/>
-					<span style={{padding:'0px'}}><IconButton tooltip="Duration">
+
+          <IconButton tooltip="Duration">
 						<DateIcon/>
 					</IconButton>
-          {this.props.course.Duration}
-            Weeks</span><br/>
-						<IconButton tooltip="Add Assessments or Schedule" style={{
-	            display: this.state.hide
-	          }} onClick={this.openDetailDialog}>
-	            <AddIcon/>
-	          </IconButton>
-          <IconButton tooltip="Edit Course" onClick={this.handleEditCourse} style={{
+          <span style={{verticalAlign: 'super'}}>
+            {this.props.course.Duration}&nbsp;week(s)
+          </span><br/>
+
+          <IconButton tooltip="Skills">
+						<SkillsIcon/>
+					</IconButton>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{console.log('Skills clicked...')}}>
+            {this.props.course.Skills.length}&nbsp;skill(s)
+          </span><br/>
+
+          <IconButton tooltip="Schedule">
+            <ScheduleIcon/>
+          </IconButton>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{console.log('Schedule clicked...')}}>
+            {this.props.course.Schedule.length}&nbsp;session(s)
+          </span><br/>
+
+          <IconButton tooltip="Assignments">
+						<AssignmentIcon/>
+					</IconButton>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer',  verticalAlign: 'super'}} onTouchTap={()=>{console.log('Assignments clicked...')}}>
+            {this.props.course.Assignments.length}&nbsp;assignment(s)
+          </span><br/>
+
+					<IconButton tooltip="Add Assessments or Schedule" style={{
+            display: this.state.hide
+          }} onClick={this.openDetailDialog}>
+            <AddIcon/>
+          </IconButton>
+
+          <IconButton
+          tooltip="Edit Course"
+          onClick={this.handleEditCourse}
+          style={{
             display: this.state.hide,
             marginLeft: '150px'
           }}>
