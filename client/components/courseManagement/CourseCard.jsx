@@ -73,6 +73,10 @@ export default class CourseCard extends React.Component {
 		this.closeDetailDialog = this.closeDetailDialog.bind(this);
   }
 
+  componentWillMount() {
+    this.props.setCurrentCourse();
+  }
+
   handleExpandChange = (expanded) => {
     this.setState({expanded: expanded});
     if (this.state.expanded) {
@@ -152,7 +156,6 @@ export default class CourseCard extends React.Component {
       let date = history[1].split(' : ');
       history[1] = date[0];
     }
-    console.log(this.props.course.Mode);
     let bgColor = this.props.bgColor;
     let bgIcon = this.props.bgIcon;
     return (
@@ -193,7 +196,7 @@ export default class CourseCard extends React.Component {
           <IconButton tooltip="Assignments">
 						<AssignmentIcon/>
 					</IconButton>
-          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer',  verticalAlign: 'super'}} onTouchTap={()=>{console.log('Assignments clicked...')}}>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer',  verticalAlign: 'super'}} onTouchTap={this.props.openAssignments}>
             {this.props.course.Assignments.length}&nbsp;assignment(s)
           </span><br/>
 

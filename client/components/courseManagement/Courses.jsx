@@ -6,6 +6,7 @@ import RestoreIcon from 'material-ui/svg-icons/content/undo';
 import IconButton from 'material-ui/IconButton';
 import RestoreCourse from './RestoreCourse.jsx';
 import AddCourse from './AddCourse.jsx';
+import Assignments from './Assignments.jsx';
 
 const styles = {
 	heading: {
@@ -40,7 +41,9 @@ export default class Courses extends React.Component {
 		super(props);
 		this.state = {
 			courses: [],
-			openDialog: false
+			currentCard: {},
+			openDialog: false,
+			assignmentsDialog: false
 		}
 		this.getCourses = this.getCourses.bind(this);
 		this.updateCourse = this.updateCourse.bind(this);
@@ -52,6 +55,9 @@ export default class Courses extends React.Component {
 		this.addCategory = this.addCategory.bind(this);
 		this.deleteCategory = this.deleteCategory.bind(this);
 		this.addCourse = this.addCourse.bind(this);
+		this.openAssignments = this.openAssignments.bind(this);
+		this.closeAssignments = this.closeAssignments.bind(this);
+		this.setCurrentCourse = this.setCurrentCourse.bind(this);
 	}
 
 	componentWillMount() {
@@ -186,6 +192,28 @@ export default class Courses extends React.Component {
 		  });
 	}
 
+	openAssignments() {
+		this.setState({
+			assignmentsDialog: true
+		});
+	}
+
+	closeAssignments() {
+		this.setState({
+			assignmentsDialog: false
+		});
+	}
+
+	setCurrentCourse(currentCourse, bgColor, iconColor) {
+		this.setState({
+			currentCard: {
+				course: currentCourse,
+				bgColor: bgColor,
+				iconColor: iconColor
+			}
+		});
+	}
+
 	render() {
 		let th = this;
 		return(
@@ -201,9 +229,17 @@ export default class Courses extends React.Component {
 								{
 									return (
 											<Col md={3} key={key} style={styles.col}>
-												<CourseCard course={course} updateCourse={th.updateCourse} deleteCourse={th.deleteCourse} addCategory={th.addCategory} deleteCategory={th.deleteCategory}
+												<CourseCard course={course}
+												updateCourse={th.updateCourse}
+												deleteCourse={th.deleteCourse}
+												addCategory={th.addCategory}
+												deleteCategory={th.deleteCategory}
 												bgColor={backgroundColors[key%4]}
-												bgIcon={backgroundIcons[key%4]}/>
+												bgIcon={backgroundIcons[key%4]}
+												openAssignments={th.openAssignments}
+												closeAssignments={th.closeAssignments}
+												setCurrentCourse={()=>{th.setCurrentCourse(course, backgroundColors[key%4], backgroundIcons[key%4])}}
+												/>
 											</Col>
 											)
 								}
@@ -219,6 +255,19 @@ export default class Courses extends React.Component {
 							this.state.openDialog &&
 							<RestoreCourse course={this.state.courses} openDialog={this.state.openDialog} handleRestore={this.handleRestoreCourse} handleClose={this.closeRestoreDialog}/>
 				}
+				<Assignments
+					bgColor={this.state.currentCard.bgColor || 'white'}
+					bgIcon={this.state.currentCard.iconColor || 'white'}
+					courseID={this.state.currentCard.course ? this.state.currentCard.course.ID : 'NA'}
+					assignments={
+						this.state.currentCard.course ?
+						this.state.currentCard.course.Assignments.sort(function(a, b) {
+							return a.Week - b.Week
+						}) :
+						[]
+					}
+					openDialog={this.state.assignmentsDialog}
+					closeDialog={this.closeAssignments} />
 			</div>
 		)
 	}
