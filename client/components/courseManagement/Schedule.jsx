@@ -1,15 +1,16 @@
 import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import dialog from '../../styles/dialog.json';
-import AssignmentCard from './AssignmentCard.jsx';
+import SessionCard from './SessionCard.jsx';
 
-export default class Assignments extends React.Component {
+export default class Schedule extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       showDialog: false
     }
-}
+
+  }
 
 	componentWillReceiveProps(nextProps) {
 		this.setState({showDialog: nextProps.openDialog});
@@ -17,7 +18,7 @@ export default class Assignments extends React.Component {
 
   render() {
     let th = this
-		let title = `${th.props.courseID} - Assignments`
+		let title = `${th.props.courseID} - Schedule`
     return (
       <div>
         <Dialog
@@ -33,11 +34,11 @@ export default class Assignments extends React.Component {
           <div>
             <div style={dialog.box100}>
 						{
-							this.props.assignments.map(function(assignment, key) {
-								return (<AssignmentCard
+							this.props.sessions.map(function(session, key) {
+								return (<SessionCard
 									bgColor={th.props.bgColor}
 									bgIcon={th.props.bgIcon}
-									assignment={assignment}
+									session={session}
 									key={key}/>)
 							})
 						}

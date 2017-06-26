@@ -189,7 +189,7 @@ export default class CourseCard extends React.Component {
           <IconButton tooltip="Schedule">
             <ScheduleIcon/>
           </IconButton>
-          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{console.log('Schedule clicked...')}}>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={this.props.openSchedule}>
             {this.props.course.Schedule.length}&nbsp;session(s)
           </span><br/>
 
