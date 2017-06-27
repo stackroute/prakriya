@@ -3,6 +3,7 @@ import {
   Card,
   CardHeader
 } from 'material-ui/Card';
+import Paper from 'material-ui/Paper';
 import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
 import SkillsIcon from 'material-ui/svg-icons/action/stars';
@@ -25,7 +26,7 @@ export default class AssignmentCard extends React.Component {
 				padding: '10px'
 			}}>
 				<Card style={{
-					width: '320px',
+					width: '310px',
 					background: bgColor
 				}}>
 					<CardHeader
@@ -43,12 +44,38 @@ export default class AssignmentCard extends React.Component {
 						{this.props.assignment.Duration}&nbsp;day(s)
 					</span><br/>
 
-					<IconButton tooltip="Skills">
-						<SkillsIcon/>
-					</IconButton>
-					<span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{console.log('Skills clicked...')}}>
-						{this.props.assignment.Skills.length}&nbsp;skill(s)
-					</span><br/>
+          <Paper style={{
+            margin: '5px',
+            padding: '5px',
+            width: '92%',
+            margin: 'auto',
+            borderRadius: '2px',
+            boxSizing: 'border-box'}}>
+            <span style={{textAlign: 'jusitfy'}}>
+              <b style={{color: bgIcon}}>Skills: </b>
+              {
+                this.props.assignment.Skills.length == 0 ?
+                'NA' :
+                this.props.assignment.Skills.map(function(skill, index) {
+                  if(index == th.props.assignment.Skills.length - 1)
+                    return skill;
+                  return skill + ', ';
+                })
+              }
+            </span>
+          </Paper><br/>
+
+          <Paper style={{
+            margin: '5px',
+            padding: '5px',
+            width: '92%',
+            margin: 'auto',
+            borderRadius: '2px',
+            boxSizing: 'border-box'}}>
+            <span style={{textAlign: 'jusitfy'}}>
+              <b style={{color: bgIcon}}>Description: </b>{this.props.assignment.Description}
+            </span>
+          </Paper><br/>
 
 				</Card>
 			</div>
