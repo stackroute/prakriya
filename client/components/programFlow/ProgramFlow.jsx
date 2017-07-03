@@ -1,7 +1,6 @@
 import React from 'react'
 import Request from 'superagent'
 import RaisedButton from 'material-ui/RaisedButton'
-import TextField from 'material-ui/TextField'
 import SelectField from 'material-ui/SelectField'
 import {Grid, Row, Col} from 'react-flexbox-grid'
 import MenuItem from 'material-ui/MenuItem'
@@ -13,9 +12,20 @@ import AddIcon from 'material-ui/svg-icons/content/add'
 import Session from './Session.jsx'
 import {Card, CardText, CardHeader} from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
+import Paper from 'material-ui/Paper';
 import {lightBlack} from 'material-ui/styles/colors';
 import Schedule from './Schedule.jsx';
 import app from '../../styles/app.json';
+
+const styles = {
+	tableHeading: {
+		paddingTop: 20,
+		paddingBottom: 20,
+		background: '#333',
+		color: '#eee',
+		textAlign: 'center'
+	}
+}
 
 export default class Wave extends React.Component {
 	constructor(props) {
@@ -32,6 +42,7 @@ export default class Wave extends React.Component {
 		this.getWaveIDs = this.getWaveIDs.bind(this)
 		this.getWaveObject = this.getWaveObject.bind(this)
 		this.getCourse = this.getCourse.bind(this)
+		this.waveUpdate = this.waveUpdate.bind(this)
 		this.onWaveChange = this.onWaveChange.bind(this)
 		this.addSession = this.addSession.bind(this)
 		this.onSessionAddition = this.onSessionAddition.bind(this)
@@ -81,6 +92,17 @@ export default class Wave extends React.Component {
 					courseObj: res.body,
 				})
 				console.log('Course', th.state.courseObj)
+			})
+	}
+
+	waveUpdate(waveObj) {
+		let th = this
+		Request
+			.post('/dashboard/updatewave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({'wave': waveObj})
+			.end(function(err, res){
+				console.log('Wave Updated')
 			})
 	}
 
@@ -141,12 +163,33 @@ export default class Wave extends React.Component {
 							</SelectField>
 						</Col>
 					</Row>
+					{
+						Object.keys(this.state.waveObj).length !== 0 &&
+						Object.keys(this.state.courseObj).length !== 0 &&
+						<Row style={styles.tableHeading}>
+							<Col md={1}>Day</Col>
+							<Col md={2}>Name</Col>
+							<Col md={2}>Skills</Col>
+							<Col md={2}>Session By</Col>
+							<Col md={2}>Session On</Col>
+							<Col md={2}>Status</Col>
+						</Row>
+					}
+					{
+						Object.keys(this.state.waveObj).length !== 0 &&
+						Object.keys(this.state.courseObj).length !== 0 &&
+						this.state.courseObj.Schedule.map(function(session, i) {
+							return (
+								<Schedule 
+									wave={th.state.waveObj} 
+									session={session} 
+									key={i}
+									handleWaveUpdate={th.waveUpdate}
+								/>
+							)
+						})
+					}
 				</Grid>
-				{
-					Object.keys(this.state.waveObj).length !== 0 &&
-					Object.keys(this.state.courseObj).length !== 0 &&
-					<Schedule wave={this.state.waveObj} sessions={this.state.courseObj.Schedule}/>
-				}
 			</div>
 		)
 	}

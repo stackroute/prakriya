@@ -114,8 +114,8 @@ router.get('/user', function (req, res) {
         userObj.email = req.user.email;
         userObj.actions = accesscontrols;
         if(req.user.lastLogin !== undefined) {
-userObj.lastLogin = req.user.lastLogin;
-}
+          userObj.lastLogin = req.user.lastLogin;
+        }
         res.status(201).json(userObj);
       }, function (err) {
         logger.error('Get Access Controls Error: ', err);
@@ -924,7 +924,7 @@ router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, 
 });
 
 // update a wave
-router.post('/updatewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try {
     dashboardMongoController.updateWave(req.body.wave, function (wave) {
       res.status(201).json(wave);

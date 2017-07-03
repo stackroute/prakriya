@@ -129,6 +129,7 @@ let getWave = function (waveID, successCB, errorCB) {
 		successCB(result);
 	});
 };
+
 let getActiveWaves = function (successCB, errorCB) {
 	let today = new Date();
 	WaveModel.aggregate(
