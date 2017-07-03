@@ -944,5 +944,64 @@ router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, 
   }
 });
 
-
+router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardMongoController.getBillability(function (billable) {
+      res.status(201).json(billable);
+    }, function (err) {
+      logger.error('Get All billable Error: ', err);
+      res.status(500).json({error: 'Cannot get all billable count from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get All billable Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardMongoController.getNonBillability(function (nonbillable) {
+      res.status(201).json(nonbillable);
+    }, function (err) {
+      logger.error('Get All non-billable Error: ', err);
+      res.status(500).json({error: 'Cannot get all non-billable count from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get All non-billable Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardMongoController.getBillabilityFree(function (free) {
+      res.status(201).json(free);
+    }, function (err) {
+      logger.error('Get All billable-free Error: ', err);
+      res.status(500).json({error: 'Cannot get all billable-free count from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get All billable-free Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardMongoController.getBillabilitySupport(function (support) {
+      res.status(201).json(support);
+    }, function (err) {
+      logger.error('Get All billable-support Error: ', err);
+      res.status(500).json({error: 'Cannot get all billable-support count from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get All billable-support Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
 module.exports = router;

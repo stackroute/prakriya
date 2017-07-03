@@ -731,6 +731,40 @@ let cancelPresent = function (EmpID, date, successCB, errorCB) {
 	});
 };
 
+let getBillability = function (successCB, errorCB) {
+	CandidateModel.count({'Billability':'Billable'}, function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
+let getBillabilityFree = function (successCB, errorCB) {
+	CandidateModel.count(({'Billability':'Free' }), function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
+let getBillabilitySupport = function (successCB, errorCB) {
+	CandidateModel.count(({'Billability':'Support'}),function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
+let getNonBillability = function (successCB, errorCB) {
+	CandidateModel.count(
+		({'Billability':'Non-billable'}),function (err, result) {
+		if (err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -776,5 +810,10 @@ module.exports = {
 	cancelLeave,
 	updatePresent,
 	cancelPresent,
-	getFilteredCandidates
+	getFilteredCandidates,
+	getBillability,
+	getBillabilityFree,
+	getNonBillability,
+	getBillabilitySupport
+
 };

@@ -111,7 +111,7 @@ var token= '';
             if (err) throw err;
             done();
        });
-    });  
+    });
     it("update users",function(done){
       let user = {}
       user.name = 'joe'
@@ -128,7 +128,7 @@ var token= '';
             if (err) throw err;
             done();
        });
-    }); 
+    });
     it("lock users",function(done){
       url
           .post('/admin/lockuser')
@@ -150,7 +150,7 @@ var token= '';
             if (err) throw err;
             done();
        });
-    }); 
+    });
     it("delete users",function(done){
       url
           .delete('/admin/deleteuser')
@@ -177,7 +177,7 @@ var token= '';
             if (err) throw err;
             done();
        });
-    });  
+    });
     it("update roles",function(done){
       let roles = {};
       roles.name = 'test';
@@ -191,7 +191,7 @@ var token= '';
             if (err) throw err;
             done();
        });
-    }); 
+    });
     it("delete roles",function(done){
       let roles = {};
       roles.name = 'test';
@@ -205,5 +205,5 @@ var token= '';
             if (err) throw err;
             done();
        });
-    }); 
+    });
   })

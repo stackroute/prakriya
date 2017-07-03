@@ -12,6 +12,7 @@ var candidates = new Schema({
 		Remarks: String,
 		CareerBand: String,
 		RevisedBU: String,
+		Billability: String,
 		DigiThonPhase: Number,
 		DigiThonScore: Number,
 		TrainingStatus: String,
