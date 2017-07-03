@@ -34,9 +34,18 @@ errorCB(err);
 	});
 };
 
+let getCourse = function (Course, successCB, errorCB) {
+	CourseModel.find({ID: Course}, function (err, result) {
+		if (err) {
+errorCB(err);
+}
+		successCB(result);
+	});
+}
+
 let updateCourse = function (CourseObj, successCB, errorCB) {
 	CourseModel.
-	update({CourseID: CourseObj.CourseID},
+	update({ID: CourseObj.ID},
 		{$set: CourseObj
 		},
 		function (err, status) {
@@ -60,7 +69,7 @@ errorCB(err);
 
 let deleteCourse = function (courseObj, successCB, errorCB) {
 	CourseModel.
-	update({CourseID: courseObj.CourseID}, {$set: {Removed: true}}, function (err, status) {
+	update({ID: courseObj.ID}, {$set: {Removed: true}}, function (err, status) {
 		if(err) {
 errorCB(err);
 }
@@ -220,5 +229,6 @@ module.exports = {
 	getWaveObject,
 	addNewSession,
 	updateSession,
-	deleteSession
+	deleteSession,
+	getCourse
 };

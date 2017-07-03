@@ -363,10 +363,11 @@ export default class WaveCard extends React.Component {
 					    <IconButton  tooltip="Course">
 					      <CourseIcon/>
 					    </IconButton><span style={{position: 'absolute',top: '62%'}}>{this.props.wave.Course}</span><br/>
-				    	<IconButton tooltip="Members" onClick={this.handleOpen}>
-					      <GroupIcon/>
+              <IconButton tooltip="Members" onClick={this.handleOpen}>
+                <GroupIcon/>
 					    </IconButton>
-					  	<IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{float:'right'}}>
+              <b style={{position: 'absolute', top: '77%'}}>({this.props.wave.Cadets.length})</b>
+              <IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{float:'right'}}>
 					      <DeleteIcon/>
 					    </IconButton>
 					  	<IconButton tooltip="Edit Wave" onClick={this.handleEditWave} style={{float:'right'}}>
