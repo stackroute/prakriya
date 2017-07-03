@@ -15,7 +15,7 @@ let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 		function (err, status) {
 		if(err) {
 				errorCB(err);
-}
+		}
 		successCB(status);
 	});
 };
@@ -28,8 +28,8 @@ let updateCandidateAssessment = function (candidateObj, successCB, errorCB) {
 let getCourses = function (successCB, errorCB) {
 	CourseModel.find({}, function (err, result) {
 		if (err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
@@ -49,9 +49,9 @@ let updateCourse = function (CourseObj, successCB, errorCB) {
 		{$set: CourseObj
 		},
 		function (err, status) {
-		if(err) {
-errorCB(err);
-}
+			if(err) {
+				errorCB(err);
+			}
 		successCB(status);
 	});
 };
@@ -61,8 +61,8 @@ let addCourse = function (CourseObj, successCB, errorCB) {
 	let CourseModelObj = new CourseModel(CourseObj);
 	CourseModelObj.save(function (err, status) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(status);
 	});
 };
@@ -71,8 +71,8 @@ let deleteCourse = function (courseObj, successCB, errorCB) {
 	CourseModel.
 	update({ID: courseObj.ID}, {$set: {Removed: true}}, function (err, status) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(status);
 	});
 };
@@ -81,8 +81,8 @@ let restoreCourse = function (restoreObj, successCB, errorCB) {
 	CourseModel.
 	updateMany({ID: {$in: restoreObj}}, {$set: {Removed: false}}, function (err, status) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(status);
 	});
 };
@@ -106,8 +106,8 @@ let addCategory = function (object, successCB, errorCB) {
 		},
 		function (err, status) {
 			if(err) {
-errorCB(err);
-}
+				errorCB(err);
+			}
 			successCB(status);
 		});
 };
@@ -132,8 +132,8 @@ let deleteCategory = function (object, successCB, errorCB) {
 		},
 		function (err, status) {
 			if(err) {
-errorCB(err);
-}
+				errorCB(err);
+			}
 			successCB(status);
 		}
 	);

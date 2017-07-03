@@ -2,15 +2,13 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const sessionSchema = new Schema({
-  SessionID: Number,
-  CourseName: String,
-  Week: Number,
-  Activities: String,
+  Day: Number,
+  Name: String,
+  Description: String,
+  Skills: [String],
   Status: String,
-  ContextSetSession: String,
   SessionBy: String,
-  SessionOn: Date,
-  Remarks: String
+  SessionOn: Date
 })
 
 const wave = new Schema({
