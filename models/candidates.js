@@ -1,6 +1,13 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
+var assessment = new Schema({
+	AssignmentName : String,
+	implementation : String,
+	completion: String,
+	learning: String
+})
+
 var candidates = new Schema({
 		EmployeeID: {type: Number, unique: true, required: true},
 		EmployeeName: String,
@@ -32,7 +39,7 @@ var candidates = new Schema({
 		ProjectDescription: String,
 		ProjectSkills: [String],
 		AssetID: String,
-		AssessmentTrack: [String],
+		AssessmentTrack: [assessment],
 		DaysPresent: [Date],
 		DaysAbsent: [{
 			fromDate: {type:Date, unique:true},

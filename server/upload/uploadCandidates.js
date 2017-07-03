@@ -44,10 +44,10 @@ let registerCandidates = function () {
 							} else if(err2.name === 'ValidationError') {
 								cadet.errmsg = 'Employee ID is required';
 								if(cadetObj.EmailID) {
-cadet.eid = cadetObj.EmailID;
-} else if(cadetObj.EmployeeName) {
-cadet.eid = cadetObj.EmployeeName;
-}
+									cadet.eid = cadetObj.EmailID;
+									} else if(cadetObj.EmployeeName) {
+									cadet.eid = cadetObj.EmployeeName;
+								}
 							}
 							failedCadets.push(cadet);
 							callback();

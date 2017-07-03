@@ -8,7 +8,6 @@ import Snackbar from 'material-ui/Snackbar';
 import Slider from 'material-ui/Slider';
 import FileDrop from './FileDrop.jsx';
 import CadetItem from './CadetItem.jsx';
-import AddWave from './AddWave.jsx';
 
 const styles = {
 	heading: {
@@ -275,11 +274,6 @@ export default class MentorConnect extends React.Component {
 						<h3 style={styles.heading}>No cadets available for Mentor Connect</h3>
 					}
 				</Grid>
-				{
-					this.state.user.role == "sradmin" &&
-					this.state.cadets.length > 0 &&
-					<AddWave cadets={this.state.cadets} handleWaveAdd={this.addWave}/>
-				}
 				<Snackbar
           open={this.state.open}
           message={this.state.message}

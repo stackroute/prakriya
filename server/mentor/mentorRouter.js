@@ -42,6 +42,24 @@ router.get('/waves/:trainingTrack', auth.canAccess(CONFIG.MENTOR), function (req
   }
 });
 
+
+// Get course
+router.get('/course/:course', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    mentorMongoController.getCourse(req.params.course, function (course) {
+      res.status(201).json(course);
+    }, function (gcourseerr) {
+      logger.error('error in get course', gcourseerr);
+      res.status(500).json({error: 'Cannot get course from db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
 // Get all courses
 router.get('/coursesfrom/:wave', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 logger.info('API HIT ===> GET Courses');
@@ -141,7 +159,7 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) 
     mentorMongoController.updateCourse(courseObj, function (courses) {
       res.status(201).json(courses);
     }, function (updateerr) {
-      logger.error('err in updateerr', updateerr);
+      logger.error('err in update', updateerr);
       res.status(500).json({error: 'Cannot update course in db...!'});
     });
   } catch(err) {

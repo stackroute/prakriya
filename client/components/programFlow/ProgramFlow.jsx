@@ -1,7 +1,6 @@
 import React from 'react'
 import Request from 'superagent'
 import RaisedButton from 'material-ui/RaisedButton'
-import TextField from 'material-ui/TextField'
 import SelectField from 'material-ui/SelectField'
 import {Grid, Row, Col} from 'react-flexbox-grid'
 import MenuItem from 'material-ui/MenuItem'
@@ -13,9 +12,20 @@ import AddIcon from 'material-ui/svg-icons/content/add'
 import Session from './Session.jsx'
 import {Card, CardText, CardHeader} from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
+import Paper from 'material-ui/Paper';
 import {lightBlack} from 'material-ui/styles/colors';
 import Schedule from './Schedule.jsx';
 import app from '../../styles/app.json';
+
+const styles = {
+	tableHeading: {
+		paddingTop: 20,
+		paddingBottom: 20,
+		background: '#333',
+		color: '#eee',
+		textAlign: 'center'
+	}
+}
 
 export default class Wave extends React.Component {
 	constructor(props) {
@@ -23,14 +33,16 @@ export default class Wave extends React.Component {
 		this.state = {
 			waves: [],
 			waveString: '',
-			waveObject: {},
-			course: '',
+			waveObj: {},
+			courseObj: {},
 			canCreateSession: true,
 			addSessionDialog: false
 		}
 
 		this.getWaveIDs = this.getWaveIDs.bind(this)
 		this.getWaveObject = this.getWaveObject.bind(this)
+		this.getCourse = this.getCourse.bind(this)
+		this.waveUpdate = this.waveUpdate.bind(this)
 		this.onWaveChange = this.onWaveChange.bind(this)
 		this.addSession = this.addSession.bind(this)
 		this.onSessionAddition = this.onSessionAddition.bind(this)
@@ -63,19 +75,43 @@ export default class Wave extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
 				th.setState({
-					waveObject: res.body.waveObject,
+					waveObj: res.body.waveObject,
 				})
-				console.log('State Changed: ', th.state.waveObject)
+				console.log('Wave obj', th.state.waveObj.Course)
+				th.getCourse(th.state.waveObj.Course);
+			})
+	}
+
+	getCourse(courseID) {
+		let th = this
+		Request
+			.get(`/dashboard/course/${courseID}`)
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res){
+				th.setState({
+					courseObj: res.body,
+				})
+				console.log('Course', th.state.courseObj)
+			})
+	}
+
+	waveUpdate(waveObj) {
+		let th = this
+		Request
+			.post('/dashboard/updatewave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({'wave': waveObj})
+			.end(function(err, res){
+				console.log('Wave Updated')
 			})
 	}
 
 	onWaveChange(e) {
-		let th = this
-		th.setState({
+		this.setState({
 			waveString: e.target.outerText,
-			waveObject: {}
+			waveObj: {}
 		})
-		th.getWaveObject(e.target.outerText)
+		this.getWaveObject(e.target.outerText)
 	}
 
 	addSession() {
@@ -101,7 +137,7 @@ export default class Wave extends React.Component {
 
 	onSessionDeletion() {
 		this.setState({
-			waveObject:{}
+			waveObj:{}
 		})
 		this.getWaveObject(this.state.waveString)
 	}
@@ -127,21 +163,33 @@ export default class Wave extends React.Component {
 							</SelectField>
 						</Col>
 					</Row>
-					<Row>
 					{
-						th.state.waveObject.Sessions === undefined ? '' :
-						th.state.waveObject.Sessions.map(function(session, index) {
-							return <Col md={6}><Session key={index} session={session} waveID={th.state.waveObject.WaveID} onSessionAddition={th.onSessionAddition} onSessionDeletion={th.onSessionDeletion}/></Col>
+						Object.keys(this.state.waveObj).length !== 0 &&
+						Object.keys(this.state.courseObj).length !== 0 &&
+						<Row style={styles.tableHeading}>
+							<Col md={1}>Day</Col>
+							<Col md={2}>Name</Col>
+							<Col md={2}>Skills</Col>
+							<Col md={2}>Session By</Col>
+							<Col md={2}>Session On</Col>
+							<Col md={2}>Status</Col>
+						</Row>
+					}
+					{
+						Object.keys(this.state.waveObj).length !== 0 &&
+						Object.keys(this.state.courseObj).length !== 0 &&
+						this.state.courseObj.Schedule.map(function(session, i) {
+							return (
+								<Schedule 
+									wave={th.state.waveObj} 
+									session={session} 
+									key={i}
+									handleWaveUpdate={th.waveUpdate}
+								/>
+							)
 						})
 					}
-					</Row>
 				</Grid>
-				<Schedule />
-					<FloatingActionButton style={app.fab} mini={true} onTouchTap={this.addSession}>
-						<AddIcon />
-					</FloatingActionButton>
-					{this.state.addSessionDialog &&
-							<Session waveID={th.state.waveObject.WaveID} openDialog={this.state.addSessionDialog} handleClose={this.handleClose} onSessionAddition={th.onSessionAddition}/>}
 			</div>
 		)
 	}

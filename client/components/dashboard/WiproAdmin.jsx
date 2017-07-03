@@ -117,7 +117,6 @@ export default class WiproAdmin extends React.Component {
           </div>
         ))
 }
-
         <WaveDetails/>
       </div>
     )

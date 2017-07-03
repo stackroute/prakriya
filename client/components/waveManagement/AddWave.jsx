@@ -138,7 +138,7 @@ export default class AddWave extends React.Component {
 		let th = this;
 		wave.WaveID = this.state.Mode.substr(0, 1) + this.state.WaveNumber.split('-')[1];
 		wave.Mode = this.state.Mode;
-		wave.Courses = [this.state.Course];
+		wave.Course = this.state.Course;
 		wave.WaveNumber = this.state.WaveNumber
 		wave.Location = this.state.Location
 		wave.StartDate = this.state.StartDate
@@ -151,6 +151,8 @@ export default class AddWave extends React.Component {
 	resetFields() {
 		this.setState({
 			open: false,
+			Mode: '',
+			Course: '',
 			WaveID: '',
 			WaveNumber: '',
 			WaveNumberErrorText: '',
@@ -246,11 +248,7 @@ export default class AddWave extends React.Component {
 		          floatingLabelText="Course"
 		          value={this.state.Course}
 		          onChange={this.handleCourseChange}
-		          menuItemStyle={select.menu}
-							listStyle={select.list}
 							style={{width: '100%'}}
-							selectedMenuItemStyle={select.selectedMenu}
-							maxHeight={600}
 							disabled={this.state.disableCourse}
 							errorText={this.state.CourseErrorText}
 		        >

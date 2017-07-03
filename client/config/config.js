@@ -1,7 +1,7 @@
 let locations = [
-  'Koramangala',
-  'RO',
-  'Gharebavipalya'
+  'SR1',
+  'SR2',
+  'SR3'
 ];
 
 let modes = [

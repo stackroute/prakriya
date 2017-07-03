@@ -2,27 +2,20 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const sessionSchema = new Schema({
-  SessionID: Number,
-  CourseName: String,
-  Week: Number,
-  Activities: String,
+  Day: Number,
+  Name: String,
+  Description: String,
+  Skills: [String],
   Status: String,
-  ContextSetSession: String,
   SessionBy: String,
-  SessionOn: Date,
-  Remarks: String
-})
-
-const cadetSchema = new Schema({
-  CadetID: Number,
-  Course: String
+  SessionOn: Date
 })
 
 const wave = new Schema({
   WaveID: {type: String, unique: true},
   WaveNumber: String,
   Mode: String,
-  Courses: [String],
+  Course: String,
   StartDate: Date,
   EndDate: Date,
   Location: String,

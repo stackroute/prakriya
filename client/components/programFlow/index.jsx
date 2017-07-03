@@ -1,3 +1,3 @@
-import Wave from './Wave.jsx';
+import ProgramFlow from './ProgramFlow.jsx';
 
-export default Wave;
+export default ProgramFlow;
