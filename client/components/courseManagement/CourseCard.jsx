@@ -14,6 +14,9 @@ import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import HistoryIcon from 'material-ui/svg-icons/action/history';
+import AssignmentIcon from 'material-ui/svg-icons/action/assignment';
+import ScheduleIcon from 'material-ui/svg-icons/action/schedule';
+import SkillsIcon from 'material-ui/svg-icons/action/stars';
 import CourseSubCard from './CourseSubCard.jsx';
 import AddCourse from './AddCourse.jsx';
 import FlatButton from 'material-ui/FlatButton';
@@ -68,6 +71,10 @@ export default class CourseCard extends React.Component {
 		this.handleEditDetail = this.handleEditDetail.bind(this);
 		this.openDetailDialog = this.openDetailDialog.bind(this);
 		this.closeDetailDialog = this.closeDetailDialog.bind(this);
+  }
+
+  componentWillMount() {
+    this.props.setCurrentCourse();
   }
 
   handleExpandChange = (expanded) => {
@@ -149,7 +156,6 @@ export default class CourseCard extends React.Component {
       let date = history[1].split(' : ');
       history[1] = date[0];
     }
-    console.log(this.props.course.Mode);
     let bgColor = this.props.bgColor;
     let bgIcon = this.props.bgIcon;
     return (
@@ -165,17 +171,45 @@ export default class CourseCard extends React.Component {
           } > {
             this.props.course.Mode.charAt(0).toUpperCase()
           } < /Avatar>}/>
-					<span style={{padding:'0px'}}><IconButton tooltip="Duration">
+
+          <IconButton tooltip="Duration">
 						<DateIcon/>
 					</IconButton>
-          {this.props.course.Duration}
-            Weeks</span><br/>
-						<IconButton tooltip="Add Assessments or Schedule" style={{
-	            display: this.state.hide
-	          }} onClick={this.openDetailDialog}>
-	            <AddIcon/>
-	          </IconButton>
-          <IconButton tooltip="Edit Course" onClick={this.handleEditCourse} style={{
+          <span style={{verticalAlign: 'super'}}>
+            {this.props.course.Duration}&nbsp;week(s)
+          </span><br/>
+
+          <IconButton tooltip="Skills">
+						<SkillsIcon/>
+					</IconButton>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{console.log('Skills clicked...')}}>
+            {this.props.course.Skills.length}&nbsp;skill(s)
+          </span><br/>
+
+          <IconButton tooltip="Schedule">
+            <ScheduleIcon/>
+          </IconButton>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={this.props.openSchedule}>
+            {this.props.course.Schedule.length}&nbsp;session(s)
+          </span><br/>
+
+          <IconButton tooltip="Assignments">
+						<AssignmentIcon/>
+					</IconButton>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer',  verticalAlign: 'super'}} onTouchTap={this.props.openAssignments}>
+            {this.props.course.Assignments.length}&nbsp;assignment(s)
+          </span><br/>
+
+					<IconButton tooltip="Add Assessments or Schedule" style={{
+            display: this.state.hide
+          }} onClick={this.openDetailDialog}>
+            <AddIcon/>
+          </IconButton>
+
+          <IconButton
+          tooltip="Edit Course"
+          onClick={this.handleEditCourse}
+          style={{
             display: this.state.hide,
             marginLeft: '150px'
           }}>
