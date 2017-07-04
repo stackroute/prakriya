@@ -9,7 +9,6 @@ const adminMongoController = require('../admin/adminMongoController.js');
 const email = require('./../email');
 let auth = require('../auth')();
 let CONFIG = require('../../config');
-const dashboardNeo4jController = require('./dashboardNeo4jController');
 
 /** **************************************************
 *******          Notification System         ********
