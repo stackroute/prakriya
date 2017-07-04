@@ -53,8 +53,8 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 						headers.map(function (head, key) {
 							if(key > 0) {
 								if(lineCol[key] !== '') {
-cadetObj[head] = lineCol[key];
-}
+									cadetObj[head] = lineCol[key];
+								}
 							}
 						});
 						cadetColln.push(cadetObj);

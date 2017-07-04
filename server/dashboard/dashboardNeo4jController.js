@@ -58,7 +58,8 @@ let driver = neo4jDriver.driver(config.NEO4J.neo4jURL,
       set c.Name = '${CourseObj.Name}',
       c.Mode = '${CourseObj.Mode}',c.Duration = ${CourseObj.Duration},
       c.History = '${CourseObj.History}',
-      c.Removed = ${CourseObj.Removed} with c as course
+      c.Removed = ${CourseObj.Removed}
+      with c as course
       UNWIND ${JSON.stringify(CourseObj.Skills)} as skill
       MERGE (n:Skill{Name:skill})
       MERGE (n)<-[:includes_a]-(course);`

@@ -6,10 +6,10 @@ let addCadet = function (cadetObj, successCB, errorCB) {
 	let saveCadet = new CandidateModel(cadetObj);
 	saveCadet.save(cadetObj, function (err, result) {
 		if(err) {
-errorCB(err);
-} else {
-successCB(result);
-}
+			errorCB(err);
+		} else {
+			successCB(result);
+		}
 	});
 };
 
