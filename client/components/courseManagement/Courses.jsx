@@ -90,7 +90,7 @@ export default class Courses extends React.Component {
 	getCourses() {
 		let th = this;
 		Request
-			.get('/mentor/courses')
+			.get('/dashboard/courses')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
@@ -108,7 +108,7 @@ export default class Courses extends React.Component {
 		let th = this
 		course.CourseID = this.state.courses.length + 1;
 		Request
-			.post('/mentor/addcourse')
+			.post('/dashboard/addcourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(course)
 			.end(function(err, res){
@@ -123,7 +123,7 @@ export default class Courses extends React.Component {
 	updateCourse(course){
 		let th = this
 		Request
-			.post('/mentor/updatecourse')
+			.post('/dashboard/updatecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(course)
 			.end(function(err, res){

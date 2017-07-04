@@ -67,7 +67,7 @@ export default class AddCourse extends React.Component {
 
   componentWillMount() {
     if (this.props.openDialog) {
-      this.setState({showDialog: true, Name: this.props.course.Name, Mode: this.props.course.Mode, Duration: this.props.course.Duration, Skills: this.props.course.Skills})
+      this.setState({showDialog: true, Name: this.props.course.Name, Mode: this.props.course.Mode, Duration: this.props.course.Duration.low, Skills: this.props.course.Skills})
     }
   }
 
@@ -149,6 +149,7 @@ export default class AddCourse extends React.Component {
     course.Mode = this.state.Mode;
     course.Duration = this.state.Duration;
 		course.Skills = this.state.Skills;
+    course.Removed = false;
     course.History = '';
     this.props.handleUpdate(course);
   }

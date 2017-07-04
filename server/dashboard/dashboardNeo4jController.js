@@ -52,7 +52,29 @@ let driver = neo4jDriver.driver(config.NEO4J.neo4jURL,
            });
   };
 
+  let updateCourse = function (CourseObj, successCB, errorCB) {
+  let query = `MATCH (c:Course{ID:'${CourseObj.ID}'})-[r:includes_a]->()
+      delete r
+      set c.Name = '${CourseObj.Name}',
+      c.Mode = '${CourseObj.Mode}',c.Duration = ${CourseObj.Duration},
+      c.History = '${CourseObj.History}',
+      c.Removed = ${CourseObj.Removed} with c as course
+      UNWIND ${JSON.stringify(CourseObj.Skills)} as skill
+      MERGE (n:Skill{Name:skill})
+      MERGE (n)<-[:includes_a]-(course);`
+      let session = driver.session();
+         session.run(query).then(function (resultObj, err) {
+             session.close();
+           if(err) {
+             errorCB('Error');
+           } else {
+             successCB('success');
+            }
+           });
+  };
+
   module.exports = {
     addCourse,
-    getCourses
+    getCourses,
+    updateCourse
   }
