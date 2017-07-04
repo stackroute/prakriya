@@ -681,10 +681,10 @@ router.get('/getabsentees', auth.canAccess(CONFIG.ADMINISTRATOR), function (req,
   }
 });
 
-// Gett all courses
-router.get('/courses', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) {
+// Get all courses
+router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
   try {
-    dashboardMongoController.getCourses(function(courses) {
+    dashboardNeo4jController.getCourses(function(courses) {
       res.status(201).json(courses);
     }, function(err) {
       logger.error('Get Courses For Wave Error: ', err);
@@ -697,6 +697,45 @@ router.get('/courses', auth.canAccess(CONFIG.ADMINISTRATOR), function(req, res) 
     });
   }
 })
+
+// add courses
+router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+  try{
+    let courseObj = req.body;
+    courseObj.History = courseObj.History + ' added by ' +
+     req.user.name + ' on ' + new Date() + '\n';
+    dashboardNeo4jController.addCourse(courseObj, function (courses) {
+      res.status(201).json(courses);
+    }, function (addcourseerr) {
+      logger.error('err in addcourseerr', addcourseerr);
+      res.status(500).json({error: 'Cannot add course in db...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// update courses
+router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+  try{
+    let courseObj = req.body;
+    courseObj.History = courseObj.History + ' last update by ' +
+     req.user.name + ' on ' + new Date() + '\n';
+    dashboardNeo4jController.updateCourse(courseObj, function (courses) {
+      res.status(201).json(courses);
+    }, function (updateerr) {
+      logger.error('err in update', updateerr);
+      res.status(500).json({error: 'Cannot update course in db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
 
 // Get course
 router.get('/course/:courseID', auth.canAccess(CONFIG.ADMMEN), function (req, res) {

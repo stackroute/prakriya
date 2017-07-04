@@ -58,7 +58,8 @@ export default class CourseCard extends React.Component {
       showDeleteDialog: false,
       openDialog: false,
 			edit: false,
-			showDetailDialog: false
+			showDetailDialog: false,
+      showSkills: false
     }
     this.handleExpandChange = this.handleExpandChange.bind(this);
     this.handleEditCourse = this.handleEditCourse.bind(this);
@@ -182,10 +183,14 @@ export default class CourseCard extends React.Component {
           <IconButton tooltip="Skills">
 						<SkillsIcon/>
 					</IconButton>
-          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{console.log('Skills clicked...')}}>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{th.setState({showSkills:!th.state.showSkills})}}>
             {this.props.course.Skills.length}&nbsp;skill(s)
           </span><br/>
-
+          {
+            th.state.showSkills && <ul>{th.props.course.Skills.map(function(skill){
+              return (<li> {skill} </li>);
+            })}</ul>
+          }
           <IconButton tooltip="Schedule">
             <ScheduleIcon/>
           </IconButton>
