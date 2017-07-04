@@ -6,11 +6,16 @@ const graphConsts = require('./../common/graphConstants');
 let driver = neo4jDriver.driver(config.NEO4J.neo4jURL,
   neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
-// Adding a cadet
+/**********************************************
+************ Candidate management *************
+**********************************************/
+
+// Add cadet
 
 let addCadet = function(cadetObj, successCB, errorCB) {
  
   let cadet = {};
+
   cadet.EmployeeID = cadetObj.EmployeeID || '';
   cadet.EmployeeName = cadetObj.EmployeeName || '';
   cadet.EmailID = cadetObj.EmailID || '';
@@ -25,9 +30,8 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   cadet.ProjectSupervisor = cadetObj.ProjectSupervisor || '';
   cadet.Selected = cadetObj.Selected || '';
   cadet.Remarks = cadetObj.Remarks || '';
-  let session = driver.session();
 
-  logger.debug("obtained connection with neo4j");
+  let session = driver.session();
 
   let query  = 
   	`CREATE (n: ${graphConsts.NODE_CANDIDATE}
@@ -61,6 +65,30 @@ let addCadet = function(cadetObj, successCB, errorCB) {
     });
 }
 
+let getCadets = function(successCB, errorCB) {
+  let session = driver.session();
+  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
+  session.run(query)
+    .then(function(resultObj) {
+      session.close();
+      let cadets = [];
+      
+      for(let i = 0; i < resultObj.records.length; i++) {
+        let result = resultObj.records[i];
+        logger.debug('Result obj from neo4j', result._fields);
+          cadets.push(result._fields[0].properties);
+      }
+      successCB(cadets);
+    })
+    .catch(function (err) {
+      errorCB(err);
+    })
+}
+
+
+/**********************************************
+************** Course management **************
+**********************************************/
 
 // Course Management
 
@@ -133,6 +161,7 @@ let getCourses = function (successCB, errorCB) {
 
   module.exports = {
     addCadet,
+    getCadets,
     addCourse,
     getCourses,
     updateCourse

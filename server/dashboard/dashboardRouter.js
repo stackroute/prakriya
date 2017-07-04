@@ -360,13 +360,14 @@ router.get('/userrole', auth.canAccess(CONFIG.ALL), function (req, res) {
 // Get all the cadets
 router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardMongoController.getCadets(function (cadets) {
+    dashboardNeo4jController.getCadets(function (cadets) {
       res.status(201).json(cadets);
     }, function (err) {
       logger.error('Get All Cadets Error: ', err);
-      res.status(500).json({error: 'Cannot get all cadets from db...!'});
+      res.status(500).json({error: 'Cannot get all cadets from neo4j...!'});
     });
   } catch(err) {
+    logger.debug('Get cadets error', err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
