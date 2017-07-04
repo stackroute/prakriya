@@ -120,12 +120,13 @@ export default class Courses extends React.Component {
 		  });
 	}
 
-	updateCourse(course){
+	updateCourse(course, edit){
 		let th = this
+		console.log(edit)
 		Request
 			.post('/dashboard/updatecourse')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send(course)
+			.send({course:course,edit:edit})
 			.end(function(err, res){
 		    if(err)
 		    	console.log(err);

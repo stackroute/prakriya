@@ -117,9 +117,9 @@ export default class CourseCard extends React.Component {
 		this.setState({showDetailDialog: false})
 	}
 
-  handleUpdateCourse(course) {
+  handleUpdateCourse(course, edit) {
     course.History = this.props.course.History;
-    this.props.updateCourse(course);
+    this.props.updateCourse(course, edit);
   }
 
   handleDeleteCourse(course) {

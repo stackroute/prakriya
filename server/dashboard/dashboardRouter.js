@@ -721,10 +721,10 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
 // update courses
 router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
   try{
-    let courseObj = req.body;
+    let courseObj = req.body.course;
     courseObj.History = courseObj.History + ' last update by ' +
      req.user.name + ' on ' + new Date() + '\n';
-    dashboardNeo4jController.updateCourse(courseObj, function (courses) {
+    dashboardNeo4jController.updateCourse(courseObj, req.body.edit, function (courses) {
       res.status(201).json(courses);
     }, function (updateerr) {
       logger.error('err in update', updateerr);
