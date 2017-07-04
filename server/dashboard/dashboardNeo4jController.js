@@ -25,8 +25,6 @@ let addCadet = function(cadetObj, successCB, errorCB) {
 	cadet.Selected = cadetObj.Selected || '';
 	cadet.Remarks = cadetObj.Remarks || '';
 
-	logger.debug("Now proceeding to add a cadet", cadetObj);
-
   let session = driver.session();
 
   logger.debug("obtained connection with neo4j");
