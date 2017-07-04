@@ -197,7 +197,7 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Success');
+		    	console.log('Added candidate successfully');
 		    }
 			})
 	}

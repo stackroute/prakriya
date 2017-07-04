@@ -3,6 +3,7 @@ const client = require('redis').createClient();
 const logger = require('./../../applogger');
 const async = require('async');
 const uploadMongoController = require('./uploadMongoController');
+const dashboardNeo4jController = require('../dashboard/dashboardNeo4jController');
 
 let registerCandidates = function () {
 	client.brpop('fileImport', 0, function (err1, fileId) {
@@ -33,25 +34,20 @@ let registerCandidates = function () {
 
 				async.each(cadetColln,
 					function (cadetObj, callback) {
-						uploadMongoController.addCadet(cadetObj, function (cadet) {
-							importedCadets.push(cadet);
-							callback();
-						}, function (err2) {
-							let cadet = {};
-							if(err2.name === 'MongoError') {
-								cadet.errmsg = 'Duplicate cadet error';
-								cadet.eid = cadetObj.EmployeeID;
-							} else if(err2.name === 'ValidationError') {
-								cadet.errmsg = 'Employee ID is required';
-								if(cadetObj.EmailID) {
-									cadet.eid = cadetObj.EmailID;
-									} else if(cadetObj.EmployeeName) {
-									cadet.eid = cadetObj.EmployeeName;
-								}
-							}
-							failedCadets.push(cadet);
-							callback();
-						});
+						dashboardNeo4jController.addCadet(cadetObj)
+				      .then(function(result) {
+				        logger.debug('Added the cadet', result)
+				        importedCadets.push(cadetObj);
+				        callback();
+				      })
+				      .catch(function (err) {
+				      	let cadet = {}
+				        logger.error('Error in adding a cadet in the neo4j',  err)
+				        cadet.eid = cadetObj.EmployeeID;
+				        cadet.errmsg = 'Duplicate cadet error';
+				        failedCadets.push(cadet);
+				        callback();
+				      })
 					},
 					function (err3) {
 						logger.debug('Final function', err3);
