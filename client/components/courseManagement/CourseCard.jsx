@@ -176,7 +176,7 @@ export default class CourseCard extends React.Component {
 						<DateIcon/>
 					</IconButton>
           <span style={{verticalAlign: 'super'}}>
-            {this.props.course.Duration}&nbsp;week(s)
+            {this.props.course.Duration.low}&nbsp;week(s)
           </span><br/>
 
           <IconButton tooltip="Skills">
