@@ -3,7 +3,7 @@ const mentorMongoController = require('./mentorMongoController');
 let auth = require('../auth')();
 let CONFIG = require('../../config');
 const logger = require('./../../applogger');
-
+const dashboardNeo4jController = require('./../dashboard/dashboardNeo4jController');
 /** ************************************************
 *******          AssessmentTrack           ********
 ***************************************************/
@@ -137,7 +137,7 @@ router.post('/updatecandidateassessment', auth.canAccess(CONFIG.MENTOR), functio
 // Get all courses
 router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    mentorMongoController.getCourses(function (course) {
+    dashboardNeo4jController.getCourses(function (course) {
       res.status(201).json(course);
     }, function (gcourseerr) {
       logger.error('error in get course', gcourseerr);
@@ -175,7 +175,7 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
     let courseObj = req.body;
     courseObj.History = courseObj.History + ' added by ' +
      req.user.name + ' on ' + new Date() + '\n';
-    mentorMongoController.addCourse(courseObj, function (courses) {
+    dashboardNeo4jController.addCourse(courseObj, function (courses) {
       res.status(201).json(courses);
     }, function (addcourseerr) {
       logger.error('err in addcourseerr', addcourseerr);

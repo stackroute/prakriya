@@ -811,21 +811,13 @@ router.get('/waveobject/:waveID', auth.canAccess(CONFIG.ADMMEN), function (req, 
 // Save the cadet information
 router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
-    // dashboardMongoController.saveCandidate(req.body, function (evalObj) {
-    //   res.status(200).json(evalObj);
-    // }, function (err) {
-    //   logger.error('Get Add Candidate Error: ', err);
-    //   res.status(500).json({error: 'Cannot save cadidate in db...!'});
-    // });
-    dashboardNeo4jController.addCadet(req.body)
-      .then(function(result) {
-        logger.debug('Added the cadet', result)
+    dashboardNeo4jController.addCadet(req.body, function (cadet) {
+      logger.debug('Added the cadet', result)
         res.status(200).json(result);
-      })
-      .catch(function (err) {
-        logger.error('Error in adding a cadet in the neo4j',  err)
-        res.status(500).json({error: 'Cannot save cadidate in neo4j...!'});
-      }) 
+    }, function(err) {
+      logger.error('Error in adding a cadet in the neo4j',  err)
+      res.status(500).json({error: 'Cannot save cadidate in neo4j...!'});
+    })
   } catch(err) {
     logger.error('Add Candidate Exception: ', err);
     res.status(500).json({
