@@ -133,7 +133,9 @@ let updateCadets = function (cadetArr, successCB, errorCB) {
 
 let getCadets = function(successCB, errorCB) {
   let session = driver.session();
-  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
+  let query  = `MATCH 
+  (n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(:${graphConsts.NODE_WAVE}) 
+  return n`;
   session.run(query)
     .then(function(resultObj) {
       session.close();
