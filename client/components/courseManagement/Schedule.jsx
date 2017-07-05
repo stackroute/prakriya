@@ -9,12 +9,17 @@ export default class Schedule extends React.Component {
     this.state = {
       showDialog: false
     }
-
+    this.delete = this.delete.bind(this);
   }
 
 	componentWillReceiveProps(nextProps) {
 		this.setState({showDialog: nextProps.openDialog});
 	}
+
+    delete(obj,type) {
+      this.props.delete(obj,type);
+      this.props.closeDialog();
+    }
 
   render() {
     let th = this
@@ -39,7 +44,7 @@ export default class Schedule extends React.Component {
 									bgColor={th.props.bgColor}
 									bgIcon={th.props.bgIcon}
 									session={session}
-									key={key}/>)
+									key={key} delete={th.delete}/>)
 							})
 						}
             </div>

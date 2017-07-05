@@ -72,6 +72,8 @@ export default class CourseCard extends React.Component {
 		this.handleEditDetail = this.handleEditDetail.bind(this);
 		this.openDetailDialog = this.openDetailDialog.bind(this);
 		this.closeDetailDialog = this.closeDetailDialog.bind(this);
+    this.assignment = this.assignment.bind(this);
+    this.session = this.session.bind(this);
   }
 
   componentWillMount() {
@@ -124,6 +126,17 @@ export default class CourseCard extends React.Component {
 
   handleDeleteCourse(course) {
     this.props.deleteCourse(this.props.course);
+  }
+
+  assignment() {
+    console.log('here');
+    this.props.setCurrentCourse();
+    this.props.openAssignments();
+  }
+
+  session() {
+      this.props.setCurrentCourse();
+      this.props.openSchedule();
   }
 
   formatDate(date) {
@@ -194,14 +207,14 @@ export default class CourseCard extends React.Component {
           <IconButton tooltip="Schedule">
             <ScheduleIcon/>
           </IconButton>
-          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={this.props.openSchedule}>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={th.session}>
             {this.props.course.Schedule.length}&nbsp;session(s)
           </span><br/>
 
           <IconButton tooltip="Assignments">
 						<AssignmentIcon/>
 					</IconButton>
-          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer',  verticalAlign: 'super'}} onTouchTap={this.props.openAssignments}>
+          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer',  verticalAlign: 'super'}} onTouchTap={th.assignment}>
             {this.props.course.Assignments.length}&nbsp;assignment(s)
           </span><br/>
 
