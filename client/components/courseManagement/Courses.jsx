@@ -54,14 +54,13 @@ export default class Courses extends React.Component {
 		this.closeRestoreDialog = this.closeRestoreDialog.bind(this);
 		this.handleRestoreCourse = this.handleRestoreCourse.bind(this);
 		this.restoreCourses = this.restoreCourses.bind(this);
-		this.addCategory = this.addCategory.bind(this);
-		this.deleteCategory = this.deleteCategory.bind(this);
 		this.addCourse = this.addCourse.bind(this);
 		this.openAssignments = this.openAssignments.bind(this);
 		this.closeAssignments = this.closeAssignments.bind(this);
 		this.openSchedule = this.openSchedule.bind(this);
 		this.closeSchedule = this.closeSchedule.bind(this);
 		this.setCurrentCourse = this.setCurrentCourse.bind(this);
+		this.subDelete = this.subDelete.bind(this);
 	}
 
 	componentWillMount() {
@@ -120,12 +119,13 @@ export default class Courses extends React.Component {
 		  });
 	}
 
-	updateCourse(course){
+	updateCourse(course, edit){
 		let th = this
+		console.log(edit)
 		Request
 			.post('/dashboard/updatecourse')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send(course)
+			.send({course:course,edit:edit})
 			.end(function(err, res){
 		    if(err)
 		    	console.log(err);
@@ -139,7 +139,7 @@ export default class Courses extends React.Component {
 		let th = this
 		console.log(course)
 		Request
-			.post('/mentor/deletecourse')
+			.post('/dashboard/deletecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(course)
 			.end(function(err, res){
@@ -154,39 +154,9 @@ export default class Courses extends React.Component {
 	restoreCourses(actions){
 		let th = this
 		Request
-			.post('/mentor/restorecourse')
+			.post('/dashboard/restorecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(actions)
-			.end(function(err, res){
-		    if(err)
-		    	console.log(err);
-		    else {
-		    	th.getCourses();
-		    }
-		  });
-	}
-
-	addCategory(category){
-		let th = this
-		Request
-			.post('/mentor/addcategory')
-			.set({'Authorization': localStorage.getItem('token')})
-			.send(category)
-			.end(function(err, res){
-		    if(err)
-		    	console.log(err);
-		    else {
-		    	th.getCourses();
-		    }
-		  });
-	}
-
-	deleteCategory(category){
-		let th = this
-		Request
-			.post('/mentor/deletecategory')
-			.set({'Authorization': localStorage.getItem('token')})
-			.send(category)
 			.end(function(err, res){
 		    if(err)
 		    	console.log(err);
@@ -230,6 +200,23 @@ export default class Courses extends React.Component {
 		});
 	}
 
+	subDelete(obj,type) {
+		let th = this
+		console.log(type)
+		Request
+			.post('/dashboard/deleteassignmentorschedule')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({obj:obj, course:th.state.currentCard.course, type:type})
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+					console.log('coming here')
+		    	th.getCourses();
+		    }
+		  });
+	}
+
 	render() {
 		let th = this;
 		return(
@@ -248,8 +235,6 @@ export default class Courses extends React.Component {
 												<CourseCard course={course}
 												updateCourse={th.updateCourse}
 												deleteCourse={th.deleteCourse}
-												addCategory={th.addCategory}
-												deleteCategory={th.deleteCategory}
 												bgColor={backgroundColors[key%4]}
 												bgIcon={backgroundIcons[key%4]}
 												openAssignments={th.openAssignments}
@@ -280,10 +265,11 @@ export default class Courses extends React.Component {
 					assignments={
 						this.state.currentCard.course ?
 						this.state.currentCard.course.Assignments.sort(function(a, b) {
-							return a.Week - b.Week
+							return a.Week.low - b.Week.low
 						}) :
 						[]
 					}
+					delete={this.subDelete}
 					openDialog={this.state.assignmentsDialog}
 					closeDialog={this.closeAssignments} />
 
@@ -298,6 +284,7 @@ export default class Courses extends React.Component {
 							}) :
 							[]
 						}
+						delete={this.subDelete}
 						openDialog={this.state.scheduleDialog}
 						closeDialog={this.closeSchedule} />
 			</div>

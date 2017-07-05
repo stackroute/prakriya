@@ -7,19 +7,79 @@ import Avatar from 'material-ui/Avatar';
 import IconButton from 'material-ui/IconButton';
 import Paper from 'material-ui/Paper';
 import SkillsIcon from 'material-ui/svg-icons/action/stars';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
+
+const styles = {
+  heading: {
+    textAlign: 'center'
+  },
+  col: {
+    marginBottom: 20
+  },
+  deleteDialog: {
+    backgroundColor: '#DDDBF1',
+    border: '10px solid teal'
+  },
+  actionsContainer: {
+    backgroundColor: 'teal',
+    borderTop: '0px',
+    marginTop: '0px'
+  },
+  actionButton: {
+    backgroundColor: '#DDDBF1',
+    width: '50%',
+    color: 'teal',
+    border: '1px solid teal',
+    height: '100%'
+  }
+}
 
 export default class SessionCard extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+      showDeleteDialog: false
 		}
+    this.openDeleteDialog = this.openDeleteDialog.bind(this);
+    this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
+    this.handleDeleteSchedule = this.handleDeleteSchedule.bind(this);
 	}
+
+    openDeleteDialog() {
+      this.setState({showDeleteDialog: true})
+    }
+
+    closeDeleteDialog() {
+      this.setState({showDeleteDialog: false})
+    }
+
+    handleDeleteSchedule() {
+      let th = this
+  		this.props.delete(this.props.session,'schedule');
+    }
 
 	render() {
 		let th = this
 		let bgColor = this.props.bgColor;
     let bgIcon = this.props.bgIcon;
-		return(
+    const deleteDialogActions = [ < FlatButton label = "Cancel" onTouchTap = {
+        this.closeDeleteDialog
+      }
+      style = {
+        styles.actionButton
+      } />, < FlatButton label = "Delete" onTouchTap = {
+        this.closeDeleteDialog
+      }
+      onClick = {
+        this.handleDeleteSchedule
+      }
+      style = {
+        styles.actionButton
+      } />
+    ]
+    return(
 			<div style={{
 				display: 'inline-block',
 				padding: '10px'
@@ -32,7 +92,7 @@ export default class SessionCard extends React.Component {
 					title={`${this.props.session.Name}`}
 					avatar={
 						<Avatar backgroundColor={bgIcon}>
-							{this.props.session.Day}
+							{this.props.session.Day.low}
 						</Avatar>
 					} />
 
@@ -46,7 +106,7 @@ export default class SessionCard extends React.Component {
             <span style={{textAlign: 'jusitfy'}}>
               <b style={{color: bgIcon}}>Skills: </b>
               {
-                this.props.assignment.Skills.length == 0 ?
+                this.props.session.Skills.length == 0 ?
                 'NA' :
                 this.props.session.Skills.map(function(skill, index) {
                   if(index == th.props.session.Skills.length - 1)
@@ -70,7 +130,15 @@ export default class SessionCard extends React.Component {
             </span>
           </Paper><br/>
 
-				</Card>
+          <IconButton tooltip="Delete Assignment" style={{
+            display: this.state.hide
+          }} onClick={this.openDeleteDialog}>
+            <DeleteIcon/>
+          </IconButton>
+          </Card>
+          <Dialog bodyStyle={styles.deleteDialog} actionsContainerStyle={styles.actionsContainer} actions={deleteDialogActions} modal={false} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
+          Are you sure you want to delete this Assignment?
+          </Dialog>
 			</div>
 		)
 	}

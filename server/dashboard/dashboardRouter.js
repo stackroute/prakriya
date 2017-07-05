@@ -208,7 +208,7 @@ router.post('/updatecadetwave', auth.canAccess(CONFIG.ADMIN), function (req, res
 // Get all projects
 router.get('/projects', auth.canAccess(CONFIG.MENCAN), function (req, res) {
     try{
-      dashboardMongoController.getProjects(function (projects) {
+      dashboardNeo4jController.getProducts(function (projects) {
       res.status(201).json(projects);
     }, function (err) {
       logger.error('Get All Projects Error: ', err);
@@ -226,7 +226,7 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     let projectObj = req.body;
     projectObj.version[0].addedBy = req.user.name;
-    dashboardMongoController.addProject(projectObj, function (project) {
+    dashboardNeo4jController.addProduct(projectObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Add Project Error: ', err);
@@ -273,7 +273,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
     let versionObj = req.body.version;
     versionObj.addedBy = req.user.name;
     versionObj.updatedBy = true;
-    dashboardMongoController.addVersion(req.body.product, versionObj, function (project) {
+    dashboardNeo4jController.addVersion(req.body.product, versionObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Add Version Error: ', err);
@@ -290,18 +290,17 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     if(req.body.type === 'project') {
-    let projectObj = req.body.project;
-    projectObj.addedBy = req.user.name;
-    projectObj.updatedBy = true;
-    dashboardMongoController.deleteProject(projectObj, function (project) {
+    let productName = req.body.project.product;
+    dashboardNeo4jController.deleteProduct(productName, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Delete Project Error: ', err);
       res.status(500).json({error: 'Cannot delete the project...!'});
     });
     } else {
-      dashboardMongoController.deleteVersion(req.body.project, function (project) {
-        res.status(201).json(project);
+      let versionName = req.body.project.name;
+      dashboardNeo4jController.deleteVersion(versionName, function (version) {
+        res.status(201).json(version);
       }, function (err) {
         logger.error('Delete Version Error: ', err);
         res.status(500).json({error: 'Cannot delete the version...!'});
@@ -375,14 +374,31 @@ router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   }
 });
 
+// Get all the cadets who are not part of any wave
+router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.getNewCadets(function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get All New Cadets Error: ', err);
+      res.status(500).json({error: 'Cannot get all new cadets from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get cadets error',  err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // Update a cadet
 router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    dashboardMongoController.updateCadet(req.body, function (status) {
+    dashboardNeo4jController.updateCadet(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Update Cadet Error: ', err);
-      res.status(500).json({error: 'Cannot update candidate in db...!'});
+      res.status(500).json({error: 'Cannot update candidate in neo4j...!'});
     });
   } catch(err) {
     res.status(500).json({
@@ -394,8 +410,7 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
 // Update many cadets
 router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    logger.debug('Update cadets', req.body);
-    dashboardMongoController.updateCadets(req.body, function (status) {
+    dashboardNeo4jController.updateCadets(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Update Cadets Error: ', err);
@@ -723,10 +738,10 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
 // update courses
 router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
   try{
-    let courseObj = req.body;
+    let courseObj = req.body.course;
     courseObj.History = courseObj.History + ' last update by ' +
      req.user.name + ' on ' + new Date() + '\n';
-    dashboardNeo4jController.updateCourse(courseObj, function (courses) {
+    dashboardNeo4jController.updateCourse(courseObj, req.body.edit, function (courses) {
       res.status(201).json(courses);
     }, function (updateerr) {
       logger.error('err in update', updateerr);
@@ -738,6 +753,63 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) 
     });
   }
 });
+
+// delete assignment or schedule
+router.post('/deleteassignmentorschedule', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+  try{
+    let obj = req.body.obj;
+    console.log(req.body);
+    dashboardNeo4jController.deleteAssignmentOrSchedule(obj, req.body.course, req.body.type, function (result) {
+      res.status(201).json({success:'success'});
+    }, function (updateerr) {
+      logger.error('err in update', updateerr);
+      res.status(500).json({error: 'Cannot update course in db...!'});
+    });
+  } catch(err) {
+    console.log(err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Delete a course
+router.post('/deletecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+  try {
+    let courseObj = req.body;
+    courseObj.History = courseObj.History + ' deleted by ' +
+     req.user.name + ' on ' + new Date() + '\n';
+    dashboardNeo4jController.deleteOrRestoreCourse(courseObj, 'delete', function (status) {
+      res.status(200).json(status);
+    }, function (deletecourseerr) {
+      logger.error('err in deletecourseerr', deletecourseerr);
+      res.status(500).json({error: 'Cannot delete course in db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// restore a course
+router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+  try {
+    let courseObj = req.body;
+    courseObj.History = 'restored by ' + req.user.name + ' on ' + new Date() + '\n';
+    dashboardNeo4jController.deleteOrRestoreCourse(courseObj, 'restore', function (status) {
+      res.status(200).json(status);
+    }, function (restorecourseerr) {
+      logger.error('err in restorecourseerr', restorecourseerr);
+      res.status(500).json({error: 'Cannot restore course in db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 
 // Get course
 router.get('/course/:courseID', auth.canAccess(CONFIG.ADMMEN), function (req, res) {

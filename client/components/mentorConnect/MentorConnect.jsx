@@ -47,9 +47,9 @@ export default class MentorConnect extends React.Component {
 			message: ''
 		}
 		this.getCadets = this.getCadets.bind(this);
+		this.updateBulkRemarks = this.updateBulkRemarks.bind(this);
 		this.saveRemarks = this.saveRemarks.bind(this);
 		this.saveAllRemarks = this.saveAllRemarks.bind(this);
-		this.addWave = this.addWave.bind(this);
 		this.handleFilter = this.handleFilter.bind(this);
 		this.handleSort = this.handleSort.bind(this);
 		this.handleClearFilter = this.handleClearFilter.bind(this);
@@ -68,16 +68,13 @@ export default class MentorConnect extends React.Component {
 	getCadets() {
 		let th = this;
 		Request
-			.get('/dashboard/cadets')
+			.get('/dashboard/newcadets')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	let cadets = res.body.filter(function(cadet) {
-		    		if(cadet.Wave == undefined || cadet.Wave == '')
-		    			return cadet;
-		    	})
+		    	let cadets = res.body;
 		    	cadets.sort(th.handleSort());
 		    	th.setState({
 		    		cadets: cadets
@@ -127,24 +124,6 @@ export default class MentorConnect extends React.Component {
 		    else {
 		    	th.getCadets();
 		    	console.log('After slider selected')
-		    }
-			});
-	}
-	addWave(wave) {
-		let th = this;
-		Request
-			.post('/dashboard/addwave')
-			.set({'Authorization': localStorage.getItem('token')})
-			.send(wave)
-			.end(function(err, res){
-		    if(err)
-		    	console.log(err);
-		    else {
-		    	th.setState({
-		    		open: true,
-		    		message: "Wave added successfully with Wave ID: " + res.body.WaveID
-		    	})
-		    	th.getCadets();
 		    }
 			});
 	}

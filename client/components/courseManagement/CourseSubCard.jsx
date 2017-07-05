@@ -201,7 +201,7 @@ export default class CourseCard extends React.Component {
       assignment.Skills = th.state.Skills;
       assignment.Duration = th.state.Duration;
       course.Assignments.push(assignment);
-      this.props.handleUpdate(course);
+      this.props.handleUpdate(course,'assignment');
       this.props.handleClose();
     }
     else {
@@ -212,7 +212,8 @@ export default class CourseCard extends React.Component {
       schedule.Skills = th.state.Skills;
       schedule.Day = th.state.Day;
       course.Schedule.push(schedule);
-      this.props.handleUpdate(course);
+      console.log(schedule);
+      this.props.handleUpdate(course,'schedule');
       this.props.handleClose();
     }
   }
