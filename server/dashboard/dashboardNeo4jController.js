@@ -186,14 +186,14 @@ let addProduct = function (projectObj, successCB, errorCB) {
 
    let query  =
      `CREATE
-     (p:${graphConsts.NODE_PRODUCT}
+     (product:${graphConsts.NODE_PRODUCT}
        {
         name: '${product.product}',
         description: '${product.description}'
        }
      )
      -[:${graphConsts.REL_HAS}]->
-     (v:${graphConsts.NODE_VERSION}
+     (version:${graphConsts.NODE_VERSION}
        {
         name: '${version.name}',
         description: '${version.description}',
@@ -202,9 +202,10 @@ let addProduct = function (projectObj, successCB, errorCB) {
         updated: '${version.updated}'
        }
      )
-     WITH p AS product
+     WITH version AS version
      UNWIND ${JSON.stringify(version.skills)} AS skillname
-     MERGE (product) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+     MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+     MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
      `;
 
    session.run(query)
@@ -220,11 +221,66 @@ let addProduct = function (projectObj, successCB, errorCB) {
      });
   };
 
+  // adding a version
+  let addVersion = function (name, versionObj, successCB, errorCB) {
+
+     let productName = name;
+
+     let version = {};
+     version.name = versionObj.name;
+     version.description = versionObj.description || '';
+     // version.wave = versionObj.wave;
+     // version.members = versionObj..members;
+     version.skills = versionObj.skills;
+     version.addedBy = versionObj.addedBy;
+     version.addedOn = versionObj.addedOn;
+     version.updated = versionObj.updated;
+
+     let session = driver.session();
+
+     logger.debug("obtained connection with neo4j");
+
+     let query  =
+       `
+       CREATE
+       (version:${graphConsts.NODE_VERSION}
+         {
+           name: '${version.name}',
+           description: '${version.description}',
+           addedOn: '${version.addedOn}',
+           addedBy: '${version.addedBy}',
+           updated: '${version.updated}'
+         }
+       )
+       WITH version AS version
+       MERGE (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
+       MERGE (version) <-[:${graphConsts.REL_HAS}]- (product)
+       WITH version AS version
+       UNWIND ${JSON.stringify(version.skills)} AS skillname
+       MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+       MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
+       `;
+
+     session.run(query)
+       .then(function(result) {
+         logger.debug('Result from the neo4j', result)
+
+         // Completed!
+         session.close();
+         successCB(versionObj);
+       })
+       .catch(function(err) {
+         errorCB(err);
+       });
+  };
+
+
   module.exports = {
     addCadet,
     getCadets,
     addCourse,
     getCourses,
     updateCourse,
-    addProduct
+    addProduct,
+    addVersion
   }

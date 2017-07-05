@@ -272,7 +272,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
     let versionObj = req.body.version;
     versionObj.addedBy = req.user.name;
     versionObj.updatedBy = true;
-    dashboardMongoController.addVersion(req.body.product, versionObj, function (project) {
+    dashboardNeo4jController.addVersion(req.body.product, versionObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Add Version Error: ', err);
