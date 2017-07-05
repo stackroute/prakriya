@@ -394,11 +394,11 @@ router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 // Update a cadet
 router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    dashboardMongoController.updateCadet(req.body, function (status) {
+    dashboardNeo4jController.updateCadet(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Update Cadet Error: ', err);
-      res.status(500).json({error: 'Cannot update candidate in db...!'});
+      res.status(500).json({error: 'Cannot update candidate in neo4j...!'});
     });
   } catch(err) {
     res.status(500).json({
@@ -410,8 +410,7 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
 // Update many cadets
 router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    logger.debug('Update cadets', req.body);
-    dashboardMongoController.updateCadets(req.body, function (status) {
+    dashboardNeo4jController.updateCadets(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Update Cadets Error: ', err);

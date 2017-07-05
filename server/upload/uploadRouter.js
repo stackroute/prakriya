@@ -5,7 +5,7 @@ const logger = require('./../../applogger');
 const client = require('redis').createClient();
 // const client = require('redis').createClient(6379,'redis');
 const uploadMongoController = require('./uploadMongoController');
-const dashboardMongoController = require('../dashboard/dashboardMongoController');
+const dashboardNeo4jController = require('../dashboard/dashboardNeo4jController');
 let auth = require('../auth')();
 let CONFIG = require('../../config');
 
@@ -60,15 +60,12 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 						cadetColln.push(cadetObj);
 					}
 				});
-				cadetColln.map(function (cadet) {
-					dashboardMongoController.updateCadet(cadet, function (status) {
-						logger.debug('Status of the update cadet', status);
-						logger.info('Remarks updated for ', cadet.EmployeeID);
-					}, function (err3) {
-						logger.error('Error while saving remarks', err3);
-					});
-				});
-				res.status(200).json({status: 'Remarks updated'});
+				dashboardNeo4jController.updateCadets(cadetColln, function (status) {
+		      res.status(200).json(status);
+		    }, function (err) {
+		      logger.error('Update Cadets Error: ', err);
+		      res.status(500).json({error: 'Cannot update candidates in neo4j...!'});
+		    });
 			} catch(err4) {
 				logger.error('Error', err4);
 				res.status(500).json({

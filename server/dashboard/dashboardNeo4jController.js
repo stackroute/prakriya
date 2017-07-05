@@ -67,6 +67,68 @@ let addCadet = function(cadetObj, successCB, errorCB) {
     });
 }
 
+// Update cadet
+
+let updateCadet = function(cadetObj, successCB, errorCB) {
+  
+  let cadet = {};
+
+  cadet.EmployeeID = cadetObj.EmployeeID || '';
+  cadet.AltEmail = cadetObj.AltEmail || '';
+  cadet.Contact = cadetObj.Contact || '';
+  cadet.CareerBand = cadetObj.CareerBand || '';
+  cadet.WorkExperience = cadetObj.WorkExperience || '';
+  cadet.Billability = cadetObj.Billability || '';
+  cadet.PrimarySupervisor = cadetObj.PrimarySupervisor || '';
+  cadet.ProjectSupervisor = cadetObj.ProjectSupervisor || '';
+  cadet.Selected = cadetObj.Selected || '';
+  cadet.Remarks = cadetObj.Remarks || '';
+
+  let session = driver.session();
+
+  let query  =
+    `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmployeeID: '${cadet.EmployeeID}'})
+    SET 
+      n.AltEmail = '${cadet.AltEmail}',
+      n.Contact = '${cadet.Contact}',
+      n.CareerBand = '${cadet.CareerBand}',
+      n.WorkExperience = '${cadet.WorkExperience}',
+      n.Billability = '${cadet.Billability}',
+      n.PrimarySupervisor = '${cadet.PrimarySupervisor}',
+      n.ProjectSupervisor = '${cadet.ProjectSupervisor}',
+      n.Selected = '${cadet.Selected}',
+      n.Remarks = '${cadet.Remarks}'
+    return n`;
+
+    session.run(query)
+    .then(function(result) {
+      logger.debug('Result from the neo4j', result)
+
+      // Completed!
+      session.close();
+      successCB(cadetObj);
+    })
+    .catch(function(err) {
+      errorCB(err);
+    });
+}
+
+// Update cadets
+
+let updateCadets = function (cadetArr, successCB, errorCB) {
+  let count = 0;
+  cadetArr.map(function(cadet) {
+    updateCadet(cadet, function (cadetObj) {
+      count = count+1;
+      if(count == cadetArr.length) {
+        successCB()
+      }
+    }, function (err) {
+      errorCB(err);
+    })
+  })
+}
+
 // Get all the cadets
 
 let getCadets = function(successCB, errorCB) {
@@ -93,7 +155,9 @@ let getCadets = function(successCB, errorCB) {
 
 let getNewCadets = function(successCB, errorCB) {
   let session = driver.session();
-  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
+  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) WHERE NOT
+    (n)-[:${graphConsts.REL_BELONGS_TO}]->(:${graphConsts.NODE_WAVE})
+    return n`;
   session.run(query)
     .then(function(resultObj) {
       session.close();
@@ -246,6 +310,8 @@ let addProduct = function (projectObj, successCB, errorCB) {
 
   module.exports = {
     addCadet,
+    updateCadet,
+    updateCadets,
     getCadets,
     getNewCadets,
     addCourse,
