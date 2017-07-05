@@ -289,18 +289,17 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     if(req.body.type === 'project') {
-    let projectObj = req.body.project;
-    projectObj.addedBy = req.user.name;
-    projectObj.updatedBy = true;
-    dashboardMongoController.deleteProject(projectObj, function (project) {
+    let productName = req.body.project.product;
+    dashboardNeo4jController.deleteProduct(productName, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Delete Project Error: ', err);
       res.status(500).json({error: 'Cannot delete the project...!'});
     });
     } else {
-      dashboardMongoController.deleteVersion(req.body.project, function (project) {
-        res.status(201).json(project);
+      let versionName = req.body.project.name;
+      dashboardNeo4jController.deleteVersion(versionName, function (version) {
+        res.status(201).json(version);
       }, function (err) {
         logger.error('Delete Version Error: ', err);
         res.status(500).json({error: 'Cannot delete the version...!'});

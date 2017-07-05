@@ -278,21 +278,21 @@ let getCourses = function (successCB, errorCB) {
 **********************************************/
 
 // adding a new product
-let addProduct = function (projectObj, successCB, errorCB) {
+let addProduct = function (productObj, successCB, errorCB) {
 
    let product = {};
-   product.product = projectObj.product;
-   product.description = projectObj.description || '';
+   product.product = productObj.product;
+   product.description = productObj.description || '';
 
    let version = {};
-   version.name = projectObj.version[0].name;
-   version.description = projectObj.version[0].description || '';
-   // version.wave = projectObj.version[0].wave;
-   // version.members = projectObj.version[0].members;
-   version.skills = projectObj.version[0].skills;
-   version.addedBy = projectObj.version[0].addedBy;
-   version.addedOn = projectObj.version[0].addedOn;
-   version.updated = projectObj.version[0].updated;
+   version.name = productObj.version[0].name;
+   version.description = productObj.version[0].description || '';
+   // version.wave = productObj.version[0].wave;
+   // version.members = productObj.version[0].members;
+   version.skills = productObj.version[0].skills;
+   version.addedBy = productObj.version[0].addedBy;
+   version.addedOn = productObj.version[0].addedOn;
+   version.updated = productObj.version[0].updated;
 
    let session = driver.session();
 
@@ -328,7 +328,7 @@ let addProduct = function (projectObj, successCB, errorCB) {
 
        // Completed!
        session.close();
-       successCB(projectObj);
+       successCB(productObj);
      })
      .catch(function(err) {
        errorCB(err);
@@ -388,6 +388,59 @@ let addProduct = function (projectObj, successCB, errorCB) {
        });
   };
 
+  // deleting a product
+  let deleteProduct = function (productName, successCB, errorCB) {
+
+     let session = driver.session();
+
+     logger.debug("obtained connection with neo4j");
+
+     let query  =
+       `
+       MATCH (version:${graphConsts.NODE_VERSION})
+       <-[:${graphConsts.REL_HAS}]-
+       (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
+       DETACH DELETE version
+       DETACH DELETE product
+       `;
+
+     session.run(query)
+       .then(function(result) {
+         logger.debug('Result from the neo4j', result)
+
+         // Completed!
+         session.close();
+         successCB(productName);
+       })
+       .catch(function(err) {
+         errorCB(err);
+       });
+  };
+
+  // deleting a version
+  let deleteVersion = function (versionName, successCB, errorCB) {
+
+     let session = driver.session();
+
+     logger.debug("obtained connection with neo4j");
+
+     let query  =
+       `
+       MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
+       `;
+
+     session.run(query)
+       .then(function(result) {
+         logger.debug('Result from the neo4j', result)
+
+         // Completed!
+         session.close();
+         successCB(versionName);
+       })
+       .catch(function(err) {
+         errorCB(err);
+       });
+  };
 
   module.exports = {
     addCadet,
@@ -397,5 +450,7 @@ let addProduct = function (projectObj, successCB, errorCB) {
     getCourses,
     updateCourse,
     addProduct,
-    addVersion
+    addVersion,
+    deleteProduct,
+    deleteVersion
   }
