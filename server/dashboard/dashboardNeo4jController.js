@@ -274,7 +274,7 @@ let getCourses = function (successCB, errorCB) {
   };
 
 /**********************************************
-************ Product management *************
+************ Product Management *************
 **********************************************/
 
 // adding a new product
@@ -295,8 +295,6 @@ let addProduct = function (productObj, successCB, errorCB) {
    version.updated = productObj.version[0].updated;
 
    let session = driver.session();
-
-   logger.debug("obtained connection with neo4j");
 
    let query  =
      `CREATE
@@ -352,8 +350,6 @@ let addProduct = function (productObj, successCB, errorCB) {
 
      let session = driver.session();
 
-     logger.debug("obtained connection with neo4j");
-
      let query  =
        `
        CREATE
@@ -393,8 +389,6 @@ let addProduct = function (productObj, successCB, errorCB) {
 
      let session = driver.session();
 
-     logger.debug("obtained connection with neo4j");
-
      let query  =
        `
        MATCH (version:${graphConsts.NODE_VERSION})
@@ -422,8 +416,6 @@ let addProduct = function (productObj, successCB, errorCB) {
 
      let session = driver.session();
 
-     logger.debug("obtained connection with neo4j");
-
      let query  =
        `
        MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
@@ -442,6 +434,45 @@ let addProduct = function (productObj, successCB, errorCB) {
        });
   };
 
+  let getProducts = function (successCB, errorCB) {
+    let session = driver.session();
+
+    let query =
+    `
+    MATCH (product:${graphConsts.NODE_PRODUCT})
+    -[:${graphConsts.REL_HAS}]-> (version:${graphConsts.NODE_VERSION})
+    WITH COLLECT(version) AS versions, product AS product
+    UNWIND versions AS version
+    MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
+    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product
+    WITH COLLECT({
+      name: version.name,
+      description: version.description,
+      wave: 'WaveDummi',
+      members: [],
+      skills: skills,
+      addedBy: version.addedBy,
+      addedOn: version.addedOn,
+      updated: version.updated
+    }) AS versions, product AS product
+    RETURN {
+      product: product.name,
+      description: product.description,
+      version: versions
+    }
+    `;
+
+   session.run(query).then(function (resultObj, err) {
+     session.close();
+     if(err) {
+       errorCB('Error');
+     } else {
+       successCB(resultObj.records[0]._fields);
+      }
+     });
+  };
+
   module.exports = {
     addCadet,
     getCadets,
@@ -452,5 +483,6 @@ let addProduct = function (productObj, successCB, errorCB) {
     addProduct,
     addVersion,
     deleteProduct,
-    deleteVersion
+    deleteVersion,
+    getProducts
   }

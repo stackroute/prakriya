@@ -207,7 +207,7 @@ router.post('/updatecadetwave', auth.canAccess(CONFIG.ADMIN), function (req, res
 // Get all projects
 router.get('/projects', auth.canAccess(CONFIG.MENCAN), function (req, res) {
     try{
-      dashboardMongoController.getProjects(function (projects) {
+      dashboardNeo4jController.getProducts(function (projects) {
       res.status(201).json(projects);
     }, function (err) {
       logger.error('Get All Projects Error: ', err);
