@@ -393,11 +393,11 @@ router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 // Update a cadet
 router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    dashboardMongoController.updateCadet(req.body, function (status) {
+    dashboardNeo4jController.updateCadet(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Update Cadet Error: ', err);
-      res.status(500).json({error: 'Cannot update candidate in db...!'});
+      res.status(500).json({error: 'Cannot update candidate in neo4j...!'});
     });
   } catch(err) {
     res.status(500).json({
@@ -409,8 +409,7 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
 // Update many cadets
 router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    logger.debug('Update cadets', req.body);
-    dashboardMongoController.updateCadets(req.body, function (status) {
+    dashboardNeo4jController.updateCadets(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Update Cadets Error: ', err);
@@ -753,6 +752,63 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) 
     });
   }
 });
+
+// delete assignment or schedule
+router.post('/deleteassignmentorschedule', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+  try{
+    let obj = req.body.obj;
+    console.log(req.body);
+    dashboardNeo4jController.deleteAssignmentOrSchedule(obj, req.body.course, req.body.type, function (result) {
+      res.status(201).json({success:'success'});
+    }, function (updateerr) {
+      logger.error('err in update', updateerr);
+      res.status(500).json({error: 'Cannot update course in db...!'});
+    });
+  } catch(err) {
+    console.log(err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Delete a course
+router.post('/deletecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+  try {
+    let courseObj = req.body;
+    courseObj.History = courseObj.History + ' deleted by ' +
+     req.user.name + ' on ' + new Date() + '\n';
+    dashboardNeo4jController.deleteOrRestoreCourse(courseObj, 'delete', function (status) {
+      res.status(200).json(status);
+    }, function (deletecourseerr) {
+      logger.error('err in deletecourseerr', deletecourseerr);
+      res.status(500).json({error: 'Cannot delete course in db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// restore a course
+router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+  try {
+    let courseObj = req.body;
+    courseObj.History = 'restored by ' + req.user.name + ' on ' + new Date() + '\n';
+    dashboardNeo4jController.deleteOrRestoreCourse(courseObj, 'restore', function (status) {
+      res.status(200).json(status);
+    }, function (restorecourseerr) {
+      logger.error('err in restorecourseerr', restorecourseerr);
+      res.status(500).json({error: 'Cannot restore course in db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 
 // Get course
 router.get('/course/:courseID', auth.canAccess(CONFIG.ADMMEN), function (req, res) {

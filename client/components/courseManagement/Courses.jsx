@@ -62,6 +62,7 @@ export default class Courses extends React.Component {
 		this.openSchedule = this.openSchedule.bind(this);
 		this.closeSchedule = this.closeSchedule.bind(this);
 		this.setCurrentCourse = this.setCurrentCourse.bind(this);
+		this.subDelete = this.subDelete.bind(this);
 	}
 
 	componentWillMount() {
@@ -140,7 +141,7 @@ export default class Courses extends React.Component {
 		let th = this
 		console.log(course)
 		Request
-			.post('/mentor/deletecourse')
+			.post('/dashboard/deletecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(course)
 			.end(function(err, res){
@@ -155,7 +156,7 @@ export default class Courses extends React.Component {
 	restoreCourses(actions){
 		let th = this
 		Request
-			.post('/mentor/restorecourse')
+			.post('/dashboard/restorecourse')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(actions)
 			.end(function(err, res){
@@ -231,6 +232,23 @@ export default class Courses extends React.Component {
 		});
 	}
 
+	subDelete(obj,type) {
+		let th = this
+		console.log(type)
+		Request
+			.post('/dashboard/deleteassignmentorschedule')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({obj:obj, course:th.state.currentCard.course, type:type})
+			.end(function(err, res){
+		    if(err)
+		    	console.log(err);
+		    else {
+					console.log('coming here')
+		    	th.getCourses();
+		    }
+		  });
+	}
+
 	render() {
 		let th = this;
 		return(
@@ -285,6 +303,7 @@ export default class Courses extends React.Component {
 						}) :
 						[]
 					}
+					delete={this.subDelete}
 					openDialog={this.state.assignmentsDialog}
 					closeDialog={this.closeAssignments} />
 
@@ -299,6 +318,7 @@ export default class Courses extends React.Component {
 							}) :
 							[]
 						}
+						delete={this.subDelete}
 						openDialog={this.state.scheduleDialog}
 						closeDialog={this.closeSchedule} />
 			</div>
