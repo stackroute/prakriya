@@ -281,7 +281,7 @@ export default class Courses extends React.Component {
 					assignments={
 						this.state.currentCard.course ?
 						this.state.currentCard.course.Assignments.sort(function(a, b) {
-							return a.Week - b.Week
+							return a.Week.low - b.Week.low
 						}) :
 						[]
 					}

@@ -6,11 +6,16 @@ const graphConsts = require('./../common/graphConstants');
 let driver = neo4jDriver.driver(config.NEO4J.neo4jURL,
   neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
-// Adding a cadet
+/**********************************************
+************ Candidate management *************
+**********************************************/
+
+// Add cadet
 
 let addCadet = function(cadetObj, successCB, errorCB) {
 
   let cadet = {};
+
   cadet.EmployeeID = cadetObj.EmployeeID || '';
   cadet.EmployeeName = cadetObj.EmployeeName || '';
   cadet.EmailID = cadetObj.EmailID || '';
@@ -25,9 +30,8 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   cadet.ProjectSupervisor = cadetObj.ProjectSupervisor || '';
   cadet.Selected = cadetObj.Selected || '';
   cadet.Remarks = cadetObj.Remarks || '';
-  let session = driver.session();
 
-  logger.debug("obtained connection with neo4j");
+  let session = driver.session();
 
   let query  =
   	`CREATE (n: ${graphConsts.NODE_CANDIDATE}
@@ -61,6 +65,30 @@ let addCadet = function(cadetObj, successCB, errorCB) {
     });
 }
 
+let getCadets = function(successCB, errorCB) {
+  let session = driver.session();
+  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
+  session.run(query)
+    .then(function(resultObj) {
+      session.close();
+      let cadets = [];
+
+      for(let i = 0; i < resultObj.records.length; i++) {
+        let result = resultObj.records[i];
+        logger.debug('Result obj from neo4j', result._fields);
+          cadets.push(result._fields[0].properties);
+      }
+      successCB(cadets);
+    })
+    .catch(function (err) {
+      errorCB(err);
+    })
+}
+
+
+/**********************************************
+************** Course management **************
+**********************************************/
 
 // Course Management
 
@@ -68,8 +96,8 @@ let addCourse = function (CourseObj, successCB, errorCB) {
   logger.info(CourseObj);
   let query = `MERGE (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}',Name:'${CourseObj.Name}',
   Mode:'${CourseObj.Mode}',Duration:${CourseObj.Duration},History:'${CourseObj.History}',
-  Removed:${CourseObj.Removed}}) with c as course
-  UNWIND ${JSON.stringify(CourseObj.Skills)} as skill
+  Removed:${CourseObj.Removed}}) WITH c AS course
+  UNWIND ${JSON.stringify(CourseObj.Skills)} AS skill
   MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
   MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(course);`;
     let session = driver.session();
@@ -85,19 +113,46 @@ let addCourse = function (CourseObj, successCB, errorCB) {
   };
 
 let getCourses = function (successCB, errorCB) {
-  let query = `MATCH (courses:${graphConsts.NODE_COURSE}),(courses)-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL}) return courses, collect(s.Name) as skills`;
+  let query = `MATCH (courses:${graphConsts.NODE_COURSE})
+  OPTIONAL MATCH (courses)-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
+  OPTIONAL MATCH (courses)-[:${graphConsts.REL_HAS}]->(a:${graphConsts.NODE_ASSIGNMENT})-[:${graphConsts.REL_INCLUDES}]->(aSkill:${graphConsts.NODE_SKILL})
+  with collect(aSkill.Name) as assgSkill, a as a, courses as courses,s as s
+  OPTIONAL MATCH (courses)-[:${graphConsts.REL_HAS}]->(se:${graphConsts.NODE_SESSION})
+  optional match (se)-[:${graphConsts.REL_INCLUDES}]->(seSkill:${graphConsts.NODE_SKILL})
+  with collect(seSkill.Name) as sessSkill, assgSkill as assgSkill, a as a, courses as courses,s as s,se as se
+  return courses, collect(distinct s.Name) as skills,COLLECT(distinct {a: a, b: assgSkill}) as assg,COLLECT(distinct {a: se, b: sessSkill}) as session`;
     let session = driver.session();
        session.run(query).then(function (resultObj, err) {
            session.close();
            let courseArray = [];
            for(let i = 0; i < resultObj.records.length; i++) {
                 let result = resultObj.records[i];
-                if(result._fields.length === 2)
-                {
+                console.log(result);
                 courseArray.push(result._fields[0].properties);
                 courseArray[i].Skills = result._fields[1];
-                courseArray[i].Assignments = [];
-                courseArray[i].Schedule = [];
+                if(result._fields[2][0].a === null) {
+                  courseArray[i].Assignments = [];
+                }
+                else {
+                  console.log(result._fields[2][0].a.properties);
+                  let Assignments = [];
+                  for(let j=0; j< result._fields[2].length; j++) {
+                    Assignments.push(result._fields[2][j].a.properties);
+                    Assignments[j].Skills = result._fields[2][j].b;
+                  }
+                  courseArray[i].Assignments = Assignments
+                }
+                if(result._fields[3][0].a === null) {
+                  courseArray[i].Schedule = [];
+                }
+                else {
+                  let Session = [];
+                  for(let j=0; j< result._fields[3].length; j++) {
+                    console.log(result._fields[3][j].b);
+                    Session.push(result._fields[3][j].a.properties);
+                    Session[j].Skills = result._fields[3][j].b;
+                  }
+                  courseArray[i].Schedule = Session
                 }
             }
          if(err) {
@@ -139,7 +194,7 @@ let getCourses = function (successCB, errorCB) {
         Description: '${assignment.Description}',
         Week: ${assignment.Week},
         Duration: ${assignment.Duration}})
-        with assg as assg
+        with assg as assg,course as course
         MERGE (assg)<-[:${graphConsts.REL_HAS}]-(course)
         with assg as assg
         UNWIND ${JSON.stringify(assignment.Skills)} as skill
@@ -156,12 +211,48 @@ let getCourses = function (successCB, errorCB) {
               }
              });
   } else if(edit === 'schedule') {
-
+            let schedule = CourseObj.Schedule[CourseObj.Schedule.length - 1]
+            console.log(CourseObj.ID)
+            let query = ``;
+            if(schedule.Skills.length >= 1) {
+              query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
+              with c as course
+              MERGE (schedule:${graphConsts.NODE_SESSION}{Name:'${schedule.Name}',
+              Description: '${schedule.Description}',
+              Day: ${schedule.Day}})
+              with schedule as schedule,course as course
+              MERGE (schedule)<-[:${graphConsts.REL_HAS}]-(course)
+              with schedule as schedule
+              UNWIND ${JSON.stringify(schedule.Skills)} as skill
+              MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
+              MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(schedule);
+              `
+            }
+            else {
+              query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
+              with c as course
+              MERGE (schedule:${graphConsts.NODE_SESSION}{Name:'${schedule.Name}',
+              Description: '${schedule.Description}',
+              Day: ${schedule.Day}})
+              with schedule as schedule,course as course
+              MERGE (schedule)<-[:${graphConsts.REL_HAS}]-(course);
+              `
+            }
+            let session = driver.session();
+               session.run(query).then(function (resultObj, err) {
+                   session.close();
+                 if(err) {
+                   errorCB('Error');
+                 } else {
+                   successCB('success');
+                  }
+                 });
   }
   };
 
   module.exports = {
     addCadet,
+    getCadets,
     addCourse,
     getCourses,
     updateCourse

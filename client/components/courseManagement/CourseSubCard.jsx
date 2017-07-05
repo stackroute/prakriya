@@ -212,6 +212,7 @@ export default class CourseCard extends React.Component {
       schedule.Skills = th.state.Skills;
       schedule.Day = th.state.Day;
       course.Schedule.push(schedule);
+      console.log(schedule);
       this.props.handleUpdate(course,'schedule');
       this.props.handleClose();
     }
