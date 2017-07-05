@@ -225,7 +225,7 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     let projectObj = req.body;
     projectObj.version[0].addedBy = req.user.name;
-    dashboardMongoController.addProject(projectObj, function (project) {
+    dashboardNeo4jController.addProduct(projectObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Add Project Error: ', err);
