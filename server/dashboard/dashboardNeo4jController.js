@@ -26,6 +26,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   cadet.DigiThonScore = cadetObj.DigiThonScore || '';
   cadet.CareerBand = cadetObj.CareerBand || '';
   cadet.WorkExperience = cadetObj.WorkExperience || '';
+  cadet.Billability = cadetObj.Billability || '';
   cadet.PrimarySupervisor = cadetObj.PrimarySupervisor || '';
   cadet.ProjectSupervisor = cadetObj.ProjectSupervisor || '';
   cadet.Selected = cadetObj.Selected || '';
@@ -46,6 +47,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   		DigiThonScore: '${cadet.DigiThonScore}',
   		CareerBand: '${cadet.CareerBand}',
   		WorkExperience: '${cadet.WorkExperience}',
+      Billability: '${cadet.Billability}',
   		PrimarySupervisor: '${cadet.PrimarySupervisor}',
   		ProjectSupervisor: '${cadet.ProjectSupervisor}',
   		Selected: '${cadet.Selected}',
@@ -65,7 +67,31 @@ let addCadet = function(cadetObj, successCB, errorCB) {
     });
 }
 
+// Get all the cadets
+
 let getCadets = function(successCB, errorCB) {
+  let session = driver.session();
+  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
+  session.run(query)
+    .then(function(resultObj) {
+      session.close();
+      let cadets = [];
+      
+      for(let i = 0; i < resultObj.records.length; i++) {
+        let result = resultObj.records[i];
+        logger.debug('Result obj from neo4j', result._fields);
+          cadets.push(result._fields[0].properties);
+      }
+      successCB(cadets);
+    })
+    .catch(function (err) {
+      errorCB(err);
+    })
+}
+
+// Get all the new cadets
+
+let getNewCadets = function(successCB, errorCB) {
   let session = driver.session();
   let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
   session.run(query)
@@ -89,8 +115,6 @@ let getCadets = function(successCB, errorCB) {
 /**********************************************
 ************** Course management **************
 **********************************************/
-
-// Course Management
 
 let addCourse = function (CourseObj, successCB, errorCB) {
   logger.info(CourseObj);
@@ -162,6 +186,7 @@ let getCourses = function (successCB, errorCB) {
   module.exports = {
     addCadet,
     getCadets,
+    getNewCadets,
     addCourse,
     getCourses,
     updateCourse

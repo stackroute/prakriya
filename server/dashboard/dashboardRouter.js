@@ -374,6 +374,23 @@ router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   }
 });
 
+// Get all the cadets who are not part of any wave
+router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.getNewCadets(function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get All New Cadets Error: ', err);
+      res.status(500).json({error: 'Cannot get all new cadets from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get cadets error',  err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // Update a cadet
 router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {

@@ -68,7 +68,7 @@ export default class MentorConnect extends React.Component {
 	getCadets() {
 		let th = this;
 		Request
-			.get('/dashboard/cadets')
+			.get('/dashboard/newcadets')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
