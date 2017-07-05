@@ -272,7 +272,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
     let versionObj = req.body.version;
     versionObj.addedBy = req.user.name;
     versionObj.updatedBy = true;
-    dashboardMongoController.addVersion(req.body.product, versionObj, function (project) {
+    dashboardNeo4jController.addVersion(req.body.product, versionObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Add Version Error: ', err);
@@ -289,18 +289,17 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     if(req.body.type === 'project') {
-    let projectObj = req.body.project;
-    projectObj.addedBy = req.user.name;
-    projectObj.updatedBy = true;
-    dashboardMongoController.deleteProject(projectObj, function (project) {
+    let productName = req.body.project.product;
+    dashboardNeo4jController.deleteProduct(productName, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Delete Project Error: ', err);
       res.status(500).json({error: 'Cannot delete the project...!'});
     });
     } else {
-      dashboardMongoController.deleteVersion(req.body.project, function (project) {
-        res.status(201).json(project);
+      let versionName = req.body.project.name;
+      dashboardNeo4jController.deleteVersion(versionName, function (version) {
+        res.status(201).json(version);
       }, function (err) {
         logger.error('Delete Version Error: ', err);
         res.status(500).json({error: 'Cannot delete the version...!'});
@@ -738,10 +737,10 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
 // update courses
 router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
   try{
-    let courseObj = req.body;
+    let courseObj = req.body.course;
     courseObj.History = courseObj.History + ' last update by ' +
      req.user.name + ' on ' + new Date() + '\n';
-    dashboardNeo4jController.updateCourse(courseObj, function (courses) {
+    dashboardNeo4jController.updateCourse(courseObj, req.body.edit, function (courses) {
       res.status(201).json(courses);
     }, function (updateerr) {
       logger.error('err in update', updateerr);

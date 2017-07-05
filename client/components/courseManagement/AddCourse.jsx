@@ -151,7 +151,7 @@ export default class AddCourse extends React.Component {
 		course.Skills = this.state.Skills;
     course.Removed = false;
     course.History = '';
-    this.props.handleUpdate(course);
+    this.props.handleUpdate(course, 'edit');
   }
 
   handleAdd() {

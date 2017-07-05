@@ -19,7 +19,8 @@ export default class SessionCard extends React.Component {
 		let th = this
 		let bgColor = this.props.bgColor;
     let bgIcon = this.props.bgIcon;
-		return(
+    console.log(this.props.session);
+    return(
 			<div style={{
 				display: 'inline-block',
 				padding: '10px'
@@ -32,7 +33,7 @@ export default class SessionCard extends React.Component {
 					title={`${this.props.session.Name}`}
 					avatar={
 						<Avatar backgroundColor={bgIcon}>
-							{this.props.session.Day}
+							{this.props.session.Day.low}
 						</Avatar>
 					} />
 
@@ -46,7 +47,7 @@ export default class SessionCard extends React.Component {
             <span style={{textAlign: 'jusitfy'}}>
               <b style={{color: bgIcon}}>Skills: </b>
               {
-                this.props.assignment.Skills.length == 0 ?
+                this.props.session.Skills.length == 0 ?
                 'NA' :
                 this.props.session.Skills.map(function(skill, index) {
                   if(index == th.props.session.Skills.length - 1)

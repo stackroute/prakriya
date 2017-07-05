@@ -20,6 +20,7 @@ export default class AssignmentCard extends React.Component {
 		let th = this
 		let bgColor = this.props.bgColor;
     let bgIcon = this.props.bgIcon;
+    console.log(th.props.assignment)
 		return(
 			<div style={{
 				display: 'inline-block',
@@ -33,7 +34,7 @@ export default class AssignmentCard extends React.Component {
 					title={`${this.props.assignment.Name}`}
 					avatar={
 						<Avatar backgroundColor={bgIcon}>
-							{this.props.assignment.Week}
+							{this.props.assignment.Week.low}
 						</Avatar>
 					} />
 
@@ -41,7 +42,7 @@ export default class AssignmentCard extends React.Component {
 						<DateIcon/>
 					</IconButton>
 					<span style={{verticalAlign: 'super'}}>
-						{this.props.assignment.Duration}&nbsp;day(s)
+						{this.props.assignment.Duration.low}&nbsp;day(s)
 					</span><br/>
 
           <Paper style={{
