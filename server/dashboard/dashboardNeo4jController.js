@@ -847,10 +847,6 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 //            });
 //     };
 
-=======
-
->>>>>>> 9da609f969e32b90800d50e0e5e8415aa0dfceae
-
   module.exports = {
     addCadet,
     updateCadet,
@@ -870,7 +866,6 @@ let deleteWave = function (waveObj, successCB, errorCB) {
     deleteProduct,
     deleteVersion,
     getProducts
->>>>>>> 9da609f969e32b90800d50e0e5e8415aa0dfceae
   }
   // getWave,
   // getWaveIDs,
