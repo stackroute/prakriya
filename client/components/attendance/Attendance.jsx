@@ -181,7 +181,7 @@ export default class Attendance extends React.Component {
       if (err)
         console.log(err);
       else {
-        console.log(res.body);
+        console.log(res.body,'in attendance');
         th.setState({
           startDate: res.body.StartDate,
           endDate: res.body.EndDate

@@ -58,7 +58,7 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err,"err");
 		    else {
-					console.log('Successfully fetched all projects')
+					console.log('Successfully fetched all projects -- ', res.body)
 		    	th.setState({
 		    		projects: res.body
 		    	})

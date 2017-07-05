@@ -140,13 +140,14 @@ router.get('/user', function (req, res) {
 // Add a new Wave
 router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
-    dashboardMongoController.addWave(req.body, function (wave) {
+    dashboardNeo4jController.addWave(req.body, function (wave) {
       res.status(200).json(wave);
     }, function (err) {
       logger.error('Add Wave Error: ', err);
       res.status(500).json({error: 'Cannot add wave in db...!'});
     });
   } catch(err) {
+    console.log(err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -155,7 +156,7 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 
 router.get('/wave', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getWave(req.query.waveid, function (wave) {
+    dashboardNeo4jController.getWave(req.query.waveid, function (wave) {
       res.status(201).json(wave);
     }, function (err) {
       logger.error('Error 1', err);
@@ -207,7 +208,7 @@ router.post('/updatecadetwave', auth.canAccess(CONFIG.ADMIN), function (req, res
 // Get all projects
 router.get('/projects', auth.canAccess(CONFIG.MENCAN), function (req, res) {
     try{
-      dashboardMongoController.getProjects(function (projects) {
+      dashboardNeo4jController.getProducts(function (projects) {
       res.status(201).json(projects);
     }, function (err) {
       logger.error('Get All Projects Error: ', err);
@@ -971,7 +972,7 @@ router.post('/sendmail', function (req, res) {
 // Get all waves
 router.get('/waves', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try{
-    dashboardMongoController.getWaves(function (waves) {
+    dashboardNeo4jController.getWaves(function (waves) {
       res.status(201).json(waves);
     }, function (err) {
       logger.error('Get All Waves Error: ', err);
@@ -1023,7 +1024,8 @@ router.post('/cadetsofproj', auth.canAccess(CONFIG.MENTOR), function (req, res) 
 // delete a wave
 router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
-    dashboardMongoController.deleteWave(req.body.wave, function (wave) {
+    console.log(req.body.wave,"req.body.wave")
+    dashboardNeo4jController.deleteWave(req.body.wave, function (wave) {
       res.status(201).json(wave);
     }, function (err) {
       logger.error('Delete Wave Error: ', err);

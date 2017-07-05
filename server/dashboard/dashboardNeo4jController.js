@@ -3,8 +3,7 @@ const logger = require('./../../applogger');
 const config = require('./../../config');
 const graphConsts = require('./../common/graphConstants');
 
-let driver = neo4jDriver.driver(config.NEO4J.neo4jURL,
-  neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
+let driver = neo4jDriver.driver(config.NEO4J.neo4jURL, neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
 /**********************************************
 ************ Candidate management *************
@@ -53,18 +52,15 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   		Selected: '${cadet.Selected}',
   		Remarks: '${cadet.Remarks}'
   	}) return n`;
+  session.run(query).then(function(result) {
+    logger.debug('Result from the neo4j', result)
 
-  session.run(query)
-    .then(function(result) {
-      logger.debug('Result from the neo4j', result)
-
-      // Completed!
-      session.close();
-      successCB(cadetObj);
-    })
-    .catch(function(err) {
-      errorCB(err);
-    });
+    // Completed!
+    session.close();
+    successCB(cadetObj);
+  }).catch(function(err) {
+    errorCB(err);
+  });
 }
 
 // Update cadet
@@ -181,6 +177,7 @@ let getNewCadets = function(successCB, errorCB) {
 ************** Course management **************
 **********************************************/
 
+// Course Management
 let addCourse = function (CourseObj, successCB, errorCB) {
   logger.info(CourseObj);
   let query = `MERGE (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}',Name:'${CourseObj.Name}',
@@ -201,7 +198,7 @@ let addCourse = function (CourseObj, successCB, errorCB) {
          });
   };
 
-let getCourses = function (successCB, errorCB) {
+  let getCourses = function (successCB, errorCB) {
   let query = `MATCH (courses:${graphConsts.NODE_COURSE})
   OPTIONAL MATCH (courses)-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
   OPTIONAL MATCH (courses)-[:${graphConsts.REL_HAS}]->(a:${graphConsts.NODE_ASSIGNMENT})-[:${graphConsts.REL_INCLUDES}]->(aSkill:${graphConsts.NODE_SKILL})
@@ -247,7 +244,7 @@ let getCourses = function (successCB, errorCB) {
            successCB(courseArray);
           }
          });
-};
+  };
 
   let updateCourse = function (CourseObj, edit, successCB, errorCB) {
     if(edit === 'edit') {
@@ -441,12 +438,12 @@ let getCourses = function (successCB, errorCB) {
              });
       }
     }
-/**********************************************
-************ Product management *************
-**********************************************/
+  /**********************************************
+  ************ Product Management *************
+  **********************************************/
 
-// adding a new product
-let addProduct = function (productObj, successCB, errorCB) {
+  // adding a new product
+  let addProduct = function (productObj, successCB, errorCB) {
 
    let product = {};
    product.product = productObj.product;
@@ -463,8 +460,6 @@ let addProduct = function (productObj, successCB, errorCB) {
    version.updated = productObj.version[0].updated;
 
    let session = driver.session();
-
-   logger.debug("obtained connection with neo4j");
 
    let query  =
      `CREATE
@@ -520,8 +515,6 @@ let addProduct = function (productObj, successCB, errorCB) {
 
      let session = driver.session();
 
-     logger.debug("obtained connection with neo4j");
-
      let query  =
        `
        CREATE
@@ -561,8 +554,6 @@ let addProduct = function (productObj, successCB, errorCB) {
 
      let session = driver.session();
 
-     logger.debug("obtained connection with neo4j");
-
      let query  =
        `
        MATCH (version:${graphConsts.NODE_VERSION})
@@ -590,8 +581,6 @@ let addProduct = function (productObj, successCB, errorCB) {
 
      let session = driver.session();
 
-     logger.debug("obtained connection with neo4j");
-
      let query  =
        `
        MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
@@ -610,6 +599,246 @@ let addProduct = function (productObj, successCB, errorCB) {
        });
   };
 
+  let getProducts = function (successCB, errorCB) {
+    let session = driver.session();
+
+    let query =
+    `
+    MATCH (product:${graphConsts.NODE_PRODUCT})
+    -[:${graphConsts.REL_HAS}]-> (version:${graphConsts.NODE_VERSION})
+    WITH COLLECT(version) AS versions, product AS product
+    UNWIND versions AS version
+    MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
+    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product
+    WITH COLLECT({
+      name: version.name,
+      description: version.description,
+      wave: 'WaveDummi',
+      members: [],
+      skills: skills,
+      addedBy: version.addedBy,
+      addedOn: version.addedOn,
+      updated: version.updated
+    }) AS versions, product AS product
+    RETURN {
+      product: product.name,
+      description: product.description,
+      version: versions
+    }
+    `;
+
+   session.run(query).then(function (resultObj, err) {
+     session.close();
+     if(err) {
+       errorCB('Error');
+     } else {
+       successCB(resultObj.records[0]._fields);
+      }
+     });
+  };
+// let getWave = function(waveID, successCB, errorCB) {
+//   logger.debug('In get Wave', waveID);
+//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
+//   let session = driver.session();
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     if (resultObj) {
+//       logger.debug(resultObj);
+//     } else {
+//       errorCB('Error');
+//     }
+//   });
+// };
+// let getWaveIDs = function(successCB, errorCB) {
+//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
+//   let session = driver.session();
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     if (resultObj) {
+//       logger.debug(resultObj);
+//     } else {
+//       errorCB('Error');
+//     }
+//   });
+// };
+// let getWaveSpecificCandidates = function(waveID, successCB, errorCB) {
+//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n.EmployeeName`;
+//   let session = driver.session();
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     if (resultObj) {
+//       logger.debug(resultObj);
+//     } else {
+//       errorCB('Error');
+//     }
+//   });
+// };
+// let getWaveObject = function(waveID, successCB, errorCB) {
+//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
+//   let session = driver.session();
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     if (resultObj) {
+//       logger.debug(resultObj);
+//     } else {
+//       errorCB('Error');
+//     }
+//   });
+// };
+let getWaves = function(successCB, errorCB) {
+  let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN n`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      let waves = []
+      resultObj.records.map(function(res){
+        waves.push(res._fields[0].properties)
+      })
+      successCB(waves);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
+// let getCadetsOfWave = function(waveID, successCB, errorCB) {
+//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
+//   let session = driver.session();
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     if (resultObj) {
+//       logger.debug(resultObj);
+//     } else {
+//       errorCB('Error');
+//     }
+//   });
+// };
+// let updateWave = function(waveObj, successCB, errorCB) {
+//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveObj.waveID}'
+//                SET n.WaveID = '${waveObj.WaveID}'
+//                   n.WaveNumber = '${waveObj.WaveNumber}'
+//                   n.Location = '${waveObj.Location}'
+//                   n.StartDate = '${waveObj.StartDate}'
+//                   n.EndDate = '${waveObj.EndDate}'
+//                   n.Sessions = '${waveObj.Sessions}'
+//                   n.Cadets = '${waveObj.Cadets}'
+//                   n.CourseNames = '${waveObj.CourseNames}'
+//                RETURN n`;
+//   let session = driver.session();
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     if (resultObj) {
+//       logger.debug(resultObj);
+//     } else {
+//       errorCB('Error');
+//     }
+//   });
+// };
+// let getCoursesForWave = function(waveID, successCB, errorCB) {
+//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n.CourseNames`;
+//   let session = driver.session();
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     if (resultObj) {
+//       logger.debug(resultObj);
+//     } else {
+//       errorCB('Error');
+//     }
+//   });
+let addWave = function (waveObj, successCB, errorCB) {
+  	let userObj = {};
+    userObj.WaveID = waveObj.WaveID ||'',
+    userObj.WaveNumber = waveObj.WaveNumber ||'',
+    userObj.Location = waveObj.Location ||'',
+    userObj.StartDate = waveObj.StartDate ||'',
+    userObj.EndDate = waveObj.EndDate ||'',
+    userObj.Sessions  = waveObj.Sessions  ||'',
+    userObj.Cadets  = waveObj.Cadets ||'',
+    userObj.CourseNames  = waveObj.CourseNames ||''
+    let session = driver.session();
+
+    let query = `CREATE  (wave:${graphConsts.NODE_WAVE}
+    	{
+          WaveID: '${userObj.WaveID}',
+          WaveNumber: '${userObj.WaveNumber}',
+          Location: '${userObj.Location}',
+          StartDate: '${userObj.StartDate}',
+          EndDate: '${userObj.EndDate}'
+        })
+        WITH wave AS wave
+        UNWIND ${JSON.stringify(userObj.Cadets)} AS empID
+        MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: empID})
+        MERGE (candidate) -[:BELONGSTO]-> (wave)`;
+
+      session.run(query).then(function(result) {
+        logger.debug('Result from the neo4j', result)
+        session.close();
+        successCB(userObj);
+      }).catch(function(err) {
+        errorCB(err);
+      });
+    }
+let deleteWave = function (waveObj, successCB, errorCB) {
+  console.log(waveObj,"waveObj")
+    let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'}) DETACH DELETE n `;
+    let session = driver.session();
+    session.run(query).then(function(resultObj) {
+      session.close();
+      if (resultObj) {
+        logger.debug(resultObj)
+      } else {
+        errorCB('Error');
+      }
+    });
+    successCB();
+  }
+// let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
+//   let userObj={}
+//   cadets.map(function (cadet) {
+//   let query=`MATCH(n:${graphConsts.NODE_WAVE})
+//              WHERE n.EmployeeID='${cadet}'
+//              SET n.Wave = waveID`;
+//    let session = driver.session();
+//    session.run(query).then(function(resultObj) {
+//      session.close();
+//      if (resultObj) {
+//        logger.debug(resultObj);
+//        userObj.name = user.EmployeeName;
+//        userObj.email = user.EmailID;
+//        userObj.username = user.EmailID.split('@')[0];
+//        userObj.password = CONFIG.DEFAULT_PASS;
+//        userObj.role = 'candidate';
+//        adminMongoController.addUser(userObj, function (savedUser) {
+//          logger.info('New User created: ', savedUser);
+//        }, function (Err) {
+//          logger.error('Error in creating user', Err);
+//        });
+//      }
+//       else {
+//        errorCB('Error');
+//      }
+//    })
+//  }}
+//  let getActiveWaves = function (successCB, errorCB) {
+//     let todayDate = new Date();
+//     let today = todayDate.getFullYear()*10000 + '' + todayDate.getMonth()*100 + '' + todayDate.getDay();
+//     let query = `MATCH(n) WHERE toInt(n.StartDate) <= today AND toInt(n.EndDate) >= today`;
+//       let session = driver.session();
+//          session.run(query).then(function (resultObj) {
+//              session.close();
+//              if(resultObj) {
+//              logger.debug(resultObj);
+//                resultObj.map(function(obj)
+//                       {
+//
+//                       })
+//            } else {
+//                errorCB('Error');
+//              }
+//            });
+//     };
+
   module.exports = {
     addCadet,
     updateCadet,
@@ -619,10 +848,26 @@ let addProduct = function (productObj, successCB, errorCB) {
     addCourse,
     getCourses,
     updateCourse,
+    getWaves,
+    addWave,
+    deleteWave,
     addProduct,
     deleteAssignmentOrSchedule,
     deleteOrRestoreCourse,
     addVersion,
     deleteProduct,
-    deleteVersion
+    deleteVersion,
+    getProducts
   }
+  // getWave,
+  // getWaveIDs,
+  // getWaveSpecificCandidates,
+  // getWaveObject,
+  // getWaves,
+  // getCadetsOfWave,
+  // updateWave,
+  // getCoursesForWave,
+  // addWave,
+  // deleteWave,
+  // updateCadetWave,
+  // getActiveWaves
