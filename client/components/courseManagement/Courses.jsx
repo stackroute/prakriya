@@ -54,8 +54,6 @@ export default class Courses extends React.Component {
 		this.closeRestoreDialog = this.closeRestoreDialog.bind(this);
 		this.handleRestoreCourse = this.handleRestoreCourse.bind(this);
 		this.restoreCourses = this.restoreCourses.bind(this);
-		this.addCategory = this.addCategory.bind(this);
-		this.deleteCategory = this.deleteCategory.bind(this);
 		this.addCourse = this.addCourse.bind(this);
 		this.openAssignments = this.openAssignments.bind(this);
 		this.closeAssignments = this.closeAssignments.bind(this);
@@ -168,36 +166,6 @@ export default class Courses extends React.Component {
 		  });
 	}
 
-	addCategory(category){
-		let th = this
-		Request
-			.post('/mentor/addcategory')
-			.set({'Authorization': localStorage.getItem('token')})
-			.send(category)
-			.end(function(err, res){
-		    if(err)
-		    	console.log(err);
-		    else {
-		    	th.getCourses();
-		    }
-		  });
-	}
-
-	deleteCategory(category){
-		let th = this
-		Request
-			.post('/mentor/deletecategory')
-			.set({'Authorization': localStorage.getItem('token')})
-			.send(category)
-			.end(function(err, res){
-		    if(err)
-		    	console.log(err);
-		    else {
-		    	th.getCourses();
-		    }
-		  });
-	}
-
 	openAssignments() {
 		this.setState({
 			assignmentsDialog: true
@@ -267,8 +235,6 @@ export default class Courses extends React.Component {
 												<CourseCard course={course}
 												updateCourse={th.updateCourse}
 												deleteCourse={th.deleteCourse}
-												addCategory={th.addCategory}
-												deleteCategory={th.deleteCategory}
 												bgColor={backgroundColors[key%4]}
 												bgIcon={backgroundIcons[key%4]}
 												openAssignments={th.openAssignments}
