@@ -374,6 +374,23 @@ router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   }
 });
 
+// Get all the cadets who are not part of any wave
+router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.getNewCadets(function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get All New Cadets Error: ', err);
+      res.status(500).json({error: 'Cannot get all new cadets from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get cadets error',  err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // Update a cadet
 router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
@@ -722,10 +739,10 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
 // update courses
 router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
   try{
-    let courseObj = req.body;
+    let courseObj = req.body.course;
     courseObj.History = courseObj.History + ' last update by ' +
      req.user.name + ' on ' + new Date() + '\n';
-    dashboardNeo4jController.updateCourse(courseObj, function (courses) {
+    dashboardNeo4jController.updateCourse(courseObj, req.body.edit, function (courses) {
       res.status(201).json(courses);
     }, function (updateerr) {
       logger.error('err in update', updateerr);

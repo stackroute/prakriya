@@ -120,12 +120,13 @@ export default class Courses extends React.Component {
 		  });
 	}
 
-	updateCourse(course){
+	updateCourse(course, edit){
 		let th = this
+		console.log(edit)
 		Request
 			.post('/dashboard/updatecourse')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send(course)
+			.send({course:course,edit:edit})
 			.end(function(err, res){
 		    if(err)
 		    	console.log(err);
@@ -280,7 +281,7 @@ export default class Courses extends React.Component {
 					assignments={
 						this.state.currentCard.course ?
 						this.state.currentCard.course.Assignments.sort(function(a, b) {
-							return a.Week - b.Week
+							return a.Week.low - b.Week.low
 						}) :
 						[]
 					}
