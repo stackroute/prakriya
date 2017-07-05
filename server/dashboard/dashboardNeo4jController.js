@@ -70,7 +70,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
 // Update cadet
 
 let updateCadet = function(cadetObj, successCB, errorCB) {
-  
+
   let cadet = {};
 
   cadet.EmployeeID = cadetObj.EmployeeID || '';
@@ -88,7 +88,7 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
 
   let query  =
     `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmployeeID: '${cadet.EmployeeID}'})
-    SET 
+    SET
       n.AltEmail = '${cadet.AltEmail}',
       n.Contact = '${cadet.Contact}',
       n.CareerBand = '${cadet.CareerBand}',
@@ -216,14 +216,12 @@ let getCourses = function (successCB, errorCB) {
            let courseArray = [];
            for(let i = 0; i < resultObj.records.length; i++) {
                 let result = resultObj.records[i];
-                console.log(result);
                 courseArray.push(result._fields[0].properties);
                 courseArray[i].Skills = result._fields[1];
                 if(result._fields[2][0].a === null) {
                   courseArray[i].Assignments = [];
                 }
                 else {
-                  console.log(result._fields[2][0].a.properties);
                   let Assignments = [];
                   for(let j=0; j< result._fields[2].length; j++) {
                     Assignments.push(result._fields[2][j].a.properties);
@@ -237,7 +235,6 @@ let getCourses = function (successCB, errorCB) {
                 else {
                   let Session = [];
                   for(let j=0; j< result._fields[3].length; j++) {
-                    console.log(result._fields[3][j].b);
                     Session.push(result._fields[3][j].a.properties);
                     Session[j].Skills = result._fields[3][j].b;
                   }
@@ -247,7 +244,6 @@ let getCourses = function (successCB, errorCB) {
          if(err) {
            errorCB('Error');
          } else {
-           logger.debug(courseArray);
            successCB(courseArray);
           }
          });
@@ -271,12 +267,16 @@ let getCourses = function (successCB, errorCB) {
                if(err) {
                  errorCB('Error');
                } else {
+                 let query1 = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
+                 let session = driver.session();
+                  session.run(query1).then(function (resultObj, err) {
+                      session.close();
+                    });
                  successCB('success');
                 }
                });
   } else if(edit === 'assignment') {
         let assignment = CourseObj.Assignments[CourseObj.Assignments.length - 1]
-        console.log(CourseObj.ID)
         let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
         with c as course
         MERGE (assg:${graphConsts.NODE_ASSIGNMENT}{Name:'${assignment.Name}',
@@ -301,7 +301,6 @@ let getCourses = function (successCB, errorCB) {
              });
   } else if(edit === 'schedule') {
             let schedule = CourseObj.Schedule[CourseObj.Schedule.length - 1]
-            console.log(CourseObj.ID)
             let query = ``;
             if(schedule.Skills.length >= 1) {
               query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
@@ -339,6 +338,109 @@ let getCourses = function (successCB, errorCB) {
   }
   };
 
+  let deleteOrRestoreCourse = function(CourseObj, type, successCB, errorCB) {
+    if(type === 'delete') {
+      let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})-[r:${graphConsts.REL_INCLUDES}]->()
+          set c.Removed = true
+          return c`;
+          let session = driver.session();
+             session.run(query).then(function (resultObj, err) {
+                 session.close();
+               if(err) {
+                 errorCB('Error');
+               } else {
+                 successCB('success');
+                }
+               });
+    }
+    else {
+      let query = `UNWIND ${JSON.stringify(CourseObj)} as id
+      MATCH (c:${graphConsts.NODE_COURSE}{ID:id})-[r:${graphConsts.REL_INCLUDES}]->()
+      set c.Removed = false`;
+          let session = driver.session();
+             session.run(query).then(function (resultObj, err) {
+                 session.close();
+               if(err) {
+                 errorCB('Error');
+               } else {
+                 successCB('success');
+                }
+               });
+    }
+  }
+
+
+    let deleteAssignmentOrSchedule = function (obj, course, type, successCB, errorCB) {
+      if(type === 'assignment') {
+        let query = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}) return count(c);`
+        let session = driver.session();
+           session.run(query).then(function (resultObj, err) {
+               session.close();
+               if(err) {
+               errorCB('Error');
+             } else {
+               if(resultObj.records[0]._fields[0].low <= 1) {
+                 let query1 = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'}) detach delete s;`
+                 let session1 = driver.session();
+                    session1.run(query1).then(function (resultObj, err) {
+                        session1.close();
+                        if(err) {
+                        errorCB('Error');
+                      } else {
+                        successCB();
+                      }
+                    });}
+               else {
+                 let query1 = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'})<-[r:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}{Name:'${course.Name}'}) delete r`
+                 let session1 = driver.session();
+                    session1.run(query1).then(function (resultObj, err) {
+                        session1.close();
+                        if(err) {
+                        errorCB('Error');
+                      } else {
+                        successCB();
+                      }
+                      })
+               }
+              }
+             });
+      }
+      else {
+        let query = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}) return count(c);`
+        let session = driver.session();
+           session.run(query).then(function (resultObj, err) {
+               session.close();
+               if(err) {
+               errorCB('Error');
+             } else {
+               if(resultObj.records[0]._fields[0].low <= 1) {
+                 let query1 = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'}) detach delete s;`
+                 let session1 = driver.session();
+                    session1.run(query1).then(function (resultObj, err) {
+                        session1.close();
+                        if(err) {
+                        errorCB('Error');
+                      } else {
+                        successCB();
+                      }
+                      })
+               }
+               else {
+                 let query1 = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'})<-[r:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}{Name:'${course.Name}'}) delete r`
+                 let session1 = driver.session();
+                    session1.run(query1).then(function (resultObj, err) {
+                        session1.close();
+                        if(err) {
+                        errorCB('Error');
+                      } else {
+                        successCB();
+                      }
+                      })
+               }
+              }
+             });
+      }
+    }
 /**********************************************
 ************ Product management *************
 **********************************************/
@@ -518,6 +620,8 @@ let addProduct = function (productObj, successCB, errorCB) {
     getCourses,
     updateCourse,
     addProduct,
+    deleteAssignmentOrSchedule,
+    deleteOrRestoreCourse,
     addVersion,
     deleteProduct,
     deleteVersion
