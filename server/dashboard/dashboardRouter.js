@@ -225,7 +225,7 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     let projectObj = req.body;
     projectObj.version[0].addedBy = req.user.name;
-    dashboardMongoController.addProject(projectObj, function (project) {
+    dashboardNeo4jController.addProduct(projectObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Add Project Error: ', err);
@@ -368,6 +368,23 @@ router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
     });
   } catch(err) {
     logger.debug('Get cadets error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Get all the cadets who are not part of any wave
+router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.getNewCadets(function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get All New Cadets Error: ', err);
+      res.status(500).json({error: 'Cannot get all new cadets from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get cadets error',  err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });

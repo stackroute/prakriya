@@ -12,4 +12,4 @@ module.exports = {
     REL_KNOWS: 'knows',
     REL_WORKEDON: 'worked_on',
     REL_BELONGS_TO: 'belongs_to'
-}
+  }
