@@ -13,7 +13,7 @@ let driver = neo4jDriver.driver(config.NEO4J.neo4jURL,
 // Add cadet
 
 let addCadet = function(cadetObj, successCB, errorCB) {
- 
+
   let cadet = {};
 
   cadet.EmployeeID = cadetObj.EmployeeID || '';
@@ -33,7 +33,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
 
   let session = driver.session();
 
-  let query  = 
+  let query  =
   	`CREATE (n: ${graphConsts.NODE_CANDIDATE}
   	{
   		EmployeeID: '${cadet.EmployeeID}',
@@ -54,7 +54,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
 
   session.run(query)
     .then(function(result) {
-      logger.debug('Result from the neo4j', result) 
+      logger.debug('Result from the neo4j', result)
 
       // Completed!
       session.close();
@@ -72,7 +72,7 @@ let getCadets = function(successCB, errorCB) {
     .then(function(resultObj) {
       session.close();
       let cadets = [];
-      
+
       for(let i = 0; i < resultObj.records.length; i++) {
         let result = resultObj.records[i];
         logger.debug('Result obj from neo4j', result._fields);
@@ -159,10 +159,72 @@ let getCourses = function (successCB, errorCB) {
            });
   };
 
+/**********************************************
+************ Product management *************
+**********************************************/
+
+// adding a new product
+let addProduct = function (projectObj, successCB, errorCB) {
+
+   let product = {};
+   product.product = projectObj.product;
+   product.description = projectObj.description || '';
+
+   let version = {};
+   version.name = projectObj.version[0].name;
+   version.description = projectObj.version[0].description || '';
+   // version.wave = projectObj.version[0].wave;
+   // version.members = projectObj.version[0].members;
+   version.skills = projectObj.version[0].skills;
+   version.addedBy = projectObj.version[0].addedBy;
+   version.addedOn = projectObj.version[0].addedOn;
+   version.updated = projectObj.version[0].updated;
+
+   let session = driver.session();
+
+   logger.debug("obtained connection with neo4j");
+
+   let query  =
+     `CREATE
+     (p:${graphConsts.NODE_PRODUCT}
+       {
+        name: '${product.product}',
+        description: '${product.description}'
+       }
+     )
+     -[:${graphConsts.REL_HAS}]->
+     (v:${graphConsts.NODE_VERSION}
+       {
+        name: '${version.name}',
+        description: '${version.description}',
+        addedOn: '${version.addedOn}',
+        addedBy: '${version.addedBy}',
+        updated: '${version.updated}'
+       }
+     )
+     WITH p AS product
+     UNWIND ${JSON.stringify(version.skills)} AS skillname
+     MERGE (product) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+     `;
+
+   session.run(query)
+     .then(function(result) {
+       logger.debug('Result from the neo4j', result)
+
+       // Completed!
+       session.close();
+       successCB(projectObj);
+     })
+     .catch(function(err) {
+       errorCB(err);
+     });
+  };
+
   module.exports = {
     addCadet,
     getCadets,
     addCourse,
     getCourses,
-    updateCourse
+    updateCourse,
+    addProduct
   }
