@@ -111,13 +111,13 @@ export default class AddWave extends React.Component {
 		let startDate = new Date(date);
 		this.state.courses.map(function (course, i) {
 			if(course.ID == th.state.Course) {
-				dur = course.Duration
+				dur = course.Duration.low
 			}
 		})
 		let endDate = new Date(date.setDate(date.getDate() + dur*7));
 		this.setState({
 			StartDate: startDate,
-			EndDate: endDate,
+			EndDate: endDate
 		})
 	}
 
