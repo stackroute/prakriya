@@ -272,7 +272,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
     let versionObj = req.body.version;
     versionObj.addedBy = req.user.name;
     versionObj.updatedBy = true;
-    dashboardMongoController.addVersion(req.body.product, versionObj, function (project) {
+    dashboardNeo4jController.addVersion(req.body.product, versionObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Add Version Error: ', err);
@@ -289,18 +289,17 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     if(req.body.type === 'project') {
-    let projectObj = req.body.project;
-    projectObj.addedBy = req.user.name;
-    projectObj.updatedBy = true;
-    dashboardMongoController.deleteProject(projectObj, function (project) {
+    let productName = req.body.project.product;
+    dashboardNeo4jController.deleteProduct(productName, function (project) {
       res.status(201).json(project);
     }, function (err) {
       logger.error('Delete Project Error: ', err);
       res.status(500).json({error: 'Cannot delete the project...!'});
     });
     } else {
-      dashboardMongoController.deleteVersion(req.body.project, function (project) {
-        res.status(201).json(project);
+      let versionName = req.body.project.name;
+      dashboardNeo4jController.deleteVersion(versionName, function (version) {
+        res.status(201).json(version);
       }, function (err) {
         logger.error('Delete Version Error: ', err);
         res.status(500).json({error: 'Cannot delete the version...!'});
@@ -394,11 +393,11 @@ router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 // Update a cadet
 router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    dashboardMongoController.updateCadet(req.body, function (status) {
+    dashboardNeo4jController.updateCadet(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Update Cadet Error: ', err);
-      res.status(500).json({error: 'Cannot update candidate in db...!'});
+      res.status(500).json({error: 'Cannot update candidate in neo4j...!'});
     });
   } catch(err) {
     res.status(500).json({
@@ -410,8 +409,7 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
 // Update many cadets
 router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    logger.debug('Update cadets', req.body);
-    dashboardMongoController.updateCadets(req.body, function (status) {
+    dashboardNeo4jController.updateCadets(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Update Cadets Error: ', err);

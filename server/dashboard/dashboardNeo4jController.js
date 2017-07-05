@@ -67,6 +67,68 @@ let addCadet = function(cadetObj, successCB, errorCB) {
     });
 }
 
+// Update cadet
+
+let updateCadet = function(cadetObj, successCB, errorCB) {
+
+  let cadet = {};
+
+  cadet.EmployeeID = cadetObj.EmployeeID || '';
+  cadet.AltEmail = cadetObj.AltEmail || '';
+  cadet.Contact = cadetObj.Contact || '';
+  cadet.CareerBand = cadetObj.CareerBand || '';
+  cadet.WorkExperience = cadetObj.WorkExperience || '';
+  cadet.Billability = cadetObj.Billability || '';
+  cadet.PrimarySupervisor = cadetObj.PrimarySupervisor || '';
+  cadet.ProjectSupervisor = cadetObj.ProjectSupervisor || '';
+  cadet.Selected = cadetObj.Selected || '';
+  cadet.Remarks = cadetObj.Remarks || '';
+
+  let session = driver.session();
+
+  let query  =
+    `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmployeeID: '${cadet.EmployeeID}'})
+    SET
+      n.AltEmail = '${cadet.AltEmail}',
+      n.Contact = '${cadet.Contact}',
+      n.CareerBand = '${cadet.CareerBand}',
+      n.WorkExperience = '${cadet.WorkExperience}',
+      n.Billability = '${cadet.Billability}',
+      n.PrimarySupervisor = '${cadet.PrimarySupervisor}',
+      n.ProjectSupervisor = '${cadet.ProjectSupervisor}',
+      n.Selected = '${cadet.Selected}',
+      n.Remarks = '${cadet.Remarks}'
+    return n`;
+
+    session.run(query)
+    .then(function(result) {
+      logger.debug('Result from the neo4j', result)
+
+      // Completed!
+      session.close();
+      successCB(cadetObj);
+    })
+    .catch(function(err) {
+      errorCB(err);
+    });
+}
+
+// Update cadets
+
+let updateCadets = function (cadetArr, successCB, errorCB) {
+  let count = 0;
+  cadetArr.map(function(cadet) {
+    updateCadet(cadet, function (cadetObj) {
+      count = count+1;
+      if(count == cadetArr.length) {
+        successCB()
+      }
+    }, function (err) {
+      errorCB(err);
+    })
+  })
+}
+
 // Get all the cadets
 
 let getCadets = function(successCB, errorCB) {
@@ -92,7 +154,9 @@ let getCadets = function(successCB, errorCB) {
 
 let getNewCadets = function(successCB, errorCB) {
   let session = driver.session();
-  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
+  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) WHERE NOT
+    (n)-[:${graphConsts.REL_BELONGS_TO}]->(:${graphConsts.NODE_WAVE})
+    return n`;
   session.run(query)
     .then(function(resultObj) {
       session.close();
@@ -380,21 +444,21 @@ let getCourses = function (successCB, errorCB) {
 **********************************************/
 
 // adding a new product
-let addProduct = function (projectObj, successCB, errorCB) {
+let addProduct = function (productObj, successCB, errorCB) {
 
    let product = {};
-   product.product = projectObj.product;
-   product.description = projectObj.description || '';
+   product.product = productObj.product;
+   product.description = productObj.description || '';
 
    let version = {};
-   version.name = projectObj.version[0].name;
-   version.description = projectObj.version[0].description || '';
-   // version.wave = projectObj.version[0].wave;
-   // version.members = projectObj.version[0].members;
-   version.skills = projectObj.version[0].skills;
-   version.addedBy = projectObj.version[0].addedBy;
-   version.addedOn = projectObj.version[0].addedOn;
-   version.updated = projectObj.version[0].updated;
+   version.name = productObj.version[0].name;
+   version.description = productObj.version[0].description || '';
+   // version.wave = productObj.version[0].wave;
+   // version.members = productObj.version[0].members;
+   version.skills = productObj.version[0].skills;
+   version.addedBy = productObj.version[0].addedBy;
+   version.addedOn = productObj.version[0].addedOn;
+   version.updated = productObj.version[0].updated;
 
    let session = driver.session();
 
@@ -402,14 +466,14 @@ let addProduct = function (projectObj, successCB, errorCB) {
 
    let query  =
      `CREATE
-     (p:${graphConsts.NODE_PRODUCT}
+     (product:${graphConsts.NODE_PRODUCT}
        {
         name: '${product.product}',
         description: '${product.description}'
        }
      )
      -[:${graphConsts.REL_HAS}]->
-     (v:${graphConsts.NODE_VERSION}
+     (version:${graphConsts.NODE_VERSION}
        {
         name: '${version.name}',
         description: '${version.description}',
@@ -418,9 +482,10 @@ let addProduct = function (projectObj, successCB, errorCB) {
         updated: '${version.updated}'
        }
      )
-     WITH p AS product
+     WITH version AS version
      UNWIND ${JSON.stringify(version.skills)} AS skillname
-     MERGE (product) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+     MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+     MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
      `;
 
    session.run(query)
@@ -429,16 +494,124 @@ let addProduct = function (projectObj, successCB, errorCB) {
 
        // Completed!
        session.close();
-       successCB(projectObj);
+       successCB(productObj);
      })
      .catch(function(err) {
        errorCB(err);
      });
   };
 
+  // adding a version
+  let addVersion = function (name, versionObj, successCB, errorCB) {
+
+     let productName = name;
+
+     let version = {};
+     version.name = versionObj.name;
+     version.description = versionObj.description || '';
+     // version.wave = versionObj.wave;
+     // version.members = versionObj..members;
+     version.skills = versionObj.skills;
+     version.addedBy = versionObj.addedBy;
+     version.addedOn = versionObj.addedOn;
+     version.updated = versionObj.updated;
+
+     let session = driver.session();
+
+     logger.debug("obtained connection with neo4j");
+
+     let query  =
+       `
+       CREATE
+       (version:${graphConsts.NODE_VERSION}
+         {
+           name: '${version.name}',
+           description: '${version.description}',
+           addedOn: '${version.addedOn}',
+           addedBy: '${version.addedBy}',
+           updated: '${version.updated}'
+         }
+       )
+       WITH version AS version
+       MERGE (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
+       MERGE (version) <-[:${graphConsts.REL_HAS}]- (product)
+       WITH version AS version
+       UNWIND ${JSON.stringify(version.skills)} AS skillname
+       MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+       MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
+       `;
+
+     session.run(query)
+       .then(function(result) {
+         logger.debug('Result from the neo4j', result)
+
+         // Completed!
+         session.close();
+         successCB(versionObj);
+       })
+       .catch(function(err) {
+         errorCB(err);
+       });
+  };
+
+  // deleting a product
+  let deleteProduct = function (productName, successCB, errorCB) {
+
+     let session = driver.session();
+
+     logger.debug("obtained connection with neo4j");
+
+     let query  =
+       `
+       MATCH (version:${graphConsts.NODE_VERSION})
+       <-[:${graphConsts.REL_HAS}]-
+       (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
+       DETACH DELETE version
+       DETACH DELETE product
+       `;
+
+     session.run(query)
+       .then(function(result) {
+         logger.debug('Result from the neo4j', result)
+
+         // Completed!
+         session.close();
+         successCB(productName);
+       })
+       .catch(function(err) {
+         errorCB(err);
+       });
+  };
+
+  // deleting a version
+  let deleteVersion = function (versionName, successCB, errorCB) {
+
+     let session = driver.session();
+
+     logger.debug("obtained connection with neo4j");
+
+     let query  =
+       `
+       MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
+       `;
+
+     session.run(query)
+       .then(function(result) {
+         logger.debug('Result from the neo4j', result)
+
+         // Completed!
+         session.close();
+         successCB(versionName);
+       })
+       .catch(function(err) {
+         errorCB(err);
+       });
+  };
 
   module.exports = {
     addCadet,
+    updateCadet,
+    updateCadets,
     getCadets,
     getNewCadets,
     addCourse,
@@ -446,5 +619,8 @@ let addProduct = function (projectObj, successCB, errorCB) {
     updateCourse,
     addProduct,
     deleteAssignmentOrSchedule,
-    deleteOrRestoreCourse
+    deleteOrRestoreCourse,
+    addVersion,
+    deleteProduct,
+    deleteVersion
   }
