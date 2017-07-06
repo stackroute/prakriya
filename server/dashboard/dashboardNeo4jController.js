@@ -147,20 +147,24 @@ let getNewCadets = function(successCB, errorCB) {
   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) WHERE NOT
     (n)-[:${graphConsts.REL_BELONGS_TO}]->(:${graphConsts.NODE_WAVE})
     return n`;
-  session.run(query).then(function(resultObj) {
-    session.close();
-    let cadets = [];
+  session.run(query)
+    .then(function(resultObj) {
+      session.close();
+      let cadets = [];
 
-    for (let i = 0; i < resultObj.records.length; i++) {
-      let result = resultObj.records[i];
-      logger.debug('Result obj from neo4j', result._fields);
-      cadets.push(result._fields[0].properties);
-    }
-    successCB(cadets);
-  }).catch(function(err) {
-    errorCB(err);
-  })
+      for(let i = 0; i < resultObj.records.length; i++) {
+        let result = resultObj.records[i];
+        logger.debug('Result obj from neo4j', result._fields);
+          cadets.push(result._fields[0].properties);
+      }
+      successCB(cadets);
+    })
+    .catch(function (err) {
+      errorCB(err);
+    })
 }
+
+
 
 /**********************************************
 ************** Course management **************
@@ -594,8 +598,7 @@ let getProducts = function(successCB, errorCB) {
       product: product.name,
       description: product.description,
       version: versions
-    }
-    `;
+    }`;
 
   session.run(query).then(function(resultObj, err) {
     session.close();
@@ -606,9 +609,22 @@ let getProducts = function(successCB, errorCB) {
     }
   });
 };
-// let getWave = function(waveID, successCB, errorCB) {
-//   logger.debug('In get Wave', waveID);
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
+
+let getWave = function(waveID, successCB, errorCB) {
+  logger.debug('In get Wave', waveID);
+  let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      successCB(resultObj.records[0]._fields.properties);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
+// let getWaveIDs = function(successCB, errorCB) {
+//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
 //   let session = driver.session();
 //   session.run(query).then(function(resultObj) {
 //     session.close();
@@ -619,6 +635,8 @@ let getProducts = function(successCB, errorCB) {
 //     }
 //   });
 // };
+
+
 let getWaveIDs = function(successCB, errorCB) {
   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
   let session = driver.session();
@@ -654,6 +672,7 @@ let getWaveSpecificCandidates = function(waveID, successCB, errorCB) {
     }
   });
 };
+
 // let getWaveObject = function(waveID, successCB, errorCB) {
 //   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
 //   let session = driver.session();
@@ -808,37 +827,54 @@ let deleteWave = function(waveObj, successCB, errorCB) {
 //            });
 //     };
 
-module.exports = {
-  addCadet,
-  updateCadet,
-  updateCadets,
-  getCadets,
-  getNewCadets,
-  addCourse,
-  getCourses,
-  updateCourse,
-  getWaves,
-  addWave,
-  deleteWave,
-  getWaveSpecificCandidates,
-  getWaveIDs,
-  addProduct,
-  deleteAssignmentOrSchedule,
-  deleteOrRestoreCourse,
-  addVersion,
-  deleteProduct,
-  deleteVersion,
-  getProducts
-}
-// getWave,
-// getWaveIDs,
-// getWaveSpecificCandidates,
-// getWaveObject,
-// getWaves,
-// getCadetsOfWave,
-// updateWave,
-// getCoursesForWave,
-// addWave,
-// deleteWave,
-// updateCadetWave,
-// getActiveWaves
+/**********************************************
+************ Assessment Tracker *************
+**********************************************/
+
+let getAssessmentTrack = function (courseName, successCB, errorCB) {
+  let query = `match (n:${graphConsts.NODE_COURSE}{Name:'${courseName}'})-[:has]->(a:Assignment) return collect(a.Name)`;
+    let session = driver.session();
+       session.run(query).then(function (resultObj, err) {
+           session.close();
+  if(err) {
+			errorCB(err);
+		}
+    console.log(resultObj);
+    successCB(resultObj);
+	});
+};
+
+  module.exports = {
+    addCadet,
+    updateCadet,
+    updateCadets,
+    getCadets,
+    getNewCadets,
+    addCourse,
+    getCourses,
+    updateCourse,
+    getWaves,
+    addWave,
+    deleteWave,
+    getWaveSpecificCandidates,
+    getWaveIDs,
+    addProduct,
+    deleteAssignmentOrSchedule,
+    deleteOrRestoreCourse,
+    addVersion,
+    deleteProduct,
+    deleteVersion,
+    getProducts,
+    getAssessmentTrack
+  }
+  // getWaveIDs,
+  // getWaveSpecificCandidates,
+  // getWaveObject,
+  // getWaves,
+  // getCadetsOfWave,
+  // updateWave,
+  // getCoursesForWave,
+  // addWave,
+  // deleteWave,
+  // updateCadetWave,
+  // getActiveWaves
