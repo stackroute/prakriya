@@ -158,6 +158,7 @@ export default class Attendance extends React.Component {
         )
       }
     }
+    console.log(th.state.cadetsOfWave);
     return (
       <div>
         <SelectField onChange={th.onWaveIdChange} floatingLabelText="Select WaveID" value={th.state.WaveId}>
@@ -169,7 +170,7 @@ export default class Attendance extends React.Component {
         &nbsp;&nbsp;
         <SelectField onChange={th.onCadetChange} floatingLabelText="Select Cadet" value={th.state.CadetName}>
           {th.state.cadetsOfWave.map(function(val, key) {
-            return <MenuItem key={key} value={val.EmployeeName + "("+val.EmployeeID+")"} primaryText={val.EmployeeName + "("+val.EmployeeID+")"}/>
+            return <MenuItem key={key} value={val.EmployeeName + "("+val.EmployeeID.low+")"} primaryText={val.EmployeeName + "("+val.EmployeeID+")"}/>
           })
 }
         </SelectField>
