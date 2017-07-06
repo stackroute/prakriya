@@ -53,9 +53,6 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   		Remarks: '${cadet.Remarks}'
   	}) return n`;
   session.run(query).then(function(result) {
-    logger.debug('Result from the neo4j', result)
-
-    // Completed!
     session.close();
     successCB(cadetObj);
   }).catch(function(err) {
@@ -98,9 +95,6 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
 
     session.run(query)
     .then(function(result) {
-      logger.debug('Result from the neo4j', result)
-
-      // Completed!
       session.close();
       successCB(cadetObj);
     })
@@ -748,28 +742,35 @@ let getWaves = function(successCB, errorCB) {
 //   });
 let addWave = function (waveObj, successCB, errorCB) {
   	let userObj = {};
-    userObj.WaveID = waveObj.WaveID ||'',
-    userObj.WaveNumber = waveObj.WaveNumber ||'',
-    userObj.Location = waveObj.Location ||'',
-    userObj.StartDate = waveObj.StartDate ||'',
-    userObj.EndDate = waveObj.EndDate ||'',
-    userObj.Sessions  = waveObj.Sessions  ||'',
-    userObj.Cadets  = waveObj.Cadets ||'',
-    userObj.CourseNames  = waveObj.CourseNames ||''
+    userObj.WaveID = waveObj.WaveID || '',
+    userObj.WaveNumber = waveObj.WaveNumber || '',
+    userObj.Mode = waveObj.Mode || '',
+    userObj.Location = waveObj.Location || '',
+    userObj.StartDate = waveObj.StartDate || '',
+    userObj.EndDate = waveObj.EndDate || '',
+    userObj.Sessions = waveObj.Sessions  || '',
+    userObj.Cadets = waveObj.Cadets || '',
+    userObj.Course = waveObj.Course || '';
+
     let session = driver.session();
 
     let query = `CREATE  (wave:${graphConsts.NODE_WAVE}
     	{
           WaveID: '${userObj.WaveID}',
           WaveNumber: '${userObj.WaveNumber}',
+          Mode: '${userObj.Mode}',
           Location: '${userObj.Location}',
           StartDate: '${userObj.StartDate}',
           EndDate: '${userObj.EndDate}'
         })
         WITH wave AS wave
+        MATCH (course: ${graphConsts.NODE_COURSE}{ID: '${userObj.Course}'})
+        WITH wave AS wave, course AS course
+        MERGE (wave)-[:${graphConsts.REL_HAS}]->(course)
+        WITH wave AS wave
         UNWIND ${JSON.stringify(userObj.Cadets)} AS empID
         MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: empID})
-        MERGE (candidate) -[:BELONGSTO]-> (wave)`;
+        MERGE (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (wave)`;
 
       session.run(query).then(function(result) {
         logger.debug('Result from the neo4j', result)
