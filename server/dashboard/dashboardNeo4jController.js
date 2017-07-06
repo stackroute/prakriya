@@ -129,8 +129,8 @@ let updateCadets = function (cadetArr, successCB, errorCB) {
 
 let getCadets = function(successCB, errorCB) {
   let session = driver.session();
-  let query  = `MATCH 
-  (n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(:${graphConsts.NODE_WAVE}) 
+  let query  = `MATCH
+  (n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(:${graphConsts.NODE_WAVE})
   return n`;
   session.run(query)
     .then(function(resultObj) {
@@ -637,19 +637,19 @@ let addCourse = function (CourseObj, successCB, errorCB) {
       }
      });
   };
-// let getWave = function(waveID, successCB, errorCB) {
-//   logger.debug('In get Wave', waveID);
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
+let getWave = function(waveID, successCB, errorCB) {
+  logger.debug('In get Wave', waveID);
+  let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      successCB(resultObj.records[0]._fields.properties);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
 // let getWaveIDs = function(successCB, errorCB) {
 //   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
 //   let session = driver.session();
@@ -839,6 +839,23 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 //            });
 //     };
 
+/**********************************************
+************ Assessment Tracker *************
+**********************************************/
+
+let getAssessmentTrack = function (courseName, successCB, errorCB) {
+  let query = `match (n:${graphConsts.NODE_COURSE}{Name:'${courseName}'})-[:has]->(a:Assignment) return collect(a.Name)`;
+    let session = driver.session();
+       session.run(query).then(function (resultObj, err) {
+           session.close();
+  if(err) {
+			errorCB(err);
+		}
+    console.log(resultObj);
+    successCB(resultObj);
+	});
+};
+
   module.exports = {
     addCadet,
     updateCadet,
@@ -849,6 +866,7 @@ let deleteWave = function (waveObj, successCB, errorCB) {
     getCourses,
     updateCourse,
     getWaves,
+    getWave,
     addWave,
     deleteWave,
     addProduct,
@@ -857,9 +875,9 @@ let deleteWave = function (waveObj, successCB, errorCB) {
     addVersion,
     deleteProduct,
     deleteVersion,
-    getProducts
+    getProducts,
+    getAssessmentTrack
   }
-  // getWave,
   // getWaveIDs,
   // getWaveSpecificCandidates,
   // getWaveObject,

@@ -576,7 +576,7 @@ let getCandidates = function (waveID, courseName, successCB, errorCB) {
 	});
 };
 
-let getAssesmentTrack = function (courseName, successCB, errorCB) {
+let getAssessmentTrack = function (courseName, successCB, errorCB) {
 	CourseModel.findOne({CourseName: courseName}, 'AssessmentCategories', function (err, result) {
 		if(err) {
 			errorCB(err);
@@ -802,7 +802,7 @@ module.exports = {
 	getCourse,
 	getCoursesForWave,
 	getCandidates,
-	getAssesmentTrack,
+	getAssessmentTrack,
 	getWaveObject,
 	changePassword,
 	addNotification,

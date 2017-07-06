@@ -852,7 +852,7 @@ get('/candidatesandtracks/:waveID/:courseName', auth.canAccess(CONFIG.MENTOR), f
   try{
     dashboardMongoController.getCandidates(req.params.waveID, req.params.courseName,
        function (candidates) {
-         dashboardMongoController.getAssesmentTrack(req.params.courseName,
+         dashboardNeo4jController.getAssessmentTrack(req.params.courseName,
            function (assessmentTrack) {
               res.status(201).json({
                 candidates: candidates,
