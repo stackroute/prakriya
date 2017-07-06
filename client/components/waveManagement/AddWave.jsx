@@ -101,7 +101,7 @@ export default class AddWave extends React.Component {
 
 	handleLocationChange(event, key, val) {
 		this.setState({
-			Location: val,
+			Location: val
 		})
 	}
 

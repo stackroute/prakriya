@@ -297,6 +297,7 @@ export default class WaveCard extends React.Component {
 		enddate = enddate.getFullYear() + '/' + (enddate.getMonth()+1) + '/' + enddate.getDate();
 		let th = this
     let title = 'CADETS'
+    console.log(this.state.wave);
     if(th.props.wave.Cadets !== undefined)
     {
       title = ('CADETS - (' + th.props.wave.Cadets.length + ')')
@@ -390,6 +391,7 @@ export default class WaveCard extends React.Component {
                 bodyStyle={dialog.body}
                 titleStyle={dialog.title}
 			        >
+
 			        <Grid style={styles.grid}><Row>
 			        {
 			        	th.state.cadets.map(function(cadet,index){

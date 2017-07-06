@@ -33,8 +33,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
 
   let session = driver.session();
 
-  let query  =
-  	`CREATE (n: ${graphConsts.NODE_CANDIDATE}
+  let query = `CREATE (n: ${graphConsts.NODE_CANDIDATE}
   	{
   		EmployeeID: '${cadet.EmployeeID}',
   		EmployeeName: '${cadet.EmployeeName}',
@@ -79,8 +78,7 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
 
   let session = driver.session();
 
-  let query  =
-    `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmployeeID: '${cadet.EmployeeID}'})
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmployeeID: '${cadet.EmployeeID}'})
     SET
       n.AltEmail = '${cadet.AltEmail}',
       n.Contact = '${cadet.Contact}',
@@ -105,15 +103,15 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
 
 // Update cadets
 
-let updateCadets = function (cadetArr, successCB, errorCB) {
+let updateCadets = function(cadetArr, successCB, errorCB) {
   let count = 0;
   cadetArr.map(function(cadet) {
-    updateCadet(cadet, function (cadetObj) {
-      count = count+1;
-      if(count == cadetArr.length) {
+    updateCadet(cadet, function(cadetObj) {
+      count = count + 1;
+      if (count == cadetArr.length) {
         successCB()
       }
-    }, function (err) {
+    }, function(err) {
       errorCB(err);
     })
   })
@@ -123,30 +121,26 @@ let updateCadets = function (cadetArr, successCB, errorCB) {
 
 let getCadets = function(successCB, errorCB) {
   let session = driver.session();
-  let query  = `MATCH 
-  (n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(:${graphConsts.NODE_WAVE}) 
-  return n`;
-  session.run(query)
-    .then(function(resultObj) {
-      session.close();
-      let cadets = [];
-      for(let i = 0; i < resultObj.records.length; i++) {
-        let result = resultObj.records[i];
-        logger.debug('Result obj from neo4j', result._fields);
-          cadets.push(result._fields[0].properties);
-      }
-      successCB(cadets);
-    })
-    .catch(function (err) {
-      errorCB(err);
-    })
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    let cadets = [];
+    for (let i = 0; i < resultObj.records.length; i++) {
+      let result = resultObj.records[i];
+      logger.debug('Result obj from neo4j', result._fields);
+      cadets.push(result._fields[0].properties);
+    }
+    successCB(cadets);
+  }).catch(function(err) {
+    errorCB(err);
+  })
 }
 
 // Get all the new cadets
 
 let getNewCadets = function(successCB, errorCB) {
   let session = driver.session();
-  let query  = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) WHERE NOT
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) WHERE NOT
     (n)-[:${graphConsts.REL_BELONGS_TO}]->(:${graphConsts.NODE_WAVE})
     return n`;
   session.run(query)
@@ -167,12 +161,13 @@ let getNewCadets = function(successCB, errorCB) {
 }
 
 
+
 /**********************************************
 ************** Course management **************
 **********************************************/
 
 // Course Management
-let addCourse = function (CourseObj, successCB, errorCB) {
+let addCourse = function(CourseObj, successCB, errorCB) {
   logger.info(CourseObj);
   let query = `MERGE (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}',Name:'${CourseObj.Name}',
   Mode:'${CourseObj.Mode}',Duration:${CourseObj.Duration},History:'${CourseObj.History}',
@@ -180,19 +175,19 @@ let addCourse = function (CourseObj, successCB, errorCB) {
   UNWIND ${JSON.stringify(CourseObj.Skills)} AS skill
   MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
   MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(course);`;
-    let session = driver.session();
-       session.run(query).then(function (resultObj, err) {
-           session.close();
-           if(resultObj) {
-           logger.debug(resultObj);
-            successCB();
-         } else {
-             errorCB(err);
-           }
-         });
-  };
+  let session = driver.session();
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+    if (resultObj) {
+      logger.debug(resultObj);
+      successCB();
+    } else {
+      errorCB(err);
+    }
+  });
+};
 
-  let getCourses = function (successCB, errorCB) {
+let getCourses = function(successCB, errorCB) {
   let query = `MATCH (courses:${graphConsts.NODE_COURSE})
   OPTIONAL MATCH (courses)-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
   OPTIONAL MATCH (courses)-[:${graphConsts.REL_HAS}]->(a:${graphConsts.NODE_ASSIGNMENT})-[:${graphConsts.REL_INCLUDES}]->(aSkill:${graphConsts.NODE_SKILL})
@@ -201,48 +196,46 @@ let addCourse = function (CourseObj, successCB, errorCB) {
   optional match (se)-[:${graphConsts.REL_INCLUDES}]->(seSkill:${graphConsts.NODE_SKILL})
   with collect(seSkill.Name) as sessSkill, assgSkill as assgSkill, a as a, courses as courses,s as s,se as se
   return courses, collect(distinct s.Name) as skills,COLLECT(distinct {a: a, b: assgSkill}) as assg,COLLECT(distinct {a: se, b: sessSkill}) as session`;
-    let session = driver.session();
-       session.run(query).then(function (resultObj, err) {
-           session.close();
-           let courseArray = [];
-           for(let i = 0; i < resultObj.records.length; i++) {
-                let result = resultObj.records[i];
-                courseArray.push(result._fields[0].properties);
-                courseArray[i].Skills = result._fields[1];
-                if(result._fields[2][0].a === null) {
-                  courseArray[i].Assignments = [];
-                }
-                else {
-                  let Assignments = [];
-                  for(let j=0; j< result._fields[2].length; j++) {
-                    Assignments.push(result._fields[2][j].a.properties);
-                    Assignments[j].Skills = result._fields[2][j].b;
-                  }
-                  courseArray[i].Assignments = Assignments
-                }
-                if(result._fields[3][0].a === null) {
-                  courseArray[i].Schedule = [];
-                }
-                else {
-                  let Session = [];
-                  for(let j=0; j< result._fields[3].length; j++) {
-                    Session.push(result._fields[3][j].a.properties);
-                    Session[j].Skills = result._fields[3][j].b;
-                  }
-                  courseArray[i].Schedule = Session
-                }
-            }
-         if(err) {
-           errorCB('Error');
-         } else {
-           successCB(courseArray);
-          }
-         });
-  };
+  let session = driver.session();
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+    let courseArray = [];
+    for (let i = 0; i < resultObj.records.length; i++) {
+      let result = resultObj.records[i];
+      courseArray.push(result._fields[0].properties);
+      courseArray[i].Skills = result._fields[1];
+      if (result._fields[2][0].a === null) {
+        courseArray[i].Assignments = [];
+      } else {
+        let Assignments = [];
+        for (let j = 0; j < result._fields[2].length; j++) {
+          Assignments.push(result._fields[2][j].a.properties);
+          Assignments[j].Skills = result._fields[2][j].b;
+        }
+        courseArray[i].Assignments = Assignments
+      }
+      if (result._fields[3][0].a === null) {
+        courseArray[i].Schedule = [];
+      } else {
+        let Session = [];
+        for (let j = 0; j < result._fields[3].length; j++) {
+          Session.push(result._fields[3][j].a.properties);
+          Session[j].Skills = result._fields[3][j].b;
+        }
+        courseArray[i].Schedule = Session
+      }
+    }
+    if (err) {
+      errorCB('Error');
+    } else {
+      successCB(courseArray);
+    }
+  });
+};
 
-  let updateCourse = function (CourseObj, edit, successCB, errorCB) {
-    if(edit === 'edit') {
-      let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})-[r:${graphConsts.REL_INCLUDES}]->()
+let updateCourse = function(CourseObj, edit, successCB, errorCB) {
+  if (edit === 'edit') {
+    let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})-[r:${graphConsts.REL_INCLUDES}]->()
           delete r
           set c.Name = '${CourseObj.Name}',
           c.Mode = '${CourseObj.Mode}',c.Duration = ${CourseObj.Duration},
@@ -252,23 +245,23 @@ let addCourse = function (CourseObj, successCB, errorCB) {
           UNWIND ${JSON.stringify(CourseObj.Skills)} as skill
           MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
           MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(course);`
-          let session = driver.session();
-             session.run(query).then(function (resultObj, err) {
-                 session.close();
-               if(err) {
-                 errorCB('Error');
-               } else {
-                 let query1 = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
-                 let session = driver.session();
-                  session.run(query1).then(function (resultObj, err) {
-                      session.close();
-                    });
-                 successCB('success');
-                }
-               });
-  } else if(edit === 'assignment') {
-        let assignment = CourseObj.Assignments[CourseObj.Assignments.length - 1]
-        let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
+    let session = driver.session();
+    session.run(query).then(function(resultObj, err) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        let query1 = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
+        let session1 = driver.session();
+        session1.run(query1).then(function(resultObj, err) {
+          session1.close();
+        });
+        successCB('success');
+      }
+    });
+  } else if (edit === 'assignment') {
+    let assignment = CourseObj.Assignments[CourseObj.Assignments.length - 1]
+    let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
         with c as course
         MERGE (assg:${graphConsts.NODE_ASSIGNMENT}{Name:'${assignment.Name}',
         Description: '${assignment.Description}',
@@ -281,20 +274,20 @@ let addCourse = function (CourseObj, successCB, errorCB) {
         MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
         MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(assg);
         `
-        let session = driver.session();
-           session.run(query).then(function (resultObj, err) {
-               session.close();
-             if(err) {
-               errorCB('Error');
-             } else {
-               successCB('success');
-              }
-             });
-  } else if(edit === 'schedule') {
-            let schedule = CourseObj.Schedule[CourseObj.Schedule.length - 1]
-            let query = ``;
-            if(schedule.Skills.length >= 1) {
-              query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
+    let session = driver.session();
+    session.run(query).then(function(resultObj, err) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        successCB('success');
+      }
+    });
+  } else if (edit === 'schedule') {
+    let schedule = CourseObj.Schedule[CourseObj.Schedule.length - 1]
+    let query = ``;
+    if (schedule.Skills.length >= 1) {
+      query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
               with c as course
               MERGE (schedule:${graphConsts.NODE_SESSION}{Name:'${schedule.Name}',
               Description: '${schedule.Description}',
@@ -306,9 +299,8 @@ let addCourse = function (CourseObj, successCB, errorCB) {
               MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
               MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(schedule);
               `
-            }
-            else {
-              query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
+    } else {
+      query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
               with c as course
               MERGE (schedule:${graphConsts.NODE_SESSION}{Name:'${schedule.Name}',
               Description: '${schedule.Description}',
@@ -316,147 +308,142 @@ let addCourse = function (CourseObj, successCB, errorCB) {
               with schedule as schedule,course as course
               MERGE (schedule)<-[:${graphConsts.REL_HAS}]-(course);
               `
-            }
-            let session = driver.session();
-               session.run(query).then(function (resultObj, err) {
-                   session.close();
-                 if(err) {
-                   errorCB('Error');
-                 } else {
-                   successCB('success');
-                  }
-                 });
+    }
+    let session = driver.session();
+    session.run(query).then(function(resultObj, err) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        successCB('success');
+      }
+    });
   }
-  };
+};
 
-  let deleteOrRestoreCourse = function(CourseObj, type, successCB, errorCB) {
-    if(type === 'delete') {
-      let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})-[r:${graphConsts.REL_INCLUDES}]->()
+let deleteOrRestoreCourse = function(CourseObj, type, successCB, errorCB) {
+  if (type === 'delete') {
+    let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})-[r:${graphConsts.REL_INCLUDES}]->()
           set c.Removed = true
           return c`;
-          let session = driver.session();
-             session.run(query).then(function (resultObj, err) {
-                 session.close();
-               if(err) {
-                 errorCB('Error');
-               } else {
-                 successCB('success');
-                }
-               });
-    }
-    else {
-      let query = `UNWIND ${JSON.stringify(CourseObj)} as id
+    let session = driver.session();
+    session.run(query).then(function(resultObj, err) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        successCB('success');
+      }
+    });
+  } else {
+    let query = `UNWIND ${JSON.stringify(CourseObj)} as id
       MATCH (c:${graphConsts.NODE_COURSE}{ID:id})-[r:${graphConsts.REL_INCLUDES}]->()
       set c.Removed = false`;
-          let session = driver.session();
-             session.run(query).then(function (resultObj, err) {
-                 session.close();
-               if(err) {
-                 errorCB('Error');
-               } else {
-                 successCB('success');
-                }
-               });
-    }
+    let session = driver.session();
+    session.run(query).then(function(resultObj, err) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        successCB('success');
+      }
+    });
   }
+}
 
-
-    let deleteAssignmentOrSchedule = function (obj, course, type, successCB, errorCB) {
-      if(type === 'assignment') {
-        let query = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}) return count(c);`
-        let session = driver.session();
-           session.run(query).then(function (resultObj, err) {
-               session.close();
-               if(err) {
-               errorCB('Error');
-             } else {
-               if(resultObj.records[0]._fields[0].low <= 1) {
-                 let query1 = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'}) detach delete s;`
-                 let session1 = driver.session();
-                    session1.run(query1).then(function (resultObj, err) {
-                        session1.close();
-                        if(err) {
-                        errorCB('Error');
-                      } else {
-                        successCB();
-                      }
-                    });}
-               else {
-                 let query1 = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'})<-[r:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}{Name:'${course.Name}'}) delete r`
-                 let session1 = driver.session();
-                    session1.run(query1).then(function (resultObj, err) {
-                        session1.close();
-                        if(err) {
-                        errorCB('Error');
-                      } else {
-                        successCB();
-                      }
-                      })
-               }
-              }
-             });
+let deleteAssignmentOrSchedule = function(obj, course, type, successCB, errorCB) {
+  if (type === 'assignment') {
+    let query = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}) return count(c);`
+    let session = driver.session();
+    session.run(query).then(function(resultObj, err) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        if (resultObj.records[0]._fields[0].low <= 1) {
+          let query1 = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'}) detach delete s;`
+          let session1 = driver.session();
+          session1.run(query1).then(function(resultObj, err) {
+            session1.close();
+            if (err) {
+              errorCB('Error');
+            } else {
+              successCB();
+            }
+          });
+        } else {
+          let query1 = `MATCH (s:${graphConsts.NODE_ASSIGNMENT}{Name:'${obj.Name}'})<-[r:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}{Name:'${course.Name}'}) delete r`
+          let session1 = driver.session();
+          session1.run(query1).then(function(resultObj, err) {
+            session1.close();
+            if (err) {
+              errorCB('Error');
+            } else {
+              successCB();
+            }
+          })
+        }
       }
-      else {
-        let query = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}) return count(c);`
-        let session = driver.session();
-           session.run(query).then(function (resultObj, err) {
-               session.close();
-               if(err) {
-               errorCB('Error');
-             } else {
-               if(resultObj.records[0]._fields[0].low <= 1) {
-                 let query1 = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'}) detach delete s;`
-                 let session1 = driver.session();
-                    session1.run(query1).then(function (resultObj, err) {
-                        session1.close();
-                        if(err) {
-                        errorCB('Error');
-                      } else {
-                        successCB();
-                      }
-                      })
-               }
-               else {
-                 let query1 = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'})<-[r:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}{Name:'${course.Name}'}) delete r`
-                 let session1 = driver.session();
-                    session1.run(query1).then(function (resultObj, err) {
-                        session1.close();
-                        if(err) {
-                        errorCB('Error');
-                      } else {
-                        successCB();
-                      }
-                      })
-               }
-              }
-             });
+    });
+  } else {
+    let query = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}) return count(c);`
+    let session = driver.session();
+    session.run(query).then(function(resultObj, err) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        if (resultObj.records[0]._fields[0].low <= 1) {
+          let query1 = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'}) detach delete s;`
+          let session1 = driver.session();
+          session1.run(query1).then(function(resultObj, err) {
+            session1.close();
+            if (err) {
+              errorCB('Error');
+            } else {
+              successCB();
+            }
+          })
+        } else {
+          let query1 = `MATCH (s:${graphConsts.NODE_SESSION}{Name:'${obj.Name}'})<-[r:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE}{Name:'${course.Name}'}) delete r`
+          let session1 = driver.session();
+          session1.run(query1).then(function(resultObj, err) {
+            session1.close();
+            if (err) {
+              errorCB('Error');
+            } else {
+              successCB();
+            }
+          })
+        }
       }
-    }
-  /**********************************************
+    });
+  }
+}
+/**********************************************
   ************ Product Management *************
   **********************************************/
 
-  // adding a new product
-  let addProduct = function (productObj, successCB, errorCB) {
+// adding a new product
+let addProduct = function(productObj, successCB, errorCB) {
 
-   let product = {};
-   product.product = productObj.product;
-   product.description = productObj.description || '';
+  let product = {};
+  product.product = productObj.product;
+  product.description = productObj.description || '';
 
-   let version = {};
-   version.name = productObj.version[0].name;
-   version.description = productObj.version[0].description || '';
-   // version.wave = productObj.version[0].wave;
-   // version.members = productObj.version[0].members;
-   version.skills = productObj.version[0].skills;
-   version.addedBy = productObj.version[0].addedBy;
-   version.addedOn = productObj.version[0].addedOn;
-   version.updated = productObj.version[0].updated;
+  let version = {};
+  version.name = productObj.version[0].name;
+  version.description = productObj.version[0].description || '';
+  // version.wave = productObj.version[0].wave;
+  // version.members = productObj.version[0].members;
+  version.skills = productObj.version[0].skills;
+  version.addedBy = productObj.version[0].addedBy;
+  version.addedOn = productObj.version[0].addedOn;
+  version.updated = productObj.version[0].updated;
 
-   let session = driver.session();
+  let session = driver.session();
 
-   let query  =
-     `CREATE
+  let query = `CREATE
      (product:${graphConsts.NODE_PRODUCT}
        {
         name: '${product.product}',
@@ -479,38 +466,35 @@ let addCourse = function (CourseObj, successCB, errorCB) {
      MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
      `;
 
-   session.run(query)
-     .then(function(result) {
-       logger.debug('Result from the neo4j', result)
+  session.run(query).then(function(result) {
+    logger.debug('Result from the neo4j', result)
 
-       // Completed!
-       session.close();
-       successCB(productObj);
-     })
-     .catch(function(err) {
-       errorCB(err);
-     });
-  };
+    // Completed!
+    session.close();
+    successCB(productObj);
+  }).catch(function(err) {
+    errorCB(err);
+  });
+};
 
-  // adding a version
-  let addVersion = function (name, versionObj, successCB, errorCB) {
+// adding a version
+let addVersion = function(name, versionObj, successCB, errorCB) {
 
-     let productName = name;
+  let productName = name;
 
-     let version = {};
-     version.name = versionObj.name;
-     version.description = versionObj.description || '';
-     // version.wave = versionObj.wave;
-     // version.members = versionObj..members;
-     version.skills = versionObj.skills;
-     version.addedBy = versionObj.addedBy;
-     version.addedOn = versionObj.addedOn;
-     version.updated = versionObj.updated;
+  let version = {};
+  version.name = versionObj.name;
+  version.description = versionObj.description || '';
+  // version.wave = versionObj.wave;
+  // version.members = versionObj..members;
+  version.skills = versionObj.skills;
+  version.addedBy = versionObj.addedBy;
+  version.addedOn = versionObj.addedOn;
+  version.updated = versionObj.updated;
 
-     let session = driver.session();
+  let session = driver.session();
 
-     let query  =
-       `
+  let query = `
        CREATE
        (version:${graphConsts.NODE_VERSION}
          {
@@ -530,26 +514,23 @@ let addCourse = function (CourseObj, successCB, errorCB) {
        MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
        `;
 
-     session.run(query)
-       .then(function(result) {
-         logger.debug('Result from the neo4j', result)
+  session.run(query).then(function(result) {
+    logger.debug('Result from the neo4j', result)
 
-         // Completed!
-         session.close();
-         successCB(versionObj);
-       })
-       .catch(function(err) {
-         errorCB(err);
-       });
-  };
+    // Completed!
+    session.close();
+    successCB(versionObj);
+  }).catch(function(err) {
+    errorCB(err);
+  });
+};
 
-  // deleting a product
-  let deleteProduct = function (productName, successCB, errorCB) {
+// deleting a product
+let deleteProduct = function(productName, successCB, errorCB) {
 
-     let session = driver.session();
+  let session = driver.session();
 
-     let query  =
-       `
+  let query = `
        MATCH (version:${graphConsts.NODE_VERSION})
        <-[:${graphConsts.REL_HAS}]-
        (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
@@ -557,47 +538,41 @@ let addCourse = function (CourseObj, successCB, errorCB) {
        DETACH DELETE product
        `;
 
-     session.run(query)
-       .then(function(result) {
-         logger.debug('Result from the neo4j', result)
+  session.run(query).then(function(result) {
+    logger.debug('Result from the neo4j', result)
 
-         // Completed!
-         session.close();
-         successCB(productName);
-       })
-       .catch(function(err) {
-         errorCB(err);
-       });
-  };
+    // Completed!
+    session.close();
+    successCB(productName);
+  }).catch(function(err) {
+    errorCB(err);
+  });
+};
 
-  // deleting a version
-  let deleteVersion = function (versionName, successCB, errorCB) {
+// deleting a version
+let deleteVersion = function(versionName, successCB, errorCB) {
 
-     let session = driver.session();
+  let session = driver.session();
 
-     let query  =
-       `
+  let query = `
        MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
        `;
 
-     session.run(query)
-       .then(function(result) {
-         logger.debug('Result from the neo4j', result)
+  session.run(query).then(function(result) {
+    logger.debug('Result from the neo4j', result)
 
-         // Completed!
-         session.close();
-         successCB(versionName);
-       })
-       .catch(function(err) {
-         errorCB(err);
-       });
-  };
+    // Completed!
+    session.close();
+    successCB(versionName);
+  }).catch(function(err) {
+    errorCB(err);
+  });
+};
 
-  let getProducts = function (successCB, errorCB) {
-    let session = driver.session();
+let getProducts = function(successCB, errorCB) {
+  let session = driver.session();
 
-    let query =
-    `
+  let query = `
     MATCH (product:${graphConsts.NODE_PRODUCT})
     -[:${graphConsts.REL_HAS}]-> (version:${graphConsts.NODE_VERSION})
     WITH COLLECT(version) AS versions, product AS product
@@ -619,31 +594,31 @@ let addCourse = function (CourseObj, successCB, errorCB) {
       product: product.name,
       description: product.description,
       version: versions
-    }
-    `;
+    }`;
 
-   session.run(query).then(function (resultObj, err) {
-     session.close();
-     if(err) {
-       errorCB('Error');
-     } else {
-       successCB(resultObj.records[0]._fields);
-      }
-     });
-  };
-// let getWave = function(waveID, successCB, errorCB) {
-//   logger.debug('In get Wave', waveID);
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+    if (err) {
+      errorCB('Error');
+    } else {
+      successCB(resultObj.records[0]._fields);
+    }
+  });
+};
+
+let getWave = function(waveID, successCB, errorCB) {
+  logger.debug('In get Wave', waveID);
+  let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      successCB(resultObj.records[0]._fields.properties);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
 // let getWaveIDs = function(successCB, errorCB) {
 //   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
 //   let session = driver.session();
@@ -656,18 +631,44 @@ let addCourse = function (CourseObj, successCB, errorCB) {
 //     }
 //   });
 // };
-// let getWaveSpecificCandidates = function(waveID, successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n.EmployeeName`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
+
+
+let getWaveIDs = function(successCB, errorCB) {
+  let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      let waves = []
+      resultObj.records.map(function(res) {
+        waves.push(res._fields[0])
+      })
+      successCB(waves);
+      logger.debug(waves);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
+let getWaveSpecificCandidates = function(waveID, successCB, errorCB) {
+  let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'}) RETURN n`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      let candidateName = []
+      resultObj.records.map(function(res) {
+        logger.debug(res._fields[0])
+        candidateName.push(res._fields[0].properties)
+      })
+      successCB(candidateName);
+      logger.debug(candidateName,"candidateName");
+    } else {
+      errorCB('Error');
+    }
+  });
+};
+
 // let getWaveObject = function(waveID, successCB, errorCB) {
 //   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
 //   let session = driver.session();
@@ -687,7 +688,7 @@ let getWaves = function(successCB, errorCB) {
     session.close();
     if (resultObj) {
       let waves = []
-      resultObj.records.map(function(res){
+      resultObj.records.map(function(res) {
         waves.push(res._fields[0].properties)
       })
       successCB(waves);
@@ -696,18 +697,7 @@ let getWaves = function(successCB, errorCB) {
     }
   });
 };
-// let getCadetsOfWave = function(waveID, successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
+
 // let updateWave = function(waveObj, successCB, errorCB) {
 //   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveObj.waveID}'
 //                SET n.WaveID = '${waveObj.WaveID}'
@@ -741,20 +731,20 @@ let getWaves = function(successCB, errorCB) {
 //     }
 //   });
 let addWave = function (waveObj, successCB, errorCB) {
-  	let userObj = {};
-    userObj.WaveID = waveObj.WaveID || '',
-    userObj.WaveNumber = waveObj.WaveNumber || '',
-    userObj.Mode = waveObj.Mode || '',
-    userObj.Location = waveObj.Location || '',
-    userObj.StartDate = waveObj.StartDate || '',
-    userObj.EndDate = waveObj.EndDate || '',
-    userObj.Sessions = waveObj.Sessions  || '',
-    userObj.Cadets = waveObj.Cadets || '',
-    userObj.Course = waveObj.Course || '';
+	let userObj = {};
+  userObj.WaveID = waveObj.WaveID || '',
+  userObj.WaveNumber = waveObj.WaveNumber || '',
+  userObj.Mode = waveObj.Mode || '',
+  userObj.Location = waveObj.Location || '',
+  userObj.StartDate = waveObj.StartDate || '',
+  userObj.EndDate = waveObj.EndDate || '',
+  userObj.Sessions = waveObj.Sessions  || '',
+  userObj.Cadets = waveObj.Cadets || '',
+  userObj.Course = waveObj.Course || '';
 
-    let session = driver.session();
+  let session = driver.session();
 
-    let query = `CREATE  (wave:${graphConsts.NODE_WAVE}
+  let query = `CREATE  (wave:${graphConsts.NODE_WAVE}
     	{
           WaveID: '${userObj.WaveID}',
           WaveNumber: '${userObj.WaveNumber}',
@@ -772,28 +762,28 @@ let addWave = function (waveObj, successCB, errorCB) {
         MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: empID})
         MERGE (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (wave)`;
 
-      session.run(query).then(function(result) {
-        logger.debug('Result from the neo4j', result)
-        session.close();
-        successCB(userObj);
-      }).catch(function(err) {
-        errorCB(err);
-      });
+  session.run(query).then(function(result) {
+    logger.debug('Result from the neo4j', result)
+    session.close();
+    successCB(userObj);
+  }).catch(function(err) {
+    errorCB(err);
+  });
+}
+let deleteWave = function(waveObj, successCB, errorCB) {
+  console.log(waveObj, "waveObj")
+  let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'}) DETACH DELETE n `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      logger.debug(resultObj)
+    } else {
+      errorCB('Error');
     }
-let deleteWave = function (waveObj, successCB, errorCB) {
-  console.log(waveObj,"waveObj")
-    let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'}) DETACH DELETE n `;
-    let session = driver.session();
-    session.run(query).then(function(resultObj) {
-      session.close();
-      if (resultObj) {
-        logger.debug(resultObj)
-      } else {
-        errorCB('Error');
-      }
-    });
-    successCB();
-  }
+  });
+  successCB();
+}
 // let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 //   let userObj={}
 //   cadets.map(function (cadet) {
@@ -840,6 +830,23 @@ let deleteWave = function (waveObj, successCB, errorCB) {
 //            });
 //     };
 
+/**********************************************
+************ Assessment Tracker *************
+**********************************************/
+
+let getAssessmentTrack = function (courseName, successCB, errorCB) {
+  let query = `match (n:${graphConsts.NODE_COURSE}{Name:'${courseName}'})-[:has]->(a:Assignment) return collect(a.Name)`;
+    let session = driver.session();
+       session.run(query).then(function (resultObj, err) {
+           session.close();
+  if(err) {
+			errorCB(err);
+		}
+    console.log(resultObj);
+    successCB(resultObj);
+	});
+};
+
   module.exports = {
     addCadet,
     updateCadet,
@@ -851,16 +858,19 @@ let deleteWave = function (waveObj, successCB, errorCB) {
     updateCourse,
     getWaves,
     addWave,
+    getWave,
     deleteWave,
+    getWaveSpecificCandidates,
+    getWaveIDs,
     addProduct,
     deleteAssignmentOrSchedule,
     deleteOrRestoreCourse,
     addVersion,
     deleteProduct,
     deleteVersion,
-    getProducts
+    getProducts,
+    getAssessmentTrack
   }
-  // getWave,
   // getWaveIDs,
   // getWaveSpecificCandidates,
   // getWaveObject,

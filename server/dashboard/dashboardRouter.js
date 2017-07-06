@@ -550,7 +550,8 @@ res.send(data);
 // get all candidates for specific wave
 router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardMongoController.getWaveSpecificCandidates(req.query.waveID, function (data) {
+    dashboardNeo4jController.getWaveSpecificCandidates(req.query.waveID, function (data) {
+      console.log(data,"data")
       res.status(201).json({data: data});
     }, function (err) {
       logger.error('Get Wave Specific Candidates Error: ', err);
@@ -852,7 +853,7 @@ get('/candidatesandtracks/:waveID/:courseName', auth.canAccess(CONFIG.MENTOR), f
   try{
     dashboardMongoController.getCandidates(req.params.waveID, req.params.courseName,
        function (candidates) {
-         dashboardMongoController.getAssesmentTrack(req.params.courseName,
+         dashboardNeo4jController.getAssessmentTrack(req.params.courseName,
            function (assessmentTrack) {
               res.status(201).json({
                 candidates: candidates,
@@ -884,7 +885,8 @@ get('/candidatesandtracks/:waveID/:courseName', auth.canAccess(CONFIG.MENTOR), f
 router.get('/waveids', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   logger.info('API HIT ===> GET WAVEIDS');
   try{
-    dashboardMongoController.getWaveIDs(function (waveids) {
+    dashboardNeo4jController.getWaveIDs(function (waveids) {
+      console.log(waveids,"waveids")
       res.status(201).json({waveids: waveids});
     }, function (err) {
       logger.error('Get All Wave IDs Error: ', err);
