@@ -65,8 +65,8 @@ export default class Attendance extends React.Component {
 
   waveDetails(waveid) {
     let th = this;
-    Request.get(`/dashboard/waveobject/${waveid}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      th.setState({waveObject: res.body.waveObject})
+    Request.get(`/dashboard/wave?waveid=${waveid}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      th.setState({waveObject: res.body})
     })
   }
 
@@ -158,7 +158,7 @@ export default class Attendance extends React.Component {
         )
       }
     }
-    console.log(th.state.cadetsOfWave);
+    console.log(th.state.waveObject);
     return (
       <div>
         <SelectField onChange={th.onWaveIdChange} floatingLabelText="Select WaveID" value={th.state.WaveId}>

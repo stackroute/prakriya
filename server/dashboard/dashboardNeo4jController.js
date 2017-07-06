@@ -617,7 +617,8 @@ let getWave = function(waveID, successCB, errorCB) {
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
-      successCB(resultObj.records[0]._fields.properties);
+      console.log(resultObj.records[0]._fields[0].properties);
+      successCB(resultObj.records[0]._fields[0].properties);
     } else {
       errorCB('Error');
     }
