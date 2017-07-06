@@ -5,6 +5,14 @@ const graphConsts = require('./../common/graphConstants');
 
 let driver = neo4jDriver.driver(config.NEO4J.neo4jURL, neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
+let deleteDanglingSkills = function() {
+  let query = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
+  let session = driver.session();
+  session.run(query).then(function(result, err) {
+    session.close();
+  });
+};
+
 /**********************************************
 ************ Candidate management *************
 **********************************************/
@@ -163,8 +171,6 @@ let getNewCadets = function(successCB, errorCB) {
       errorCB(err);
     })
 }
-
-
 
 /**********************************************
 ************** Course management **************
@@ -438,7 +444,7 @@ let addProduct = function(productObj, successCB, errorCB) {
   let version = {};
   version.name = productObj.version[0].name;
   version.description = productObj.version[0].description || '';
-  // version.wave = productObj.version[0].wave;
+  version.wave = productObj.version[0].wave || '';
   // version.members = productObj.version[0].members;
   version.skills = productObj.version[0].skills;
   version.addedBy = productObj.version[0].addedBy;
@@ -459,6 +465,7 @@ let addProduct = function(productObj, successCB, errorCB) {
        {
         name: '${version.name}',
         description: '${version.description}',
+        wave: '${version.wave}',
         addedOn: '${version.addedOn}',
         addedBy: '${version.addedBy}',
         updated: '${version.updated}'
@@ -489,7 +496,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   let version = {};
   version.name = versionObj.name;
   version.description = versionObj.description || '';
-  // version.wave = versionObj.wave;
+  version.wave = versionObj.wave || '';
   // version.members = versionObj..members;
   version.skills = versionObj.skills;
   version.addedBy = versionObj.addedBy;
@@ -504,6 +511,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
          {
            name: '${version.name}',
            description: '${version.description}',
+           wave: '${version.wave}',
            addedOn: '${version.addedOn}',
            addedBy: '${version.addedBy}',
            updated: '${version.updated}'
@@ -518,12 +526,13 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
        MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
        `;
 
-  session.run(query).then(function(result) {
-    logger.debug('Result from the neo4j', result)
-
-    // Completed!
+  session.run(query).then(function(result, err) {
     session.close();
-    successCB(versionObj);
+    if(err) {
+      errorCB(err);
+    } else {
+      successCB(versionObj);
+    }
   }).catch(function(err) {
     errorCB(err);
   });
@@ -542,12 +551,14 @@ let deleteProduct = function(productName, successCB, errorCB) {
        DETACH DELETE product
        `;
 
-  session.run(query).then(function(result) {
-    logger.debug('Result from the neo4j', result)
-
-    // Completed!
+  session.run(query).then(function(result, err) {
     session.close();
-    successCB(productName);
+    if(err) {
+      errorCB(err);
+    } else {
+      deleteDanglingSkills();
+      successCB(productName);
+    }
   }).catch(function(err) {
     errorCB(err);
   });
@@ -562,12 +573,14 @@ let deleteVersion = function(versionName, successCB, errorCB) {
        MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
        `;
 
-  session.run(query).then(function(result) {
-    logger.debug('Result from the neo4j', result)
-
-    // Completed!
+  session.run(query).then(function(result, err) {
     session.close();
-    successCB(versionName);
+    if(err) {
+      errorCB(err);
+    } else {
+      deleteDanglingSkills();
+      successCB(versionName);
+    }
   }).catch(function(err) {
     errorCB(err);
   });
@@ -605,8 +618,10 @@ let getProducts = function(successCB, errorCB) {
     if (err) {
       errorCB('Error');
     } else {
-      successCB(resultObj.records[0]._fields);
+      successCB(resultObj.records[0] ? resultObj.records[0]._fields : []);
     }
+  }).catch(function(err) {
+    errorCB(err);
   });
 };
 
