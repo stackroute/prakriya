@@ -83,19 +83,16 @@ export default class Waves extends React.Component {
 	getCadets() {
 		let th = this;
 		Request
-			.get('/dashboard/cadets')
+			.get('/dashboard/newcadets')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	let cadets = res.body.filter(function(cadet) {
-		    		if(cadet.Wave == undefined || cadet.Wave == '')
-		    			return cadet;
-		    	})
 		    	th.setState({
-		    		cadets: cadets
+		    		cadets: res.body
 		    	})
+		    	console.log('Cadets for wave', th.state.cadets);
 		    }
 		  })
 	}

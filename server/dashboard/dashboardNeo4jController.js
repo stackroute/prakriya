@@ -60,9 +60,6 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   		Remarks: '${cadet.Remarks}'
   	}) return n`;
   session.run(query).then(function(result) {
-    logger.debug('Result from the neo4j', result)
-
-    // Completed!
     session.close();
     successCB(cadetObj);
   }).catch(function(err) {
@@ -102,15 +99,14 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
       n.Remarks = '${cadet.Remarks}'
     return n`;
 
-  session.run(query).then(function(result) {
-    logger.debug('Result from the neo4j', result)
-
-    // Completed!
-    session.close();
-    successCB(cadetObj);
-  }).catch(function(err) {
-    errorCB(err);
-  });
+    session.run(query)
+    .then(function(result) {
+      session.close();
+      successCB(cadetObj);
+    })
+    .catch(function(err) {
+      errorCB(err);
+    });
 }
 
 // Update cadets
@@ -262,9 +258,9 @@ let updateCourse = function(CourseObj, edit, successCB, errorCB) {
         errorCB('Error');
       } else {
         let query1 = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
-        let session = driver.session();
-        session.run(query1).then(function(resultObj, err) {
-          session.close();
+        let session1 = driver.session();
+        session1.run(query1).then(function(resultObj, err) {
+          session1.close();
         });
         successCB('success');
       }
@@ -670,7 +666,7 @@ let getWaveIDs = function(successCB, errorCB) {
   });
 };
 let getWaveSpecificCandidates = function(waveID, successCB, errorCB) {
-  let query = `MATCH(n:${graphConsts.NODE_CANDIDATE}) WHERE n.Wave='${waveID}' RETURN n`;
+  let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'}) RETURN n`;
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
@@ -749,30 +745,37 @@ let getWaves = function(successCB, errorCB) {
 //       errorCB('Error');
 //     }
 //   });
-let addWave = function(waveObj, successCB, errorCB) {
-  let userObj = {};
+let addWave = function (waveObj, successCB, errorCB) {
+	let userObj = {};
   userObj.WaveID = waveObj.WaveID || '',
   userObj.WaveNumber = waveObj.WaveNumber || '',
+  userObj.Mode = waveObj.Mode || '',
   userObj.Location = waveObj.Location || '',
   userObj.StartDate = waveObj.StartDate || '',
   userObj.EndDate = waveObj.EndDate || '',
-  userObj.Sessions = waveObj.Sessions || '',
+  userObj.Sessions = waveObj.Sessions  || '',
   userObj.Cadets = waveObj.Cadets || '',
-  userObj.CourseNames = waveObj.CourseNames || ''
+  userObj.Course = waveObj.Course || '';
+
   let session = driver.session();
 
   let query = `CREATE  (wave:${graphConsts.NODE_WAVE}
     	{
           WaveID: '${userObj.WaveID}',
           WaveNumber: '${userObj.WaveNumber}',
+          Mode: '${userObj.Mode}',
           Location: '${userObj.Location}',
           StartDate: '${userObj.StartDate}',
           EndDate: '${userObj.EndDate}'
         })
         WITH wave AS wave
+        MATCH (course: ${graphConsts.NODE_COURSE}{ID: '${userObj.Course}'})
+        WITH wave AS wave, course AS course
+        MERGE (wave)-[:${graphConsts.REL_HAS}]->(course)
+        WITH wave AS wave
         UNWIND ${JSON.stringify(userObj.Cadets)} AS empID
         MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: empID})
-        MERGE (candidate) -[:BELONGSTO]-> (wave)`;
+        MERGE (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (wave)`;
 
   session.run(query).then(function(result) {
     logger.debug('Result from the neo4j', result)
@@ -870,6 +873,7 @@ let getAssessmentTrack = function (courseName, successCB, errorCB) {
     updateCourse,
     getWaves,
     addWave,
+    getWave,
     deleteWave,
     getWaveSpecificCandidates,
     getWaveIDs,

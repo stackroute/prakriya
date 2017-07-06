@@ -391,7 +391,7 @@ export default class WaveCard extends React.Component {
                 bodyStyle={dialog.body}
                 titleStyle={dialog.title}
 			        >
-              
+
 			        <Grid style={styles.grid}><Row>
 			        {
 			        	th.state.cadets.map(function(cadet,index){
