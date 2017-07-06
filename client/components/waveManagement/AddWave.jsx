@@ -101,7 +101,7 @@ export default class AddWave extends React.Component {
 
 	handleLocationChange(event, key, val) {
 		this.setState({
-			Location: val,
+			Location: val
 		})
 	}
 
@@ -327,7 +327,7 @@ export default class AddWave extends React.Component {
 		      >
 		        {
 		        	this.state.cadets.map(function(cadet, i) {
-		        		return (
+								return (
 		        			cadet.Selected != undefined &&
 		        			(cadet.Selected == 'Yes' ||
 									cadet.Selected == 'DS') &&
