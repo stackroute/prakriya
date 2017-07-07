@@ -14,11 +14,10 @@ let deleteDanglingSkills = function() {
 };
 
 /**********************************************
-************ Candidate management *************
+************ Candidate Management *************
 **********************************************/
 
-// Add cadet
-
+// adding cadet
 let addCadet = function(cadetObj, successCB, errorCB) {
 
   let cadet = {};
@@ -67,8 +66,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   });
 }
 
-// Update cadet
-
+// updating a cadet
 let updateCadet = function(cadetObj, successCB, errorCB) {
 
   let cadet = {};
@@ -109,8 +107,7 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
     });
 }
 
-// Update cadets
-
+// updating cadets
 let updateCadets = function(cadetArr, successCB, errorCB) {
   let count = 0;
   cadetArr.map(function(cadet) {
@@ -125,8 +122,7 @@ let updateCadets = function(cadetArr, successCB, errorCB) {
   })
 }
 
-// Get all the cadets
-
+// fetching all the cadets
 let getCadets = function(successCB, errorCB) {
   let session = driver.session();
   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
@@ -144,8 +140,7 @@ let getCadets = function(successCB, errorCB) {
   })
 }
 
-// Get all the new cadets
-
+// fetching all the new cadets
 let getNewCadets = function(successCB, errorCB) {
   let session = driver.session();
   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) WHERE NOT
@@ -169,10 +164,10 @@ let getNewCadets = function(successCB, errorCB) {
 }
 
 /**********************************************
-************** Course management **************
+************** Course Management **************
 **********************************************/
 
-// Course Management
+// adding a course
 let addCourse = function(CourseObj, successCB, errorCB) {
   logger.info(CourseObj);
   let query = `MERGE (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}',Name:'${CourseObj.Name}',
@@ -426,9 +421,10 @@ let deleteAssignmentOrSchedule = function(obj, course, type, successCB, errorCB)
     });
   }
 }
+
 /**********************************************
-  ************ Product Management *************
-  **********************************************/
+************ Product Management ***************
+**********************************************/
 
 // adding a new product
 let addProduct = function(productObj, successCB, errorCB) {
@@ -441,7 +437,9 @@ let addProduct = function(productObj, successCB, errorCB) {
   version.name = productObj.version[0].name;
   version.description = productObj.version[0].description || '';
   version.wave = productObj.version[0].wave || '';
-  // version.members = productObj.version[0].members;
+  version.members = productObj.version[0].members.map(function(member) {
+    return member.EmployeeName
+  });
   version.skills = productObj.version[0].skills;
   version.addedBy = productObj.version[0].addedBy;
   version.addedOn = productObj.version[0].addedOn;
@@ -467,10 +465,20 @@ let addProduct = function(productObj, successCB, errorCB) {
         updated: '${version.updated}'
        }
      )
-     WITH version AS version
+     WITH version AS version, product AS product
      UNWIND ${JSON.stringify(version.skills)} AS skillname
      MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
      MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
+     WITH version AS version, product AS product
+     UNWIND ${JSON.stringify(version.members)} AS employeeName
+     UNWIND ${JSON.stringify(version.skills)} AS skillname
+     MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+     MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
+     MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
+     WITH product AS product
+     UNWIND ${JSON.stringify(version.members)} AS employeeName
+     MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
+     MERGE (product) <-[:${graphConsts.REL_WORKEDON} {version: '${version.name}'}]- (employee)
      `;
 
   session.run(query).then(function(result) {
@@ -493,7 +501,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   version.name = versionObj.name;
   version.description = versionObj.description || '';
   version.wave = versionObj.wave || '';
-  // version.members = versionObj..members;
+  // version.members = versionObj.members;
   version.skills = versionObj.skills;
   version.addedBy = versionObj.addedBy;
   version.addedOn = versionObj.addedOn;
@@ -596,7 +604,7 @@ let getProducts = function(successCB, errorCB) {
     WITH COLLECT({
       name: version.name,
       description: version.description,
-      wave: 'WaveDummi',
+      wave: version.wave,
       members: [],
       skills: skills,
       addedBy: version.addedBy,

@@ -83,13 +83,9 @@ export default class ProjectCard extends React.Component {
       versionName.push(x.name);
     })
     this.setState({project: this.props.project, versionName: versionName})
-    console.log('Version Names', versionName)
-    console.log('ProjectObj from props', this.props.project);
   }
 
   componentWillReceiveProps(nextProps, nextState) {
-    console.log('-- card updated --')
-    console.log(nextProps)
     let versionNames = [];
     nextProps.project.version.map(function(x, i) {
       versionNames.push(x.name);
