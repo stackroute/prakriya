@@ -257,7 +257,8 @@ export default class AddWave extends React.Component {
 		        >
 		        	{
 		        		this.state.courses.map(function(course, i) {
-		        			return <MenuItem key={i} value={course.ID} primaryText={course.ID}/>
+		        			if(th.state.Mode == course.Mode)
+		        				return <MenuItem key={i} value={course.ID} primaryText={course.ID}/>
 		        		})
 		        	}
 		        </SelectField>
@@ -327,8 +328,7 @@ export default class AddWave extends React.Component {
 		      >
 		        {
 		        	this.state.cadets.map(function(cadet, i) {
-								return (
-		        			cadet.Selected != undefined &&
+		        		return (
 		        			(cadet.Selected == 'Yes' ||
 									cadet.Selected == 'DS') &&
 		        			<MenuItem
