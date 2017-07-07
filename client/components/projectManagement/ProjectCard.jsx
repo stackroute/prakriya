@@ -87,6 +87,16 @@ export default class ProjectCard extends React.Component {
     console.log('ProjectObj from props', this.props.project);
   }
 
+  componentWillReceiveProps(nextProps, nextState) {
+    console.log('-- card updated --')
+    console.log(nextProps)
+    let versionNames = [];
+    nextProps.project.version.map(function(x, i) {
+      versionNames.push(x.name);
+    })
+    this.setState({project: nextProps.project, versionName: versionNames})
+  }
+
   getCadets(name) {
     let th = this;
     Request.post('/dashboard/cadetsofproj').set({'Authorization': localStorage.getItem('token')}).send({name: name}).end(function(err, res) {
@@ -196,7 +206,7 @@ export default class ProjectCard extends React.Component {
             return <MenuItem key={key} value={val} primaryText={val} onTouchTap={(e)=>th.onVersionChange(key, val)}/>
         })
       }
-        <MenuItem value='Add new version' primaryText='Add new Version' onClick={th.newVersion}/>
+        <MenuItem value='Add new version' primaryText='Add New Version' onClick={th.newVersion}/>
     </IconMenu></span>)
     return (
       <div>

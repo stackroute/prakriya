@@ -30,11 +30,7 @@ export default class Projects extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			projects:{
-				product: " ",
-				description: " ",
-				version:[]
-			}
+			projects: []
 		}
 		this.getProjects = this.getProjects.bind(this)
 		this.addProject = this.addProject.bind(this)
@@ -44,27 +40,25 @@ export default class Projects extends React.Component {
 	}
 	componentWillMount() {
 		 this.getProjects()
-
 	}
 
 	getProjects() {
-		console.log("inside getproj in proj")
     let th = this
 		Request
 			.get('/dashboard/projects')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
-				console.log("success")
 				if(err)
 		    	console.log(err,"err");
 		    else {
-					console.log('Successfully fetched all projects -- ', res.body)
+					console.log('fetched all projects from db -- ', res.body);
 		    	th.setState({
 		    		projects: res.body
 		    	})
 		    }
 			})
 	}
+	
 	addProject(project) {
 		console.log("addproj n projects",project)
 		let th = this;
@@ -76,9 +70,9 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully added a project')
 		    	let projects = th.state.projects;
-		    	projects.push(res.body);
+		    	projects.push(project);
+					console.log('project addition successfull -- ', projects)
 		    	th.setState({
 		    		projects: projects
 		    	})
@@ -96,9 +90,9 @@ export default class Projects extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully added a version')
+		    	console.log('version addition successfull')
 		    	th.getProjects();
-		    	}
+		    }
 			})
 	}
 
