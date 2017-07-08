@@ -426,6 +426,20 @@ let deleteAssignmentOrSchedule = function(obj, course, type, successCB, errorCB)
     });
   }
 }
+
+let getCourse = function (courseID, successCB, errorCB) {
+  let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${courseID}'})<-[:${graphConsts.REL_HAS}]-(w:${graphConsts.NODE_WAVE}) return c;`
+  let session = driver.session();
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+  if (err) {
+			errorCB(err);
+		}
+    console.log(resultObj.records[0]._fields[0].properties);
+		successCB(resultObj.records[0]._fields[0].properties);
+	});
+};
+
 /**********************************************
   ************ Product Management *************
   **********************************************/
@@ -735,17 +749,6 @@ let getWaves = function(successCB, errorCB) {
 //     }
 //   });
 // };
-// let getCoursesForWave = function(waveID, successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n.CourseNames`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
 let addWave = function (waveObj, successCB, errorCB) {
 	let userObj = {};
   userObj.WaveID = waveObj.WaveID || '',
@@ -850,16 +853,22 @@ let deleteWave = function(waveObj, successCB, errorCB) {
 ************ Assessment Tracker *************
 **********************************************/
 
-let getAssessmentTrack = function (courseName, successCB, errorCB) {
-  let query = `match (n:${graphConsts.NODE_COURSE}{Name:'${courseName}'})-[:has]->(a:Assignment) return collect(a.Name)`;
+let getAssessmentTrack =  function(waveID, successCB, errorCB) {
+  console.log('here');
+  let query = `MATCH (a:${graphConsts.NODE_ASSIGNMENT})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE})<-[:${graphConsts.REL_HAS}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'}) return COLLECT(a)`;
     let session = driver.session();
        session.run(query).then(function (resultObj, err) {
            session.close();
   if(err) {
 			errorCB(err);
 		}
-    console.log(resultObj);
-    successCB(resultObj);
+    console.log(resultObj.records[0]._fields[0][0].properties);
+    let assessment = [];
+    resultObj.records[0]._fields[0].map(function (record) {
+      assessment.push(record.properties)
+    })
+    console.log(assessment);
+    successCB(assessment);
 	});
 };
 

@@ -832,8 +832,9 @@ router.get('/course/:courseID', auth.canAccess(CONFIG.ADMMEN), function (req, re
 // Get all courses for specific wave
 router.get('/coursesforwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardMongoController.getCoursesForWave(req.query.waveID, function (data) {
-      res.status(201).json({courses: data.Course});
+    console.log(req.query.waveid);
+    dashboardNeo4jController.getAssessmentTrack(req.query.waveid, function (data) {
+      res.status(201).json({data: data});
     }, function (err) {
       logger.error('Get Courses For Wave Error: ', err);
       res.status(500).json({error: 'Cannot get course for specific wave from db...!'});
@@ -851,7 +852,7 @@ router.
 get('/candidatesandtracks/:waveID/:courseName', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   logger.info('API HIT ===> GET Candidates And Tracks');
   try{
-    dashboardMongoController.getCandidates(req.params.waveID, req.params.courseName,
+    dashboardNeo4jController.getWaveSpecificCandidates(req.params.waveID,
        function (candidates) {
          dashboardNeo4jController.getAssessmentTrack(req.params.courseName,
            function (assessmentTrack) {

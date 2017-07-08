@@ -7,6 +7,7 @@ import TrackItem from './TrackItem.jsx';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import app from '../../styles/app.json';
+import RaisedButton from 'material-ui/RaisedButton';
 import {
   Table,
   TableBody,
@@ -27,13 +28,11 @@ export default class AssessmentTracker extends React.Component {
 			cadetsOfWave: [],
 			assessment: '',
 			select: false,
-			course: {},
-			implement: 'Understands and implements very well',
-			complete: 'Completed with no help',
-			learn: 'High',
+			Assignments: [],
 			implementation: ['Understands and implements very well','Understands and implements ok', 'Understands but finds it difficult to implement','Do not understand and is not able to implement'],
 			completion: ['Completed with no help','Completed with minimal help','Completed with lots of help and review','Was not able to solve the problem'],
-			learning: ['High', 'Medium', 'Low']
+			learning: ['High', 'Medium', 'Low'],
+      cadetsResult: []
 		}
 
 		this.getWaveIDs = this.getWaveIDs.bind(this)
@@ -43,6 +42,7 @@ export default class AssessmentTracker extends React.Component {
     this.onImplementChange = this.onImplementChange.bind(this);
     this.onCompleteChange = this.onCompleteChange.bind(this);
     this.onLearnChange = this.onLearnChange.bind(this);
+    this.save = this.save.bind(this);
 	}
 
 	componentWillMount() {
@@ -69,8 +69,8 @@ export default class AssessmentTracker extends React.Component {
 			wave: e.target.outerText,
 			assessment: ''
 		})
-		console.log(e.target.outerText)
 		this.getWave(e.target.outerText);
+    this.getCourse(e.target.outerText);
 		this.getCadetsOfWave(e.target.outerText);
 	}
 
@@ -79,32 +79,39 @@ export default class AssessmentTracker extends React.Component {
 		th.setState({
 			assessment: e.target.outerText
 		})
-		console.log(e.target.outerText)
 	}
 
-		onImplementChange(e) {
+		onImplementChange(value, index) {
 			let th = this
-			th.setState({
-				implement: e.target.outerText
-			})
-			console.log(e.target.outerText)
+      let cadetsResult = th.state.cadetsResult;
+      cadetsResult[index].implement = value
+  		th.setState({
+  			cadetsResult: cadetsResult
+  		})
 		}
 
-			onCompleteChange(e) {
+			onCompleteChange(value, index) {
 				let th = this
-				th.setState({
-					complete: e.target.outerText
-				})
-				console.log(e.target.outerText)
+        let cadetsResult = th.state.cadetsResult;
+        cadetsResult[index].complete = value
+    		th.setState({
+    			cadetsResult: cadetsResult
+    		})
 			}
 
-				onLearnChange(e) {
+				onLearnChange(e, position, value) {
 					let th = this
-					th.setState({
-						learn: e.target.outerText
-					})
-					console.log(e.target.outerText)
+          let cadetsResult = th.state.cadetsResult;
+          cadetsResult[index].learn = value
+      		th.setState({
+      			cadetsResult: cadetsResult
+      		})
 				}
+
+        save() {
+          let th = this;
+          console.log(th.state.cadetsResult);
+        }
 
 	getWave(waveID) {
 		let th = this
@@ -112,23 +119,20 @@ export default class AssessmentTracker extends React.Component {
 			.get(`/dashboard/wave?waveid=${waveID}`)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
-				console.log(res.body);
 				th.setState({
 					waveCadets: res.body
 				})
-				th.getCourse(res.body.Course);
 			})
 	}
 
-	getCourse(course) {
+	getCourse(waveID) {
 		let th = this
 		Request
-			.get(`/mentor/course/${course}`)
+			.get(`/dashboard/coursesforwave?waveid=${waveID}`)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
-				console.log('getCourse Object: ', res.body[0])
 				th.setState({
-					course: res.body[0],
+					Assignments: res.body.data,
 					select: true
 				})
 			})
@@ -139,7 +143,17 @@ export default class AssessmentTracker extends React.Component {
     let candidateName = [];
     let candidateID = [];
     Request.get('/dashboard/wavespecificcandidates?waveID=' + waveID).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      th.setState({cadetsOfWave: res.body.data})
+      let cadetsResult = [];
+      res.body.data.map(function(candidate){
+        cadetsResult.push({
+          EmployeeID:candidate.EmployeeID,
+          implement: 'Understands and implements very well',
+    			complete: 'Completed with no help',
+    			learn: 'High'
+        });
+      })
+      th.setState({cadetsOfWave: res.body.data,
+      cadetsResult:cadetsResult})
     })
 	}
 
@@ -168,14 +182,15 @@ export default class AssessmentTracker extends React.Component {
 							value={th.state.assessment}
 						>
 							{
-								th.state.select && th.state.course.Assignments.map(function(val, key) {
+								th.state.select && th.state.Assignments.map(function(val, key) {
 									return <MenuItem key={key} value={val.Name} primaryText={val.Name} />
 								})
 							}
 						</SelectField>
 						</Paper></Col>
-					</Row></Grid>
-						<Table>
+          </Row>
+          </Grid>
+						<Table width='100%'>
 							<TableHeader displaySelectAll={false} adjustForCheckbox={false}>
 								<TableHeaderColumn style = {{width:'70px'}}>Cadet ID</TableHeaderColumn>
 								<TableHeaderColumn style = {{width:'150px'}}>Cadet Name</TableHeaderColumn>
@@ -185,29 +200,33 @@ export default class AssessmentTracker extends React.Component {
 							</TableHeader>
 							<TableBody displayRowCheckbox={false} showRowHover={false}>
 								{
-									th.state.assessment && th.state.cadetsOfWave.map(function(cadet){
-										return (<TableRow>
+									th.state.assessment && th.state.cadetsOfWave.map(function(cadet, index){
+                    return (<TableRow>
 															<TableRowColumn style = {{width:'70px'}}>{cadet.EmployeeID}</TableRowColumn>
 															<TableRowColumn style = {{width:'150px'}}>{cadet.EmployeeName}</TableRowColumn>
 															<TableRowColumn style = {{width:'350px'}}>
 																<SelectField
-																	onChange={th.onImplementChange}
+																	onChange={
+                                    (event, key, val) => th.onImplementChange(val, index)
+                                  }
 																	floatingLabelText="Select Assessment"
-																	value={th.state.implement}
+																	value={th.state.cadetsResult[index].implement}
                                    fullWidth='true'
 																>
 																	{
 																		th.state.implementation.map(function(implement, key) {
-																			return <MenuItem key={key} value={implement} primaryText={implement}/>
+                                      return <MenuItem key={key} value={implement} primaryText={implement}/>
 																		})
 																	}
 																</SelectField>
 															</TableRowColumn>
 														<TableRowColumn style = {{width:'350px'}}>
 															<SelectField
-																onChange={th.onCompleteChange}
+																onChange={
+                                (event, key, val) => th.onCompleteChange(val, index)
+                              }
 																floatingLabelText="Select Assessment"
-																value={th.state.complete}
+																value={th.state.cadetsResult[index].complete}
                                 fullWidth='true'
 															>
 																{
@@ -219,9 +238,11 @@ export default class AssessmentTracker extends React.Component {
 														</TableRowColumn>
 													<TableRowColumn>
 															<SelectField
-																onChange={th.onLearnChange}
+																onChange={
+                                (event, key, val) => th.onLearnChange(val, index)
+                              }
 																floatingLabelText="Select learning"
-																value={th.state.learn}
+																value={th.state.cadetsResult[index].learn}
 															>
 																{
 																	th.state.learning.map(function(learn, key) {
@@ -235,6 +256,7 @@ export default class AssessmentTracker extends React.Component {
 								}
 							</TableBody>
 						</Table>
+            <RaisedButton label="Save" primary={true} onClick={th.save}/>
 			</div>
 		)
 	}
