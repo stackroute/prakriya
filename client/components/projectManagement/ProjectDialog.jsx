@@ -261,7 +261,6 @@ export default class ProjectDialog extends React.Component {
 	handleClose(e, action) {
 		if(action == 'CLOSE') {
 			if(this.props.dialogTitle == 'ADD PRODUCT') {
-				console.log("addproduct")
 				this.setState({
 					showDialog: false,
 					projectName: '',
@@ -271,7 +270,9 @@ export default class ProjectDialog extends React.Component {
 					projectNameErrorText: '',
 					projectDescErrorText: '',
 					waveErrorText: '',
-					skillsErrorText: ''
+					skillsErrorText: '',
+					skills: [],
+					candidateList: []
 				})
 			} else if(this.props.dialogTitle == 'EDIT PRODUCT') {
 				this.setState({
@@ -548,7 +549,6 @@ export default class ProjectDialog extends React.Component {
 				actionsContainerStyle={styles.actionsContainer}
         open={this.state.showDialog}
         autoScrollBodyContent={true}
-        onRequestClose={(e)=>{this.handleClose(e, 'CLOSE')}}
       >
 				<div>
 				 <TextField

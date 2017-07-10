@@ -614,12 +614,14 @@ let getProducts = function(successCB, errorCB) {
     UNWIND versions AS version
     MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
     -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE}) -[:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
+    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product,
+    COLLECT ({EmployeeID: candidate.EmployeeID, EmployeeName: candidate.EmployeeName}) AS candidates
     WITH COLLECT({
       name: version.name,
       description: version.description,
       wave: version.wave,
-      members: [],
+      members: candidates,
       skills: skills,
       addedBy: version.addedBy,
       addedOn: version.addedOn,
