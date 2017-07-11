@@ -583,25 +583,6 @@ res.send(data);
 *******          Attendance         ********
 ****************************************************/
 
-// get all candidates for specific wave
-router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
-  try{
-    dashboardNeo4jController.getWaveSpecificCandidates(req.query.waveID, function (data) {
-      console.log(data,"data")
-      res.status(201).json({data: data});
-    }, function (err) {
-      logger.error('Get Wave Specific Candidates Error: ', err);
-      res.status(500).json({error: 'Cannot get all candidate for specific wave from db...!'});
-    });
-  } catch(err) {
-    logger.error('Get Wave Specific Candidates Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
-
-// get all candidates for specific wave
 router.get('/getwaveofcadet', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     dashboardNeo4jController.getWaveOfCadet(req.user.email, function (data) {
@@ -1083,7 +1064,7 @@ router.get('/waves', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 });
 
 // Get all cadets of a particular wave
-router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
     dashboardNeo4jController.getCadetsOfWave(req.body.waveid, function (cadets) {
       res.status(201).json(cadets);

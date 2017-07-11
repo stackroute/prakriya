@@ -175,22 +175,21 @@ export default class ProjectDialog extends React.Component {
 			let candidateName = []
 			let candidateID = []
 			Request
-				.get('/dashboard/wavespecificcandidates?waveID='+waveID)
+				.post('/dashboard/cadetsofwave')
 				.set({'Authorization': localStorage.getItem('token')})
+				.send({waveid: waveID})
 				.end(function(err, res){
-					console.log('candidates: ', res)
-				res.body.data.map(function(candidate,index) {
-					candidateList.push(candidate)
-					candidateName.push(candidate.EmployeeName)
-					candidateID.push(candidate.EmployeeID)
+					res.body.map(function(candidate,index) {
+						candidateList.push(candidate)
+						candidateName.push(candidate.EmployeeName)
+						candidateID.push(candidate.EmployeeID)
+					})
+					th.setState({
+						candidates: candidateList,
+						candidatesName: candidateName
+					})
 				})
-				th.setState({
-					candidates: candidateList,
-					candidatesName: candidateName
-				})
-			})
 	}
-
 
 	handleControlDelete(perm) {
 		console.log(perm,"cntrlDelete")
