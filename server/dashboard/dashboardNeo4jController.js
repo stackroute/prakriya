@@ -36,7 +36,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   cadet.PrimarySupervisor = cadetObj.PrimarySupervisor || '';
   cadet.ProjectSupervisor = cadetObj.ProjectSupervisor || '';
   cadet.Selected = cadetObj.Selected || '';
-  cadet.Remarks = cadetObj.Remarks || '';
+  cadet.Remarks = cadetObj.Remarks || ''
 
   let session = driver.session();
 
@@ -135,6 +135,19 @@ let getCadets = function(successCB, errorCB) {
       cadets.push(result._fields[0].properties);
     }
     successCB(cadets);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
+// fetching candidate logged in
+let getCadet = function(email, successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w: '${graphConsts.NODE_WAVE}') return n`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    console.log('done');
+    successCB(resultObj.records[0]._fields[0].properties);
   }).catch(function(err) {
     errorCB(err);
   })
@@ -430,11 +443,9 @@ let getCourse = function (courseID, successCB, errorCB) {
   if (err) {
 			errorCB(err);
 		}
-    console.log(resultObj.records[0]._fields[0].properties);
-		successCB(resultObj.records[0]._fields[0].properties);
+    successCB(resultObj.records[0]._fields[0].properties);
 	});
 };
-
 
 /**********************************************
 ************ Product Management ***************
@@ -650,7 +661,6 @@ let getWave = function(waveID, successCB, errorCB) {
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
-      console.log(resultObj.records[0]._fields[0].properties);
       successCB(resultObj.records[0]._fields[0].properties);
     } else {
       errorCB('Error');
@@ -862,7 +872,6 @@ let deleteWave = function(waveObj, successCB, errorCB) {
 **********************************************/
 
 let getAssessmentTrack =  function(waveID, successCB, errorCB) {
-  console.log('here');
   let query = `MATCH (a:${graphConsts.NODE_ASSIGNMENT})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE})<-[:${graphConsts.REL_HAS}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'}) return COLLECT(a)`;
     let session = driver.session();
        session.run(query).then(function (resultObj, err) {
@@ -870,21 +879,72 @@ let getAssessmentTrack =  function(waveID, successCB, errorCB) {
   if(err) {
 			errorCB(err);
 		}
-    console.log(resultObj.records[0]._fields[0][0].properties);
     let assessment = [];
     resultObj.records[0]._fields[0].map(function (record) {
       assessment.push(record.properties)
     })
-    console.log(assessment);
     successCB(assessment);
 	});
 };
+
+let mapAssessmentTrack = function (assessments, update, successCB, errorCB) {
+  if(update) {
+    assessments.map(function (assessment) {
+    let query = `
+      MATCH (a:${graphConsts.NODE_ASSIGNMENT}{Name:'${assessment.assignment}'})<-[r:${graphConsts.REL_WORKEDON}]-(c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${assessment.EmpID}'})
+      set r.implement='${assessment.remarks.implement}',
+      r.complete='${assessment.remarks.complete}',
+      r.learn = '${assessment.remarks.learn}'`
+      let session = driver.session();
+         session.run(query).then(function (resultObj, err) {
+             session.close();
+           })
+  }, successCB())
+  } else {
+    assessments.map(function (assessment) {
+    let query = `
+      MATCH (a:${graphConsts.NODE_ASSIGNMENT}{Name:'${assessment.assignment}'}),(c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${assessment.EmpID}'})
+      MERGE (a)<-[:${graphConsts.REL_WORKEDON}{implement:'${assessment.remarks.implement}',complete:'${assessment.remarks.complete}',learn:'${assessment.remarks.learn}'}]-(c)`
+      let session = driver.session();
+         session.run(query).then(function (resultObj, err) {
+             session.close();
+           })
+  }, successCB())
+  }
+}
+
+let assessmentsandcandidates = function(waveID, assessment, successCB, errorCB) {
+  let query = `
+    MATCH (n:${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'})
+    with collect(n) as n
+    unwind n as cadet
+    OPTIONAL MATCH (cadet)-[r:${graphConsts.REL_WORKEDON}]-(a:${graphConsts.NODE_ASSIGNMENT}{Name:'${assessment}'})
+    RETURN {cadet:cadet, assignment:r}`
+    let session = driver.session();
+    let candidates = [];
+       session.run(query).then(function (resultObj, err) {
+           session.close();
+           resultObj.records.map(function (res) {
+             let assignment = null;
+             if(res._fields[0].assignment != null) {
+               assignment= res._fields[0].assignment.properties
+             }
+             let detail = {
+               cadet: res._fields[0].cadet.properties,
+               assignment: assignment
+              }
+              candidates.push(detail);
+           })
+           successCB(candidates)
+         });
+}
 
   module.exports = {
     addCadet,
     updateCadet,
     updateCadets,
     getCadets,
+    getCadet,
     getNewCadets,
     addCourse,
     getCourses,
@@ -902,7 +962,9 @@ let getAssessmentTrack =  function(waveID, successCB, errorCB) {
     deleteProduct,
     deleteVersion,
     getProducts,
-    getAssessmentTrack
+    getAssessmentTrack,
+    mapAssessmentTrack,
+    assessmentsandcandidates
   }
   // getWaveIDs,
   // getWaveSpecificCandidates,

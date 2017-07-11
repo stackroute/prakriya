@@ -534,8 +534,10 @@ let saveCandidate = function (candidate, successCB, errorCB) {
 	let newCadet = new CandidateModel(candidate);
 	newCadet.save(function (err, result) {
 		if(err) {
+			console.log(err);
 			errorCB(err);
 		}
+		console.log(result);
 		successCB(result);
 	});
 };
@@ -576,7 +578,7 @@ let getCandidates = function (waveID, courseName, successCB, errorCB) {
 	});
 };
 
-let getAssessmentTrack = function (courseName, successCB, errorCB) {
+let getAssesmentTrack = function (courseName, successCB, errorCB) {
 	CourseModel.findOne({CourseName: courseName}, 'AssessmentCategories', function (err, result) {
 		if(err) {
 			errorCB(err);
@@ -802,7 +804,7 @@ module.exports = {
 	getCourse,
 	getCoursesForWave,
 	getCandidates,
-	getAssessmentTrack,
+	getAssesmentTrack,
 	getWaveObject,
 	changePassword,
 	addNotification,
