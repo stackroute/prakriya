@@ -92,7 +92,6 @@ export default class ProjectDialog extends React.Component {
 			candidatesName: [] ,
 			candidateIDList: [] ,
 			candidateDelList: [],
-			prevWave: '',
 			project: {}
 		}
 		this.getWaveIDs = this.getWaveIDs.bind(this)
@@ -134,7 +133,6 @@ export default class ProjectDialog extends React.Component {
 				candidateList:candidateList,
 				candidateIDList:candidateIDList,
 				wave: this.props.project.version[th.props.version].wave,
-				prevWave: this.props.project.version[th.props.version].wave,
 				skills: this.props.project.version[th.props.version].skills,
 				showDialog: this.props.openDialog
 			})
@@ -426,24 +424,18 @@ export default class ProjectDialog extends React.Component {
 	}
 
 	handleUpdate() {
-		console.log("inside handleUpdate",this.state.candidateList)
-		let prevWave = '';
-		if(this.state.prevWave !== this.state.wave)
-		{
-			prevWave = this.state.prevWave
-		}
-		let project = this.state.project;
-		let th = this
-		project.version[th.props.version].members = [];
-			this.state.candidateList.map(function(name, index){
-				project.version[th.props.version].members.push({EmployeeName:name,EmployeeID:th.state.candidateIDList[index]})
-			})
-		console.log(project.version[th.props.version].members,"members in handleupdate");
-		project.product= this.state.projectName;
-		project.version[th.props.version].name = this.state.versionName;
-		project.version[th.props.version].description = this.state.projectDesc;
-		project.version[th.props.version].wave = this.state.wave;
-		project.version[th.props.version].skills = this.state.skills;
+		let th = this;
+		console.log('upadate:: ', th.props.version);
+		console.log(this.state.project.version[th.props.version]);
+		let version = this.state.project.version[th.props.version];
+		version.members = [];
+		this.state.candidateList.map(function(name, index){
+			version.members.push({EmployeeName: name, EmployeeID: th.state.candidateIDList[index]})
+		})
+		version.name = this.state.versionName;
+		version.description = this.state.projectDesc;
+		version.wave = this.state.wave;
+		version.skills = this.state.skills;
 		this.setState({
 			projectName: '',
 			projectDesc: '',
@@ -451,15 +443,8 @@ export default class ProjectDialog extends React.Component {
 			wave: '',
 			skills: []
 		})
-		let projObj = {
-			project: project,
-			delList: this.state.candidateDelList,
-			prevWave: prevWave,
-			version: th.props.version
-		}
-		this.props.handleUpdate(projObj);
+		this.props.handleUpdate(version);
 		this.props.handleClose();
-		console.log(projObj,"projobj in handleupdt")
 	}
 
 	validationSuccess() {

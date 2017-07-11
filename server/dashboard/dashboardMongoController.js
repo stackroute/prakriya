@@ -153,75 +153,6 @@ let getActiveWaves = function (successCB, errorCB) {
 *******              Projects                ********
 ****************************************************/
 
-let getProjects = function (successCB, errorCB) {
-	ProjectModel.find({}, function (err, result) {
-		if (err) {
-			errorCB(err);
-		}
-		successCB(result);
-	});
-};
-
-let addProject = function (projectObj, successCB, errorCB) {
-	let saveProject = new ProjectModel(projectObj);
-	let length = projectObj.version.length;
-	saveProject.save(function (err, result) {
-		if(err) {
-				errorCB(err);
-		} else {
-			projectObj.version[length - 1].members.map(function (member) {
-				CandidateModel.
-				update(
-					{EmployeeID: member.EmployeeID},
-					{$set:
-						{
-							ProjectName: projectObj.version[length - 1].name,
-							ProjectDescription: projectObj.version[length - 1].description,
-							ProjectSkills: projectObj.version[length - 1].skills
-						}
-					},
-					function (updateError, updateResult) {
-						if(updateError) {
-							errorCB(updateError);
-						}
-						logger.info('Update Result: ', updateResult);
-					}
-				);
-			},
-					successCB(result));
-		}
-	});
-};
-
-let addVersion = function (name, versionObj, successCB, errorCB) {
-	ProjectModel.update({product: name}, {$push: {version: versionObj}}, function (err, result) {
-		if(err) {
-			errorCB(err);
-		} else {
-			versionObj.members.map(function (member) {
-				CandidateModel.
-				update(
-					{EmployeeID: member.EmployeeID},
-					{$set:
-						{
-							ProjectName: versionObj.name,
-							ProjectDescription: versionObj.description,
-							ProjectSkills: versionObj.skills
-						}
-					},
-					function (updateError2, updateResult2) {
-						if(err) {
-							errorCB(err);
-						}
-						logger.info('Update Result2: ', updateResult2);
-					}
-				);
-			},
-			successCB(result));
-		}
-	});
-};
-
 let updateProject = function (projectObj, delList, prevWave, version, successCB, errorCB) {
 	let proj = projectObj.version[version];
 	ProjectModel.
@@ -279,65 +210,6 @@ let updateProject = function (projectObj, delList, prevWave, version, successCB,
 				)
 			);
 		}
-	});
-};
-
-let deleteVersion = function (versionObj, successCB, errorCB) {
-	ProjectModel.update(
-		{version: {$elemMatch: {name: versionObj.name}}},
-		{$pull: {version: {name: versionObj.name}}},
-		function (err, result) {
-		if(err) {
-			logger.error('Project Update Error: ', err);
-			logger.error('Result: ', result);
-		} else {
-			CandidateModel.
-			updateMany(
-				{ProjectName: versionObj.name},
-				{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
-				function (updateManyError3, updateManyResult3) {
-					if(updateManyError3) {
-						errorCB(updateManyError3);
-					}
-					successCB(updateManyResult3);
-				});
-		}
-	});
-};
-
-let deleteProject = function (projectObj, successCB, errorCB) {
-	ProjectModel.remove({product: projectObj.product}, function (err, result) {
-		if(err) {
-			logger.error('Prject Delete Error: ', err);
-		} else {
-			projectObj.version.map(function (version) {
-				CandidateModel.
-				updateMany(
-					{ProjectName: version.name},
-					{$set:
-						{
-							ProjectName: '',
-							ProjectDescription: '',
-							ProjectSkills: []
-						}
-					},
-					function (updateManyError4, updateManyResult4) {
-						if(updateManyError4) {
-							errorCB(updateManyError4);
-						}
-						logger.info('Update ManyResult4: ', updateManyResult4);
-					});
-			}, successCB(result));
-		}
-	});
-};
-
-let getCadetsOfProj = function (name, successCB, errorCB) {
-	CandidateModel.find({ProjectName: name}, function (err, result) {
-		if (err) {
-			errorCB(err);
-		}
-		successCB(result);
 	});
 };
 
@@ -782,11 +654,6 @@ module.exports = {
 	getWave,
 	getCadet,
 	getCadets,
-	getProjects,
-	addProject,
-	addVersion,
-	deleteProject,
-	deleteVersion,
 	updateProject,
 	getFiles,
 	updateCadet,
@@ -813,7 +680,6 @@ module.exports = {
 	deleteWave,
 	getActiveWaves,
 	updateWave,
-	getCadetsOfProj,
 	updateCadetWave,
 	getUserRole,
 	getAbsentees,

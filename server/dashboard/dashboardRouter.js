@@ -243,15 +243,12 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 // update a project
 router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
-    let projectObj = req.body.project;
-    projectObj.version[req.body.version].addedBy = req.user.name;
-    projectObj.version[req.body.version].updatedBy = true;
-    dashboardMongoController.
-    updateProject(
-      projectObj,
-      req.body.delList,
-      req.body.prevWave,
-      req.body.version,
+    let version = req.body;
+    version.addedBy = req.user.name;
+    version.updatedBy = true;
+    dashboardNeo4jController.
+    updateVersion(
+      version,
       function (project) {
         res.status(201).json(project);
       },
