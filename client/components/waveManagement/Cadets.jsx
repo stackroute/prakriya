@@ -31,7 +31,7 @@ export default class CandidateCard extends React.Component {
 			.query({q: eid})
 			.end(function(err, res) {
 				if(err)
-		    	console.log(err);
+		    	console.log('Image not found for ', eid);
 		    else {
 		    	if(res.text) {
 		    		let array = new Uint8Array(res.text.length);

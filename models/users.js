@@ -9,7 +9,15 @@ var users = new Schema({
     role: String,
     lastLogin: Date,
     actions: [String],
-		notifications: [String]
+		notifications: [String],
+		DaysPresent: [Date],
+		DaysAbsent: [{
+			fromDate: {type:Date, unique:true},
+			toDate: {type:Date, unique:true},
+			approved: String,
+			leaveType: String,
+			reason: String
+		}]
 });
 
 module.exports = mongoose.model('Users', users);

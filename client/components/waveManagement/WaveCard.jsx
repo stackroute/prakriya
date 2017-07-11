@@ -84,7 +84,7 @@ export default class WaveCard extends React.Component {
 	handleEditWave() {
 		this.setState({
 			openDialog: true,
-			wave: this.props.wave
+			wave: this.props.wave,
 		})
 		this.getCourses();
 	}
@@ -110,16 +110,13 @@ export default class WaveCard extends React.Component {
 	getNewCadets() {
 		let th = this;
 		Request
-			.get('/dashboard/cadets')
+			.get('/dashboard/newcadets')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	let cadets = res.body.filter(function(cadet) {
-		    		if((cadet.Wave == undefined || cadet.Wave == '') && (cadet.Selected === 'Yes' || cadet.Selected === 'DS' ))
-		    			return cadet;
-		    	})
+		    	let cadets = res.body;
 		    	if(cadets.length == 0)
 		    	{
 		    		th.setState({
@@ -134,7 +131,6 @@ export default class WaveCard extends React.Component {
 		    			noCadets: false
 		    		})
 		    	}
-		    	console.log(th.state.newCadets);
 		    }
 			})
 	}
@@ -150,7 +146,6 @@ export default class WaveCard extends React.Component {
 		if(this.state.addCadet)
 		{
 				wave = this.props.wave;
-				wave.Cadets = this.props.wave.Cadets.concat(this.state.selectedCadets);
 				this.updateCadets(this.state.selectedCadets);
 				this.handleClose();
 		}
@@ -167,7 +162,7 @@ export default class WaveCard extends React.Component {
 	updateCadets(cadets) {
 		let th = this;
 		Request
-			.post('/dashboard/updatecadetWave')
+			.post('/dashboard/updatewavecadets')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send({cadets:cadets,waveID:this.props.wave.WaveID})
 			.end(function(err, res) {
@@ -204,19 +199,18 @@ export default class WaveCard extends React.Component {
 	}
 
 	closeUpdateDialog() {
-		let cadet = [];
-		if(this.state.addCadet)
-		{
-			cadet = this.props.wave.Cadets
-		}
-		else
-		{
-			cadet = this.state.wave.Cadets
-		}
+		// let cadet = [];
+		// if(this.state.addCadet)
+		// {
+		// 	cadet = this.props.wave.Cadets
+		// }
+		// else
+		// {
+		// 	cadet = this.state.wave.Cadets
+		// }
 		this.setState({
 			openDialog: false,
-			addCadet: false,
-			cadets: cadet
+			addCadet: false
 		})
 	}
 
@@ -231,7 +225,7 @@ export default class WaveCard extends React.Component {
 		Request
 			.post('/dashboard/cadetsofwave')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send({cadets:this.props.wave.WaveID})
+			.send({waveid:this.props.wave.WaveID})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
@@ -297,7 +291,6 @@ export default class WaveCard extends React.Component {
 		enddate = enddate.getFullYear() + '/' + (enddate.getMonth()+1) + '/' + enddate.getDate();
 		let th = this
     let title = 'CADETS'
-    console.log(this.state.wave);
     if(th.props.wave.Cadets !== undefined)
     {
       title = ('CADETS - (' + th.props.wave.Cadets.length + ')')
@@ -392,56 +385,64 @@ export default class WaveCard extends React.Component {
                 titleStyle={dialog.title}
 			        >
 
-			        <Grid style={styles.grid}><Row>
-			        {
-			        	th.state.cadets.map(function(cadet,index){
-			        		return <Col xs={3} key={index} style={styles.col}><Cadets cadet={cadet}/></Col>
-			        	})
-			        }
-			        </Row>
+			        <Grid style={styles.grid}>
+			        	<Row>
+					        {
+					        	th.state.cadets.map(function(cadet,index){
+					        		return (
+					        			<Col xs={3} key={index} style={styles.col}>
+						        			<Cadets cadet={cadet}/>
+						        		</Col>
+						        	)
+					        	})
+					        }
+			        	</Row>
 			        </Grid>
 			        <IconButton tooltip="Add Cadet" style={{display:view,float: 'right'}} onClick={this.openAddDialog}>
 					      <AddIcon/>
 					    </IconButton>
 					    {
-					    	this.state.addCadet && (!this.state.noCadets) && <p><SelectField
-		        		multiple={true}
-				        hintText="Select Cadets"
-								floatingLabelText='Cadets'
-				        value={this.state.selectedCadets}
-				        onChange={this.handleCadetsChange}
-								menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
-								listStyle={select.list}
-								style={{width: '100%'}}
-								selectedMenuItemStyle={select.selectedMenu}
-				      >
-				      {
-				        	th.state.newCadets.map(function(cadet, i) {
-				        		return (
-				        			cadet.Selected != undefined &&
-				        			(cadet.Selected == 'Yes' ||
-											cadet.Selected == 'DS') &&
-				        			<MenuItem
-								        key={i}
-								        insetChildren={true}
-								        checked={
-								        	th.state.selectedCadets &&
-								        	th.state.selectedCadets.includes(cadet.EmployeeID)
-								       	}
-								        value={cadet.EmployeeID}
-								        primaryText={`${cadet.EmployeeName} (${cadet.EmployeeID})`}
-								      />
-								      )
-		        				})
-		        			}
-		      			</SelectField>
-		      			<RaisedButton
-						    	label="Save Changes"
-						    	disabled={this.state.disableSave}
-						    	primary={true}
-						    	onClick={this.handleUpdateWave}
-						    />
-						    </p>
+					    	this.state.addCadet && 
+					    	(!this.state.noCadets) && 
+					    	<div>
+						    	<SelectField
+				        		multiple={true}
+						        hintText="Select Cadets"
+										floatingLabelText='Cadets'
+						        value={this.state.selectedCadets}
+						        onChange={this.handleCadetsChange}
+										menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
+										listStyle={select.list}
+										style={{width: '100%'}}
+										selectedMenuItemStyle={select.selectedMenu}
+						      >
+						      {
+					        	th.state.newCadets.map(function(cadet, i) {
+					        		return (
+					        			cadet.Selected != undefined &&
+					        			(cadet.Selected == 'Yes' ||
+												cadet.Selected == 'DS') &&
+					        			<MenuItem
+									        key={i}
+									        insetChildren={true}
+									        checked={
+									        	th.state.selectedCadets &&
+									        	th.state.selectedCadets.includes(cadet.EmployeeID)
+									       	}
+									        value={cadet.EmployeeID}
+									        primaryText={`${cadet.EmployeeName} (${cadet.EmployeeID})`}
+									      />
+									      )
+			        				})
+			        			}
+			      			</SelectField>
+			      			<RaisedButton
+							    	label="Save Changes"
+							    	disabled={this.state.disableSave}
+							    	primary={true}
+							    	onClick={this.handleUpdateWave}
+							    />
+						    </div>
 						  	}
 						   {
 						   	this.state.noCadets && <h3>No Cadets available</h3>
@@ -507,8 +508,8 @@ export default class WaveCard extends React.Component {
               </div>
               <div style={dialog.box100}>
 						    <SelectField
-					        hintText="Select Courses"
-                  floatingLabelText='Courses'
+					        hintText="Select Course"
+                  floatingLabelText='Course'
 					        value={this.state.selectedCourse}
 					        onChange={this.handleCourseChange}
                   style={{width: '100%'}}

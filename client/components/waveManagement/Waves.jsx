@@ -107,6 +107,7 @@ export default class Waves extends React.Component {
 		    	console.log(err);
 		    else {
 					let filteredWaves = [];
+					console.log('All the waves', res.body)
 					res.body.map(function(wave, key) {
 						let today = Date.now();
 							if(new Date(wave.StartDate) <= today && new Date(wave.EndDate) >= today)
@@ -151,7 +152,6 @@ export default class Waves extends React.Component {
 		    	th.getWaves();
 		    	}
 			})
-		console.log('handle update');
 	}
 
 	handleDelete(wave)
@@ -169,7 +169,6 @@ export default class Waves extends React.Component {
 		    		th.getWaves();
 		    	}
 			})
-		console.log('handle delete');
 	}
 
 	addWave(wave) {
