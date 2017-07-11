@@ -148,71 +148,6 @@ let getActiveWaves = function (successCB, errorCB) {
 	);
 };
 
-
-/** **************************************************
-*******              Projects                ********
-****************************************************/
-
-let updateProject = function (projectObj, delList, prevWave, version, successCB, errorCB) {
-	let proj = projectObj.version[version];
-	ProjectModel.
-	findOneAndUpdate(
-		{version: {$elemMatch: {name: proj.name}}},
-		{$set: {'version.$': proj}},
-		function (err, result) {
-		if(err) {
-			errorCB(err);
-			logger.error('Update Project Error Object: ', result);
-		} else {
-			projectObj.version[version].members.map(function (member) {
-				CandidateModel.
-				update(
-					{EmployeeID: member.EmployeeID},
-					{$set:
-						{
-							ProjectName: projectObj.version[version].name,
-							ProjectDescription: projectObj.version[version].description,
-							ProjectSkills: projectObj.version[version].skills
-						}
-					},
-					function (updateError3, updateResult3) {
-					if(updateError3) {
-						errorCB(updateError3);
-					}
-					logger.info('Update Result3: ', updateResult3);
-				});
-			},
-			CandidateModel.
-			updateMany(
-				{EmployeeID: {$in: delList}},
-				{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
-				function (updateManyError, updateManyResult) {
-					if(updateManyError) {
-						errorCB(updateManyError);
-					}
-					logger.info('Update ManyResult: ', updateManyResult);
-				},
-				CandidateModel.
-				updateMany(
-					{$and:
-						[
-							{ProjectName: projectObj.name},
-							{Wave: prevWave}
-						]
-					},
-					{$set: {ProjectName: '', ProjectDescription: '', ProjectSkills: []}},
-					function (updateManyError2, updateManyResult2) {
-					if(updateManyError2) {
-						errorCB(updateManyError2);
-					}
-					successCB(updateManyResult2);
-				})
-				)
-			);
-		}
-	});
-};
-
 let getCadet = function (email, successCB, errorCB) {
 	CandidateModel.findOne({EmailID: email}, function (err, result) {
 		if (err) {
@@ -654,7 +589,6 @@ module.exports = {
 	getWave,
 	getCadet,
 	getCadets,
-	updateProject,
 	getFiles,
 	updateCadet,
 	updateCadets,
