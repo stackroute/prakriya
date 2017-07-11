@@ -518,7 +518,9 @@ let addProduct = function(productObj, successCB, errorCB) {
 };
 
 // adding a version
-let addVersion = function(productName, versionObj, successCB, errorCB) {
+let addVersion = function(name, versionObj, successCB, errorCB) {
+
+  let productName = name;
 
   let version = {};
   version.name = versionObj.name;
@@ -597,12 +599,7 @@ let deleteVersion = function(versionName, successCB, errorCB) {
   let session = driver.session();
 
   let query = `
-       MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'})
-       DETACH DELETE version
-       MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-       -[relation:${graphConsts.REL_WORKEDON} {version: version.name}]->
-       (:${graphConsts.NODE_PRODUCT})
-       DELETE relation
+       MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
        `;
 
   session.run(query).then(function(result, err) {
@@ -618,7 +615,6 @@ let deleteVersion = function(versionName, successCB, errorCB) {
   });
 };
 
-// fetching all products
 let getProducts = function(successCB, errorCB) {
   let session = driver.session();
 
@@ -629,14 +625,12 @@ let getProducts = function(successCB, errorCB) {
     UNWIND versions AS version
     MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
     -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE}) -[:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
-    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product,
-    COLLECT ({EmployeeID: candidate.EmployeeID, EmployeeName: candidate.EmployeeName}) AS candidates
+    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product
     WITH COLLECT({
       name: version.name,
       description: version.description,
       wave: version.wave,
-      members: candidates,
+      members: [],
       skills: skills,
       addedBy: version.addedBy,
       addedOn: version.addedOn,
@@ -658,67 +652,6 @@ let getProducts = function(successCB, errorCB) {
   }).catch(function(err) {
     errorCB(err);
   });
-};
-
-// editing a version
-let updateVersion = function (version, successCB, errorCB) {
-
-    console.log('inside update version');
-
-    let session = driver.session();
-    let employeeIDs = version.members.map(function(member) {
-      return member.EmployeeID
-    });
-
-    let query = `
-          MATCH (version:${graphConsts.NODE_VERSION} {name: '${version.name}'})
-          -[skillsRelation:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-          DELETE skillsRelation
-          WITH COLLECT(skill.Name) AS skills, version AS version
-          UNWIND (skills) AS skillName
-          MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-          -[skillsRelation:${graphConsts.REL_KNOWS}]-> (:${graphConsts.NODE_SKILL} {Name: skillName})
-          DELETE skillsRelation
-          WITH version AS version
-          MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-          -[productRelation:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
-          DELETE productRelation
-          WITH version AS version
-          SET version.description='${version.description}',
-          version.addedOn='${String(version.addedOn)}',
-          version.addedBy='${version.addedBy}',
-          version.updated=${version.updated}
-          WITH version AS version
-          MATCH (product:${graphConsts.NODE_PRODUCT})
-          -[:${graphConsts.REL_HAS}]-> (:${graphConsts.NODE_VERSION} {name: version.name})
-          WITH version AS version, product AS product
-          UNWIND ${JSON.stringify(version.skills)} AS skillname
-          MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
-          MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
-          WITH version AS version, product AS product
-          UNWIND ${JSON.stringify(employeeIDs)} AS employeeID
-          UNWIND ${JSON.stringify(version.skills)} AS skillname
-          MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
-          MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeID: employeeID})
-          MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
-          WITH product AS product
-          UNWIND ${JSON.stringify(employeeIDs)} AS employeeID
-          MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeID: employeeID})
-          MERGE (product) <-[:${graphConsts.REL_WORKEDON} {version: '${version.name}'}]- (employee)
-         `;
-
-    session.run(query).then(function(result, err) {
-      session.close();
-      if(err) {
-        errorCB(err);
-      } else {
-        deleteDanglingSkills();
-        successCB(version);
-      }
-    }).catch(function(err) {
-      errorCB(err);
-    });
-
 };
 
 let getWave = function(waveID, successCB, errorCB) {
@@ -1006,6 +939,21 @@ let assessmentsandcandidates = function(waveID, assessment, successCB, errorCB) 
          });
 }
 
+/**********************************************
+************ Attendance *************
+**********************************************/
+
+let getWaveOfCadet = function(EmailID, successCB, errorCB) {
+  let query = `MATCH (w:${graphConsts.NODE_WAVE})<-[:${graphConsts.REL_BELONGS_TO}]-(c:${graphConsts.NODE_CANDIDATE}{EmailID:'${EmailID}'}) return c,w`
+  let session = driver.session();
+   session.run(query).then(function (resultObj, err) {
+         session.close();
+   let candidates = resultObj.records[0]._fields[0].properties;
+   candidates.Wave = resultObj.records[0]._fields[1].properties;
+   successCB(candidates);
+ })
+}
+
   module.exports = {
     addCadet,
     updateCadet,
@@ -1028,11 +976,11 @@ let assessmentsandcandidates = function(waveID, assessment, successCB, errorCB) 
     addVersion,
     deleteProduct,
     deleteVersion,
-    updateVersion,
     getProducts,
     getAssessmentTrack,
     mapAssessmentTrack,
-    assessmentsandcandidates
+    assessmentsandcandidates,
+    getWaveOfCadet
   }
   // getWaveIDs,
   // getWaveSpecificCandidates,

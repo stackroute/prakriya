@@ -562,6 +562,24 @@ router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (r
   }
 });
 
+// get all candidates for specific wave
+router.get('/getwaveofcadet', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardNeo4jController.getWaveOfCadet(req.user.email, function (data) {
+      console.log(data,"data")
+      res.status(201).json({data: data});
+    }, function (err) {
+      logger.error('Get Wave Specific Candidates Error: ', err);
+      res.status(500).json({error: 'Cannot get all candidate for specific wave from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get Wave Specific Candidates Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // update absentees
 router.post('/updateabsentees', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   try{
@@ -962,14 +980,7 @@ router.get('/waveobject/:waveID', auth.canAccess(CONFIG.ADMMEN), function (req, 
 router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
     let cadet = req.body;
-    console.log(req.body);
-    console.log('///////////////////');
-    dashboardMongoController.saveCandidate(cadet, function (result, err) {
-      if(err) {
-        logger.debug(err);
-      }
-      else {
-          dashboardNeo4jController.addCadet(cadet, function (result) {
+      dashboardNeo4jController.addCadet(cadet, function (result) {
             logger.debug('Added the cadet', result)
                 res.status(200).json(result);
             }, function(err) {
@@ -977,8 +988,6 @@ router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req
             res.status(500).json({error: 'Cannot save cadidate in neo4j...!'});
           })
         }
-      })
-    }
       catch(err) {
         logger.error('Add Candidate Exception: ', err);
         res.status(500).json({

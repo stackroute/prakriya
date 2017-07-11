@@ -35,12 +35,7 @@ let registerCandidates = function () {
 
 				async.each(cadetColln,
 					function (cadetObj, callback) {
-						dashboardMongoController.saveCandidate(cadetObj, function(cadet, err) {
-							if(err) {
-								logger.debug(err);
-							}
-							else {
-								dashboardNeo4jController.addCadet(cadetObj, function(cadet) {
+						dashboardNeo4jController.addCadet(cadetObj, function(cadet) {
 									logger.debug('Added the cadet', cadet)
 						      importedCadets.push(cadet);
 						      callback();
@@ -52,8 +47,6 @@ let registerCandidates = function () {
 					        failedCadets.push(cadet);
 					        callback();
 								})
-							}
-							})
 					},
 					function (err3) {
 						logger.debug('Final function', err3);

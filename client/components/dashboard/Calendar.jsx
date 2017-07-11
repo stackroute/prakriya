@@ -25,7 +25,6 @@ export default class Attendance extends React.Component {
     this.format = this.format.bind(this);
     this.formatMonth = this.formatMonth.bind(this);
     this.getCadet = this.getCadet.bind(this);
-    this.getWave = this.getWave.bind(this);
     this.handlePresent - this.handlePresent.bind(this);
   }
 
@@ -35,27 +34,16 @@ export default class Attendance extends React.Component {
 
   getCadet() {
     let th = this;
-    Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get('/dashboard/getwaveofcadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
         console.log(res.body);
-        th.setState({Cadet: res.body})
-        th.getWave(res.body.Wave);
-      }
-    })
-  }
-
-  getWave(waveID) {
-    let th = this;
-    Request.get(`/dashboard/wave?waveid=${waveID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
         th.setState({
-          startDate: res.body.StartDate,
-          endDate: res.body.EndDate
-        })
+            Cadet: res.body.data,
+            startDate: res.body.data.Wave.StartDate,
+            endDate: res.body.data.Wave.EndDate
+          })
       }
     })
   }
