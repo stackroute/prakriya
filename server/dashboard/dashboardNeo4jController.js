@@ -6,12 +6,19 @@ const graphConsts = require('./../common/graphConstants');
 
 let driver = neo4jDriver.driver(config.NEO4J.neo4jURL, neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
+let deleteDanglingSkills = function() {
+  let query = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
+  let session = driver.session();
+  session.run(query).then(function(result, err) {
+    session.close();
+  });
+};
+
 /**********************************************
-************ Candidate management *************
+************ Candidate Management *************
 **********************************************/
 
-// Add cadet
-
+// adding cadet
 let addCadet = function(cadetObj, successCB, errorCB) {
 
   let cadet = {};
@@ -30,7 +37,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   cadet.PrimarySupervisor = cadetObj.PrimarySupervisor || '';
   cadet.ProjectSupervisor = cadetObj.ProjectSupervisor || '';
   cadet.Selected = cadetObj.Selected || '';
-  cadet.Remarks = cadetObj.Remarks || '';
+  cadet.Remarks = cadetObj.Remarks || ''
 
   let session = driver.session();
 
@@ -60,8 +67,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
   });
 }
 
-// Update cadet
-
+// updating a cadet
 let updateCadet = function(cadetObj, successCB, errorCB) {
 
   let cadet = {};
@@ -102,8 +108,7 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
     });
 }
 
-// Update cadets
-
+// updating cadets
 let updateCadets = function(cadetArr, successCB, errorCB) {
   let count = 0;
   cadetArr.map(function(cadet) {
@@ -118,8 +123,7 @@ let updateCadets = function(cadetArr, successCB, errorCB) {
   })
 }
 
-// Get all the cadets
-
+// fetching all the cadets
 let getCadets = function(successCB, errorCB) {
   let session = driver.session();
   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
@@ -136,8 +140,20 @@ let getCadets = function(successCB, errorCB) {
   })
 }
 
-// Get all the new cadets
+// fetching candidate logged in
+let getCadet = function(email, successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w: '${graphConsts.NODE_WAVE}') return n`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    console.log('done');
+    successCB(resultObj.records[0]._fields[0].properties);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
 
+// fetching all the new cadets
 let getNewCadets = function(successCB, errorCB) {
   let session = driver.session();
   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) WHERE NOT
@@ -159,13 +175,11 @@ let getNewCadets = function(successCB, errorCB) {
     })
 }
 
-
-
 /**********************************************
-************** Course management **************
+************** Course Management **************
 **********************************************/
 
-// Course Management
+// adding a course
 let addCourse = function(CourseObj, successCB, errorCB) {
   logger.info(CourseObj);
   let query = `MERGE (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}',Name:'${CourseObj.Name}',
@@ -420,10 +434,22 @@ let deleteAssignmentOrSchedule = function(obj, course, type, successCB, errorCB)
   }
 }
 
+let getCourse = function (courseID, successCB, errorCB) {
+  let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${courseID}'})<-[:${graphConsts.REL_HAS}]-(w:${graphConsts.NODE_WAVE}) return c;`
+  let session = driver.session();
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+  if (err) {
+			errorCB(err);
+		}
+    successCB(resultObj.records[0]._fields[0].properties);
+	});
+};
+
 
 /**********************************************
-  ************ Product Management *************
-  **********************************************/
+************ Product Management ***************
+**********************************************/
 
 // adding a new product
 let addProduct = function(productObj, successCB, errorCB) {
@@ -435,8 +461,10 @@ let addProduct = function(productObj, successCB, errorCB) {
   let version = {};
   version.name = productObj.version[0].name;
   version.description = productObj.version[0].description || '';
-  // version.wave = productObj.version[0].wave;
-  // version.members = productObj.version[0].members;
+  version.wave = productObj.version[0].wave || '';
+  version.members = productObj.version[0].members.map(function(member) {
+    return member.EmployeeName
+  });
   version.skills = productObj.version[0].skills;
   version.addedBy = productObj.version[0].addedBy;
   version.addedOn = productObj.version[0].addedOn;
@@ -456,15 +484,26 @@ let addProduct = function(productObj, successCB, errorCB) {
        {
         name: '${version.name}',
         description: '${version.description}',
+        wave: '${version.wave}',
         addedOn: '${version.addedOn}',
         addedBy: '${version.addedBy}',
         updated: '${version.updated}'
        }
      )
-     WITH version AS version
+     WITH version AS version, product AS product
      UNWIND ${JSON.stringify(version.skills)} AS skillname
      MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
      MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
+     WITH version AS version, product AS product
+     UNWIND ${JSON.stringify(version.members)} AS employeeName
+     UNWIND ${JSON.stringify(version.skills)} AS skillname
+     MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+     MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
+     MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
+     WITH product AS product
+     UNWIND ${JSON.stringify(version.members)} AS employeeName
+     MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
+     MERGE (product) <-[:${graphConsts.REL_WORKEDON} {version: '${version.name}'}]- (employee)
      `;
 
   session.run(query).then(function(result) {
@@ -478,15 +517,13 @@ let addProduct = function(productObj, successCB, errorCB) {
 };
 
 // adding a version
-let addVersion = function(name, versionObj, successCB, errorCB) {
-
-  let productName = name;
+let addVersion = function(productName, versionObj, successCB, errorCB) {
 
   let version = {};
   version.name = versionObj.name;
   version.description = versionObj.description || '';
-  // version.wave = versionObj.wave;
-  // version.members = versionObj..members;
+  version.wave = versionObj.wave || '';
+  // version.members = versionObj.members;
   version.skills = versionObj.skills;
   version.addedBy = versionObj.addedBy;
   version.addedOn = versionObj.addedOn;
@@ -500,6 +537,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
          {
            name: '${version.name}',
            description: '${version.description}',
+           wave: '${version.wave}',
            addedOn: '${version.addedOn}',
            addedBy: '${version.addedBy}',
            updated: '${version.updated}'
@@ -514,14 +552,77 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
        MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
        `;
 
-  session.run(query).then(function(result) {
-
-    // Completed!
+  session.run(query).then(function(result, err) {
     session.close();
-    successCB(versionObj);
+    if(err) {
+      errorCB(err);
+    } else {
+      successCB(versionObj);
+    }
   }).catch(function(err) {
     errorCB(err);
   });
+};
+
+// editing a version
+let updateVersion = function (version, successCB, errorCB) {
+
+    console.log('inside update version');
+
+    let session = driver.session();
+    let employeeIDs = version.members.map(function(member) {
+      return member.EmployeeID
+    });
+
+    let query = `
+          MATCH (version:${graphConsts.NODE_VERSION} {name: '${version.name}'})
+          -[skillsRelation:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+          DELETE skillsRelation
+          WITH COLLECT(skill.Name) AS skills, version AS version
+          UNWIND (skills) AS skillName
+          MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+          -[skillsRelation:${graphConsts.REL_KNOWS}]-> (:${graphConsts.NODE_SKILL} {Name: skillName})
+          DELETE skillsRelation
+          WITH version AS version
+          MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+          -[productRelation:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
+          DELETE productRelation
+          WITH version AS version
+          SET version.description='${version.description}',
+          version.addedOn='${String(version.addedOn)}',
+          version.addedBy='${version.addedBy}',
+          version.updated=${version.updated}
+          WITH version AS version
+          MATCH (product:${graphConsts.NODE_PRODUCT})
+          -[:${graphConsts.REL_HAS}]-> (:${graphConsts.NODE_VERSION} {name: version.name})
+          WITH version AS version, product AS product
+          UNWIND ${JSON.stringify(version.skills)} AS skillname
+          MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+          MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
+          WITH version AS version, product AS product
+          UNWIND ${JSON.stringify(employeeIDs)} AS employeeID
+          UNWIND ${JSON.stringify(version.skills)} AS skillname
+          MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+          MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeID: employeeID})
+          MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
+          WITH product AS product
+          UNWIND ${JSON.stringify(employeeIDs)} AS employeeID
+          MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeID: employeeID})
+          MERGE (product) <-[:${graphConsts.REL_WORKEDON} {version: '${version.name}'}]- (employee)
+         `;
+
+    session.run(query).then(function(result, err) {
+      session.close();
+      if(err) {
+        errorCB(err);
+      } else {
+        deleteDanglingSkills();
+        successCB(version);
+      }
+    }).catch(function(err) {
+      errorCB(err);
+    });
+
 };
 
 // deleting a product
@@ -537,11 +638,14 @@ let deleteProduct = function(productName, successCB, errorCB) {
        DETACH DELETE product
        `;
 
-  session.run(query).then(function(result) {
-
-    // Completed!
+  session.run(query).then(function(result, err) {
     session.close();
-    successCB(productName);
+    if(err) {
+      errorCB(err);
+    } else {
+      deleteDanglingSkills();
+      successCB(productName);
+    }
   }).catch(function(err) {
     errorCB(err);
   });
@@ -553,19 +657,28 @@ let deleteVersion = function(versionName, successCB, errorCB) {
   let session = driver.session();
 
   let query = `
-       MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
+       MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'})
+       DETACH DELETE version
+       MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+       -[relation:${graphConsts.REL_WORKEDON} {version: version.name}]->
+       (:${graphConsts.NODE_PRODUCT})
+       DELETE relation
        `;
 
-  session.run(query).then(function(result) {
-
-    // Completed!
+  session.run(query).then(function(result, err) {
     session.close();
-    successCB(versionName);
+    if(err) {
+      errorCB(err);
+    } else {
+      deleteDanglingSkills();
+      successCB(versionName);
+    }
   }).catch(function(err) {
     errorCB(err);
   });
 };
 
+// fetching all products
 let getProducts = function(successCB, errorCB) {
   let session = driver.session();
 
@@ -576,12 +689,14 @@ let getProducts = function(successCB, errorCB) {
     UNWIND versions AS version
     MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
     -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE}) -[:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
+    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product,
+    COLLECT ({EmployeeID: candidate.EmployeeID, EmployeeName: candidate.EmployeeName}) AS candidates
     WITH COLLECT({
       name: version.name,
       description: version.description,
-      wave: 'WaveDummi',
-      members: [],
+      wave: version.wave,
+      members: candidates,
       skills: skills,
       addedBy: version.addedBy,
       addedOn: version.addedOn,
@@ -598,8 +713,10 @@ let getProducts = function(successCB, errorCB) {
     if (err) {
       errorCB('Error');
     } else {
-      successCB(resultObj.records[0]._fields);
+      successCB(resultObj.records[0] ? resultObj.records[0]._fields : []);
     }
+  }).catch(function(err) {
+    errorCB(err);
   });
 };
 
@@ -725,7 +842,7 @@ let getWave = function(waveID, successCB, errorCB) {
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
-      successCB(resultObj.records[0]._fields.properties);
+      successCB(resultObj.records[0]._fields[0].properties);
     } else {
       errorCB('Error');
     }
@@ -831,6 +948,7 @@ let getWaves = function(successCB, errorCB) {
 //     }
 //   });
 
+// Update cadets for the wave
 let updateWaveCadets = function (cadets, waveID, successCB, errorCB) {
 
   let session = driver.session();
@@ -893,24 +1011,80 @@ let updateWaveCadets = function (cadets, waveID, successCB, errorCB) {
 ************ Assessment Tracker *************
 **********************************************/
 
-let getAssessmentTrack = function (courseName, successCB, errorCB) {
-  let query = `match (n:${graphConsts.NODE_COURSE}{Name:'${courseName}'})-[:has]->(a:Assignment) return collect(a.Name)`;
+let getAssessmentTrack =  function(waveID, successCB, errorCB) {
+  let query = `MATCH (a:${graphConsts.NODE_ASSIGNMENT})<-[:${graphConsts.REL_HAS}]-(c:${graphConsts.NODE_COURSE})<-[:${graphConsts.REL_HAS}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'}) return COLLECT(a)`;
     let session = driver.session();
        session.run(query).then(function (resultObj, err) {
            session.close();
   if(err) {
 			errorCB(err);
 		}
-    console.log(resultObj);
-    successCB(resultObj);
+    let assessment = [];
+    resultObj.records[0]._fields[0].map(function (record) {
+      assessment.push(record.properties)
+    })
+    successCB(assessment);
 	});
 };
+
+let mapAssessmentTrack = function (assessments, update, successCB, errorCB) {
+  if(update) {
+    assessments.map(function (assessment) {
+    let query = `
+      MATCH (a:${graphConsts.NODE_ASSIGNMENT}{Name:'${assessment.assignment}'})<-[r:${graphConsts.REL_WORKEDON}]-(c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${assessment.EmpID}'})
+      set r.implement='${assessment.remarks.implement}',
+      r.complete='${assessment.remarks.complete}',
+      r.learn = '${assessment.remarks.learn}'`
+      let session = driver.session();
+         session.run(query).then(function (resultObj, err) {
+             session.close();
+           })
+  }, successCB())
+  } else {
+    assessments.map(function (assessment) {
+    let query = `
+      MATCH (a:${graphConsts.NODE_ASSIGNMENT}{Name:'${assessment.assignment}'}),(c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${assessment.EmpID}'})
+      MERGE (a)<-[:${graphConsts.REL_WORKEDON}{implement:'${assessment.remarks.implement}',complete:'${assessment.remarks.complete}',learn:'${assessment.remarks.learn}'}]-(c)`
+      let session = driver.session();
+         session.run(query).then(function (resultObj, err) {
+             session.close();
+           })
+  }, successCB())
+  }
+}
+
+let assessmentsandcandidates = function(waveID, assessment, successCB, errorCB) {
+  let query = `
+    MATCH (n:${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'})
+    with collect(n) as n
+    unwind n as cadet
+    OPTIONAL MATCH (cadet)-[r:${graphConsts.REL_WORKEDON}]-(a:${graphConsts.NODE_ASSIGNMENT}{Name:'${assessment}'})
+    RETURN {cadet:cadet, assignment:r}`
+    let session = driver.session();
+    let candidates = [];
+       session.run(query).then(function (resultObj, err) {
+           session.close();
+           resultObj.records.map(function (res) {
+             let assignment = null;
+             if(res._fields[0].assignment != null) {
+               assignment= res._fields[0].assignment.properties
+             }
+             let detail = {
+               cadet: res._fields[0].cadet.properties,
+               assignment: assignment
+              }
+              candidates.push(detail);
+           })
+           successCB(candidates)
+         });
+}
 
   module.exports = {
     addCadet,
     updateCadet,
     updateCadets,
     getCadets,
+    getCadet,
     getNewCadets,
     addCourse,
     getCourses,
@@ -929,8 +1103,11 @@ let getAssessmentTrack = function (courseName, successCB, errorCB) {
     addVersion,
     deleteProduct,
     deleteVersion,
+    updateVersion,
     getProducts,
-    getAssessmentTrack
+    getAssessmentTrack,
+    mapAssessmentTrack,
+    assessmentsandcandidates
   }
   // getWaveIDs,
   // getWaveSpecificCandidates,

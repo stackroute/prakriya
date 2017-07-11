@@ -170,6 +170,7 @@ export default class Attendance extends React.Component {
         console.log(err);
       else {
         th.setState({cadet: res.body})
+        console.log(res.body)
         th.getWave(res.body.Wave);
       }
     })
@@ -296,9 +297,10 @@ export default class Attendance extends React.Component {
     );
   }
 
-  cancelLeave(index, dateID) {
+  cancelLeave(index, date) {
     let th = this
-    Request.post('/dashboard/cancelleave').set({'Authorization': localStorage.getItem('token')}).send({id: dateID}).end(function(err, res) {
+    console.log(date);
+    Request.post('/dashboard/cancelleave').set({'Authorization': localStorage.getItem('token')}).send({id: date}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
@@ -432,7 +434,7 @@ export default class Attendance extends React.Component {
                             <TableRowColumn>{th.formatDate(dates.toDate)}</TableRowColumn>
                             <TableRowColumn>{dates.reason}</TableRowColumn>
                             <TableRowColumn>
-                              <IconButton tooltip="Cancel" onClick={th.cancelLeave.bind(this, index, dates._id)}>
+                              <IconButton tooltip="Cancel" onClick={th.cancelLeave.bind(this, index, dates)}>
                                 <RejectIcon color={red500}/>
                               </IconButton>
                             </TableRowColumn>
