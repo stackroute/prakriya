@@ -500,7 +500,7 @@ export default class Attendance extends React.Component {
                   </TableHeader>
                   <TableBody displayRowCheckbox={false} showRowHover={true}>
                     {th.state.cadet.DaysAbsent.map(function(dates, index) {
-                      if(new Date(dates.fromDate) > new Date())
+                      if(new Date(dates.fromDate) > new Date() || (th.formatDate(dates.fromDate) === th.formatDate(new Date()) && dates.reason !== 'absent'))
                       return (
                           <TableRow>
                             <TableRowColumn>{th.formatDate(dates.fromDate)}</TableRowColumn>

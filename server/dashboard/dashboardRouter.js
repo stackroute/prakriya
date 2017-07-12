@@ -723,7 +723,24 @@ router.post('/cancelleave', auth.canAccess(CONFIG.CANDIDATE), function (req, res
 
 // update absentees
 router.post('/updateapproval', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
-  try{
+  if(req.body.approval === 'closed') {
+    console.log('here');
+    try{
+      dashboardMongoController.cancelLeave({id:{_id:req.body.id}}, function (status) {
+        logger.info('Cancel Leave Status: ', status);
+        res.status(201).json({success: 'success'});
+      }, function (err) {
+        logger.error('Cancel Leave Error: ', err);
+        res.status(500).json({error: 'Cannot update candidate db...!'});
+      });
+    } catch(err) {
+      console.log(err);
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      });
+    }
+  }else {
+    try{
     dashboardMongoController.updateApproval(req.body, function (status) {
       logger.info('Update Absentees Status: ', status);
       res.status(201).json({success: 'success'});
@@ -737,6 +754,7 @@ router.post('/updateapproval', auth.canAccess(CONFIG.ADMINISTRATOR), function (r
       error: 'Internal error occurred, please report...!'
     });
   }
+}
 });
 
 // update absentees
