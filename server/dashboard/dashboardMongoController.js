@@ -214,10 +214,11 @@ let updateProject = function (projectObj, delList, prevWave, version, successCB,
 };
 
 let getCadet = function (email, successCB, errorCB) {
-	CandidateModel.findOne({EmailID: email}, function (err, result) {
+	UserModel.findOne({email: email}, function (err, result) {
 		if (err) {
 			errorCB(err);
 		}
+		console.log(result)
 		successCB(result);
 	});
 };
@@ -230,6 +231,16 @@ let getUserRole = function (email, successCB, errorCB) {
 		successCB(result);
 	});
 };
+
+	let getUser = function (email, successCB, errorCB) {
+		console.log(email);
+		UserModel.find({email: {$in: email}}, function (err, result) {
+			if (err) {
+				errorCB(err);
+			}
+			successCB(result);
+		});
+	};
 
 let getCadets = function (successCB, errorCB) {
 	CandidateModel.find({}, function (err, result) {
@@ -354,9 +365,9 @@ let getWaveSpecificCandidates = function (waveID, successCB, errorCB) {
 
 // update absentees
 let updateAbsentees = function (Absentees, successCB, errorCB) {
-	CandidateModel.
+	UserModel.
 	updateMany(
-		{EmployeeID: Absentees.absentee},
+		{email: Absentees.absentee},
 		{$push: {DaysAbsent: Absentees.details}},
 		function (err, result) {
 			if(err) {
@@ -370,8 +381,9 @@ let updateAbsentees = function (Absentees, successCB, errorCB) {
 // cancel Leave
 let cancelLeave = function (details, successCB, errorCB) {
 	if(details.id !== '') {
-	let id = new mongoose.mongo.ObjectId(details.id);
-	CandidateModel.
+		console.log(details)
+	let id = new mongoose.mongo.ObjectId(details.id._id);
+	UserModel.
 	update({'DaysAbsent._id': id}, {$pull: {DaysAbsent: {_id: id}}}, function (err, result) {
 		if(err) {
 			errorCB(err);
@@ -385,7 +397,7 @@ let cancelLeave = function (details, successCB, errorCB) {
 
 let updateApproval = function (Approval, successCB, errorCB) {
 	let id = new mongoose.mongo.ObjectId(Approval.id);
-	CandidateModel.
+	UserModel.
 	update(
 		{'DaysAbsent._id': id},
 		{$set: {'DaysAbsent.$.approved': Approval.approval}},
@@ -570,7 +582,7 @@ let updateCadetWave = function (cadets, waveID, successCB, errorCB) {
 };
 
 let getAbsentees = function (successCB, errorCB) {
-	CandidateModel.
+	UserModel.
 	find(
 		{DaysAbsent: {$elemMatch: {$or: [{approved: 'no'}, {approved: 'rejected'}]}}},
 		function (err, cadets) {
@@ -595,9 +607,9 @@ let getFilteredCandidates = function (filterQuery, successCB, errorCB) {
 	});
 };
 
-let updatePresent = function (EmpID, present, successCB, errorCB) {
-	CandidateModel.
-	update({EmployeeID: EmpID}, {$push: {DaysPresent: present}}, function (err, candidates) {
+let updatePresent = function (email, present, successCB, errorCB) {
+	UserModel.
+	update({email: email}, {$push: {DaysPresent: present}}, function (err, candidates) {
 		if(err) {
 			errorCB(err);
 		}
@@ -605,9 +617,9 @@ let updatePresent = function (EmpID, present, successCB, errorCB) {
 	});
 };
 
-let cancelPresent = function (EmpID, date, successCB, errorCB) {
-	CandidateModel.
-	update({EmployeeID: EmpID}, {$pull: {DaysPresent: date}}, function (err, candidates) {
+let cancelPresent = function (email, date, successCB, errorCB) {
+	UserModel.
+	update({email: email}, {$pull: {DaysPresent: date}}, function (err, candidates) {
 		if(err) {
 			errorCB(err);
 		}
@@ -684,6 +696,7 @@ module.exports = {
 	updateWave,
 	updateCadetWave,
 	getUserRole,
+	getUser,
 	getAbsentees,
 	updateApproval,
 	cancelLeave,

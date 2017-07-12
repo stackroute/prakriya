@@ -586,7 +586,7 @@ res.send(data);
 // get all candidates for specific wave
 router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardNeo4jController.getWaveSpecificCandidates(req.query.waveID, function (data) {
+    dashboardNeo4jController.getCadetsOfWave(req.query.waveID, function (data) {
       console.log(data,"data")
       res.status(201).json({data: data});
     }, function (err) {
@@ -640,8 +640,8 @@ router.post('/updateabsentees', auth.canAccess(CONFIG.CANDIDATE), function (req,
 // update present
 router.post('/updatepresent', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   try{
-    dashboardMongoController.updatePresent(req.body.EmployeeID, new Date(), function (status) {
-      logger.info('Update Project Status: ', status);
+    dashboardMongoController.updatePresent(req.body.email, new Date(), function (status) {
+      logger.info('Update Present Status: ', status);
       res.status(201).json({success: 'success'});
     }, function (err) {
       logger.error('Update Present Error: ', err);
@@ -657,8 +657,8 @@ router.post('/updatepresent', auth.canAccess(CONFIG.CANDIDATE), function (req, r
 // update present
 router.post('/present', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try{
-    dashboardMongoController.updatePresent(req.body.EmployeeID, req.body.Date, function (status) {
-      dashboardMongoController.cancelLeave({id: req.body.id}, function (cancelLeaveStatus) {
+    dashboardMongoController.updatePresent(req.body.email, req.body.Date, function (status) {
+      dashboardMongoController.cancelLeave({id:req.body.id}, function (cancelLeaveStatus) {
         logger.info('Update Present Status: ', status);
         logger.info('Cancel Leave Status: ', cancelLeaveStatus);
         res.status(201).json({success: 'success'});
@@ -681,9 +681,9 @@ router.post('/present', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 router.post('/absent', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try{
     dashboardMongoController.
-    updateAbsentees({details: req.body.details, absentee: req.body.EmployeeID}, function (status) {
+    updateAbsentees({details: req.body.details, absentee: req.body.email}, function (status) {
       dashboardMongoController.
-      cancelPresent(req.body.EmployeeID, req.body.Date, function (cancelPresentStatus) {
+      cancelPresent(req.body.email, req.body.Date, function (cancelPresentStatus) {
         logger.info('Cancel Present Status: ', cancelPresentStatus);
         logger.info('Update Absent Status: ', status);
         res.status(201).json({success: 'success'});
@@ -713,6 +713,7 @@ router.post('/cancelleave', auth.canAccess(CONFIG.CANDIDATE), function (req, res
       res.status(500).json({error: 'Cannot update candidate db...!'});
     });
   } catch(err) {
+    console.log(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -731,6 +732,24 @@ router.post('/updateapproval', auth.canAccess(CONFIG.ADMINISTRATOR), function (r
     });
   } catch(err) {
     logger.error('Update Absentees Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// update absentees
+router.post('/getwavecandidates', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+  try{
+    dashboardMongoController.getUser(req.body.email, function (data) {
+      logger.info('get user : ', data);
+      res.status(201).json({data: data});
+    }, function (err) {
+      logger.error('Get Absentees Error: ', err);
+      res.status(500).json({error: 'Cannot update candidate db...!'});
+    });
+  } catch(err) {
+    logger.error('Get Absentees Exception: ', err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
