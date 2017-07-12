@@ -362,7 +362,6 @@ export default class ProjectDialog extends React.Component {
 				skills: []
 			})
 			this.props.addProject(project);
-			console.log(project,"handleadd")
 	}
 
 	handleAddVersion() {

@@ -284,7 +284,7 @@ router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function (req, res)
   try {
     let version = req.body;
     version.addedBy = req.user.name;
-    version.updatedBy = true;
+    version.updated = true;
     dashboardNeo4jController.
     updateVersion(
       version,
@@ -308,7 +308,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     let versionObj = req.body.version;
     versionObj.addedBy = req.user.name;
-    versionObj.updatedBy = true;
+    versionObj.updated = true;
     dashboardNeo4jController.addVersion(req.body.product, versionObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
@@ -316,6 +316,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
       res.status(500).json({error: 'Cannot update the project...!'});
     });
   } catch(err) {
+    console.log('Add Version Internal Error: ', err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });

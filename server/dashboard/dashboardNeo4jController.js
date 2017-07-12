@@ -525,7 +525,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   version.name = versionObj.name;
   version.description = versionObj.description || '';
   version.wave = versionObj.wave || '';
-  version.members = productObj.version[0].members.map(function(member) {
+  version.members =  versionObj.members.map(function(member) {
     return member.EmployeeName
   });
   version.skills = versionObj.skills;
@@ -550,9 +550,9 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
        WITH version AS version
        MERGE (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
        MERGE (version) <-[:${graphConsts.REL_HAS}]- (product)
-       WITH version AS version
-       UNWIND ${JSON.stringify(version.skills)} AS skillname
-       MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+       WITH version AS version, product AS product
+       UNWIND ${JSON.stringify(version.skills)} AS skillName
+       MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillName})
        MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
        WITH version AS version, product AS product
        UNWIND ${JSON.stringify(version.members)} AS employeeName
@@ -757,7 +757,7 @@ let getProducts = function(successCB, errorCB) {
     if (err) {
       errorCB('Error');
     } else {
-      successCB(resultObj.records[0] ? resultObj.records[0]._fields : []);
+      successCB(resultObj.records);
     }
   }).catch(function(err) {
     errorCB(err);
