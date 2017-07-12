@@ -1102,7 +1102,7 @@ router.get('/waves', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 });
 
 // Get all cadets of a particular wave
-router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
     dashboardNeo4jController.getCadetsOfWave(req.body.waveid, function (cadets) {
       res.status(201).json(cadets);

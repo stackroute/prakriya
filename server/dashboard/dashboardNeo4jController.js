@@ -6,8 +6,8 @@ const graphConsts = require('./../common/graphConstants');
 
 let driver = neo4jDriver.driver(config.NEO4J.neo4jURL, neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
-let deleteDanglingSkills = function() {
-  let query = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
+let deleteDanglingNodes = function(label) {
+  let query = `MATCH (n:${label}) where SIZE((n)--())=0 DELETE n`;
   let session = driver.session();
   session.run(query).then(function(result, err) {
     session.close();
@@ -525,7 +525,9 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   version.name = versionObj.name;
   version.description = versionObj.description || '';
   version.wave = versionObj.wave || '';
-  // version.members = versionObj.members;
+  version.members = productObj.version[0].members.map(function(member) {
+    return member.EmployeeName
+  });
   version.skills = versionObj.skills;
   version.addedBy = versionObj.addedBy;
   version.addedOn = versionObj.addedOn;
@@ -552,6 +554,16 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
        UNWIND ${JSON.stringify(version.skills)} AS skillname
        MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
        MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
+       WITH version AS version, product AS product
+       UNWIND ${JSON.stringify(version.members)} AS employeeName
+       UNWIND ${JSON.stringify(version.skills)} AS skillname
+       MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
+       MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
+       MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
+       WITH product AS product
+       UNWIND ${JSON.stringify(version.members)} AS employeeName
+       MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
+       MERGE (product) <-[:${graphConsts.REL_WORKEDON} {version: '${version.name}'}]- (employee)
        `;
 
   session.run(query).then(function(result, err) {
@@ -618,7 +630,7 @@ let updateVersion = function (version, successCB, errorCB) {
       if(err) {
         errorCB(err);
       } else {
-        deleteDanglingSkills();
+        deleteDanglingNodes(graphConsts.NODE_SKILL);
         successCB(version);
       }
     }).catch(function(err) {
@@ -636,7 +648,26 @@ let deleteProduct = function(productName, successCB, errorCB) {
        MATCH (version:${graphConsts.NODE_VERSION})
        <-[:${graphConsts.REL_HAS}]-
        (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
+       WITH COLLECT(version) AS versions, product AS product
+       UNWIND(versions) AS version
+       MATCH (version) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+       WITH COLLECT (skill) AS skills, version AS version, version.name AS versionName, product AS product
        DETACH DELETE version
+       WITH skills AS skills, versionName AS versionName, product AS product
+       MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+       -[workedonRelation:${graphConsts.REL_WORKEDON} {version: versionName}]->
+       (product:${graphConsts.NODE_PRODUCT})
+       WITH COLLECT(workedonRelation) AS workedonRelations, product AS product,
+       COLLECT(candidate) AS candidates, skills AS skills
+       UNWIND (candidates) AS candidate
+       UNWIND (skills) AS skill
+       MATCH (candidate)
+       -[knowsRelation:${graphConsts.REL_KNOWS}]-> (skill)
+       DELETE knowsRelation
+       WITH workedonRelations AS workedonRelations, product AS product
+       UNWIND (workedonRelations) AS workedonRelation
+       DELETE workedonRelation
+       WITH product AS product
        DETACH DELETE product
        `;
 
@@ -645,7 +676,7 @@ let deleteProduct = function(productName, successCB, errorCB) {
     if(err) {
       errorCB(err);
     } else {
-      deleteDanglingSkills();
+      deleteDanglingNodes(graphConsts.NODE_SKILL);
       successCB(productName);
     }
   }).catch(function(err) {
@@ -659,7 +690,25 @@ let deleteVersion = function(versionName, successCB, errorCB) {
   let session = driver.session();
 
   let query = `
-       MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'}) DETACH DELETE version
+       MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'})
+       WITH version as version, version.name AS versionName
+       MATCH (version) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+       WITH COLLECT (skill) AS skills, version AS version, versionName AS versionName
+       DETACH DELETE version
+       WITH skills AS skills, versionName AS versionName
+       MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+       -[workedonRelation:${graphConsts.REL_WORKEDON} {version: versionName}]->
+       (product:${graphConsts.NODE_PRODUCT})
+       WITH COLLECT(workedonRelation) AS workedonRelations,
+       COLLECT(candidate) AS candidates, skills AS skills
+       UNWIND (candidates) AS candidate
+       UNWIND (skills) AS skill
+       MATCH (candidate)
+       -[knowsRelation:${graphConsts.REL_KNOWS}]-> (skill)
+       DELETE knowsRelation
+       WITH workedonRelations AS workedonRelations
+       UNWIND (workedonRelations) AS workedonRelation
+       DELETE workedonRelation
        `;
 
   session.run(query).then(function(result, err) {
@@ -667,7 +716,8 @@ let deleteVersion = function(versionName, successCB, errorCB) {
     if(err) {
       errorCB(err);
     } else {
-      deleteDanglingSkills();
+      deleteDanglingNodes(graphConsts.NODE_SKILL);
+      deleteDanglingNodes(graphConsts.NODE_PRODUCT);
       successCB(versionName);
     }
   }).catch(function(err) {
@@ -1110,6 +1160,7 @@ let getWaveOfCadet = function(EmailID, successCB, errorCB) {
     deleteAssignmentOrSchedule,
     deleteOrRestoreCourse,
     addVersion,
+    updateVersion,
     deleteProduct,
     deleteVersion,
     getProducts,
