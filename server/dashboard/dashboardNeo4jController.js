@@ -735,12 +735,22 @@ let getProducts = function(successCB, errorCB) {
     UNWIND versions AS version
     MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
     -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product
+    OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+    -[:${graphConsts.REL_WORKEDON} {version: version.name}]-> (product)
+    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product,
+    CASE WHEN candidate IS NULL THEN
+      []
+      ELSE
+      COLLECT ({
+        EmployeeID: candidate.EmployeeID,
+        EmployeeName: candidate.EmployeeName
+      })
+    END AS candidates
     WITH COLLECT({
       name: version.name,
       description: version.description,
       wave: version.wave,
-      members: [],
+      members: candidates,
       skills: skills,
       addedBy: version.addedBy,
       addedOn: version.addedOn,
