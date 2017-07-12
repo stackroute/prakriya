@@ -6,8 +6,8 @@ const graphConsts = require('./../common/graphConstants');
 
 let driver = neo4jDriver.driver(config.NEO4J.neo4jURL, neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
-let deleteDanglingSkills = function() {
-  let query = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
+let deleteDanglingNodes = function(label) {
+  let query = `MATCH (n:${label}) where SIZE((n)--())=0 DELETE n`;
   let session = driver.session();
   session.run(query).then(function(result, err) {
     session.close();
@@ -630,7 +630,7 @@ let updateVersion = function (version, successCB, errorCB) {
       if(err) {
         errorCB(err);
       } else {
-        deleteDanglingSkills();
+        deleteDanglingNodes(graphConsts.NODE_SKILL);
         successCB(version);
       }
     }).catch(function(err) {
@@ -676,7 +676,7 @@ let deleteProduct = function(productName, successCB, errorCB) {
     if(err) {
       errorCB(err);
     } else {
-      deleteDanglingSkills();
+      deleteDanglingNodes(graphConsts.NODE_SKILL);
       successCB(productName);
     }
   }).catch(function(err) {
@@ -716,7 +716,8 @@ let deleteVersion = function(versionName, successCB, errorCB) {
     if(err) {
       errorCB(err);
     } else {
-      deleteDanglingSkills();
+      deleteDanglingNodes(graphConsts.NODE_SKILL);
+      deleteDanglingNodes(graphConsts.NODE_PRODUCT);
       successCB(versionName);
     }
   }).catch(function(err) {
