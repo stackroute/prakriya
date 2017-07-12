@@ -169,7 +169,6 @@ export default class ProjectCard extends React.Component {
   }
 
   render() {
-    console.log(this.state.newVersionDialog)
     let detail = '';
     if (this.state.project.version[this.state.selectedVersionIndex].updated) {
       detail = this.state.project.version[this.state.selectedVersionIndex].addedBy + ' updated ' + this.formatDate(this.state.project.version[this.state.selectedVersionIndex].addedOn)

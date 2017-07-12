@@ -76,7 +76,6 @@ export default class Projects extends React.Component {
 		    else {
 		    	let projects = th.state.projects;
 		    	projects.push(project);
-					console.log('project addition successfull -- ', projects)
 		    	th.setState({
 		    		projects: projects
 		    	})
@@ -86,6 +85,7 @@ export default class Projects extends React.Component {
 
 	addVersion(version) {
 		console.log("addproj n version", version)
+		version.version.addedOn = new Date();
 		let th = this;
 		Request
 			.post('/dashboard/addversion')

@@ -423,8 +423,6 @@ export default class ProjectDialog extends React.Component {
 
 	handleUpdate() {
 		let th = this;
-		console.log('upadate:: ', th.props.version);
-		console.log(this.state.project.version[th.props.version]);
 		let version = this.state.project.version[th.props.version];
 		version.members = [];
 		this.state.candidateList.map(function(name, index){
@@ -434,6 +432,7 @@ export default class ProjectDialog extends React.Component {
 		version.description = this.state.projectDesc;
 		version.wave = this.state.wave;
 		version.skills = this.state.skills;
+		version.addedOn = new Date();
 		this.setState({
 			projectName: '',
 			projectDesc: '',
