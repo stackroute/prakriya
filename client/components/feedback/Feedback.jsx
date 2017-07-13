@@ -16,6 +16,20 @@ import {
 import IconButton from 'material-ui/IconButton';
 import StarIcon from 'material-ui/svg-icons/toggle/star';
 
+const StarsComponent = React.createClass({
+  render: function() {
+    return (
+      <TableRowColumn style={{textAlign: 'center'}}>
+        <IconButton><StarIcon color='#FFE900'/></IconButton>
+        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
+        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
+        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
+        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
+      </TableRowColumn>
+    )
+  }
+});
+
 const styles = {
   heading: {
     textAlign: 'center'
@@ -39,10 +53,21 @@ const styles = {
 const feedback = [
   {
     type: "relevance",
-    options: ["The objectives were clearly defined at the beginning of the program", "The stated objectives for the Immersive program have been met successfully", "This program relevance to learn the new set of tech for Web development", "This program is relevant to my role/job", "This program made good use of my time"]
+    options: [
+      "The objectives were clearly defined at the beginning of the program",
+      "The stated objectives for the Immersive program have been met successfully",
+      "This program relevance to learn the new set of tech for Web development",
+      "This program is relevant to my role/job",
+      "This program made good use of my time"
+    ]
   }, {
     type: "training",
-    options: ["Program was stimulating and challenging", "Relevant learning material and reference materials were provided", "Program is paced well", "Assignments helped in implementing technologies covered"]
+    options: [
+      "Program was stimulating and challenging",
+      "Relevant learning material and reference materials were provided",
+      "Program is paced well",
+      "Assignments helped in implementing technologies covered"
+    ]
   }, {
     type: "confidence",
     options: [
@@ -55,27 +80,40 @@ const feedback = [
     ]
   }, {
     type: "mentors",
-    options: ["Mentor Knowledge of the Subject", "Ability to technically challenge and help learn", "Interest and involvement in the program", "Responsiveness to questions/ queries", "Overall ability to mentor"]
+    options: [
+      "Mentor Knowledge of the Subject",
+      "Ability to technically challenge and help learn",
+      "Interest and involvement in the program",
+      "Responsiveness to questions/ queries", "Overall ability to mentor"
+    ]
   }, {
     type: "facilities",
-    options: ["Environment / Workspace", "Quality and speed of Internet / Network", "The facility was clean and well maintained", "Overall Infrastructure"]
+    options: [
+      "Environment / Workspace",
+      "Quality and speed of Internet / Network",
+      "The facility was clean and well maintained",
+      "Overall Infrastructure"
+    ]
   }, {
     type: "overall",
-    options: ["How would you rate your overall satisfaction after completing this program", "How would you rate yourself in terms of confidence level", "How likely are you to recommend this program to others in your organization"]
+    options: [
+      "How would you rate your overall satisfaction after completing this program",
+      "How would you rate yourself in terms of confidence level",
+      "How likely are you to recommend this program to others in your organization"]
   }
-]
+];
 
 export default class Feedback extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       cadet: {},
-      relevance: {},
-      training: {},
-      confidence: {},
-      mentors: {},
-      facilities: {},
-      overall: {},
+      relevance: [],
+      training: [],
+      confidence: [],
+      mentors: [],
+      facilities: [],
+      overall: [],
       mostLiked: '',
       leastLiked: '',
       open: false,
@@ -88,50 +126,19 @@ export default class Feedback extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.saveFeedback = this.saveFeedback.bind(this);
   }
+
   componentWillMount() {
     this.getCadet();
     this.setState({
-      relevance: {
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        '4': 0,
-        '5': 0
-      },
-      training: {
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        '4': 0
-      },
-      confidence: {
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        '4': 0,
-        '5': 0,
-        '6': 0
-      },
-      mentors: {
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        '4': 0,
-        '5': 0
-      },
-      facilities: {
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        '4': 0
-      },
-      overall: {
-        '1': 0,
-        '2': 0,
-        '3': 0
-      }
+      relevance: [0, 0, 0, 0, 0],
+      training: [0, 0, 0, 0],
+      confidence: [0, 0, 0, 0, 0, 0],
+      mentors: [0, 0, 0, 0, 0],
+      facilities: [0, 0, 0, 0],
+      overall: [0, 0, 0]
     });
   }
+
   getCadet() {
     let th = this;
     Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
@@ -143,6 +150,7 @@ export default class Feedback extends React.Component {
       }
     })
   }
+
   saveFeedback(feedbackObj) {
     let th = this;
     Request.post('/dashboard/savefeedback').set({'Authorization': localStorage.getItem('token')}).send(feedbackObj).end(function(err, res) {
@@ -154,6 +162,7 @@ export default class Feedback extends React.Component {
       }
     })
   }
+
   getInitialState() {
     return {invalidData: true}
   }
@@ -165,7 +174,9 @@ export default class Feedback extends React.Component {
   handleChange(val, type, key) {
     let temp = this.state[type];
     temp[key] = val;
+    console.log('type: ', [type])
     this.setState({[type]: temp})
+    console.log('state: ', this.state)
   }
 
   handleMostLikedChange(event) {
@@ -207,171 +218,71 @@ export default class Feedback extends React.Component {
           </Row>
           <br/>
           <Table selectable={false} multiSelectable={false} style={styles.table} fixedHeader={false}>
-            <TableHeader displaySelectAll={false} adjustForCheckbox={false} enableSelectAll={false} style={{
-              textAlign: 'center'
-            }}>
-              <TableRow style={{
-                textAlign: 'center'
-              }}>
-                <TableHeaderColumn style={{
-                  width: '50px',
-                  textAlign: 'center'
-                }}>Worst</TableHeaderColumn>
-                <TableHeaderColumn style={{
-                  width: '80px',
-                  textAlign: 'center'
-                }}>Bad</TableHeaderColumn>
-                <TableHeaderColumn style={{
-                  width: '110px',
-                  textAlign: 'center'
-                }}>Fair</TableHeaderColumn>
-                <TableHeaderColumn style={{
-                  width: '120px',
-                  textAlign: 'center'
-                }}>Good</TableHeaderColumn>
-                <TableHeaderColumn style={{
-                  textAlign: 'center'
-                }}>Excellent</TableHeaderColumn>
+            <TableHeader
+            displaySelectAll={false} adjustForCheckbox={false}
+            enableSelectAll={false} style={{textAlign: 'center'}}>
+              <TableRow style={{textAlign: 'center'}}>
+                <TableHeaderColumn style={{width: '50px', textAlign: 'center'}}>
+                Worst</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '80px', textAlign: 'center'}}>
+                Bad</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '110px', textAlign: 'center'}}>
+                Fair</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '120px', textAlign: 'center'}}>
+                Good</TableHeaderColumn>
+                <TableHeaderColumn style={{textAlign: 'center'}}>
+                Excellent</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false}>
               <TableRow>
-                <TableRowColumn style={{
-                  textAlign: 'center'
-                }}>
-                  <IconButton >
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                </TableRowColumn>
-                <TableRowColumn style={{
-                  textAlign: 'center'
-                }}>
-                  <IconButton >
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                </TableRowColumn>
-                <TableRowColumn style={{
-                  textAlign: 'center'
-                }}>
-                  <IconButton >
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                </TableRowColumn>
-                <TableRowColumn style={{
-                  textAlign: 'center'
-                }}>
-                  <IconButton >
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                </TableRowColumn>
-                <TableRowColumn style={{
-                  textAlign: 'center'
-                }}>
-                  <IconButton>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                  <IconButton style={{
-                    marginLeft: '-20px'
-                  }}>
-                    <StarIcon color='#FFE900'/>
-                  </IconButton>
-                </TableRowColumn>
+                <StarsComponent />
+                <StarsComponent />
+                <StarsComponent />
+                <StarsComponent />
+                <StarsComponent />
               </TableRow>
             </TableBody>
           </Table>
 
-          {feedback.map(function(item, key) {
+          {
+            feedback.map(function(item, key) {
             return (
               <div key={key}>
-                <Row>
-                  <Col md={8} mdOffset={2}>
-                    <h4>{item.type.toUpperCase()}</h4>
-                  </Col>
-                </Row>
-                {item.options.map(function(option, index) {
-                  return (
-                    <Row key={index}>
-                      <Col md ={6} mdOffset={2} style={{
-                        marginTop: 10
-                      }}>
-                        {index + 1}. {option}
-                      </Col>
-                      <Col md={2}>
-                        <StarRating color1={'#ddd'} half={false} size={30} value={th.state[item.type][index + 1]} onChange={(newVal) => th.handleChange(newVal, item.type, index + 1)}/>
-                      </Col>
-                    </Row>
-                  )
-                })
-}
-
+                <Row><Col md={8} mdOffset={2}><h4>{item.type.toUpperCase()}</h4></Col></Row>
+                {
+                  item.options.map(function(option, index) {
+                    return (
+                      <Row key={index}>
+                        <Col md ={6} mdOffset={2} style={{marginTop: 10}}>
+                          {index + 1}. {option}
+                        </Col>
+                        <Col md={2}>
+                          <StarRating
+                            color1={'#ddd'} half={false} size={30}
+                            value={th.state[item.type][index]}
+                            onChange={(newVal) => th.handleChange(newVal, item.type, index)}/>
+                        </Col>
+                      </Row>
+                    )
+                  })
+                }
               </div>
-            )
-          })
-}
+            )})
+          }
 
-          <Row>
-            <Col md={8} mdOffset={2}>
+          <Row><Col md={8} mdOffset={2}>
               <TextField hintText="Express your views" floatingLabelText="Things you liked most about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.mostLiked} onChange={this.handleMostLikedChange}/>
-            </Col>
-          </Row>
+          </Col></Row>
 
-          <Row>
-            <Col md={8} mdOffset={2}>
+          <Row><Col md={8} mdOffset={2}>
               <TextField hintText="Express your views" floatingLabelText="Things you liked least about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.leastLiked} onChange={this.handleLeastLikedChange}/>
-            </Col>
-          </Row>
+          </Col></Row>
 
-          <Row>
-            <Col md={8} mdOffset={2} style={styles.submit}>
+          <Row><Col md={8} mdOffset={2} style={styles.submit}>
               <RaisedButton label="Submit" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled || this.state.invalidData}/>
               <Snackbar open={this.state.open} message="Feedback submitted" autoHideDuration={2000}/>
-            </Col>
-          </Row>
+          </Col></Row>
         </Grid>
       </div>
     )
