@@ -296,8 +296,8 @@ let updateCourse = function(CourseObj, edit, successCB, errorCB) {
       query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
               with c as course
               MERGE (schedule:${graphConsts.NODE_SESSION}{Name:'${schedule.Name}',
-              Description: '${schedule.Description}',
-              Day: ${schedule.Day}})
+              Description: '${schedule.Description}';
+            })
               with schedule as schedule,course as course
               MERGE (schedule)<-[:${graphConsts.REL_HAS}]-(course)
               with schedule as schedule
@@ -612,7 +612,7 @@ let getProducts = function(successCB, errorCB) {
   session.run(query).then(function(resultObj, err) {
     session.close();
     if (err) {
-      errorCB('Error');
+      errforCB('Error');
     } else {
       successCB(resultObj.records[0] ? resultObj.records[0]._fields : []);
     }
@@ -620,33 +620,54 @@ let getProducts = function(successCB, errorCB) {
     errorCB(err);
   });
 };
-
 let getWave = function(waveID, successCB, errorCB) {
-  logger.debug('In get Wave', waveID);
-  let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
+ logger.debug('In get Wave', waveID);
+ let query =
+   `MATCH(n:${graphConsts.NODE_WAVE}{WaveID: '${waveID}'}) RETURN n`;
+ let session = driver.session();
+ session.run(query).then(function(resultObj) {
+   session.close();
+   if (resultObj) {
+     successCB(resultObj.records[0]._fields[0].properties);
+   } else {
+     errorCB('Error');
+   }
+ });
+};
+let getSessionForWave = function(waveID, successCB, errorCB) {
+  logger.debug('In get session Wave', waveID);
+  let query = `MATCH(n:${graphConsts.NODE_WAVE} {WaveID:'${waveID}'})-[:${graphConsts.REL_HAS}]->(m:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_HAS}]->(x:${graphConsts.NODE_SESSION})-[:${graphConsts.REL_INCLUDES}]->(y:${graphConsts.NODE_SKILL})
+  optional match (w)-[r:${graphConsts.REL_INCLUDES}]->(x)
+  RETURN {skill:collect(y),session:x,r:r}`;
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
-      successCB(resultObj.records[0]._fields.properties);
+      console.log(resultObj)
+      let waveobject={}
+      waveobject.result = []
+      resultObj.records.map(function(res){
+        res._fields.map(function(re) {
+          console.log(re)
+          waveobject.result.push(re.session.properties)
+          waveobject.result[waveobject.result.length - 1].skill = re.skill.map(function(skills){
+            return skills.properties.Name
+          })
+          if(re.r != null)
+          {
+            waveobject.result[waveobject.result.length-1].SessionBy = re.r.properties.SessionBy;
+            waveobject.result[waveobject.result.length-1].SessionOn = re.r.properties.SessionOn;
+            waveobject.result[waveobject.result.length-1].Status = re.r.properties.Status;
+          }
+        })
+      })
+logger.debug(waveobject,"waveobject")
+      successCB(waveobject);
     } else {
       errorCB('Error');
     }
   });
 };
-// let getWaveIDs = function(successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
-
 
 let getWaveIDs = function(successCB, errorCB) {
   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
@@ -684,18 +705,7 @@ let getWaveSpecificCandidates = function(waveID, successCB, errorCB) {
   });
 };
 
-// let getWaveObject = function(waveID, successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
+
 let getWaves = function(successCB, errorCB) {
   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN n`;
   let session = driver.session();
@@ -713,38 +723,31 @@ let getWaves = function(successCB, errorCB) {
   });
 };
 
-// let updateWave = function(waveObj, successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveObj.waveID}'
-//                SET n.WaveID = '${waveObj.WaveID}'
-//                   n.WaveNumber = '${waveObj.WaveNumber}'
-//                   n.Location = '${waveObj.Location}'
-//                   n.StartDate = '${waveObj.StartDate}'
-//                   n.EndDate = '${waveObj.EndDate}'
-//                   n.Sessions = '${waveObj.Sessions}'
-//                   n.Cadets = '${waveObj.Cadets}'
-//                   n.CourseNames = '${waveObj.CourseNames}'
-//                RETURN n`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
-// let getCoursesForWave = function(waveID, successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n.CourseNames`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
+let updateWave = function(waveObj, successCB, errorCB) {
+ let query =
+   `MATCH(w:${graphConsts.NODE_WAVE}{WaveID: '${waveObj.WaveID}'})-
+     [r:${graphConsts.REL_HAS}]->(c:${graphConsts.NODE_COURSE})
+   DELETE r
+   SET
+     w.Location = '${waveObj.Location}',
+     w.StartDate = '${waveObj.StartDate}',
+     w.EndDate = '${waveObj.EndDate}'
+   WITH w AS w
+   MATCH (d:${graphConsts.NODE_COURSE}{ID:'${waveObj.Course}'})
+   WITH w AS w, d AS d
+   MERGE (w)-[:${graphConsts.REL_HAS}]->(d)
+   RETURN w`;
+ let session = driver.session();
+ session.run(query).then(function(resultObj) {
+   session.close();
+   if (resultObj) {
+     logger.debug(resultObj);
+   } else {
+     errorCB('Error');
+   }
+ });
+};
+
 let addWave = function (waveObj, successCB, errorCB) {
 	let userObj = {};
   userObj.WaveID = waveObj.WaveID || '',
@@ -862,6 +865,59 @@ let getAssessmentTrack = function (courseName, successCB, errorCB) {
 	});
 };
 
+
+let updateSession = function(wave,waveString, successCB, errorCB) {
+  console.log(wave,"wave")
+  let query = `OPTIONAL MATCH (n:${graphConsts.NODE_SESSION}{Name:'${wave.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
+              RETURN r`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj.records[0]._fields[0] !== null) {
+      let query1 = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${wave.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
+      SET
+         r.SessionBy = '${wave.SessionBy}',
+         r.SessionOn = '${wave.SessionOn}',
+         r.Status = '${wave.Status}'
+         RETURN n`;
+         let session1 = driver.session();
+         session1.run(query1).then(function(resultObj) {
+             if(resultObj){
+               console.log(resultObj,"first.query")
+             }
+   session1.close();
+         });
+           successCB('success');
+    } else {
+      let query1 = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${wave.Name}'}),(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
+      MERGE (n)<-[r:${graphConsts.REL_INCLUDES}{SessionBy:'${wave.SessionBy}',SessionOn:'${wave.SessionOn}',Status :'${wave.Status}'}]-(w)
+         RETURN n`;
+         let session = driver.session();
+         session.run(query1).then(function(resultObj) {
+           if(resultObj){
+             console.log(resultObj,"sec.query")
+           }
+           session.close();
+         });
+    }
+  });
+  successCB();
+}
+
+
+let deleteSession = function(waveObj,waveString, successCB, errorCB) {
+    let query = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${waveObj.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
+                 DELETE r`;
+    let session = driver.session();
+    session.run(query).then(function(resultObj, err) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        successCB('success');
+      }
+    });
+  }
   module.exports = {
     addCadet,
     updateCadet,
@@ -877,6 +933,7 @@ let getAssessmentTrack = function (courseName, successCB, errorCB) {
     deleteWave,
     getWaveSpecificCandidates,
     getWaveIDs,
+    getSessionForWave,
     addProduct,
     deleteAssignmentOrSchedule,
     deleteOrRestoreCourse,
@@ -884,16 +941,7 @@ let getAssessmentTrack = function (courseName, successCB, errorCB) {
     deleteProduct,
     deleteVersion,
     getProducts,
-    getAssessmentTrack
+    getAssessmentTrack,
+    updateSession,
+    deleteSession
   }
-  // getWaveIDs,
-  // getWaveSpecificCandidates,
-  // getWaveObject,
-  // getWaves,
-  // getCadetsOfWave,
-  // updateWave,
-  // getCoursesForWave,
-  // addWave,
-  // deleteWave,
-  // updateCadetWave,
-  // getActiveWaves
