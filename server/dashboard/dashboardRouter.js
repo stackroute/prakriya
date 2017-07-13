@@ -508,6 +508,24 @@ router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function (req, re
   }
 });
 
+// Get all the cadets with wave details
+router.get('/cadetsandwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.getCadetsAndWave(function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get All Cadets Error: ', err);
+      res.status(500).json({error: 'Cannot get all cadets from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get cadets error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
 // Save the cadet evaluation
 router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
@@ -1034,8 +1052,10 @@ router.get('/waveids', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 router.get('/waveobject/:waveID', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   logger.info('API HIT ===> GET Wave Object');
   try{
-    dashboardMongoController.getWaveObject(req.params.waveID,
+    console.log(req.params.waveID,"req.params.WAVEID")
+    dashboardNeo4jController.getSessionForWave (req.params.waveID,
        function (wave) {
+         console.log(wave,"waveobj waveid")
          res.status(201).json({waveObject: wave});
     }, function (err) {
       logger.error('Get Wave Object Error: ', err);
@@ -1154,6 +1174,40 @@ router.post('/cadetsofproj', auth.canAccess(CONFIG.MENTOR), function (req, res) 
   }
 });
 
+// delete a wave
+router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+  try {
+    console.log(req.body.wave,"req.body.wave")
+    dashboardNeo4jController.deleteWave(req.body.wave, function (wave) {
+      res.status(201).json(wave);
+    }, function (err) {
+      logger.error('Delete Wave Error: ', err);
+      res.status(500).json({error: 'Cannot delete the wave...!'});
+    });
+  } catch(err) {
+    logger.error('Delete Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// update a wave
+router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try {
+    dashboardNeo4jController.updateWave(req.body.wave, function (wave) {
+      res.status(201).json(wave);
+    }, function (err) {
+      logger.error('Update Wave Error: ', err);
+      res.status(500).json({error: 'Cannot delete the wave...!'});
+    });
+  } catch(err) {
+    logger.error('Update Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
 
 /** **************************************************
 *********          Candidate Filter         *********
@@ -1178,7 +1232,7 @@ router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, 
 
 router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillability(function (billable) {
+    dashboardNeo4jController.getBillability(function (billable) {
       res.status(201).json(billable);
     }, function (err) {
       logger.error('Get All billable Error: ', err);
@@ -1193,7 +1247,7 @@ router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getNonBillability(function (nonbillable) {
+    dashboardNeo4jController.getNonBillability(function (nonbillable) {
       res.status(201).json(nonbillable);
     }, function (err) {
       logger.error('Get All non-billable Error: ', err);
@@ -1208,7 +1262,7 @@ router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillabilityFree(function (free) {
+    dashboardNeo4jController.getBillabilityFree(function (free) {
       res.status(201).json(free);
     }, function (err) {
       logger.error('Get All billable-free Error: ', err);
@@ -1223,7 +1277,7 @@ router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillabilitySupport(function (support) {
+    dashboardNeo4jController.getBillabilitySupport(function (support) {
       res.status(201).json(support);
     }, function (err) {
       logger.error('Get All billable-support Error: ', err);
@@ -1236,4 +1290,40 @@ router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
     });
   }
 });
+///////////////////////program flow///////////////////
+router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+  try {
+    dashboardNeo4jController.updateSession(req.body.wave, req.body.waveString,function (status) {
+       console.log(req.body.waveString,"waveString")
+      res.status(201).json({status:'success'});
+    }, function (uperr) {
+      logger.error('err in update session', uperr);
+      res.status(500).json({error: 'Cannot add new session...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// delete session
+router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+  try {
+    dashboardNeo4jController.deleteSession(req.body.wave,req.body.waveString ,function (status) {
+      logger.info('Status: ', status);
+      res.status(201).json(status);
+    }, function (sessionerr) {
+      logger.error('err in delete session', sessionerr);
+      res.status(500).json({error: 'Cannot delete session...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 module.exports = router;
