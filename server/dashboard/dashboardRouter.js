@@ -508,6 +508,24 @@ router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function (req, re
   }
 });
 
+// Get all the cadets with wave details
+router.get('/cadetsandwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.getCadetsAndWave(function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get All Cadets Error: ', err);
+      res.status(500).json({error: 'Cannot get all cadets from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get cadets error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
 // Save the cadet evaluation
 router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
@@ -1178,7 +1196,7 @@ router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, 
 
 router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillability(function (billable) {
+    dashboardNeo4jController.getBillability(function (billable) {
       res.status(201).json(billable);
     }, function (err) {
       logger.error('Get All billable Error: ', err);
@@ -1193,7 +1211,7 @@ router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getNonBillability(function (nonbillable) {
+    dashboardNeo4jController.getNonBillability(function (nonbillable) {
       res.status(201).json(nonbillable);
     }, function (err) {
       logger.error('Get All non-billable Error: ', err);
@@ -1208,7 +1226,7 @@ router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillabilityFree(function (free) {
+    dashboardNeo4jController.getBillabilityFree(function (free) {
       res.status(201).json(free);
     }, function (err) {
       logger.error('Get All billable-free Error: ', err);
@@ -1223,7 +1241,7 @@ router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillabilitySupport(function (support) {
+    dashboardNeo4jController.getBillabilitySupport(function (support) {
       res.status(201).json(support);
     }, function (err) {
       logger.error('Get All billable-support Error: ', err);

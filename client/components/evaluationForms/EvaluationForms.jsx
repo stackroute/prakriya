@@ -159,7 +159,7 @@ export default class EvaluationForms extends React.Component {
 	getCadets() {
 		let th = this;
 		Request
-			.get('/dashboard/cadets')
+			.get('/dashboard/cadetsandwave')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
