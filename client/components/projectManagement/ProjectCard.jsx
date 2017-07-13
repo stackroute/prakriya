@@ -57,7 +57,6 @@ export default class ProjectCard extends React.Component {
       versionName: [],
       selectedVersion: '',
       selectedVersionIndex: 0,
-      cadets: [],
       project: {},
       newVersionDialog: false,
       delete: ''
@@ -69,7 +68,7 @@ export default class ProjectCard extends React.Component {
     this.handleUpdateProject = this.handleUpdateProject.bind(this);
     this.openDeleteDialog = this.openDeleteDialog.bind(this);
     this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-    this.getCadets = this.getCadets.bind(this);
+    this.openCadetsDialog = this.openCadetsDialog.bind(this);
     this.handleDeleteProject = this.handleDeleteProject.bind(this);
     this.onVersionChange = this.onVersionChange.bind(this);
     this.addVersion = this.addVersion.bind(this);
@@ -78,34 +77,31 @@ export default class ProjectCard extends React.Component {
   }
 
   componentWillMount() {
-    let versionName = [];
+    let versionNames = [];
     this.props.project.version.map(function(x, i) {
-      versionName.push(x.name);
+      versionNames.push(x.name);
     })
-    this.setState({project: this.props.project, versionName: versionName})
-    console.log('Version Names', versionName)
-    console.log('ProjectObj from props', this.props.project);
+    this.setState({
+      project: this.props.project,
+      versionName: versionNames
+    })
   }
 
   componentWillReceiveProps(nextProps, nextState) {
-    console.log('-- card updated --')
-    console.log(nextProps)
     let versionNames = [];
     nextProps.project.version.map(function(x, i) {
       versionNames.push(x.name);
     })
-    this.setState({project: nextProps.project, versionName: versionNames})
+    this.setState({
+      project: nextProps.project,
+      versionName: versionNames
+    })
   }
 
-  getCadets(name) {
-    let th = this;
-    Request.post('/dashboard/cadetsofproj').set({'Authorization': localStorage.getItem('token')}).send({name: name}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        console.log('Successfully fetched all cadets', res.body)
-        th.setState({cadets: res.body, dialog: false, dialogOpen: true})
-      }
+  openCadetsDialog() {
+    this.setState({
+      dialog: false,
+      dialogOpen: true
     })
   }
 
@@ -173,7 +169,6 @@ export default class ProjectCard extends React.Component {
   }
 
   render() {
-    console.log(this.state.newVersionDialog)
     let detail = '';
     if (this.state.project.version[this.state.selectedVersionIndex].updated) {
       detail = this.state.project.version[this.state.selectedVersionIndex].addedBy + ' updated ' + this.formatDate(this.state.project.version[this.state.selectedVersionIndex].addedOn)
@@ -237,12 +232,12 @@ export default class ProjectCard extends React.Component {
             <DeleteIcon/>
           </IconButton>
         </Card>
-        {this.state.dialog && th.getCadets(this.props.project.version[this.state.selectedVersionIndex].name)}
+        {this.state.dialog && th.openCadetsDialog()}
         <Dialog bodyStyle={dialog.body} title='TEAM MEMBERS' titleStyle={dialog.title} open={this.state.dialogOpen} autoScrollBodyContent={true} onRequestClose={this.handleClose}>
           <Grid style={styles.grid}>
             <Row>
-              {this.state.cadets.length > 0
-                ? this.state.cadets.map(function(cadet, index) {
+              {this.state.project.version[this.state.selectedVersionIndex].members.length > 0
+                ? this.state.project.version[this.state.selectedVersionIndex].members.map(function(cadet, index) {
                   return <Col xs={3} key={index} style={styles.col}><Cadets cadet={cadet}/></Col>
                 })
                 : <div><br/>Team list has not been updated yet. Sorry for the inconvenience caused.</div>

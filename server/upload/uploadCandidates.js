@@ -4,6 +4,7 @@ const logger = require('./../../applogger');
 const async = require('async');
 const uploadMongoController = require('./uploadMongoController');
 const dashboardNeo4jController = require('../dashboard/dashboardNeo4jController');
+const dashboardMongoController = require('../dashboard/dashboardMongoController');
 
 let registerCandidates = function () {
 	client.brpop('fileImport', 0, function (err1, fileId) {
@@ -35,17 +36,17 @@ let registerCandidates = function () {
 				async.each(cadetColln,
 					function (cadetObj, callback) {
 						dashboardNeo4jController.addCadet(cadetObj, function(cadet) {
-							logger.debug('Added the cadet', cadet)
-				      importedCadets.push(cadet);
-				      callback();
-						}, function (err) {
-							let cadet = {}
-			        logger.error('Error in adding a cadet in the neo4j',  err)
-			        cadet.eid = cadetObj.EmployeeID;
-			        cadet.errmsg = 'Duplicate cadet error';
-			        failedCadets.push(cadet);
-			        callback();
-						})
+									logger.debug('Added the cadet', cadet)
+						      importedCadets.push(cadet);
+						      callback();
+								}, function (err) {
+									let cadet = {}
+					        logger.error('Error in adding a cadet in the neo4j',  err)
+					        cadet.eid = cadetObj.EmployeeID;
+					        cadet.errmsg = 'Duplicate cadet error';
+					        failedCadets.push(cadet);
+					        callback();
+								})
 					},
 					function (err3) {
 						logger.debug('Final function', err3);

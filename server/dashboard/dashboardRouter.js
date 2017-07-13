@@ -137,7 +137,7 @@ router.get('/user', function (req, res) {
 *******                 Wave                 ********
 ****************************************************/
 
-// Add a new Wave
+// Add a new wave
 router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
     dashboardNeo4jController.addWave(req.body, function (wave) {
@@ -154,6 +154,42 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
   }
 });
 
+// Update a wave
+router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try {
+    dashboardNeo4jController.updateWave(req.body.wave, function (wave) {
+      res.status(201).json(wave);
+    }, function (err) {
+      logger.error('Update Wave Error: ', err);
+      res.status(500).json({error: 'Cannot update the wave...!'});
+    });
+  } catch(err) {
+    logger.error('Update Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Delete a wave
+router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+  try {
+    console.log(req.body.wave,"req.body.wave")
+    dashboardNeo4jController.deleteWave(req.body.wave, function (wave) {
+      res.status(201).json(wave);
+    }, function (err) {
+      logger.error('Delete Wave Error: ', err);
+      res.status(500).json({error: 'Cannot delete the wave...!'});
+    });
+  } catch(err) {
+    logger.error('Delete Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Fetch a wave with WaveID
 router.get('/wave', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     dashboardNeo4jController.getWave(req.query.waveid, function (wave) {
@@ -170,6 +206,7 @@ router.get('/wave', auth.canAccess(CONFIG.ALL), function (req, res) {
   }
 });
 
+// Fetch all the active waves
 router.get('/activewaves', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
     dashboardMongoController.getActiveWaves(function (waves) {
@@ -185,9 +222,10 @@ router.get('/activewaves', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   }
 });
 
-router.post('/updatecadetwave', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+// Update the wave cadet's
+router.post('/updatewavecadets', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try{
-    dashboardMongoController.updateCadetWave(req.body.cadets, req.body.waveID, function (status) {
+    dashboardNeo4jController.updateWaveCadets(req.body.cadets, req.body.waveID, function (status) {
       logger.debug('Update Cadet Status: ', status);
       res.status(201);
     }, function (err) {
@@ -200,6 +238,7 @@ router.post('/updatecadetwave', auth.canAccess(CONFIG.ADMIN), function (req, res
     });
   }
 });
+
 
 /** **************************************************
 *******               Projects               ********
@@ -243,15 +282,12 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 // update a project
 router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
-    let projectObj = req.body.project;
-    projectObj.version[req.body.version].addedBy = req.user.name;
-    projectObj.version[req.body.version].updatedBy = true;
-    dashboardMongoController.
-    updateProject(
-      projectObj,
-      req.body.delList,
-      req.body.prevWave,
-      req.body.version,
+    let version = req.body;
+    version.addedBy = req.user.name;
+    version.updated = true;
+    dashboardNeo4jController.
+    updateVersion(
+      version,
       function (project) {
         res.status(201).json(project);
       },
@@ -272,7 +308,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
     let versionObj = req.body.version;
     versionObj.addedBy = req.user.name;
-    versionObj.updatedBy = true;
+    versionObj.updated = true;
     dashboardNeo4jController.addVersion(req.body.product, versionObj, function (project) {
       res.status(201).json(project);
     }, function (err) {
@@ -280,6 +316,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
       res.status(500).json({error: 'Cannot update the project...!'});
     });
   } catch(err) {
+    console.log('Add Version Internal Error: ', err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -471,6 +508,24 @@ router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function (req, re
   }
 });
 
+// Get all the cadets with wave details
+router.get('/cadetsandwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.getCadetsAndWave(function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get All Cadets Error: ', err);
+      res.status(500).json({error: 'Cannot get all cadets from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get cadets error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
 // Save the cadet evaluation
 router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
@@ -550,7 +605,25 @@ res.send(data);
 // get all candidates for specific wave
 router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardNeo4jController.getWaveSpecificCandidates(req.query.waveID, function (data) {
+    dashboardNeo4jController.getCadetsOfWave(req.query.waveID, function (data) {
+      console.log(data,"data")
+      res.status(201).json({data: data});
+    }, function (err) {
+      logger.error('Get Wave Specific Candidates Error: ', err);
+      res.status(500).json({error: 'Cannot get all candidate for specific wave from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get Wave Specific Candidates Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// get all candidates for specific wave
+router.get('/getwaveofcadet', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardNeo4jController.getWaveOfCadet(req.user.email, function (data) {
       console.log(data,"data")
       res.status(201).json({data: data});
     }, function (err) {
@@ -586,8 +659,8 @@ router.post('/updateabsentees', auth.canAccess(CONFIG.CANDIDATE), function (req,
 // update present
 router.post('/updatepresent', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   try{
-    dashboardMongoController.updatePresent(req.body.EmployeeID, new Date(), function (status) {
-      logger.info('Update Project Status: ', status);
+    dashboardMongoController.updatePresent(req.body.email, new Date(), function (status) {
+      logger.info('Update Present Status: ', status);
       res.status(201).json({success: 'success'});
     }, function (err) {
       logger.error('Update Present Error: ', err);
@@ -603,8 +676,8 @@ router.post('/updatepresent', auth.canAccess(CONFIG.CANDIDATE), function (req, r
 // update present
 router.post('/present', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try{
-    dashboardMongoController.updatePresent(req.body.EmployeeID, req.body.Date, function (status) {
-      dashboardMongoController.cancelLeave({id: req.body.id}, function (cancelLeaveStatus) {
+    dashboardMongoController.updatePresent(req.body.email, req.body.Date, function (status) {
+      dashboardMongoController.cancelLeave({id:req.body.id}, function (cancelLeaveStatus) {
         logger.info('Update Present Status: ', status);
         logger.info('Cancel Leave Status: ', cancelLeaveStatus);
         res.status(201).json({success: 'success'});
@@ -627,9 +700,9 @@ router.post('/present', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 router.post('/absent', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try{
     dashboardMongoController.
-    updateAbsentees({details: req.body.details, absentee: req.body.EmployeeID}, function (status) {
+    updateAbsentees({details: req.body.details, absentee: req.body.email}, function (status) {
       dashboardMongoController.
-      cancelPresent(req.body.EmployeeID, req.body.Date, function (cancelPresentStatus) {
+      cancelPresent(req.body.email, req.body.Date, function (cancelPresentStatus) {
         logger.info('Cancel Present Status: ', cancelPresentStatus);
         logger.info('Update Absent Status: ', status);
         res.status(201).json({success: 'success'});
@@ -659,6 +732,7 @@ router.post('/cancelleave', auth.canAccess(CONFIG.CANDIDATE), function (req, res
       res.status(500).json({error: 'Cannot update candidate db...!'});
     });
   } catch(err) {
+    console.log(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -667,7 +741,24 @@ router.post('/cancelleave', auth.canAccess(CONFIG.CANDIDATE), function (req, res
 
 // update absentees
 router.post('/updateapproval', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
-  try{
+  if(req.body.approval === 'closed') {
+    console.log('here');
+    try{
+      dashboardMongoController.cancelLeave({id:{_id:req.body.id}}, function (status) {
+        logger.info('Cancel Leave Status: ', status);
+        res.status(201).json({success: 'success'});
+      }, function (err) {
+        logger.error('Cancel Leave Error: ', err);
+        res.status(500).json({error: 'Cannot update candidate db...!'});
+      });
+    } catch(err) {
+      console.log(err);
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      });
+    }
+  }else {
+    try{
     dashboardMongoController.updateApproval(req.body, function (status) {
       logger.info('Update Absentees Status: ', status);
       res.status(201).json({success: 'success'});
@@ -677,6 +768,25 @@ router.post('/updateapproval', auth.canAccess(CONFIG.ADMINISTRATOR), function (r
     });
   } catch(err) {
     logger.error('Update Absentees Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+}
+});
+
+// update absentees
+router.post('/getwavecandidates', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+  try{
+    dashboardMongoController.getUser(req.body.email, function (data) {
+      logger.info('get user : ', data);
+      res.status(201).json({data: data});
+    }, function (err) {
+      logger.error('Get Absentees Error: ', err);
+      res.status(500).json({error: 'Cannot update candidate db...!'});
+    });
+  } catch(err) {
+    logger.error('Get Absentees Exception: ', err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -830,13 +940,14 @@ router.get('/course/:courseID', auth.canAccess(CONFIG.ADMMEN), function (req, re
 });
 
 // Get all courses for specific wave
-router.get('/coursesforwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/assessment', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardMongoController.getCoursesForWave(req.query.waveID, function (data) {
-      res.status(201).json({courses: data.Course});
+    console.log(req.query.waveid);
+    dashboardNeo4jController.getAssessmentTrack(req.query.waveid, function (data) {
+      res.status(201).json({data: data});
     }, function (err) {
       logger.error('Get Courses For Wave Error: ', err);
-      res.status(500).json({error: 'Cannot get course for specific wave from db...!'});
+      res.status(500).json({error: 'Cannot get assessment for specific wave from db...!'});
     });
   } catch(err) {
     logger.error('Get Courses For Wave Exception: ', err);
@@ -846,12 +957,49 @@ router.get('/coursesforwave', auth.canAccess(CONFIG.ADMMEN), function (req, res)
   }
 });
 
+// map assessments
+router.post('/assessmentdetails', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.mapAssessmentTrack(req.body.assessment, req.body.update, function (data) {
+      res.status(201).json({success: 'success'});
+    }, function (err) {
+      logger.error('Get Courses For Wave Error: ', err);
+      res.status(500).json({error: 'Cannot map to assessment...!'});
+    });
+  } catch(err) {
+    logger.error('Map assessments For Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
+// map assessments
+router.get('/assessmentandcandidates/:waveID/:assessment', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  console.log(req.params.waveID, req.params.assessment);
+  try{
+    dashboardNeo4jController.assessmentsandcandidates(req.params.waveID, req.params.assessment,  function (data) {
+      res.status(201).json({data});
+    }, function (err) {
+      logger.error('Get Candidates For Wave Error: ', err);
+      res.status(500).json({error: 'Cannot map to assessment...!'});
+    });
+  } catch(err) {
+    logger.error('Get candidates For Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
 // Get all candidates and tracks
 router.
 get('/candidatesandtracks/:waveID/:courseName', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   logger.info('API HIT ===> GET Candidates And Tracks');
   try{
-    dashboardMongoController.getCandidates(req.params.waveID, req.params.courseName,
+    dashboardNeo4jController.getWaveSpecificCandidates(req.params.waveID,
        function (candidates) {
          dashboardNeo4jController.getAssessmentTrack(req.params.courseName,
            function (assessmentTrack) {
@@ -928,19 +1076,21 @@ router.get('/waveobject/:waveID', auth.canAccess(CONFIG.ADMMEN), function (req, 
 // Save the cadet information
 router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
-    dashboardNeo4jController.addCadet(req.body, function (cadet) {
-      logger.debug('Added the cadet', result)
-        res.status(200).json(result);
-    }, function(err) {
-      logger.error('Error in adding a cadet in the neo4j',  err)
-      res.status(500).json({error: 'Cannot save cadidate in neo4j...!'});
-    })
-  } catch(err) {
-    logger.error('Add Candidate Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
+    let cadet = req.body;
+      dashboardNeo4jController.addCadet(cadet, function (result) {
+            logger.debug('Added the cadet', result)
+                res.status(200).json(result);
+            }, function(err) {
+            logger.error('Error in adding a cadet in the neo4j',  err)
+            res.status(500).json({error: 'Cannot save cadidate in neo4j...!'});
+          })
+        }
+      catch(err) {
+        logger.error('Add Candidate Exception: ', err);
+        res.status(500).json({
+          error: 'Internal error occurred, please report...!'
+        });
+      }
 });
 
 /** **************************************************
@@ -991,9 +1141,9 @@ router.get('/waves', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 });
 
 // Get all cadets of a particular wave
-router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardMongoController.getCadetsOfWave(req.body.cadets, function (cadets) {
+    dashboardNeo4jController.getCadetsOfWave(req.body.waveid, function (cadets) {
       res.status(201).json(cadets);
     }, function (err) {
       logger.error('Get Cadets of Wave Error: ', err);
@@ -1023,7 +1173,6 @@ router.post('/cadetsofproj', auth.canAccess(CONFIG.MENTOR), function (req, res) 
     });
   }
 });
-
 
 // delete a wave
 router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
@@ -1083,7 +1232,7 @@ router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, 
 
 router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillability(function (billable) {
+    dashboardNeo4jController.getBillability(function (billable) {
       res.status(201).json(billable);
     }, function (err) {
       logger.error('Get All billable Error: ', err);
@@ -1098,7 +1247,7 @@ router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getNonBillability(function (nonbillable) {
+    dashboardNeo4jController.getNonBillability(function (nonbillable) {
       res.status(201).json(nonbillable);
     }, function (err) {
       logger.error('Get All non-billable Error: ', err);
@@ -1113,7 +1262,7 @@ router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillabilityFree(function (free) {
+    dashboardNeo4jController.getBillabilityFree(function (free) {
       res.status(201).json(free);
     }, function (err) {
       logger.error('Get All billable-free Error: ', err);
@@ -1128,7 +1277,7 @@ router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardMongoController.getBillabilitySupport(function (support) {
+    dashboardNeo4jController.getBillabilitySupport(function (support) {
       res.status(201).json(support);
     }, function (err) {
       logger.error('Get All billable-support Error: ', err);

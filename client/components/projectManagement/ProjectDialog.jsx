@@ -92,7 +92,6 @@ export default class ProjectDialog extends React.Component {
 			candidatesName: [] ,
 			candidateIDList: [] ,
 			candidateDelList: [],
-			prevWave: '',
 			project: {}
 		}
 		this.getWaveIDs = this.getWaveIDs.bind(this)
@@ -134,7 +133,6 @@ export default class ProjectDialog extends React.Component {
 				candidateList:candidateList,
 				candidateIDList:candidateIDList,
 				wave: this.props.project.version[th.props.version].wave,
-				prevWave: this.props.project.version[th.props.version].wave,
 				skills: this.props.project.version[th.props.version].skills,
 				showDialog: this.props.openDialog
 			})
@@ -177,21 +175,21 @@ export default class ProjectDialog extends React.Component {
 			let candidateName = []
 			let candidateID = []
 			Request
-				.get('/dashboard/wavespecificcandidates?waveID='+waveID)
+				.post('/dashboard/cadetsofwave')
 				.set({'Authorization': localStorage.getItem('token')})
+				.send({waveid: waveID})
 				.end(function(err, res){
-				res.body.data.map(function(candidate,index) {
-					candidateList.push(candidate)
-					candidateName.push(candidate.EmployeeName)
-					candidateID.push(candidate.EmployeeID)
+					res.body.map(function(candidate,index) {
+						candidateList.push(candidate)
+						candidateName.push(candidate.EmployeeName)
+						candidateID.push(candidate.EmployeeID)
+					})
+					th.setState({
+						candidates: candidateList,
+						candidatesName: candidateName
+					})
 				})
-				th.setState({
-					candidates: candidateList,
-					candidatesName: candidateName
-				})
-			})
 	}
-
 
 	handleControlDelete(perm) {
 		console.log(perm,"cntrlDelete")
@@ -260,7 +258,6 @@ export default class ProjectDialog extends React.Component {
 	handleClose(e, action) {
 		if(action == 'CLOSE') {
 			if(this.props.dialogTitle == 'ADD PRODUCT') {
-				console.log("addproduct")
 				this.setState({
 					showDialog: false,
 					projectName: '',
@@ -270,7 +267,9 @@ export default class ProjectDialog extends React.Component {
 					projectNameErrorText: '',
 					projectDescErrorText: '',
 					waveErrorText: '',
-					skillsErrorText: ''
+					skillsErrorText: '',
+					skills: [],
+					candidateList: []
 				})
 			} else if(this.props.dialogTitle == 'EDIT PRODUCT') {
 				this.setState({
@@ -336,20 +335,24 @@ export default class ProjectDialog extends React.Component {
 	}
 
 	handleAdd() {
-		console.log(this.state.candidateList,"candidateList")
+		 console.log(this.state.candidateList,"candidateList")
+
 			let project = {}
 			project.version = []
 			project.version.push({})
 		  project.version[0].members =[]
 			let th = this
 			this.state.candidateList.map(function(name, index){
-				project.version[0].members.push({EmployeeID:th.state.candidateIDList[index],EmployeeName:name})
+				project.version[0].members.push({EmployeeID:th.state.candidateIDList[index], EmployeeName:name})
 			})
 			project.product = this.state.projectName;
-			project.version[0].name= this.state.versionName;
+			project.version[0].name = this.state.versionName;
 			project.version[0].description = this.state.projectDesc;
 			project.version[0].wave = this.state.wave;
 			project.version[0].skills = this.state.skills;
+			project.version[0].updated = false;
+			project.version[0].addedOn = new Date();
+			// project.version[0].addedBy = xyz;
 			this.setState({
 				projectName: '',
 				versionName: '',
@@ -359,10 +362,9 @@ export default class ProjectDialog extends React.Component {
 				skills: []
 			})
 			this.props.addProject(project);
-			console.log(project,"handleadd")
 	}
 
-		handleAddVersion() {
+	handleAddVersion() {
 			let th = this;
 			let product = th.state.projectName;
 			let version = {}
@@ -374,6 +376,9 @@ export default class ProjectDialog extends React.Component {
 			version.description = this.state.projectDesc;
 			version.wave = this.state.wave;
 			version.skills = this.state.skills;
+			version.updated = true;
+			// version.addedOn = new Date();
+			// version.addedBy = xyz;
 			this.setState({
 				projectName: '',
 				versionName: '',
@@ -417,24 +422,17 @@ export default class ProjectDialog extends React.Component {
 	}
 
 	handleUpdate() {
-		console.log("inside handleUpdate",this.state.candidateList)
-		let prevWave = '';
-		if(this.state.prevWave !== this.state.wave)
-		{
-			prevWave = this.state.prevWave
-		}
-		let project = this.state.project;
-		let th = this
-		project.version[th.props.version].members = [];
-			this.state.candidateList.map(function(name, index){
-				project.version[th.props.version].members.push({EmployeeName:name,EmployeeID:th.state.candidateIDList[index]})
-			})
-		console.log(project.version[th.props.version].members,"members in handleupdate");
-		project.product= this.state.projectName;
-		project.version[th.props.version].name = this.state.versionName;
-		project.version[th.props.version].description = this.state.projectDesc;
-		project.version[th.props.version].wave = this.state.wave;
-		project.version[th.props.version].skills = this.state.skills;
+		let th = this;
+		let version = this.state.project.version[th.props.version];
+		version.members = [];
+		this.state.candidateList.map(function(name, index){
+			version.members.push({EmployeeName: name, EmployeeID: th.state.candidateIDList[index]})
+		})
+		version.name = this.state.versionName;
+		version.description = this.state.projectDesc;
+		version.wave = this.state.wave;
+		version.skills = this.state.skills;
+		version.addedOn = new Date();
 		this.setState({
 			projectName: '',
 			projectDesc: '',
@@ -442,51 +440,36 @@ export default class ProjectDialog extends React.Component {
 			wave: '',
 			skills: []
 		})
-		let projObj = {
-			project: project,
-			delList: this.state.candidateDelList,
-			prevWave: prevWave,
-			version: th.props.version
-		}
-		this.props.handleUpdate(projObj);
+		this.props.handleUpdate(version);
 		this.props.handleClose();
-		console.log(projObj,"projobj in handleupdt")
 	}
 
 	validationSuccess() {
 		if(this.state.projectName.trim().length == 0) {
-
 			this.setState({
 				projectNameErrorText: 'This field cannot be empty'
 			})
-			if(this.state.versionName.trim().length == 0) {
-
-				this.setState({
-					projectVersionErrorText: 'This field cannot be empty'
-				})
+		} else if(this.state.versionName.trim().length == 0) {
+			this.setState({
+				projectVersionErrorText: 'This field cannot be empty'
+			})
 		} else if(this.state.wave.length == 0) {
-
 			this.setState({
 				waveErrorText: 'This field cannot be empty'
 			})
 		} else if(this.state.skills.length == 0) {
-
 			this.setState({
 				skillsErrorText: 'This list cannot be empty'
 			})
 		} else if(this.state.projectDesc.trim().length == 0) {
-
 			this.setState({
 				projectDescErrorText: 'This field cannot be empty'
 			})
-		}
-	}
-	 else {
-			return true
+		} else {
+				return true
 		}
 		return false
 	}
-
 
 	render() {
 		let th = this
@@ -548,7 +531,6 @@ export default class ProjectDialog extends React.Component {
 				actionsContainerStyle={styles.actionsContainer}
         open={this.state.showDialog}
         autoScrollBodyContent={true}
-        onRequestClose={(e)=>{this.handleClose(e, 'CLOSE')}}
       >
 				<div>
 				 <TextField
@@ -575,7 +557,8 @@ export default class ProjectDialog extends React.Component {
 					 <SelectField
 							onChange={th.onWaveChange}
 							errorText={this.state.waveErrorText}
-							floatingLabelText='Select Wave'
+							floatingLabelText='Wave *'
+							floatingLabelStyle={app.mandatoryField}
 							value={th.state.wave}
 							style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
 						>
@@ -619,7 +602,8 @@ export default class ProjectDialog extends React.Component {
 					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box'}}>
 					<TextField
 			    		hintText="Skills"
-			    		floatingLabelText="Skills"
+			    		floatingLabelText="Skills *"
+							floatingLabelStyle={app.mandatoryField}
 			    		value={this.state.skillName}
 							errorText={this.state.skillsErrorText}
 			    		onChange={this.onChangeSkill}
@@ -629,27 +613,28 @@ export default class ProjectDialog extends React.Component {
 				      <AddIcon/>
 				    </IconButton>
 						<Paper style={styles.paper} zDepth={1} >
-									<div style={styles.wrapper}>
-										{
-											this.state.skills.map(function (skill, index) {
-												return(
-													<Chip
-														onRequestDelete={() => th.handleSkillDelete(skill)}
-									          style={styles.chip}
-									          key={index}
-									        >
-									          <span style={styles.chipName}>{skill}</span>
-									        </Chip>
-								        )
-											})
-										}
-									</div>
+							<div style={styles.wrapper}>
+								{
+									this.state.skills.map(function (skill, index) {
+										return(
+											<Chip
+												onRequestDelete={() => th.handleSkillDelete(skill)}
+							          style={styles.chip}
+							          key={index}
+							        >
+							          <span style={styles.chipName}>{skill}</span>
+							        </Chip>
+						        )
+									})
+								}
+							</div>
 						</Paper>
 						</div>
 					</div>
 					<div>
 		      	<TextField
-				      floatingLabelText='Description'
+				      floatingLabelText='Description *'
+							floatingLabelStyle={app.mandatoryField}
 				      value={this.state.projectDesc}
 				      onChange={this.handleDescChange}
 							errorText={this.state.projectDescErrorText}

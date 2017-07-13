@@ -16,7 +16,8 @@ export default class Attendance extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      Cadet: [],
+      CadetEmail: '',
+      Cadet: {},
       startDate: '',
       endDate: '',
       pointer: 'pointer'
@@ -25,37 +26,42 @@ export default class Attendance extends React.Component {
     this.format = this.format.bind(this);
     this.formatMonth = this.formatMonth.bind(this);
     this.getCadet = this.getCadet.bind(this);
-    this.getWave = this.getWave.bind(this);
-    this.handlePresent - this.handlePresent.bind(this);
+    this.handlePresent = this.handlePresent.bind(this);
+    this.getUser = this.getUser.bind(this);
   }
 
   componentWillMount() {
     this.getCadet();
+    this.getUser();
   }
 
   getCadet() {
+    let th = this;
+    Request.get('/dashboard/getwaveofcadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log(res.body);
+        th.setState({
+            CadetEmail: res.body.data.EmailID,
+            startDate: res.body.data.Wave.StartDate,
+            endDate: res.body.data.Wave.EndDate
+          })
+      }
+    })
+  }
+
+  getUser() {
     let th = this;
     Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
         console.log(res.body);
-        th.setState({Cadet: res.body})
-        th.getWave(res.body.Wave);
-      }
-    })
-  }
-
-  getWave(waveID) {
-    let th = this;
-    Request.get(`/dashboard/wave?waveid=${waveID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
         th.setState({
-          startDate: res.body.StartDate,
-          endDate: res.body.EndDate
-        })
+            Cadet: res.body
+          })
+          console.log('done')
       }
     })
   }
@@ -73,9 +79,9 @@ export default class Attendance extends React.Component {
   }
 
 
-  handlePresent(EmpID) {
+  handlePresent(EmailID) {
       let th = this
-      Request.post('/dashboard/updatepresent').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID}).end(function(err, res) {
+      Request.post('/dashboard/updatepresent').set({'Authorization': localStorage.getItem('token')}).send({email: EmailID}).end(function(err, res) {
         if (err)
           console.log(err);
         else {
@@ -92,6 +98,7 @@ export default class Attendance extends React.Component {
     let week = [];
     let dayName = [];
     let name = [];
+    console.log(this.state.Cadet)
     if (th.state.startDate != '') {
       let now = Moment(th.state.endDate);
       let daysOfYear = [];
@@ -137,7 +144,7 @@ export default class Attendance extends React.Component {
         }
         else if((th.format(d) === th.format(new Date())) && color === 'white')
         {
-            daysOfYear.push(<TableRowColumn style={{backgroundColor:color,fontSize:'17px', width:'5px', border: '2px dotted violet'}}><u style={{cursor: 'pointer'}} onClick={this.handlePresent.bind(this, this.state.Cadet.EmployeeID)}>{th.formatDate(d)}</u></TableRowColumn>);
+            daysOfYear.push(<TableRowColumn style={{backgroundColor:color,fontSize:'17px', width:'5px', border: '2px dotted violet'}}><u style={{cursor: 'pointer'}} onClick={this.handlePresent.bind(this, this.state.Cadet.email)}>{th.formatDate(d)}</u></TableRowColumn>);
         }
         else if(th.formatDate(d) == "01")
         {

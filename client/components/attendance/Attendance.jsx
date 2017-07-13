@@ -13,6 +13,7 @@ import ApproveIcon from 'material-ui/svg-icons/navigation/check';
 import {red500, green500} from 'material-ui/styles/colors';
 import DatePicker from 'material-ui/DatePicker';
 import Moment from 'moment';
+import Dialog from 'material-ui/Dialog';
 import {
   Table,
   TableBody,
@@ -30,6 +31,15 @@ const styles = {
   },
   row: {
     wordWrap: 'break-word'
+  },
+  deleteDialog: {
+    backgroundColor: '#DDDBF1',
+    border: '10px solid teal'
+  },
+  actionsContainer: {
+    backgroundColor: 'teal',
+    borderTop: '0px',
+    marginTop: '0px'
   }
 }
 
@@ -45,7 +55,7 @@ export default class Attendance extends React.Component {
       reason: '',
       submit: true,
       days: 0,
-      cadet: null,
+      cadet: {},
       role: 'candidate',
       cadets: [],
       type: 'no',
@@ -53,10 +63,13 @@ export default class Attendance extends React.Component {
       result: 'rejected',
       WaveIds: [],
       cadetsOfWave: [],
+      cadetsEmail: [],
       WaveID: '',
       Date: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
+      CadetEmail: '',
+      future: false
     }
     this.handleSelect = this.handleSelect.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -78,7 +91,9 @@ export default class Attendance extends React.Component {
     this.handleDateChange = this.handleDateChange.bind(this);
     this.updatePresent = this.updatePresent.bind(this);
     this.handlePresent = this.handlePresent.bind(this);
-    this.getWave = this.getWave.bind(this);
+    this.getUser = this.getUser.bind(this);
+    this.getWaveCandidates = this.getWaveCandidates.bind(this);
+    this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
   }
 
   componentWillMount() {
@@ -94,6 +109,7 @@ export default class Attendance extends React.Component {
         th.setState({role: res.body})
         if (th.state.role === 'candidate') {
           th.getCadet();
+          th.getUser();
         } else {
           th.getAbsentees();
         }
@@ -101,15 +117,16 @@ export default class Attendance extends React.Component {
     })
   }
 
-  updatePresent(EmpID, date, type) {
+  updatePresent(email, date, type) {
+    console.log(date);
     if(type === 'present') {
     let th = this
-    Request.post('/dashboard/present').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID, id: date, Date: th.state.Date}).end(function(err, res) {
+    Request.post('/dashboard/present').set({'Authorization': localStorage.getItem('token')}).send({email: email, id: date, Date: th.state.Date}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
         let cadet = th.state.cadetsOfWave.filter(function(cadet) {
-          return cadet.EmployeeID === EmpID;
+          return cadet.email === email;
         });
         cadet[0].DaysPresent.push(th.state.Date);
         cadet[0].DaysAbsent = cadet[0].DaysAbsent.filter(function(cadets, key) {
@@ -128,7 +145,7 @@ export default class Attendance extends React.Component {
       leaveType: 'absent',
       reason: 'absent'
     }
-    Request.post('/dashboard/absent').set({'Authorization': localStorage.getItem('token')}).send({EmployeeID: EmpID, details: details, Date: date}).end(function(err, res) {
+    Request.post('/dashboard/absent').set({'Authorization': localStorage.getItem('token')}).send({email: email, details: details, Date: date}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
@@ -148,7 +165,29 @@ export default class Attendance extends React.Component {
     let candidateName = [];
     let candidateID = [];
     Request.get('/dashboard/wavespecificcandidates?waveID=' + waveId).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      th.setState({cadetsOfWave: res.body.data})
+      let cadetsEmail = res.body.data.map(function(cadet) {
+        return cadet.EmailID;
+      })
+      th.setState({cadetsEmail: cadetsEmail})
+      console.log(cadetsEmail);
+      th.getWaveCandidates(cadetsEmail)
+    })
+  }
+
+  getWaveCandidates(emailArray) {
+    let th = this;
+    Request.post('/dashboard/getwavecandidates')
+    .set({'Authorization': localStorage.getItem('token')})
+    .send({email:emailArray})
+    .end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log(res.body.data)
+        th.setState({
+          cadetsOfWave: res.body.data
+        })
+      }
     })
   }
 
@@ -165,30 +204,34 @@ export default class Attendance extends React.Component {
 
   getCadet() {
     let th = this;
-    Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get('/dashboard/getwaveofcadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-        th.setState({cadet: res.body})
-        th.getWave(res.body.Wave);
+        console.log(res.body);
+        th.setState({
+            CadetEmail: res.body.data.EmailID,
+            startDate: res.body.data.Wave.StartDate,
+            endDate: res.body.data.Wave.EndDate
+          })
       }
     })
   }
 
-  getWave(waveID) {
-    let th = this;
-    Request.get(`/dashboard/wave?waveid=${waveID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        console.log(res.body,'in attendance');
-        th.setState({
-          startDate: res.body.StartDate,
-          endDate: res.body.EndDate
-        })
-      }
-    })
-  }
+    getUser() {
+      let th = this;
+      Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+        if (err)
+          console.log(err);
+        else {
+          console.log(res.body);
+          th.setState({
+              cadet: res.body
+            })
+            console.log('done')
+        }
+      })
+    }
 
   updateabsentees() {
     let th = this;
@@ -200,12 +243,13 @@ export default class Attendance extends React.Component {
         leaveType: th.state.leaveType,
         reason: th.state.reason
       },
-      absentee: th.state.cadet.EmployeeID
+      absentee: th.state.cadet.email
     }).end(function(err, res) {
       if (err)
         console.log(err);
       else {
         th.getCadet();
+        th.getUser();
       }
     })
   }
@@ -214,7 +258,14 @@ export default class Attendance extends React.Component {
     let day = range.endDate._d - range.startDate._d;
     day = day / 1000;
     day = Math.floor(day / 86400) + 1;
+    if(range.startDate._d < new Date() && this.formatDate(range.startDate)!=this.formatDate(new Date()))
+    {
+      this.setState({future: true})
+      return range.startDate._d = new Date()
+    }
+    else {
     this.setState({fromDate: range.startDate._d, toDate: range.endDate._d, days: day})
+    }
   }
 
   handleChange(event, index, value) {
@@ -296,9 +347,10 @@ export default class Attendance extends React.Component {
     );
   }
 
-  cancelLeave(index, dateID) {
+  cancelLeave(index, date) {
     let th = this
-    Request.post('/dashboard/cancelleave').set({'Authorization': localStorage.getItem('token')}).send({id: dateID}).end(function(err, res) {
+    console.log(date);
+    Request.post('/dashboard/cancelleave').set({'Authorization': localStorage.getItem('token')}).send({id: date}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
@@ -329,9 +381,31 @@ export default class Attendance extends React.Component {
     this.setState({Date: date})
   }
 
+  closeDeleteDialog() {
+    this.setState({
+      future: false
+    })
+  }
+
   render() {
     let th = this;
     if (this.state.role === 'candidate') {
+      const deleteDialogActions = [
+        < FlatButton label = "Cancel" onTouchTap = {
+          this.closeDeleteDialog
+        }
+        style = {
+          styles.actionButton
+        } />, < FlatButton label = "Okay" onTouchTap = {
+          this.closeDeleteDialog
+        }
+        onClick = {
+          this.closeDeleteDialog
+        }
+        style = {
+          styles.actionButton
+        } />
+      ]
       const {finished, stepIndex} = this.state;
       if (th.state.cadet != null) {
         let attendance = '';
@@ -392,6 +466,7 @@ export default class Attendance extends React.Component {
                   <Step>
                     <StepLabel>Select DateRange</StepLabel>
                     <StepContent>
+                      <p style={{color:'red'}}><b>Leave can be applied only for future dates.</b></p>
                       <DateRange onInit={this.handleSelect} onChange={this.handleSelect}/>
                       <h3>Number of Days:{this.state.days}</h3>
                       {this.renderStepActions(1)}
@@ -425,14 +500,14 @@ export default class Attendance extends React.Component {
                   </TableHeader>
                   <TableBody displayRowCheckbox={false} showRowHover={true}>
                     {th.state.cadet.DaysAbsent.map(function(dates, index) {
-                      if(new Date(dates.fromDate) > new Date())
+                      if(new Date(dates.fromDate) > new Date() || (th.formatDate(dates.fromDate) === th.formatDate(new Date()) && dates.reason !== 'absent'))
                       return (
                           <TableRow>
                             <TableRowColumn>{th.formatDate(dates.fromDate)}</TableRowColumn>
                             <TableRowColumn>{th.formatDate(dates.toDate)}</TableRowColumn>
                             <TableRowColumn>{dates.reason}</TableRowColumn>
                             <TableRowColumn>
-                              <IconButton tooltip="Cancel" onClick={th.cancelLeave.bind(this, index, dates._id)}>
+                              <IconButton tooltip="Cancel" onClick={th.cancelLeave.bind(this, index, dates)}>
                                 <RejectIcon color={red500}/>
                               </IconButton>
                             </TableRowColumn>
@@ -445,6 +520,9 @@ export default class Attendance extends React.Component {
               </Tab>
             </Tabs>
           }
+          <Dialog bodyStyle={styles.deleteDialog} actionsContainerStyle={styles.actionsContainer} actions={deleteDialogActions} modal={false} open={th.state.future} onRequestClose={this.closeDeleteDialog}>
+            Leave can be applied only for future dates.
+          </Dialog>
           </div>
         )
       } else {
@@ -478,7 +556,7 @@ export default class Attendance extends React.Component {
                   return (
                     <TableRow>
                       <TableRowColumn>{leaveno++}</TableRowColumn>
-                      <TableRowColumn>{cadets.EmployeeName}</TableRowColumn>
+                      <TableRowColumn>{cadets.email.split('.')[0]}</TableRowColumn>
                       <TableRowColumn>{details.leaveType}</TableRowColumn>
                       <TableRowColumn>{th.formatDate(details.fromDate)}</TableRowColumn>
                       <TableRowColumn>{th.formatDate(details.toDate)}</TableRowColumn>
@@ -509,7 +587,7 @@ export default class Attendance extends React.Component {
       )
       return (
         <div>
-          <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
+            <Tabs onChange={this.handleChangeTab} value={this.state.slideIndex}>
             <Tab label="Approve Leaves" value={0}>
               {table}</Tab>
             <Tab label="Rejected Leaves" value={1}>
@@ -532,22 +610,22 @@ export default class Attendance extends React.Component {
                 </TableHeader>
                 <TableBody displayRowCheckbox={false} showRowHover={true}>
                   {th.state.cadetsOfWave.map(function(cadet, index) {
-                    let absent = "red";
+                    let absent = "#f20404";
                     let present = "grey";
                     let date = '';
                     let value = "present"
                     cadet.DaysAbsent.map(function(details) {
                       if ((th.formatDate(new Date(details.fromDate)) <= th.formatDate(new Date(th.state.Date))) && ((new Date(details.toDate) >= new Date(th.state.Date)) || (th.formatDate(new Date(details.fromDate)) === (th.formatDate(new Date(details.toDate)))))) {
                         present = "grey"
-                        absent = "red"
-                        date = details._id
+                        absent = "#f20404"
+                        date = details
                         value = "present"
                       }
                     })
                     cadet.DaysPresent.filter(function(detail) {
                       if (th.formatDate(detail) === th.formatDate(th.state.Date)) {
                       absent = "grey"
-                        present = "green"
+                        present = "#55ea0b"
                         date = detail
                         value = "absent"
                       }
@@ -555,15 +633,15 @@ export default class Attendance extends React.Component {
                     return (
                       <TableRow>
                         <TableRowColumn>
-                          {cadet.EmployeeName}
+                          {cadet.email.split('.')[0]}
                         </TableRowColumn>
                         <TableRowColumn>
-                          <IconButton tooltip="Present" onClick={th.updatePresent.bind(this, cadet.EmployeeID, date, value)}>
+                          <IconButton tooltip="Present" onClick={th.updatePresent.bind(this, cadet.email, date, value)}>
                             <ApproveIcon color={present} viewBox='0 0 20 20'/>
                           </IconButton>
                         </TableRowColumn>
                         <TableRowColumn>
-                          <IconButton tooltip="Reject" onClick={th.updatePresent.bind(this, cadet.EmployeeID, date, value)}>
+                          <IconButton tooltip="Reject" onClick={th.updatePresent.bind(this, cadet.email, date, value)}>
                             <RejectIcon color={absent}  viewBox='0 0 20 20'/>
                           </IconButton>
                         </TableRowColumn>
