@@ -16,6 +16,7 @@ import CameraIcon from 'material-ui/svg-icons/image/camera-alt';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import Dropzone from 'react-dropzone';
 import Moment from 'moment';
+import DropDownMenu from 'material-ui/DropDownMenu';
 
 const styles = {
 	container: {
@@ -40,7 +41,7 @@ const styles = {
 		width: 150
 	},
 	dropzone: {
-		borderStyle: 'none' 
+		borderStyle: 'none'
 	},
 	basicDetails: {
 		textAlign: 'center',
@@ -67,7 +68,6 @@ export default class ProfileView extends React.Component {
 			cadet: {},
 			wave: {},
 			showPersonalDialog: false,
-			showProjectDialog: false,
 			showAssetDialog: false,
 			projectName: '',
 			projectDesc: '',
@@ -79,11 +79,10 @@ export default class ProfileView extends React.Component {
 			picPreview: '',
 			assetID: '',
 			email: '',
-			contact: ''
+			contact: '',
+			Billability: '',
+			Billing: ['Billable', 'Non-billable', 'Support' , 'Free']
 		}
-		this.openProjectDialog = this.openProjectDialog.bind(this);
-		this.closeProjectDialog = this.closeProjectDialog.bind(this);
-		this.handleProjectChange = this.handleProjectChange.bind(this);
 		this.openAssetDialog = this.openAssetDialog.bind(this);
 		this.closeAssetDialog = this.closeAssetDialog.bind(this);
 		this.handleAssetChange = this.handleAssetChange.bind(this);
@@ -95,6 +94,7 @@ export default class ProfileView extends React.Component {
 		this.handleDrop = this.handleDrop.bind(this);
 		this.handlePicSave = this.handlePicSave.bind(this);
 		this.formatDate = this.formatDate.bind(this);
+		this.changeBillability = this.changeBillability.bind(this);
 	}
 	componentWillMount() {
 		let picPreview = this.state.defaultProfilePic;
@@ -106,7 +106,8 @@ export default class ProfileView extends React.Component {
 			projectName: this.props.cadet.ProjectName,
 			projectDesc: this.props.cadet.ProjectDescription,
 			projectSkills: this.props.cadet.ProjectSkills,
-  		picPreview: this.state.defaultProfilePic
+  		picPreview: this.state.defaultProfilePic,
+			Billability: this.props.cadet.Billability
   	})
 	}
 	componentWillUpdate(nextProps, nextState) {
@@ -138,29 +139,17 @@ export default class ProfileView extends React.Component {
 			contact: event.target.value
 		})
 	}
-	openProjectDialog() {
+
+	changeBillability(event, index, value) {
+		let Billability = value;
 		this.setState({
-			showProjectDialog: true
+			Billability: Billability
 		})
+		let cadet = this.state.cadet;
+		cadet.Billability = value;
+		this.props.handleUpdate(cadet);
 	}
-	closeProjectDialog() {
-		this.setState({
-			showProjectDialog: false
-		})
-	}
-	handleProjectChange(event, key, value) {
-		let th = this;
-		this.props.projects.map(function (project, index) {
-			if(index == key) {
-				th.setState({
-					disableSave: false,
-					projectName: project.name,
-					projectDesc: project.description,
-					projectSkills: project.skills
-				})
-			}
-		})
-	}
+
 	openAssetDialog() {
 		this.setState({
 			showAssetDialog: true
@@ -182,17 +171,11 @@ export default class ProfileView extends React.Component {
 		cadet.AltEmail = this.state.email;
 		cadet.Contact = this.state.contact;
 		cadet.AssetID = this.state.assetID;
-		cadet.ProjectName = this.state.projectName;
-		cadet.ProjectDescription = this.state.projectDesc;
-		cadet.ProjectSkills = this.state.projectSkills;
 		this.setState({
 			disableSave: false,
-			assetID: '',
-			email: '',
-			contact: '',
-			projectName: '',
-			projectDesc: '',
-			projectSkills: ''
+			assetID: this.state.assetID,
+			email: this.state.email,
+			contact: this.state.contact
 		})
 		this.props.handleUpdate(cadet)
 	}
@@ -200,7 +183,6 @@ export default class ProfileView extends React.Component {
 		this.setState({
 			disableSavePic: true
 		})
-		console.log('Save the pic');
 		this.props.handlePicSave(this.state.picFile)
 	}
 	handleDrop(acceptedFiles, rejectedFiles) {
@@ -218,20 +200,7 @@ export default class ProfileView extends React.Component {
 	}
 
 	render() {
-		const projectDialogActions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.closeProjectDialog}
-      />,
-      <FlatButton
-        label="Save"
-        primary={true}
-        onTouchTap={this.closeProjectDialog}
-        onClick={this.handleUpdate}
-        disabled={this.state.disableSave}
-      />,
-    ];
+		let th = this;
     const assetDialogActions = [
       <FlatButton
         label="Cancel"
@@ -244,7 +213,7 @@ export default class ProfileView extends React.Component {
         onTouchTap={this.closeAssetDialog}
         onClick={this.handleUpdate}
         disabled={this.state.disableSave}
-      />,
+      />
     ];
     const perosnalDialogActions = [
       <FlatButton
@@ -278,9 +247,9 @@ export default class ProfileView extends React.Component {
 					</Row>
 					<Row>
 						<Col md={2} mdOffset={2} style={styles.pic}>
-							<Dropzone 
+							<Dropzone
 								accept="image/jpeg, image/png"
-								onDrop={this.handleDrop} 
+								onDrop={this.handleDrop}
 								style={styles.dropzone}
 							>
 								<CardMedia>
@@ -289,7 +258,7 @@ export default class ProfileView extends React.Component {
 							</Dropzone>
 
 							<p style={styles.basicDetails}>
-								<IconButton 
+								<IconButton
 									disabled={this.state.disableSavePic}
 									onClick={this.handlePicSave}
 									style={{margin: 'auto'}}
@@ -308,8 +277,8 @@ export default class ProfileView extends React.Component {
 							<h4>
 								Personal
 								<span>
-									<EditIcon 
-										style={styles.editIcon} 
+									<EditIcon
+										style={styles.editIcon}
 										onClick={this.openPersonalDialog}
 									/>
 								</span>
@@ -318,6 +287,17 @@ export default class ProfileView extends React.Component {
 								<strong>Alternate Email:</strong> {this.state.cadet.AltEmail}<br/>
 								<strong>Contact:</strong> {this.state.cadet.Contact}
 							</p>
+
+							<span>
+								<b>Billability Status:</b><br/>
+								<DropDownMenu value={this.state.Billability} onChange={this.changeBillability}>
+									{
+										th.state.Billing.map(function (value){
+										 return (<MenuItem value={value} primaryText={value} />);
+										})
+									}
+				        </DropDownMenu>
+						</span>
 
 							<h4>Experience</h4>
  							<p style={styles.details}>
@@ -332,8 +312,8 @@ export default class ProfileView extends React.Component {
 
 							<h4>Training Details</h4>
 							<p style={styles.details}>
-								<strong>Training Track:</strong> {this.state.cadet.TrainingTrack}<br/>
 								<strong>Wave:</strong> {this.state.cadet.Wave}<br/>
+								<strong>Mode:</strong> {this.state.wave.Mode}<br/>
 								<strong>Start Date:</strong> {this.formatDate(this.state.wave.StartDate)}<br/>
 								<strong>End Date:</strong> {this.formatDate(this.state.wave.EndDate)}
 							</p>
@@ -355,12 +335,6 @@ export default class ProfileView extends React.Component {
 								<div>
 									<h4>
 										Project Details
-										<span>
-											<EditIcon 
-												style={styles.editIcon} 
-												onClick={this.openProjectDialog}
-											/>
-										</span>
 									</h4>
 									<p style={styles.details}>
 										<strong>Project Name:</strong> {this.state.cadet.ProjectName}<br/>
@@ -380,8 +354,8 @@ export default class ProfileView extends React.Component {
 									<h4>
 										Asset Details
 										<span>
-											<EditIcon 
-												style={styles.editIcon} 
+											<EditIcon
+												style={styles.editIcon}
 												onClick={this.openAssetDialog}
 											/>
 										</span>
@@ -397,20 +371,6 @@ export default class ProfileView extends React.Component {
 								<strong>Primary Supervisor:</strong> {this.state.cadet.PrimarySupervisor}<br/>
 								<strong>Project Supervisor:</strong> {this.state.cadet.ProjectSupervisor}
 							</p>
-
-							{
-								(this.state.cadet.ProjectName == undefined ||
-								this.state.cadet.ProjectName == '') &&
-								<RaisedButton
-						      label="Add Project"
-						      backgroundColor={grey900}
-						      labelColor={white}
-						      style={styles.actionButtons}
-						      icon={<ProjectIcon color={white}/>}
-						      onClick={this.openProjectDialog}
-						    />
-							}
-
 							{
 								(this.state.cadet.AssetID == undefined ||
 								this.state.cadet.AssetID == '') &&
@@ -421,7 +381,7 @@ export default class ProfileView extends React.Component {
 						      style={styles.actionButtons}
 						      icon={<AssetIcon color={white}/>}
 						      onClick={this.openAssetDialog}
-						    />	
+						    />
 							}
 
 						</Col>
@@ -444,42 +404,6 @@ export default class ProfileView extends React.Component {
 			      onChange={this.handleContactChange}
 			    />
         </Dialog>
-				<Dialog
-					title="Add your project"
-          actions={projectDialogActions}
-          open={this.state.showProjectDialog}
-          onRequestClose={this.closeProjectDialog}
-        >
-        	<SelectField
-	          value={this.state.projectName}
-	          onChange={this.handleProjectChange}
-	          floatingLabelText="Select your project"
-	        >
-	          {
-	          	this.props.projects.map(function (project, key) {
-	          		return <MenuItem key={key} value={project.name} primaryText={project.name} />
-	          	})
-	          }
-	        </SelectField><br/>
-	        <TextField
-			      floatingLabelText="Description"
-			      value={this.state.projectDesc}
-			      multiLine={true}
-			      rows={3}
-			      rowsMax={3}
-			      disabled={true}
-			      fullWidth={true}
-			    />
-			    <TextField
-			      floatingLabelText="Skills"
-			      value={this.state.projectSkills}
-			      multiLine={true}
-			      rows={3}
-			      rowsMax={3}
-			      disabled={true}
-			      fullWidth={true}
-			    />
-        </Dialog>
         <Dialog
 					title="Add your laptop details"
           actions={assetDialogActions}
@@ -492,7 +416,7 @@ export default class ProfileView extends React.Component {
 			      onChange={this.handleAssetChange}
 			    />
         </Dialog>
-			</div>	
+			</div>
 		)
-	}	
+	}
 }

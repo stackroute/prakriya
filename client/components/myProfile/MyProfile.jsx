@@ -13,11 +13,9 @@ export default class MyProfile extends React.Component {
 		super(props);
 		this.state = {
 			cadet: null,
-			projects: [],
 			imageURL: '',
 			wave: null
 		}
-		this.getProjects = this.getProjects.bind(this);
 		this.getCadet = this.getCadet.bind(this);
 		this.updateProfile = this.updateProfile.bind(this);
 		this.saveProfilePic = this.saveProfilePic.bind(this);
@@ -25,28 +23,9 @@ export default class MyProfile extends React.Component {
 		this.getCadetProject = this.getCadetProject.bind(this);
 	}
 	componentWillMount() {
-		this.getProjects();
 		this.getCadet();
 	}
-	getProjects() {
-		let th = this;
-		Request
-			.get('/dashboard/projects')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-					let projects = res.body.map(function(record) {
-							return record._fields[0];
-					});
-					console.log('Successfully fetched all projects', projects)
-		    	th.setState({
-		    		projects: projects
-		    	})
-		    }
-			})
-	}
+
 	getCadet() {
 		let th = this;
 		Request
@@ -56,9 +35,12 @@ export default class MyProfile extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.setState({
-		    		cadet: res.body.data,
-						wave: res.body.data.Wave
+					let wave = res.body.data.Wave;
+					let cadet = res.body.data;
+					cadet.Wave = cadet.Wave.WaveID;
+					th.setState({
+		    		cadet: cadet,
+						wave: wave
 		    	})
 					console.log(res.body.data)
 		    	th.getProfilePic(res.body.data.EmployeeID);
@@ -78,14 +60,12 @@ export default class MyProfile extends React.Component {
 		    	console.log(err);
 		    else {
 					let cadet = th.state.cadet;
-					cadet.projectName = res.body.projectName;
-					cadet.projectSkills = res.body.projectSkills;
-					cadet.projectDesc = res.body.projectDesc;
+					cadet.ProjectName = res.body.projectName;
+					cadet.ProjectSkills = res.body.projectSkills;
+					cadet.ProjectDescription = res.body.projectDesc;
 		    	th.setState({
 		    		cadet: cadet
 		    	})
-					console.log(cadet)
-		    	th.getProfilePic(res.body.data.EmployeeID);
 		    }
 		  })
 	}
@@ -152,9 +132,20 @@ export default class MyProfile extends React.Component {
 	}
 
 	render() {
+		let th = this;
 		return(
 			<div>
-				Hi
+				{
+					th.state.cadet != null &&
+					th.state.wave != null &&
+					<ProfileView
+						cadet={this.state.cadet}
+						wave={this.state.wave}
+						imageURL={this.state.imageURL}
+						handleUpdate={this.updateProfile}
+						handlePicSave={this.saveProfilePic}
+					/>
+				}
 			</div>
 		)
 	}
