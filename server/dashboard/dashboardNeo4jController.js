@@ -1287,7 +1287,7 @@ let deleteSession = function(waveObj,waveString, successCB, errorCB) {
         successCB('success');
       }
     });
-    
+  }
 module.exports = {
   addCadet,
   updateCadet,
