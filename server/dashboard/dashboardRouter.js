@@ -1124,7 +1124,13 @@ router.post('/cadetsofproj', auth.canAccess(CONFIG.MENTOR), function (req, res) 
 // Get filtered candidates
 router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try{
-    dashboardMongoController.getFilteredCandidates(req.body.filterQuery, function (candidates) {
+    // dashboardMongoController.getFilteredCandidates(req.body.filterQuery, function (candidates) {
+    //   res.status(201).json(candidates);
+    // }, function (err) {
+    //   logger.error('Filter Candidates Error: ', err);
+    //   res.status(500).json({error: 'Cannot filter candidates from db...!'});
+    // });
+    dashboardNeo4jController.getFilteredCadets(req.body.filterQuery, function (candidates) {
       res.status(201).json(candidates);
     }, function (err) {
       logger.error('Filter Candidates Error: ', err);

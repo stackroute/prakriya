@@ -45,7 +45,6 @@ export default class CandidateCard extends React.Component {
 		this.getProfilePic(this.props.candidate.EmployeeID);
 	}
 	componentWillReceiveProps(nextProps) {
-		console.log('new props received');
 		this.getProfilePic(nextProps.candidate.EmployeeID);
 	}
 	getProfilePic(eid) {

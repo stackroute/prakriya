@@ -126,7 +126,10 @@ let updateCadets = function(cadetArr, successCB, errorCB) {
 // fetching all the cadets
 let getCadets = function(successCB, errorCB) {
   let session = driver.session();
-  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return n`;
+  let query = 
+    `MATCH (c: ${graphConsts.NODE_CANDIDATE}),(w: ${graphConsts.NODE_WAVE})
+    MATCH (c)-[:${graphConsts.REL_BELONGS_TO}]->(w)
+    RETURN c`;
   session.run(query).then(function(resultObj) {
     session.close();
     let cadets = [];
@@ -164,16 +167,81 @@ let getNewCadets = function(successCB, errorCB) {
       session.close();
       let cadets = [];
 
-      for(let i = 0; i < resultObj.records.length; i++) {
-        let result = resultObj.records[i];
-          cadets.push(result._fields[0].properties);
-      }
+      resultObj.records.map(function(result) {
+        cadets.push(result._fields[0].properties);
+      })
       successCB(cadets);
     })
     .catch(function (err) {
       errorCB(err);
     })
 }
+
+let getFilteredCadets = function (filterQuery, successCB, errorCB) {
+
+  logger.debug('Filter Query', filterQuery)
+  let session = driver.session();
+  let addFilter = false;
+  let condition = 'WHERE ';
+  if(filterQuery.EmployeeID != '') {
+    addFilter = true;
+    condition += `n.EmployeeID = '${filterQuery.EmployeeID}' AND `
+  }
+  if(filterQuery.EmployeeName != '') {
+    addFilter = true;
+    condition += `n.EmployeeName = '${filterQuery.EmployeeName}' AND `
+  }
+  if(filterQuery.DigiThonQualified != '') {
+    addFilter = true;
+    condition += `n.DigiThonQualified = '${filterQuery.DigiThonQualified}' AND `
+  }
+  if(filterQuery.DigiThonPhase != '') {
+    addFilter = true;
+    condition += `n.DigiThonPhase = '${filterQuery.DigiThonPhase}' AND `
+  }
+  if(filterQuery.DigiThonScore != '') {
+    addFilter = true;
+    condition += `n.DigiThonScore > '${filterQuery.DigiThonScore}' AND `
+  }
+
+  if(addFilter) {
+    condition = condition.substr(0, condition.length-4);
+  }
+  else {
+    condition = '';
+  }
+
+  let wave = '';
+  if(filterQuery.Wave != '') {
+    wave = `MATCH (n)-[:${graphConsts.REL_BELONGS_TO}]->
+      (w: ${graphConsts.NODE_WAVE}{WaveID: '${filterQuery.Wave}'})`
+  }
+  
+  
+
+
+  let query = 
+    `MATCH(n: ${graphConsts.NODE_CANDIDATE})
+      ${condition}
+      ${wave}
+    RETURN n`;
+
+  logger.debug('Query for the search', query);
+
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+    if (resultObj) {
+      let cadets = [];
+      resultObj.records.map(function (record) {
+        cadets.push(record._fields[0].properties);
+      })
+      successCB(cadets);
+    } else {
+      errorCB(err);
+    }
+  });
+}
+
 
 /**********************************************
 ************** Course Management **************
@@ -1144,6 +1212,7 @@ let getWaveOfCadet = function(EmailID, successCB, errorCB) {
     getCadets,
     getCadet,
     getNewCadets,
+    getFilteredCadets,
     addCourse,
     getCourses,
     updateCourse,
