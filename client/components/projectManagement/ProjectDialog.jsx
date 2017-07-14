@@ -175,22 +175,21 @@ export default class ProjectDialog extends React.Component {
 			let candidateName = []
 			let candidateID = []
 			Request
-				.get('/dashboard/wavespecificcandidates?waveID='+waveID)
+				.post('/dashboard/cadetsofwave')
 				.set({'Authorization': localStorage.getItem('token')})
+				.send({waveid: waveID})
 				.end(function(err, res){
-					console.log('candidates: ', res)
-				res.body.data.map(function(candidate,index) {
-					candidateList.push(candidate)
-					candidateName.push(candidate.EmployeeName)
-					candidateID.push(candidate.EmployeeID)
+					res.body.map(function(candidate,index) {
+						candidateList.push(candidate)
+						candidateName.push(candidate.EmployeeName)
+						candidateID.push(candidate.EmployeeID)
+					})
+					th.setState({
+						candidates: candidateList,
+						candidatesName: candidateName
+					})
 				})
-				th.setState({
-					candidates: candidateList,
-					candidatesName: candidateName
-				})
-			})
 	}
-
 
 	handleControlDelete(perm) {
 		console.log(perm,"cntrlDelete")
@@ -363,7 +362,6 @@ export default class ProjectDialog extends React.Component {
 				skills: []
 			})
 			this.props.addProject(project);
-			console.log(project,"handleadd")
 	}
 
 	handleAddVersion() {
@@ -425,8 +423,6 @@ export default class ProjectDialog extends React.Component {
 
 	handleUpdate() {
 		let th = this;
-		console.log('upadate:: ', th.props.version);
-		console.log(this.state.project.version[th.props.version]);
 		let version = this.state.project.version[th.props.version];
 		version.members = [];
 		this.state.candidateList.map(function(name, index){
@@ -436,6 +432,7 @@ export default class ProjectDialog extends React.Component {
 		version.description = this.state.projectDesc;
 		version.wave = this.state.wave;
 		version.skills = this.state.skills;
+		version.addedOn = new Date();
 		this.setState({
 			projectName: '',
 			projectDesc: '',

@@ -12,8 +12,8 @@ var users = new Schema({
 		notifications: [String],
 		DaysPresent: [Date],
 		DaysAbsent: [{
-			fromDate: {type:Date, unique:true},
-			toDate: {type:Date, unique:true},
+			fromDate: Date,
+			toDate: Date,
 			approved: String,
 			leaveType: String,
 			reason: String

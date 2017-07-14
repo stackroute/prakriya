@@ -52,15 +52,19 @@ export default class Projects extends React.Component {
 		    	console.log(err,"err");
 		    else {
 					console.log('fetched all projects from db -- ', res.body);
+					let projects = res.body.map(function(record) {
+							return record._fields[0];
+					});
 		    	th.setState({
-		    		projects: res.body
+		    		projects: projects
 		    	})
+					console.log('projects in sate: ', projects)
 		    }
 			})
 	}
-	
+
 	addProject(project) {
-		console.log("addproj n projects",project)
+		console.log("addproj n projects", project)
 		let th = this;
 		Request
 			.post('/dashboard/addproject')
@@ -72,7 +76,6 @@ export default class Projects extends React.Component {
 		    else {
 		    	let projects = th.state.projects;
 		    	projects.push(project);
-					console.log('project addition successfull -- ', projects)
 		    	th.setState({
 		    		projects: projects
 		    	})
@@ -81,6 +84,8 @@ export default class Projects extends React.Component {
 	}
 
 	addVersion(version) {
+		console.log("addproj n version", version)
+		version.version.addedOn = new Date();
 		let th = this;
 		Request
 			.post('/dashboard/addversion')

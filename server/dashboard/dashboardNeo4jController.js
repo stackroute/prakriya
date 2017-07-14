@@ -217,9 +217,6 @@ let getFilteredCadets = function (filterQuery, successCB, errorCB) {
       (w: ${graphConsts.NODE_WAVE}{WaveID: '${filterQuery.Wave}'})`
   }
   
-  
-
-
   let query = 
     `MATCH(n: ${graphConsts.NODE_CANDIDATE})
       ${condition}
