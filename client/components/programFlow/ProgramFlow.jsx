@@ -15,6 +15,7 @@ import Paper from 'material-ui/Paper';
 import {lightBlack} from 'material-ui/styles/colors';
 import Schedule from './Schedule.jsx';
 import app from '../../styles/app.json';
+import Masonry from 'react-masonry-component';
 import {
   Table,
   TableBody,
@@ -32,8 +33,29 @@ const styles = {
     background: '#333',
     color: '#eee',
     textAlign: 'center'
-  }
+  },
+  masonry: {
+		width: '1200px'
+	}
 }
+
+const masonryOptions = {
+    transitionDuration: 0
+}
+
+const backgroundColors = [
+	'#F5DEBF',
+	'#DDDBF1',
+	'#CAF5B3',
+	'#C6D8D3'
+	]
+
+const backgroundIcons = [
+	'#847662',
+	'#666682',
+	'#4e5f46',
+	'#535f5b'
+	]
 
 export default class Wave extends React.Component {
   constructor(props) {
@@ -112,33 +134,20 @@ export default class Wave extends React.Component {
                 })
         }
               </SelectField>
-<Table>
-		    <TableHeader displaySelectAll={false} >
-		      <TableRow>
-
-          {th.state.setState === false && (th.state.waveObj).length !== 0 && <Row style={styles.tableHeading}>
-             <TableHeaderColumn><h3>Day</h3></TableHeaderColumn>
-             <TableHeaderColumn><h3>Name</h3></TableHeaderColumn>
-             <TableHeaderColumn><h3>Skills</h3></TableHeaderColumn>
-             <TableHeaderColumn><h3>Session By</h3></TableHeaderColumn>
-             <TableHeaderColumn><h3>Session On</h3></TableHeaderColumn>
-             <TableHeaderColumn><h3>Status</h3></TableHeaderColumn>
-						 </Row>
-						}
-						</TableRow>
-						</TableHeader>
-	 <TableBody displayRowCheckbox={false}>
-         <TableRow displayBorder={true}>
-				  <TableRowColumn>
-          {th.state.setState === false  && (th.state.waveObj).length !== 0  && th.state.waveObj.result.map(function(session, i) {
-            return (<Schedule wave={session} key={i} handleWaveUpdate={th.waveUpdate} handleDelete={th.handleDelete}/>)
+              <Masonry
+      					className={'my-class'}
+      					elementType={'ul'}
+      					options={masonryOptions}
+      					style={styles.masonry}
+      				>
+      				{th.state.setState === false  && (th.state.waveObj).length !== 0  && th.state.waveObj.result.map(function(session, i) {
+            return (<Schedule wave={session} key={i} handleWaveUpdate={th.waveUpdate} handleDelete={th.handleDelete}
+              bgColor={backgroundColors[i%4]}
+              bgIcon={backgroundIcons[i%4]}
+            />)
           })
-
-}
- </TableRowColumn>
-</TableRow>
-</TableBody>
-</Table>
+          }
+          </Masonry>
 </div>
 
     )

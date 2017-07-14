@@ -18,6 +18,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import Dialog from 'material-ui/Dialog';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import Avatar from 'material-ui/Avatar';
 
 const status = [
  < MenuItem key = {1} value = "Pending" primaryText = "Pending" />,
@@ -58,7 +60,6 @@ export default class Schedule extends React.Component {
 
   componentWillMount() {
     let wave = this.props.wave;
-
     this.setState({wave: wave, session: this.props.session})
   }
 
@@ -76,7 +77,6 @@ export default class Schedule extends React.Component {
     let wave = this.state.wave;
     wave.SessionOn = date;
     this.setState({SessionOn: date, wave: wave})
-
   }
 
   handleStatusChange(event, key, val) {
@@ -96,8 +96,8 @@ export default class Schedule extends React.Component {
 
   handleWaveUpdate() {
     let waveObj = this.state.wave;
-    waveObj.SessionBy = this.state.SessionBy;
-    waveObj.SessionOn = this.state.SessionOn;
+    waveObj.SessionBy = this.state.wave.SessionBy;
+    waveObj.SessionOn = this.state.wave.SessionOn;
     this.props.handleWaveUpdate(waveObj);
   }
   handleDelete() {
@@ -105,6 +105,8 @@ export default class Schedule extends React.Component {
     this.props.handleDelete(waveObj)
   }
   render() {
+    let bgColor = this.props.bgColor;
+		let bgIcon = this.props.bgIcon;
     const actions = [
 			 < FlatButton label = "Cancel" primary = {true} onTouchTap = {this.handleClose}/>,
 			 < FlatButton label = "Submit" primary = {true} onTouchTap = {  this.handleClose } onClick = {this.handleDelete} />
@@ -112,39 +114,44 @@ export default class Schedule extends React.Component {
 
     let th = this
     console.log(this.state.wave, "wave@waveObj")
+    let date = '';
+    console.log(th.state.wave.SessionOn)
+    if(th.state.wave.SessionOn != 'null')
+    {
+      date = new Date(th.state.wave.SessionOn);
+    }
     return (
-      <div>
-        <Grid>
-          <Row>
-            <Col md={1}>{th.state.wave.Day.low}</Col>
-            <Col md={1}>{th.state.wave.Name}</Col>
-            <Col md={1}>
+  <div>
+  <Card style={{width:'300px',background: bgColor, marginRight:'20px'}}>
+    <CardHeader
+      title={<b style={{fontSize:'20px'}}>{th.state.wave.Name}</b>}
+      avatar={
+        <Avatar backgroundColor={bgIcon}>
+        {this.state.wave.Day.low}
+      </Avatar>
+    }/>
+            <CardText>
               <ul>
                 {th.state.wave.skill.map(function(result) {
                   return (
                     <li>{result}</li>
                   )
                 })
-}
+                }
               </ul>
-            </Col>
-            <Col md={2} style={styles.fields}>
               <TextField hintText="Who took session ?" value={th.state.wave.SessionBy} onChange={th.handleSessionByChange} onBlur={th.handleWaveUpdate}/>
-            </Col>
-            <Col md={2} style={styles.fields}>
-              <DatePicker hintText="Session On" value={th.state.wave.SessionOn} onChange={th.handleSessionOnChange}/>
-            </Col>
-            <Col md={2} style={styles.fields}>
+              <DatePicker hintText="Session On" value={date} onChange={th.handleSessionOnChange}/>
               <SelectField hintText="What's the status?" value={th.state.wave.Status} onChange={th.handleStatusChange}>
                 {status}
               </SelectField>
-            </Col>
-          </Row>
-        </Grid>
-        <RaisedButton label="Save" primary={true} onClick={this.handleWaveUpdate}/>&nbsp;
-        <RaisedButton label="Delete" primary={true} onTouchTap={this.handleOpen}/>
-        <Dialog title="Are you sure want to delete the session?" actions={actions} modal={true} open={this.state.open}></Dialog>
-      </div>
+          </CardText>
+      <CardActions>
+        <FlatButton label="Save" primary={true} onClick={this.handleWaveUpdate}/>&nbsp;
+        <FlatButton label="Delete" primary={true} onTouchTap={this.handleOpen}/>
+      </CardActions>
+    </Card>
+      <Dialog title="Are you sure want to delete the session?" actions={actions} modal={true} open={this.state.open}></Dialog>
+    </div>
     )
 
   }

@@ -304,8 +304,8 @@ let updateCourse = function(CourseObj, edit, successCB, errorCB) {
       query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}'})
               with c as course
               MERGE (schedule:${graphConsts.NODE_SESSION}{Name:'${schedule.Name}',
-              Description: '${schedule.Description}';
-            })
+              Description: '${schedule.Description}',
+              Day: ${schedule.Day}})
               with schedule as schedule,course as course
               MERGE (schedule)<-[:${graphConsts.REL_HAS}]-(course)
               with schedule as schedule
@@ -1046,7 +1046,7 @@ let updateWaveCadets = function (cadets, waveID, successCB, errorCB) {
   });
 }
 
- 
+
 /**********************************************
 ************ Assessment Tracker *************
 **********************************************/
