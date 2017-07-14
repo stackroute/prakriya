@@ -362,7 +362,7 @@ router.get('/remarkstemplate', auth.canAccess(CONFIG.ADMMEN), function (req, res
 });
 
 // Get cadet Attendance
-router.get('/cadetProfile', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.get('/cadetProfile', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
     dashboardNeo4jController.getCadet(req.user.email, function (cadet) {
       res.status(201).json(cadet);

@@ -1,5 +1,6 @@
 import React from 'react';
 import WaveDetails from './WaveDetails.jsx';
+import GetFeedback from './GetFeedback.jsx';
 
 export default class SRAdmin extends React.Component {
 	constructor(props) {
@@ -9,7 +10,8 @@ export default class SRAdmin extends React.Component {
 	render() {
 		return (
 			<div>
-				<WaveDetails />
+				<WaveDetails /> <br />
+				<GetFeedback />
 			</div>
 		)
 	}
