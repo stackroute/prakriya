@@ -14,6 +14,30 @@ import Chip from 'material-ui/Chip';
 import Snackbar from 'material-ui/Snackbar';
 import app from '../../styles/app.json';
 
+const styles = {
+	filterBody: {
+		border: '1px solid #555'
+	},
+	header: {
+		// backgroundColor: '#eeeeee',
+		// border: '2px solid silver',
+		width: '100%',
+		marginLeft: '0px',
+		marginRight: '0px',
+		marginTop: '5px',
+		marginBottom: '0px',
+		padding: '3px'
+	},
+	name: {
+		textAlign: 'center',
+		color: 'teal'
+	},
+	filters: {
+		// border: '2px solid silver', 
+		width: ' 100%', 
+		padding: '3px'
+	}
+}
 export default class Candidates extends React.Component {
 
 	constructor(props) {
@@ -24,22 +48,25 @@ export default class Candidates extends React.Component {
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
+			waves: [],
 			filtersCount: 0,
 			filteredCandidates: [],
 			displayCandidates: [],
 			showCandidate: false,
 			displayCandidate: {},
-			appliedFilters: [
-				{EmployeeID: {$in: []}},
-				{EmployeeName: {$in: []}},
-				{DigiThonQualified: ''},
-				{DigiThonPhase: ''},
-				{Wave: ''},
-				{DigiThonScore: {$gte: 9999}}
-			]
+			appliedFilters: {
+				EmployeeID: '',
+				EmployeeName: '',
+				DigiThonQualified: '',
+				DigiThonPhase: '',
+				DigiThonScore: '',
+				Skills: '',
+				Wave: ''
+			}
 		}
 
 		this.getCandidates = this.getCandidates.bind(this);
+		this.getWaves = this.getWaves.bind(this);
 		this.candidateView = this.candidateView.bind(this);
 		this.handleBack = this.handleBack.bind(this);
 		this.deleteCandidate = this.deleteCandidate.bind(this);
@@ -56,71 +83,70 @@ export default class Candidates extends React.Component {
 	}
 
 	componentWillMount() {
-		console.log('Will Mount...');
 		this.getCandidates();
+		this.getWaves();
 	}
 
 	addFilter(key, value) {
-		let th = this;
 		let appliedFilters = this.state.appliedFilters;
-		switch(key) {
-			case 'EmployeeID':
-				if(!this.duplicateFilterFound(appliedFilters[0].EmployeeID.$in, value))
-					appliedFilters[0].EmployeeID.$in.push(value);
-				break;
-			case 'EmployeeName':
-				if(!this.duplicateFilterFound(appliedFilters[1].EmployeeName.$in, value))
-					appliedFilters[1].EmployeeName.$in.push(value);
-				break;
-			case 'DigiThonQualified':
-				appliedFilters[2].DigiThonQualified = value;
-				break;
-			case 'DigiThonPhase':
-				appliedFilters[3].DigiThonPhase = value;
-				break;
-			case 'Wave':
-				appliedFilters[4].Wave = value;
-				break;
-			case 'DigiThonScore':
-				appliedFilters[5].DigiThonScore.$gte = value;
-			default:
-				break;
-		}
+
+		appliedFilters[key] = value;
+		// switch(key) {
+		// 	case 'EmployeeID':
+		// 		if(appliedFilters.EmployeeID != value)
+		// 			appliedFilters.EmployeeID = value;
+		// 		break;
+		// 	case 'EmployeeName':
+		// 		if(appliedFilters.EmployeeName != value))
+		// 			appliedFilters.EmployeeName = value;
+		// 		break;
+		// 	case 'DigiThonQualified':
+		// 		appliedFilters[2].DigiThonQualified = value;
+		// 		break;
+		// 	case 'DigiThonPhase':
+		// 		appliedFilters[3].DigiThonPhase = value;
+		// 		break;
+		// 	case 'Wave':
+		// 		appliedFilters[4].Wave = value;
+		// 		break;
+		// 	case 'DigiThonScore':
+		// 		appliedFilters[5].DigiThonScore.$gte = value;
+		// 	default:
+		// 		break;
+		// }
 		this.setState({
-			filtersCount: th.state.filtersCount + 1,
+			filtersCount: this.state.filtersCount+1,
 			appliedFilters: appliedFilters
 		});
-
-		console.log('Add - AppliedFilters: ', appliedFilters)
 		this.getFilteredCandidates()
 	}
 
-	removeFilter(index, key, value) {
+	removeFilter(key) {
 		let th = this;
 		let appliedFilters = this.state.appliedFilters;
-		console.log('RemoveFilter: ', appliedFilters)
-		if(appliedFilters[index][key].$in == undefined) {
-			if(appliedFilters[index][key].$gte == undefined) appliedFilters[index][key] = '';
-			else appliedFilters[index][key].$gte = 9999;
-		} else {
-			let $in = appliedFilters[index][key].$in.filter(function(element) {
-				return element != value;
-			});
-			appliedFilters[index][key].$in = $in
-		}
+		// if(appliedFilters[index][key].$in == undefined) {
+		// 	if(appliedFilters[index][key].$gte == undefined) appliedFilters[index][key] = '';
+		// 	else appliedFilters[index][key].$gte = 9999;
+		// } else {
+		// 	let $in = appliedFilters[index][key].$in.filter(function(element) {
+		// 		return element != value;
+		// 	});
+		// 	appliedFilters[index][key].$in = $in
+		// }
+		appliedFilters[key] = '';
 		this.setState({
 			filtersCount: th.state.filtersCount - 1,
 			appliedFilters: appliedFilters
 		});
-		console.log('Delete - AppliedFilters: ', appliedFilters)
 		this.getFilteredCandidates();
 	}
 
-	duplicateFilterFound(arr, value) {
-			return arr.some(function(element) {
-				return element == value;
-			});
-	}
+	// duplicateFilterFound(arr, value) {
+
+		// return arr.some(function(element) {
+		// 	return element == value;
+		// });
+	// }
 
 	getCandidates() {
 		let th = this;
@@ -140,6 +166,25 @@ export default class Candidates extends React.Component {
 						filteredCandidates: cadets
 		    	});
 					th.setPage(th.state.currentPage);
+		    }
+		  })
+	}
+
+	getWaves() {
+		let th = this;
+		Request
+			.get('/dashboard/waves')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	let waves = res.body.map(function (wave) {
+		    		return wave.WaveID;
+		    	})
+					th.setState({
+						waves: waves
+					})
 		    }
 		  })
 	}
@@ -233,37 +278,39 @@ export default class Candidates extends React.Component {
 	getFilteredCandidates() {
 		let th = this;
 		console.log('FiltersCount: ', th.state.filtersCount)
-		let filterQuery = th.state.filtersCount > 0 ? {'$or': th.state.appliedFilters} : {};
-		Request
-			.post('/dashboard/filteredcandidates')
-			.set({'Authorization': localStorage.getItem('token')})
-			.send({'filterQuery': filterQuery})
-			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-					th.setState({
-						filteredCandidates: res.body
-					});
-		    	console.log('Filter Success');
-					console.log(res);
-					th.setPage(th.state.currentPage)
-		    }
-			})
+		// let filterQuery = th.state.filtersCount > 0 ? {'$or': th.state.appliedFilters} : {};
+		// if(this.state.filtersCount > 0) {
+			Request
+				.post('/dashboard/filteredcandidates')
+				.set({'Authorization': localStorage.getItem('token')})
+				.send({'filterQuery': this.state.appliedFilters})
+				.end(function(err, res) {
+					if(err)
+			    	console.log(err);
+			    else {
+			    	console.log('Filtered candidates', res.body)
+						th.setState({
+							filteredCandidates: res.body
+						});
+						th.setPage(th.state.currentPage)
+			    }
+				})
+		// }
+		
 	}
 
 	resetFilters() {
 		let th = this;
 		this.setState({
 			filtersCount: 0,
-			appliedFilters: [
-				{EmployeeID: {$in: []}},
-				{EmployeeName: {$in: []}},
-				{DigiThonQualified: ''},
-				{DigiThonPhase: ''},
-				{Wave: ''},
-				{DigiThonScore: {$gte: 9999}}
-			],
+			appliedFilters: {
+				EmployeeID: '',
+				EmployeeName: '',
+				DigiThonQualified: '',
+				DigiThonPhase: '',
+				Wave: '',
+				DigiThonScore: ''
+			},
 			filteredCandidates: th.state.candidates,
 			displayCandidates: th.state.candidates.slice(0, 3)
 		});
@@ -271,7 +318,6 @@ export default class Candidates extends React.Component {
 
 	setPage(pageNumber) {
 		let th = this;
-		console.log(th.state);
 		console.log('Page Changed To -- ' + pageNumber);
 		let start = (pageNumber - 1) * 3;
 		let end = start + 3;
@@ -294,85 +340,57 @@ export default class Candidates extends React.Component {
 					<h1 style={app.heading}>Candidate Management</h1>
 					<Grid>
 						<Row>
-							<Col md={3}>
-							<div style={{
-								backgroundColor: '#eeeeee',
-								border: '2px solid silver',
-								width: '100%',
-								marginLeft: '0px',
-								marginRight: '0px',
-								marginTop: '5px',
-								marginBottom: '0px',
-								padding: '3px'
-							}}>
-								<h3 style={{
-									textAlign: 'center',
-									color: 'teal'
-								}}>... FILTERS ...</h3>
-								<div>
-									<div style={{
-										width: '60%',
-										display: 'inline-block',
-										boxSizing: 'border-box',
-										padding: '2px'
-									}}>
-										Candidates Found: {this.state.filteredCandidates.length}
-									</div>
-									<div
-										style={{
-											cursor: 'pointer',
-											width: '40%',
+							<Col md={3} style={styles.filterBody}>
+								<div style={styles.header}>
+									<h3 style={styles.name}>... FILTERS ...</h3>
+									<div>
+										<div style={{
+											width: '60%',
 											display: 'inline-block',
-											padding: '2px',
 											boxSizing: 'border-box',
-											textAlign: 'center',
-											borderRadius: '5px',
-											color: 'blue',
-											textDecoration: 'underline'
-										}}
-										onTouchTap={th.resetFilters}
-									>
-										Reset Filters
+											padding: '2px'
+										}}>
+											Candidates Found: {this.state.filteredCandidates.length}
+										</div>
+										<div
+											style={{
+												cursor: 'pointer',
+												width: '40%',
+												display: 'inline-block',
+												padding: '2px',
+												boxSizing: 'border-box',
+												textAlign: 'center',
+												borderRadius: '5px',
+												color: 'blue',
+												textDecoration: 'underline'
+											}}
+											onTouchTap={th.resetFilters}
+										>
+											Reset Filters
+										</div>
 									</div>
 								</div>
-							</div>
 								{
-									<div style={{border: '2px solid silver', width: ' 100%', padding: '3px'}}>
+									<div style={styles.filters}>
 									{
-										th.state.appliedFilters.map(function(filter, index) {
-											let key = Object.keys(filter)[0];
-											if(filter[key].$in == undefined) {
-												let value = Object.values(filter)[0].$gte == undefined ?
-													Object.values(filter)[0] :
-													Object.values(filter)[0].$gte;
-												if(value != '' && value != 9999) {
-													return (
-														<Chip
-															key={key}
-															style={{border: '2px solid grey'}}
-															onRequestDelete={()=>th.removeFilter(index, key, value)}
-														>
-															<span style={{color: 'teal'}}>{key}: {value}</span>
-														</Chip>
-													)
-												}
-											} else {
-													return filter[key].$in.map(function(value, innerIndex) {
-														return (
-															<Chip
-																key={key + innerIndex}
-																style={{border: '2px solid grey'}}
-																onRequestDelete={()=>th.removeFilter(index, key, value)}
-															>
-																<span style={{color: 'teal'}}>{value}</span>
-															</Chip>
-														)
-													})
-												}
+										Object.keys(this.state.appliedFilters).map(function (filter, index) {
+											let val = th.state.appliedFilters[filter];
+											if(val != '') {
+												return (
+													<Chip
+														key={index}
+														style={{border: '2px solid grey'}}
+														onRequestDelete={()=>th.removeFilter(filter)}
+													>
+														<span style={{color: 'teal'}}>{filter}: {val}</span>
+													</Chip>
+												)
+											}
 										})
 									}
 									</div>
 								}
+								<hr />
 								<FilterItem
 									title={'EmployeeID'}
 									type={'AutoComplete'}
@@ -408,7 +426,7 @@ export default class Candidates extends React.Component {
 								/>
 								<FilterItem
 									title={'Skills'}
-									type={'CheckBox'}
+									type={'AutoComplete'}
 									onGetAccordianValues={()=>th.getAccordianValues('Skills')}
 									onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
 									onOpenSnackbar={th.openSnackbar}
@@ -416,7 +434,7 @@ export default class Candidates extends React.Component {
 								<FilterItem
 									title={'Wave'}
 									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('Wave')}
+									onGetAccordianValues={()=>th.state.waves}
 									onAddFilter={(filterValue)=>th.addFilter('Wave', filterValue)}
 									onOpenSnackbar={th.openSnackbar}
 								/>
@@ -429,6 +447,7 @@ export default class Candidates extends React.Component {
 														candidate={candidate}
 														handleCardClick={th.candidateView}
 														handleDelete={th.deleteCandidate}
+														key={key}
 														k={key + th.state.currentPage}
 													/>
 											)

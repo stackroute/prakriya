@@ -2,10 +2,13 @@ import React from 'react';
 import LinearProgress from 'material-ui/LinearProgress';
 import Request from 'superagent';
 import Moment from 'moment';
+import Paper from 'material-ui/Paper';
 
 const styles = {
 	container: {
-		padding: 20
+		padding: 20,
+		borderRadius: 5,
+		backgroundColor: '#C6D8D3'
 	},
 	progressBar: {
 		marginTop: 10,
@@ -69,16 +72,21 @@ export default class WaveDetails extends React.Component {
 	render() {
 		let th = this;
 		return(
-			<div style={styles.container}>
-				<h3>On going waves</h3>
+			<Paper style={styles.container}>
+				{
+					this.state.activeWaves.length > 0 ?
+					<h3>On going waves</h3> :
+					<h3>No on going waves to show.</h3>
+				}
 				{
 					this.state.activeWaves.map(function(wave, key) {
+						let progressPercentile = th.showProgress(wave);
 						return (
 							<div style={styles.wave} key={key}>
-								<div style={styles.heading}>{wave.WaveNumber} ({wave.WaveID}) at {wave.Location}</div>
-								<LinearProgress 
-									mode="determinate" 
-									value={th.showProgress(wave)} 
+								<div style={styles.heading}>{wave.WaveNumber} ({wave.WaveID}) @ {wave.Location} -- {progressPercentile}%</div>
+								<LinearProgress
+									mode="determinate"
+									value={progressPercentile}
 									key={key}
 									style={styles.progressBar}
 								/>
@@ -90,7 +98,7 @@ export default class WaveDetails extends React.Component {
 						)
 					})
 				}
-			</div>
+			</Paper>
 		)
 	}
 }
