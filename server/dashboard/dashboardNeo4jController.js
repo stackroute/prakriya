@@ -143,10 +143,10 @@ let getCadets = function(successCB, errorCB) {
 // fetching candidate logged in
 let getCadet = function(email, successCB, errorCB) {
   let session = driver.session();
-  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w: '${graphConsts.NODE_WAVE}') return n`;
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return n`;
   session.run(query).then(function(resultObj) {
     session.close();
-    console.log('done');
+    console.log(resultObj.records[0]._fields[0].properties)
     successCB(resultObj.records[0]._fields[0].properties);
   }).catch(function(err) {
     errorCB(err);
@@ -737,7 +737,7 @@ let getProducts = function(successCB, errorCB) {
     -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
     OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
     -[:${graphConsts.REL_WORKEDON} {version: version.name}]-> (product)
-    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product,
+    WITH COLLECT(DISTINCT skill.Name) AS skills, version AS version, product AS product,
     CASE WHEN candidate IS NULL THEN
       []
       ELSE
@@ -1215,6 +1215,20 @@ let getBillabilityFree = function(successCB, errorCB) {
   })
 }
 
+let getCadetProject = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `match (c:${graphConsts.NODE_CANDIDATE})-[r:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})
+               with c as c,r as r,p as p
+               match (p)-[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:r.version})-[:${graphConstants.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
+               return {projectName:v.name,projectDesc:v.description,projectSkills:collect(s.Name)}`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0]);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 
   module.exports = {
     addCadet,
@@ -1250,7 +1264,8 @@ let getBillabilityFree = function(successCB, errorCB) {
     getBillability,
     getNonBillability,
     getBillabilitySupport,
-    getBillabilityFree
+    getBillabilityFree,
+    getCadetProject
   }
   // getWaveIDs,
   // getWaveSpecificCandidates,

@@ -22,11 +22,11 @@ export default class MyProfile extends React.Component {
 		this.updateProfile = this.updateProfile.bind(this);
 		this.saveProfilePic = this.saveProfilePic.bind(this);
 		this.getProfilePic = this.getProfilePic.bind(this);
-		this.getWave = this.getWave.bind(this);
+		this.getCadetProject = this.getCadetProject.bind(this);
 	}
 	componentWillMount() {
-		this.getCadet();
 		this.getProjects();
+		this.getCadet();
 	}
 	getProjects() {
 		let th = this;
@@ -37,9 +37,12 @@ export default class MyProfile extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully fetched all projects', res.body)
+					let projects = res.body.map(function(record) {
+							return record._fields[0];
+					});
+					console.log('Successfully fetched all projects', projects)
 		    	th.setState({
-		    		projects: res.body
+		    		projects: projects
 		    	})
 		    }
 			})
@@ -47,20 +50,46 @@ export default class MyProfile extends React.Component {
 	getCadet() {
 		let th = this;
 		Request
-			.get('/dashboard/cadet')
+			.get('/dashboard/getwaveofcadet')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
 		    	th.setState({
-		    		cadet: res.body
+		    		cadet: res.body.data,
+						wave: res.body.data.Wave
 		    	})
-		    	th.getProfilePic(res.body.EmployeeID);
-		    	th.getWave(res.body.Wave);
+					console.log(res.body.data)
+		    	th.getProfilePic(res.body.data.EmployeeID);
+					th.getCadetProject(res.body.data.EmployeeID);
 		    }
 		  })
 	}
+
+	getCadetProject(EmpID) {
+		let th = this;
+		Request
+			.post('/dashboard/cadetproject')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({empid: EmpID})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+					let cadet = th.state.cadet;
+					cadet.projectName = res.body.projectName;
+					cadet.projectSkills = res.body.projectSkills;
+					cadet.projectDesc = res.body.projectDesc;
+		    	th.setState({
+		    		cadet: cadet
+		    	})
+					console.log(cadet)
+		    	th.getProfilePic(res.body.data.EmployeeID);
+		    }
+		  })
+	}
+
 	updateProfile(cadet) {
 		let th = this;
 		Request
@@ -121,37 +150,11 @@ export default class MyProfile extends React.Component {
 		    }
 			})
 	}
-	getWave(waveid) {
-		let th = this;
-		Request
-			.get(`/dashboard/wave?waveid=${waveid}`)
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	th.setState({
-		    		wave: res.body
-		    	})
-		    }
-		  })
-	}
 
 	render() {
 		return(
 			<div>
-				{
-					this.state.cadet != null &&
-					this.state.wave != null &&
-					<ProfileView
-						cadet={this.state.cadet}
-						wave={this.state.wave}
-						projects={this.state.projects}
-						imageURL={this.state.imageURL}
-						handleUpdate={this.updateProfile}
-						handlePicSave={this.saveProfilePic}
-					/>
-				}
+				Hi
 			</div>
 		)
 	}

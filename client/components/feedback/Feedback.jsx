@@ -134,7 +134,7 @@ export default class Feedback extends React.Component {
   }
   getCadet() {
     let th = this;
-    Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get('/dashboard/cadetProfile').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {

@@ -361,6 +361,22 @@ router.get('/remarkstemplate', auth.canAccess(CONFIG.ADMMEN), function (req, res
   res.send(CONFIG.REMARKS_TEMPLATE);
 });
 
+// Get cadet Attendance
+router.get('/cadetProfile', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+  try {
+    dashboardNeo4jController.getCadet(req.user.email, function (cadet) {
+      res.status(201).json(cadet);
+    }, function (err) {
+      logger.error('Get Cadet: ', err);
+      res.status(500).json({error: 'Cannot get the cadet from db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // Get cadet profile
 router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   try {
@@ -376,6 +392,25 @@ router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
     });
   }
 });
+
+// Get cadet profile
+router.post('/cadetproject', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+  try {
+    console.log(req.body.empid);
+    dashboardNeo4jController.getCadetProject(req.body.empid, function (cadet) {
+      res.status(201).json(cadet);
+    }, function (err) {
+      logger.error('Get Cadet: ', err);
+      res.status(500).json({error: 'Cannot get the cadet from db...!'});
+    });
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 
 // Get user Role
 router.get('/userrole', auth.canAccess(CONFIG.ALL), function (req, res) {
