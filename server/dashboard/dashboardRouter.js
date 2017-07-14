@@ -1087,8 +1087,10 @@ router.get('/waveids', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 router.get('/waveobject/:waveID', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   logger.info('API HIT ===> GET Wave Object');
   try{
-    dashboardMongoController.getWaveObject(req.params.waveID,
+    console.log(req.params.waveID,"req.params.WAVEID")
+    dashboardNeo4jController.getSessionForWave (req.params.waveID,
        function (wave) {
+         console.log(wave,"waveobj waveid")
          res.status(201).json({waveObject: wave});
     }, function (err) {
       logger.error('Get Wave Object Error: ', err);
@@ -1207,6 +1209,40 @@ router.post('/cadetsofproj', auth.canAccess(CONFIG.MENTOR), function (req, res) 
   }
 });
 
+// delete a wave
+router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+  try {
+    console.log(req.body.wave,"req.body.wave")
+    dashboardNeo4jController.deleteWave(req.body.wave, function (wave) {
+      res.status(201).json(wave);
+    }, function (err) {
+      logger.error('Delete Wave Error: ', err);
+      res.status(500).json({error: 'Cannot delete the wave...!'});
+    });
+  } catch(err) {
+    logger.error('Delete Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// update a wave
+router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try {
+    dashboardNeo4jController.updateWave(req.body.wave, function (wave) {
+      res.status(201).json(wave);
+    }, function (err) {
+      logger.error('Update Wave Error: ', err);
+      res.status(500).json({error: 'Cannot delete the wave...!'});
+    });
+  } catch(err) {
+    logger.error('Update Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
 
 /** **************************************************
 *********          Candidate Filter         *********
@@ -1289,4 +1325,40 @@ router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
     });
   }
 });
+///////////////////////program flow///////////////////
+router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+  try {
+    dashboardNeo4jController.updateSession(req.body.wave, req.body.waveString,function (status) {
+       console.log(req.body.waveString,"waveString")
+      res.status(201).json({status:'success'});
+    }, function (uperr) {
+      logger.error('err in update session', uperr);
+      res.status(500).json({error: 'Cannot add new session...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// delete session
+router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+  try {
+    dashboardNeo4jController.deleteSession(req.body.wave,req.body.waveString ,function (status) {
+      logger.info('Status: ', status);
+      res.status(201).json(status);
+    }, function (sessionerr) {
+      logger.error('err in delete session', sessionerr);
+      res.status(500).json({error: 'Cannot delete session...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 module.exports = router;
