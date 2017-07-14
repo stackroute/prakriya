@@ -74,6 +74,7 @@ export default class WiproAdmin extends React.Component {
     })
   }
   render() {
+    console.log(this.state.billableCount,"billableCount")
     const data = [
       {
         label: "Billable",

@@ -206,21 +206,6 @@ router.get('/wave', auth.canAccess(CONFIG.ALL), function (req, res) {
   }
 });
 
-// Fetch all the active waves
-router.get('/activewaves', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
-  try{
-    dashboardMongoController.getActiveWaves(function (waves) {
-      res.status(201).json(waves);
-    }, function (err) {
-      logger.error('Get Active Waves Error: ', err);
-      res.status(500).json({error: 'Cannot get all active waves from db...!'});
-    });
-  } catch(err) {
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
 
 // Update the wave cadet's
 router.post('/updatewavecadets', auth.canAccess(CONFIG.ADMIN), function (req, res) {

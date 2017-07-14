@@ -1045,25 +1045,7 @@ let updateWaveCadets = function (cadets, waveID, successCB, errorCB) {
   });
 }
 
-//  let getActiveWaves = function (successCB, errorCB) {
-//     let todayDate = new Date();
-//     let today = todayDate.getFullYear()*10000 + '' + todayDate.getMonth()*100 + '' + todayDate.getDay();
-//     let query = `MATCH(n) WHERE toInt(n.StartDate) <= today AND toInt(n.EndDate) >= today`;
-//       let session = driver.session();
-//          session.run(query).then(function (resultObj) {
-//              session.close();
-//              if(resultObj) {
-//              logger.debug(resultObj);
-//                resultObj.map(function(obj)
-//                       {
-//
-//                       })
-//            } else {
-//                errorCB('Error');
-//              }
-//            });
-//     };
-
+ 
 /**********************************************
 ************ Assessment Tracker *************
 **********************************************/

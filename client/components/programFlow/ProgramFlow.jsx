@@ -15,6 +15,15 @@ import Paper from 'material-ui/Paper';
 import {lightBlack} from 'material-ui/styles/colors';
 import Schedule from './Schedule.jsx';
 import app from '../../styles/app.json';
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
+
 
 const styles = {
   tableHeading: {
@@ -95,32 +104,43 @@ export default class Wave extends React.Component {
     return (
       <div>
         <h1 style={app.heading}>Program Flow</h1>
-        <Grid>
-          <Row>
-            <Col md={6}>
+
+
               <SelectField onChange={th.onWaveChange} floatingLabelText="Select Wave" value={th.state.waveString}>
                 {th.state.waves.map(function(val, key) {
                   return <MenuItem key={key} value={val} primaryText={val}/>
                 })
-}
+        }
               </SelectField>
-            </Col>
-          </Row>
+<Table>
+		    <TableHeader displaySelectAll={false} >
+		      <TableRow>
+
           {th.state.setState === false && (th.state.waveObj).length !== 0 && <Row style={styles.tableHeading}>
-            <Col md={1}>Day</Col>
-            <Col md={2}>Name</Col>
-            <Col md={2}>Skills</Col>
-            <Col md={2}>Session By</Col>
-            <Col md={2}>Session On</Col>
-            <Col md={2}>Status</Col>
-          </Row>
-}
-          {th.state.setState === false && (th.state.waveObj).length !== 0 && th.state.waveObj.result.map(function(session, i) {
+             <TableHeaderColumn><h3>Day</h3></TableHeaderColumn>
+             <TableHeaderColumn><h3>Name</h3></TableHeaderColumn>
+             <TableHeaderColumn><h3>Skills</h3></TableHeaderColumn>
+             <TableHeaderColumn><h3>Session By</h3></TableHeaderColumn>
+             <TableHeaderColumn><h3>Session On</h3></TableHeaderColumn>
+             <TableHeaderColumn><h3>Status</h3></TableHeaderColumn>
+						 </Row>
+						}
+						</TableRow>
+						</TableHeader>
+	 <TableBody displayRowCheckbox={false}>
+         <TableRow displayBorder={true}>
+				  <TableRowColumn>
+          {th.state.setState === false  && (th.state.waveObj).length !== 0  && th.state.waveObj.result.map(function(session, i) {
             return (<Schedule wave={session} key={i} handleWaveUpdate={th.waveUpdate} handleDelete={th.handleDelete}/>)
           })
+
 }
-        </Grid>
-      </div>
+ </TableRowColumn>
+</TableRow>
+</TableBody>
+</Table>
+</div>
+
     )
 
   }
