@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var feedback = new Schema({
 	cadetID: {type: String, unique: true},
+	waveID: String,
 	cadetName: String,
   relevance: [Number],
   training: [Number],

@@ -273,6 +273,15 @@ let saveFeedback = function (feedbackObj, successCB, errorCB) {
 	});
 };
 
+let getFeedbacks = function(waveID, successCB, errorCB) {
+	FeedbackModel.find({waveID: waveID}, function(err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
 let saveEvaluation = function (evaluationObj, successCB, errorCB) {
 	let saveEvaluationObj = new EvaluationModel(evaluationObj);
 	saveEvaluationObj.save(function (err, result) {
@@ -608,6 +617,7 @@ module.exports = {
 	updateCadets,
 	deleteCadet,
 	saveFeedback,
+	getFeedbacks,
 	saveEvaluation,
 	getWaveIDs,
 	getWaveSpecificCandidates,

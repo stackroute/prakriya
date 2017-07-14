@@ -510,7 +510,29 @@ router.get('/files', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   }
 });
 
-// Save the feedback
+/** **************************************************
+***************          Feedbacks         ***********
+*****************************************************/
+
+// get all feedbacks of a particular wave
+router.get('/feedbacksforwave', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+  try{
+    console.log('WAVEID: ', req.query.waveID)
+    dashboardMongoController.getFeedbacks(req.query.waveID, function (feedbacks) {
+      res.status(201).json(feedbacks);
+    }, function (err) {
+      logger.error('Get All Feedbacks Error: ', err);
+      res.status(500).json({error: 'Cannot get all feedbacks from mongo...!'});
+    });
+  } catch(err) {
+    logger.debug('Get feedbacks error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// save candidate feedback
 router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   try {
     dashboardMongoController.saveFeedback(req.body, function (feedback) {
@@ -542,7 +564,6 @@ router.get('/cadetsandwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) 
     });
   }
 });
-
 
 // Save the cadet evaluation
 router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function (req, res) {

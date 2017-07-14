@@ -141,12 +141,12 @@ export default class Feedback extends React.Component {
 
   getCadet() {
     let th = this;
-    Request.get('/dashboard/cadetProfile').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get('/dashboard/getwaveofcadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-        th.setState({cadet: res.body})
-        console.log(th.state.cadet);
+        th.setState({cadet: res.body.data})
+        console.log('getCadet: ', res.body.data);
       }
     })
   }
@@ -191,6 +191,7 @@ export default class Feedback extends React.Component {
     let feedbackObj = {};
     feedbackObj.cadetID = this.state.cadet.EmployeeID;
     feedbackObj.cadetName = this.state.cadet.EmployeeName;
+    feedbackObj.waveID = this.state.cadet.Wave.WaveID;
     feedbackObj.relevance = this.state.relevance;
     feedbackObj.training = this.state.training;
     feedbackObj.confidence = this.state.confidence;
