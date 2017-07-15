@@ -14,7 +14,10 @@ const styles = {
 		backgroundColor: '#C6D8D3'
 	}
 }
-const FEEDBACKS = [
+
+const FEEDBACK_EXTRA = `Your feedback is invaluable! It helps us measure the immersive program and improve the effectiveness Please fill up the form frankly and completely. Please indicate your opinion by a tick mark where necessary, keeping in mind the response interpretation.`;
+const FEEDBACK_STARS = `1 – Strongly Disagree. 2 - Disagree. 3 – Some What. 4 - Agree. 5 – Strongly Agree.`;
+const FEEDBACK_CATEGORIES = [
   {
     type: "relevance",
     options: [
@@ -76,8 +79,10 @@ export default class WaveDetails extends React.Component {
 			waveID: ''
 		};
 		this.getWaves = this.getWaves.bind(this);
+		this.onIDChange = this.onIDChange.bind(this);
 		this.onIDSelect = this.onIDSelect.bind(this);
 		this.getFeedbacks = this.getFeedbacks.bind(this);
+		this.createFeedback = this.createFeedback.bind(this);
 		this.downloadFeedbacks = this.downloadFeedbacks.bind(this);
 	}
 
@@ -98,26 +103,112 @@ export default class WaveDetails extends React.Component {
 	}
 
 	downloadFeedbacks() {
-
-			console.log('download feedback...');
-
-			// let fb = this.state.feedbacks[0];
+			let th = this;
+			console.log('downloading feedback...');
 
 			let doc = new jsPDF()
-			let x = 95;
-			let y = 20;
 
-			doc.setFontSize(12);
-			doc.setTextColor(0, 0, 0);
-
-			FEEDBACKS.map(function(feedback) {
-				doc.text(x, y+=10, feedback.type);
-				feedback.options.map(function(option) {
-					doc.text(x, y+=10, option)
-				});
+			this.state.feedbacks.map(function(feedback, index) {
+				th.createFeedback(doc, feedback);
+				if(index+1 != th.state.feedbacks.length) doc.addPage();
 			});
 
 			doc.save('feedbacks_' + this.state.waveID + '.pdf')
+	}
+
+	createFeedback(doc, feedback) {
+
+		console.log('feedback: ', feedback)
+
+		let x = 5;
+		let y = 5;
+
+		doc.setFontSize(10);
+
+		doc.setLineWidth(0.10);
+		doc.rect(x, y, 200, 6, 'S');
+		doc.setFontStyle('bold');
+		doc.text(x+100, y+4, 'Cadet Feedback Form', 'center');
+
+		doc.setFontStyle('default');
+		doc.rect(x, y+=6, 25, 6, 'S');
+		doc.text(x+2, y+4, 'Name');
+		doc.rect(x+25, y, 125, 6, 'S');
+		doc.text(x+27, y+4, feedback.cadetName);
+		doc.rect(x+150, y, 25, 6, 'S');
+		doc.text(x+152, y+4, 'Date');
+		doc.rect(x+175, y, 25, 6, 'S');
+		doc.text(x+177, y+4, feedback.submittedOn);
+
+		doc.rect(x, y+=6, 25, 6, 'S');
+		doc.text(x+2, y+4, 'Organization');
+		doc.rect(x+25, y, 125, 6, 'S');
+		doc.text(x+27, y+4, feedback.organization);
+		doc.rect(x+150, y, 25, 6, 'S');
+		doc.text(x+152, y+4, 'Wave');
+		doc.rect(x+175, y, 25, 6, 'S');
+		doc.text(x+177, y+4, feedback.waveID);
+
+		let lines = doc.splitTextToSize(FEEDBACK_EXTRA, 200);
+		doc.text(x+2, y+=12, lines);
+
+		doc.rect(x, y+=8, 175, 6);
+		doc.text(x+2, y+4, FEEDBACK_STARS);
+		doc.rect(x+175, y, 5, 6);
+		doc.text(x+177, y+4, '1');
+		doc.rect(x+180, y, 5, 6);
+		doc.text(x+182, y+4, '2');
+		doc.rect(x+185, y, 5, 6);
+		doc.text(x+187, y+4, '3');
+		doc.rect(x+190, y, 5, 6);
+		doc.text(x+192, y+4, '4');
+		doc.rect(x+195, y, 5, 6);
+		doc.text(x+197, y+4, '5');
+
+		FEEDBACK_CATEGORIES.map(function(CATEGORY) {
+			doc.rect(x, y+=6, 200, 6);
+			doc.setFontStyle('bold');
+			doc.text(x+2, y+4, CATEGORY.type.toUpperCase());
+			CATEGORY.options.map(function(option, index) {
+				doc.setFontStyle('default');
+				doc.rect(x, y+=6, 175, 6);
+				doc.text(x+2, y+4, doc.splitTextToSize(option, 175));
+				doc.rect(x+175, y, 5, 6);
+				if(feedback[CATEGORY.type][index] == 1) {
+					doc.text(x+177, y+4,'+');
+				}
+				doc.rect(x+180, y, 5, 6);
+				if(feedback[CATEGORY.type][index] == 2) {
+					doc.text(x+182, y+4,'+');
+				}
+				doc.rect(x+185, y, 5, 6);
+				if(feedback[CATEGORY.type][index] == 3) {
+					doc.text(x+187, y+4,'+');
+				}
+				doc.rect(x+190, y, 5, 6);
+				if(feedback[CATEGORY.type][index] == 4) {
+					doc.text(x+192, y+4,'+');
+				}
+				doc.rect(x+195, y, 5, 6);
+				if(feedback[CATEGORY.type][index] == 5) {
+					doc.text(x+197, y+4,'+');
+				}
+			});
+		});
+
+		doc.setFontStyle('bold');
+		doc.text(x+2, y+=12, 'YOUR COMMENTS')
+
+		doc.setFontStyle('default');
+		doc.rect(x, y+=4, 200, 6);
+		doc.text(x+2, y+4, 'Things you learnt / liked most about the program');
+		doc.rect(x, y+=6, 200, 14);
+		doc.text(x+2, y+4, feedback.mostLiked);
+
+		doc.rect(x, y+=14, 200, 6);
+		doc.text(x+2, y+4, 'Things you liked least about of the program');
+		doc.rect(x, y+=6, 200, 14);
+		doc.text(x+2, y+4, feedback.leastLiked);
 	}
 
 	getWaves() {
@@ -171,6 +262,7 @@ export default class WaveDetails extends React.Component {
 				      floatingLabelText='Wave ID'
 				      filter={AutoComplete.fuzzyFilter}
 				      dataSource={this.state.waveIDs}
+							onUpdateInput={this.onIDChange}
 							onNewRequest={this.onIDSelect}
 				      listStyle={{ maxHeight: 80, overflow: 'auto' }}
 
