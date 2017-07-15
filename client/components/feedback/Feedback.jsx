@@ -18,13 +18,14 @@ import StarIcon from 'material-ui/svg-icons/toggle/star';
 
 const StarsComponent = React.createClass({
   render: function() {
+    let extraStars = [];
+    for(let i=this.props.count; i>1; i--)
+    extraStars.push(<IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>)
+
     return (
       <TableRowColumn style={{textAlign: 'center'}}>
         <IconButton><StarIcon color='#FFE900'/></IconButton>
-        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
-        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
-        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
-        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
+        {extraStars}
       </TableRowColumn>
     )
   }
@@ -237,11 +238,11 @@ export default class Feedback extends React.Component {
             </TableHeader>
             <TableBody displayRowCheckbox={false}>
               <TableRow>
-                <StarsComponent />
-                <StarsComponent />
-                <StarsComponent />
-                <StarsComponent />
-                <StarsComponent />
+                <StarsComponent count={1}/>
+                <StarsComponent count={2}/>
+                <StarsComponent count={3}/>
+                <StarsComponent count={4}/>
+                <StarsComponent count={5}/>
               </TableRow>
             </TableBody>
           </Table>
