@@ -1026,7 +1026,8 @@ let getCadetsOfWave = function(waveID, successCB, errorCB) {
 let getWaves = function(successCB, errorCB) {
   let query =
   `MATCH(w:${graphConsts.NODE_WAVE})-[:${graphConsts.REL_HAS}]->(c:${graphConsts.NODE_COURSE})
-  RETURN w,c`;
+    OPTIONAL MATCH (w)<-[r:${graphConsts.REL_BELONGS_TO}]-()
+  RETURN w,c, count(r)`;
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
@@ -1035,6 +1036,7 @@ let getWaves = function(successCB, errorCB) {
       resultObj.records.map(function(res) {
         let waveObj = res._fields[0].properties;
         waveObj.Course = res._fields[1].properties.ID;
+        waveObj.Cadets = res._fields[2].low;
         waves.push(waveObj);
       })
       successCB(waves);
@@ -1095,6 +1097,45 @@ let updateWaveCadets = function (cadets, waveID, successCB, errorCB) {
     errorCB(err);
   });
 }
+
+// Getting the sessions for the wave
+let getSessionForWave = function(waveID, successCB, errorCB) {
+  logger.debug('In get session Wave', waveID);
+  let query = `MATCH(n:${graphConsts.NODE_WAVE} {WaveID:'${waveID}'})-[:${graphConsts.REL_HAS}]->(m:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_HAS}]->(x:${graphConsts.NODE_SESSION})-[:${graphConsts.REL_INCLUDES}]->(y:${graphConsts.NODE_SKILL})
+  optional match (w)-[r:${graphConsts.REL_INCLUDES}]->(x)
+  RETURN {skill:collect(y),session:x,r:r}`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      console.log(resultObj)
+      let waveobject={}
+      waveobject.result = []
+      resultObj.records.map(function(res){
+        res._fields.map(function(re) {
+          console.log(re)
+          waveobject.result.push(re.session.properties)
+          waveobject.result[waveobject.result.length - 1].skill = re.skill.map(function(skills){
+            return skills.properties.Name
+          })
+          if(re.r != null)
+          {
+            waveobject.result[waveobject.result.length-1].SessionBy = re.r.properties.SessionBy;
+            waveobject.result[waveobject.result.length-1].SessionOn = re.r.properties.SessionOn;
+            waveobject.result[waveobject.result.length-1].Status = re.r.properties.Status;
+          }
+        })
+      })
+      logger.debug(waveobject,"waveobject")
+      successCB(waveobject);
+
+    } else {
+      errorCB('Error');
+    }
+  });
+};
+
+
 /**********************************************
 ************ Assessment Tracker *************
 **********************************************/
@@ -1182,6 +1223,74 @@ let getWaveOfCadet = function(EmailID, successCB, errorCB) {
  })
 }
 
+
+//evaluation
+let getCadetsAndWave = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return {candidate:n,wave:w.WaveID}`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    let cadets = [];
+    for (let i = 0; i < resultObj.records.length; i++) {
+      let result = resultObj.records[i];
+      cadets.push(result._fields[0].candidate.properties);
+      console.log(cadets);
+      cadets[i].Wave = result._fields[0].wave;
+    }
+    successCB(cadets);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
+//Billability
+let getBillability = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{Billability:'Billable'}) return count(n)`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0].low);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
+//Non Billability
+let getNonBillability = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{Billability:'Non-billable'}) return count(n)`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0].low);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
+//Support
+let getBillabilitySupport = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{Billability:'Support'}) return count(n)`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0].low);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
+//Free
+let getBillabilityFree = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{Billability:'Free'}) return count(n)`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0].low);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
   module.exports = {
     addCadet,
     updateCadet,
@@ -1212,7 +1321,13 @@ let getWaveOfCadet = function(EmailID, successCB, errorCB) {
     getAssessmentTrack,
     mapAssessmentTrack,
     assessmentsandcandidates,
-    getWaveOfCadet
+    getWaveOfCadet,
+    getSessionForWave,
+    getCadetsAndWave,
+    getBillability,
+    getBillabilitySupport,
+    getNonBillability,
+    getBillabilityFree
   }
   // getWaveIDs,
   // getWaveSpecificCandidates,
