@@ -6,6 +6,7 @@ import Moment from 'moment';
 import Paper from 'material-ui/Paper';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
+import CONFIG from '../../config/index';
 
 const styles = {
 	container: {
@@ -14,61 +15,6 @@ const styles = {
 		backgroundColor: '#C6D8D3'
 	}
 }
-
-const FEEDBACK_EXTRA = `Your feedback is invaluable! It helps us measure the immersive program and improve the effectiveness Please fill up the form frankly and completely. Please indicate your opinion by a tick mark where necessary, keeping in mind the response interpretation.`;
-const FEEDBACK_STARS = `1 – Strongly Disagree. 2 - Disagree. 3 – Some What. 4 - Agree. 5 – Strongly Agree.`;
-const FEEDBACK_CATEGORIES = [
-  {
-    type: "relevance",
-    options: [
-      "The objectives were clearly defined at the beginning of the program",
-      "The stated objectives for the Immersive program have been met successfully",
-      "This program relevance to learn the new set of tech for Web development",
-      "This program is relevant to my role/job",
-      "This program made good use of my time"
-    ]
-  }, {
-    type: "training",
-    options: [
-      "Program was stimulating and challenging",
-      "Relevant learning material and reference materials were provided",
-      "Program is paced well",
-      "Assignments helped in implementing technologies covered"
-    ]
-  }, {
-    type: "confidence",
-    options: [
-      "Understanding of the technologies that are core to the MEAN or MERN stack",
-      "Develop and deploy JavaScript solution using MongoDB, Express and Node.js",
-      "Code using HTML / CSS",
-      "Code using JavaScript language",
-      "Code using Node.js and Express",
-      "Use MongoDB and Mongoose"
-    ]
-  }, {
-    type: "mentors",
-    options: [
-      "Mentor Knowledge of the Subject",
-      "Ability to technically challenge and help learn",
-      "Interest and involvement in the program",
-      "Responsiveness to questions/ queries", "Overall ability to mentor"
-    ]
-  }, {
-    type: "facilities",
-    options: [
-      "Environment / Workspace",
-      "Quality and speed of Internet / Network",
-      "The facility was clean and well maintained",
-      "Overall Infrastructure"
-    ]
-  }, {
-    type: "overall",
-    options: [
-      "How would you rate your overall satisfaction after completing this program",
-      "How would you rate yourself in terms of confidence level",
-      "How likely are you to recommend this program to others in your organization"]
-  }
-];
 
 export default class WaveDetails extends React.Component {
 	constructor(props) {
@@ -149,11 +95,11 @@ export default class WaveDetails extends React.Component {
 		doc.rect(x+175, y, 25, 6, 'S');
 		doc.text(x+177, y+4, feedback.waveID);
 
-		let lines = doc.splitTextToSize(FEEDBACK_EXTRA, 200);
+		let lines = doc.splitTextToSize(CONFIG.FEEDBACK.EXTRA, 200);
 		doc.text(x+2, y+=12, lines);
 
 		doc.rect(x, y+=8, 175, 6);
-		doc.text(x+2, y+4, FEEDBACK_STARS);
+		doc.text(x+2, y+4, CONFIG.FEEDBACK.STARS);
 		doc.rect(x+175, y, 5, 6);
 		doc.text(x+177, y+4, '1');
 		doc.rect(x+180, y, 5, 6);
@@ -165,7 +111,7 @@ export default class WaveDetails extends React.Component {
 		doc.rect(x+195, y, 5, 6);
 		doc.text(x+197, y+4, '5');
 
-		FEEDBACK_CATEGORIES.map(function(CATEGORY) {
+		CONFIG.FEEDBACK.CATEGORIES.map(function(CATEGORY) {
 			doc.rect(x, y+=6, 200, 6);
 			doc.setFontStyle('bold');
 			doc.text(x+2, y+4, CATEGORY.type.toUpperCase());
