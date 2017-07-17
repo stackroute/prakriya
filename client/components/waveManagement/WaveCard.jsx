@@ -293,7 +293,7 @@ export default class WaveCard extends React.Component {
     let title = 'CADETS'
     if(th.props.wave.Cadets !== undefined)
     {
-      title = ('CADETS - (' + th.props.wave.Cadets.length + ')')
+      title = ('CADETS - (' + th.props.wave.Cadets + ')')
     }
 		const deleteDialogActions = [
       <FlatButton
@@ -363,7 +363,7 @@ export default class WaveCard extends React.Component {
               <IconButton tooltip="Members" onClick={this.handleOpen}>
                 <GroupIcon/>
 					    </IconButton>
-              {this.props.wave.Cadets != undefined && <b style={{position: 'absolute', top: '77%'}}>({this.props.wave.Cadets.length})</b>}
+              {this.props.wave.Cadets != undefined && <b style={{position: 'absolute', top: '77%'}}>({this.props.wave.Cadets})</b>}
               <IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{float:'right'}}>
 					      <DeleteIcon/>
 					    </IconButton>
@@ -402,8 +402,8 @@ export default class WaveCard extends React.Component {
 					      <AddIcon/>
 					    </IconButton>
 					    {
-					    	this.state.addCadet && 
-					    	(!this.state.noCadets) && 
+					    	this.state.addCadet &&
+					    	(!this.state.noCadets) &&
 					    	<div>
 						    	<SelectField
 				        		multiple={true}
