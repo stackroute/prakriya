@@ -996,19 +996,6 @@ let getWave = function(waveID, successCB, errorCB) {
   });
 };
 
-// let getWaveIDs = function(successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
-
 // Get WaveID's of all the waves
 let getWaveIDs = function(successCB, errorCB) {
   let query = `MATCH(n:${graphConsts.NODE_WAVE}) RETURN DISTINCT n.WaveID`;
@@ -1047,19 +1034,6 @@ let getCadetsOfWave = function(waveID, successCB, errorCB) {
     }
   });
 };
-
-// let getWaveObject = function(waveID, successCB, errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
-// };
 
 // Get all waves
 let getWaves = function(successCB, errorCB) {
@@ -1344,7 +1318,60 @@ let getCadetProject = function (empID,successCB, errorCB) {
   })
 }
 
-  module.exports = {
+let updateSession = function(wave,waveString, successCB, errorCB) {
+  console.log(wave,"wave")
+  let query = `OPTIONAL MATCH (n:${graphConsts.NODE_SESSION}{Name:'${wave.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
+              RETURN r`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj.records[0]._fields[0] !== null) {
+      let query1 = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${wave.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
+      SET
+         r.SessionBy = '${wave.SessionBy}',
+         r.SessionOn = '${wave.SessionOn}',
+         r.Status = '${wave.Status}'
+         RETURN n`;
+         let session1 = driver.session();
+         session1.run(query1).then(function(resultObj) {
+             if(resultObj){
+               console.log(resultObj,"first.query")
+             }
+   session1.close();
+         });
+           successCB('success');
+    } else {
+      let query1 = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${wave.Name}'}),(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
+      MERGE (n)<-[r:${graphConsts.REL_INCLUDES}{SessionBy:'${wave.SessionBy}',SessionOn:'${wave.SessionOn}',Status :'${wave.Status}'}]-(w)
+         RETURN n`;
+         let session = driver.session();
+         session.run(query1).then(function(resultObj) {
+           if(resultObj){
+             console.log(resultObj,"sec.query")
+           }
+           session.close();
+         });
+    }
+  });
+  successCB();
+}
+
+
+let deleteSession = function(waveObj,waveString, successCB, errorCB) {
+    let query = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${waveObj.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
+                 DELETE r`;
+    let session = driver.session();
+    session.run(query).then(function(resultObj) {
+      session.close();
+      if (err) {
+        errorCB('Error');
+      } else {
+        successCB('success');
+      }
+    });
+}
+
+module.exports = {
     addCadet,
     updateCadet,
     updateCadets,
@@ -1382,14 +1409,7 @@ let getCadetProject = function (empID,successCB, errorCB) {
     getBillabilitySupport,
     getNonBillability,
     getBillabilityFree,
-    getCadetProject
+    getCadetProject,
+    updateSession,
+    deleteSession
   }
-  // getWaveIDs,
-  // getWaveSpecificCandidates,
-  // getWaveObject,
-  // getWaves,
-  // updateWave,
-  // getCoursesForWave,
-  // addWave,
-  // deleteWave,
-  // getActiveWaves
