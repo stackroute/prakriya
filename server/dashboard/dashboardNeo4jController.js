@@ -1362,7 +1362,7 @@ let deleteSession = function(waveObj,waveString, successCB, errorCB) {
     let query = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${waveObj.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
                  DELETE r`;
     let session = driver.session();
-    session.run(query).then(function(resultObj) {
+    session.run(query).then(function(resultObj, err) {
       session.close();
       if (err) {
         errorCB('Error');
