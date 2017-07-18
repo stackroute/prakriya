@@ -1406,20 +1406,4 @@ router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
   }
 });
 
-// save course columns
-router.post('/savecoursecolumns', auth.canAccess(CONFIG.MENTOR), function (req, res) {
-  try {
-    dashboardMongoController.saveCourseColumns(req.body, function (obj) {
-      res.status(200).json(obj);
-    }, function (err) {
-      logger.error('Save CourseColumns Error: ', err);
-      res.status(500).json({error: 'Cannot save coursecolumns in db...!'});
-    });
-  } catch(err) {
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
-
 module.exports = router;

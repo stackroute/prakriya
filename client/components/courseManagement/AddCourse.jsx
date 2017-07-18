@@ -163,7 +163,6 @@ export default class AddCourse extends React.Component {
   handleAdd(courseColumns) {
     let th = this;
     let course = {};
-    console.log('id: ' + th.state.Name + '_' + th.state.Mode);
     course.ID = th.state.Name + '_' + th.state.Mode;
     course.Name = this.state.Name;
     course.Mode = this.state.Mode;
@@ -173,8 +172,13 @@ export default class AddCourse extends React.Component {
     course.Removed = false;
     course.Duration = this.state.Duration;
     course.History = '';
-    console.log('courseColumns: ', courseColumns);
-    // this.props.handleAdd(course);
+    console.log('CourseColumns: ', courseColumns);
+    course.FeedbackFields = courseColumns.FeedbackFields;
+    course.EvaluationFields = courseColumns.EvaluationFields;
+    this.props.handleAdd(course);
+    this.setState({
+      courseColumns: false
+    });
   }
 
   validationSuccess() {

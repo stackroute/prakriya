@@ -104,8 +104,7 @@ export default class Courses extends React.Component {
 	}
 
 	addCourse(course){
-		let th = this
-		course.CourseID = this.state.courses.length + 1;
+		let th = this;
 		Request
 			.post('/dashboard/addcourse')
 			.set({'Authorization': localStorage.getItem('token')})
