@@ -289,7 +289,6 @@ export default class AddCourse extends React.Component {
           </Dialog>
           <CourseColumns
           open={this.state.courseColumns}
-          columnTitle={'Feedback'}
           onClose={this.closeCourseColumns}/>
         </div>
       )

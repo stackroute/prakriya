@@ -82,7 +82,7 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
   cadet.ProjectSupervisor = cadetObj.ProjectSupervisor || '';
   cadet.Selected = cadetObj.Selected || '';
   cadet.Remarks = cadetObj.Remarks || '';
-
+  cadet.AssetID = cadetObj.AssetID || '';
   let session = driver.session();
 
   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmployeeID: '${cadet.EmployeeID}'})
@@ -95,7 +95,8 @@ let updateCadet = function(cadetObj, successCB, errorCB) {
       n.PrimarySupervisor = '${cadet.PrimarySupervisor}',
       n.ProjectSupervisor = '${cadet.ProjectSupervisor}',
       n.Selected = '${cadet.Selected}',
-      n.Remarks = '${cadet.Remarks}'
+      n.Remarks = '${cadet.Remarks}',
+      n.AssetID = '${cadet.AssetID}'
     return n`;
 
     session.run(query)
