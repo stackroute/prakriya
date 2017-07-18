@@ -133,6 +133,28 @@ router.get('/user', function (req, res) {
   }
 });
 
+
+/** **************************************************
+*******                 Wave                 ********
+****************************************************/
+
+// Fetch all the skills
+router.get('/skills', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+    try{
+      dashboardNeo4jController.getSkills(function (skills) {
+      res.status(201).json(skills);
+    }, function (err) {
+      logger.error('Get All Skills Error: ', err);
+      res.status(500).json({error: 'Cannot get all skills from neo4j...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
 /** **************************************************
 *******                 Wave                 ********
 ****************************************************/
@@ -531,6 +553,23 @@ router.get('/feedbacksforwave', auth.canAccess(CONFIG.ADMIN), function (req, res
     });
   }
 });
+
+//get candidate specific feedback
+router.get('/getFeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+  try {
+    dashboardMongoController.getFeedback(req.query.empID, function (feedback) {
+      res.status(200).json(feedback);
+    }, function (err) {
+      logger.error('Get Feedback Error: ', err);
+      res.status(500).json({error: 'Cannot get feedback from db...!'});
+    });
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
 
 // save candidate feedback
 router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {

@@ -273,6 +273,15 @@ let saveFeedback = function (feedbackObj, successCB, errorCB) {
 	});
 };
 
+let getFeedback = function(empID, successCB, errorCB) {
+	FeedbackModel.find({cadetID: empID}, function(err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+}
+
 let getFeedbacks = function(waveID, successCB, errorCB) {
 	FeedbackModel.find({waveID: waveID}, function(err, result) {
 		if(err) {
@@ -617,6 +626,7 @@ module.exports = {
 	updateCadets,
 	deleteCadet,
 	saveFeedback,
+	getFeedback,
 	getFeedbacks,
 	saveEvaluation,
 	getWaveIDs,
@@ -651,5 +661,4 @@ module.exports = {
 	getBillabilityFree,
 	getNonBillability,
 	getBillabilitySupport
-
 };
