@@ -114,6 +114,7 @@ let candidate_template = [[
   "Selected",
   "Remarks",
   "CareerBand",
+  "Billability",
   "RevisedBU",
   "DigiThonPhase",
   "DigiThonScore",

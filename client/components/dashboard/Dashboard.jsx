@@ -54,7 +54,16 @@ export default class Dashboard extends React.Component {
 				<h2 style={styles.heading}>Dashboard</h2>
 				<Grid>
 					<Row>
-						<Col md={5} mdOffset={1}>
+						<Col md={3} mdOffset={9} >
+					  	<Paper style={styles.lastLogin} zDepth={1} >
+					  		<strong>Last Login: </strong> 
+					  		{this.formatDate(this.props.user.lastLogin)}
+					  	</Paper>
+					  </Col>
+					</Row>
+					<br />
+					<Row>
+						<Col md={12}>
 							{
 								this.props.user.role == 'wiproadmin' &&
 								<WiproAdmin />
@@ -72,12 +81,6 @@ export default class Dashboard extends React.Component {
 								<Candidate />
 							}
 						</Col>
-					  <Col md={3} mdOffset={2} >
-					  	<Paper style={styles.lastLogin} zDepth={1} >
-					  		<strong>Last Login: </strong> 
-					  		{this.formatDate(this.props.user.lastLogin)}
-					  	</Paper>
-					  </Col>
 				  </Row>
 			  </Grid>
 			</div>

@@ -9,6 +9,7 @@ const dashboardNeo4jController = require('../dashboard/dashboardNeo4jController'
 let auth = require('../auth')();
 let CONFIG = require('../../config');
 
+// Adding the cadets for the mentor connect
 router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 	let form = new formidable.IncomingForm();
 	form.parse(req, function (err1, fields, files) {
@@ -38,6 +39,7 @@ router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res)
 	});
 });
 
+// Adding remarks in bulk
 router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 	let form = new formidable.IncomingForm();
 	form.parse(req, function (err1, fields, files) {
@@ -73,6 +75,15 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 				});
 			}
 		});
+	});
+});
+
+// Merging two files
+router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+	let form = new formidable.IncomingForm();
+	form.parse(req, function (err1, fields, files) {
+		logger.debug('Files ZCOP',files.zcop);
+		logger.debug('Files ERD',files.erd);
 	});
 });
 
