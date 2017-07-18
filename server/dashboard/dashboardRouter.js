@@ -532,6 +532,23 @@ router.get('/feedbacksforwave', auth.canAccess(CONFIG.ADMIN), function (req, res
   }
 });
 
+//get candidate specific feedback
+router.get('/getFeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+  try {
+    dashboardMongoController.getFeedback(req.query.empID, function (feedback) {
+      res.status(200).json(feedback);
+    }, function (err) {
+      logger.error('Get Feedback Error: ', err);
+      res.status(500).json({error: 'Cannot get feedback from db...!'});
+    });
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
 // save candidate feedback
 router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   try {

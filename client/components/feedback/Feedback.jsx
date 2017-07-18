@@ -66,7 +66,9 @@ export default class Feedback extends React.Component {
       mostLiked: '',
       leastLiked: '',
       open: false,
-      buttonDisabled: false
+      buttonDisabled: false,
+      verify: false,
+      oldFeedback: false
     }
     this.getCadet = this.getCadet.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -74,6 +76,7 @@ export default class Feedback extends React.Component {
     this.handleLeastLikedChange = this.handleLeastLikedChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.saveFeedback = this.saveFeedback.bind(this);
+    this.getFeedback = this.getFeedback.bind(this);
   }
 
   componentWillMount() {
@@ -94,8 +97,36 @@ export default class Feedback extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({cadet: res.body.data})
+        th.setState({cadet: res.body.data});
+        th.getFeedback(res.body.data.EmployeeID);
         console.log('getCadet: ', res.body.data);
+      }
+    })
+  }
+
+  getFeedback(empID) {
+    let th = this;
+    Request.get(`/dashboard/getFeedback?empID=${empID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log('Feedback saved successfully', res.body.length);
+        if(res.body.length > 0)
+        {
+        th.setState({
+          buttonDisabled: true,
+          invalidData: true,
+          relevance: res.body[0].relevance,
+          training: res.body[0].training,
+          confidence: res.body[0].confidence,
+          mentors: res.body[0].mentors,
+          facilities: res.body[0].facilities,
+          overall: res.body[0].overall,
+          mostLiked: res.body[0].mostLiked,
+          leastLiked: res.body[0].leastLiked,
+          oldFeedback: true
+        })
+      }
       }
     })
   }
@@ -137,6 +168,13 @@ export default class Feedback extends React.Component {
   }
 
   handleSubmit() {
+    let th = this;
+    if(th.state.relevance.indexOf(0) != -1 || th.state.training.indexOf(0) != -1 || th.state.confidence.indexOf(0) != -1 || th.state.mentors.indexOf(0) != -1 || th.state.facilities.indexOf(0) != -1 || th.state.overall.indexOf(0) != -1) {
+      this.setState({
+        verify: true
+      });
+    }
+    else {
     let feedbackObj = {};
     feedbackObj.cadetID = this.state.cadet.EmployeeID;
     feedbackObj.cadetName = this.state.cadet.EmployeeName;
@@ -150,7 +188,10 @@ export default class Feedback extends React.Component {
     feedbackObj.mostLiked = this.state.mostLiked;
     feedbackObj.leastLiked = this.state.leastLiked;
     this.saveFeedback(feedbackObj);
-    this.setState({buttonDisabled: true});
+    this.setState({
+      buttonDisabled: true
+    });
+    }
   }
 
   render() {
@@ -164,6 +205,9 @@ export default class Feedback extends React.Component {
           <Row>
             <Col md={8} mdOffset={2} style={styles.name}>
               <h3>{this.state.cadet.EmployeeName}</h3>
+              {
+                th.state.oldFeedback && <p style={{color:'yellow'}}> You have already filled your feedback </p>
+              }
             </Col>
           </Row>
           <br/>
@@ -211,7 +255,13 @@ export default class Feedback extends React.Component {
                           <StarRating
                             color1={'#ddd'} half={false} size={30}
                             value={th.state[item.type][index]}
-                            onChange={(newVal) => th.handleChange(newVal, item.type, index)}/>
+                            onChange={(newVal) => th.handleChange(newVal, item.type, index)}
+                            editing={false}
+                          />
+                          {
+                            th.state.verify && th.state[item.type][index] === 0
+                            && <p>This is a required feild</p>
+                          }
                         </Col>
                       </Row>
                     )
@@ -222,11 +272,11 @@ export default class Feedback extends React.Component {
           }
 
           <Row><Col md={8} mdOffset={2}>
-              <TextField hintText="Express your views" floatingLabelText="Things you liked most about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.mostLiked} onChange={this.handleMostLikedChange}/>
+              <TextField hintText="Express your views" floatingLabelText="Things you liked most about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.mostLiked} onChange={this.handleMostLikedChange} disabled={th.state.oldFeedback}/>
           </Col></Row>
 
           <Row><Col md={8} mdOffset={2}>
-              <TextField hintText="Express your views" floatingLabelText="Things you liked least about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.leastLiked} onChange={this.handleLeastLikedChange}/>
+              <TextField hintText="Express your views" floatingLabelText="Things you liked least about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.leastLiked} onChange={this.handleLeastLikedChange} disabled={th.state.oldFeedback}/>
           </Col></Row>
 
           <Row><Col md={8} mdOffset={2} style={styles.submit}>

@@ -97,6 +97,7 @@ export default class WiproAdmin extends React.Component {
 
     return (
       <div>
+        <WaveDetails/>
         <h2>Billability status</h2>
         <PieChart data={data} expandedSector={this.state.expandedSector} onSectorHover={this.handleMouseEnterOnSector} sectorStrokeWidth={2} expandOnHover={true}/> {data.map((element, i) => (
           <div key={i}>
@@ -118,7 +119,6 @@ export default class WiproAdmin extends React.Component {
           </div>
         ))
 }
-        <WaveDetails/>
       </div>
     )
   }
