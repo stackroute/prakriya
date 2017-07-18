@@ -15,16 +15,18 @@ import {
 } from 'material-ui/Table';
 import IconButton from 'material-ui/IconButton';
 import StarIcon from 'material-ui/svg-icons/toggle/star';
+import CONFIG from '../../config/index';
 
 const StarsComponent = React.createClass({
   render: function() {
+    let extraStars = [];
+    for(let i=this.props.count; i>1; i--)
+    extraStars.push(<IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>)
+
     return (
       <TableRowColumn style={{textAlign: 'center'}}>
         <IconButton><StarIcon color='#FFE900'/></IconButton>
-        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
-        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
-        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
-        <IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>
+        {extraStars}
       </TableRowColumn>
     )
   }
@@ -49,59 +51,6 @@ const styles = {
     width: '820px'
   }
 }
-
-const feedback = [
-  {
-    type: "relevance",
-    options: [
-      "The objectives were clearly defined at the beginning of the program",
-      "The stated objectives for the Immersive program have been met successfully",
-      "This program relevance to learn the new set of tech for Web development",
-      "This program is relevant to my role/job",
-      "This program made good use of my time"
-    ]
-  }, {
-    type: "training",
-    options: [
-      "Program was stimulating and challenging",
-      "Relevant learning material and reference materials were provided",
-      "Program is paced well",
-      "Assignments helped in implementing technologies covered"
-    ]
-  }, {
-    type: "confidence",
-    options: [
-      "Understanding of the technologies that are core to the MEAN or MERN stack",
-      "Develop and deploy JavaScript solution using MongoDB, Express and Node.js",
-      "Code using HTML / CSS",
-      "Code using JavaScript language",
-      "Code using Node.js and Express",
-      "Use MongoDB and Mongoose"
-    ]
-  }, {
-    type: "mentors",
-    options: [
-      "Mentor Knowledge of the Subject",
-      "Ability to technically challenge and help learn",
-      "Interest and involvement in the program",
-      "Responsiveness to questions/ queries", "Overall ability to mentor"
-    ]
-  }, {
-    type: "facilities",
-    options: [
-      "Environment / Workspace",
-      "Quality and speed of Internet / Network",
-      "The facility was clean and well maintained",
-      "Overall Infrastructure"
-    ]
-  }, {
-    type: "overall",
-    options: [
-      "How would you rate your overall satisfaction after completing this program",
-      "How would you rate yourself in terms of confidence level",
-      "How likely are you to recommend this program to others in your organization"]
-  }
-];
 
 export default class Feedback extends React.Component {
   constructor(props) {
@@ -141,12 +90,12 @@ export default class Feedback extends React.Component {
 
   getCadet() {
     let th = this;
-    Request.get('/dashboard/cadetProfile').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get('/dashboard/getwaveofcadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-        th.setState({cadet: res.body})
-        console.log(th.state.cadet);
+        th.setState({cadet: res.body.data})
+        console.log('getCadet: ', res.body.data);
       }
     })
   }
@@ -191,6 +140,7 @@ export default class Feedback extends React.Component {
     let feedbackObj = {};
     feedbackObj.cadetID = this.state.cadet.EmployeeID;
     feedbackObj.cadetName = this.state.cadet.EmployeeName;
+    feedbackObj.waveID = this.state.cadet.Wave.WaveID;
     feedbackObj.relevance = this.state.relevance;
     feedbackObj.training = this.state.training;
     feedbackObj.confidence = this.state.confidence;
@@ -236,17 +186,17 @@ export default class Feedback extends React.Component {
             </TableHeader>
             <TableBody displayRowCheckbox={false}>
               <TableRow>
-                <StarsComponent />
-                <StarsComponent />
-                <StarsComponent />
-                <StarsComponent />
-                <StarsComponent />
+                <StarsComponent count={1}/>
+                <StarsComponent count={2}/>
+                <StarsComponent count={3}/>
+                <StarsComponent count={4}/>
+                <StarsComponent count={5}/>
               </TableRow>
             </TableBody>
           </Table>
 
           {
-            feedback.map(function(item, key) {
+            CONFIG.FEEDBACK.CATEGORIES.map(function(item, key) {
             return (
               <div key={key}>
                 <Row><Col md={8} mdOffset={2}><h4>{item.type.toUpperCase()}</h4></Col></Row>
