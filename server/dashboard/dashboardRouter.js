@@ -555,7 +555,7 @@ router.get('/feedbacksforwave', auth.canAccess(CONFIG.ADMIN), function (req, res
 });
 
 //get candidate specific feedback
-router.get('/getFeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+router.get('/getfeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try {
     dashboardMongoController.getFeedback(req.query.empID, function (feedback) {
       res.status(200).json(feedback);

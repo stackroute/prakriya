@@ -106,7 +106,7 @@ export default class Feedback extends React.Component {
 
   getFeedback(empID) {
     let th = this;
-    Request.get(`/dashboard/getFeedback?empID=${empID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get(`/dashboard/getfeedback?empID=${empID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
@@ -256,7 +256,6 @@ export default class Feedback extends React.Component {
                             color1={'#ddd'} half={false} size={30}
                             value={th.state[item.type][index]}
                             onChange={(newVal) => th.handleChange(newVal, item.type, index)}
-                            editing={false}
                           />
                           {
                             th.state.verify && th.state[item.type][index] === 0

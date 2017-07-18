@@ -15,6 +15,7 @@ import Chip from 'material-ui/Chip';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import IconButton from 'material-ui/IconButton';
+import CourseColumns from './CourseColumns.jsx';
 
 const styles = {
   paper: {
@@ -38,6 +39,7 @@ export default class AddCourse extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      courseColumns: false,
       showDialog: false,
       Name: '',
       Mode: '',
@@ -45,7 +47,6 @@ export default class AddCourse extends React.Component {
       NameErrorText: '',
       ModeErrorText: '',
       DurationErrorText: '',
-      key: -1,
       Skills: [],
       SkillName: '',
       disableSave: true
@@ -63,6 +64,7 @@ export default class AddCourse extends React.Component {
     this.validationSuccess = this.validationSuccess.bind(this);
     this.handleSkillChange = this.handleSkillChange.bind(this);
     this.onAddSkill = this.onAddSkill.bind(this);
+    this.closeCourseColumns = this.closeCourseColumns.bind(this);
   }
 
   componentWillMount() {
@@ -103,9 +105,11 @@ export default class AddCourse extends React.Component {
   handleClose(e, action) {
     if (action == 'ADD') {
       if (this.validationSuccess()) {
-        this.handleAdd()
-        this.setState({showDialog: false})
-        this.resetFields()
+        this.setState({
+          showDialog: false,
+          courseColumns: true
+        });
+        // this.resetFields()
       }
     } else if (action == 'EDIT') {
       if (this.validationSuccess()) {
@@ -135,6 +139,8 @@ export default class AddCourse extends React.Component {
       Name: '',
       Mode: '',
       Duration: '',
+      Skills: [],
+      SkillName: '',
       NameErrorText: '',
       ModeErrorText: '',
       DurationErrorText: ''
@@ -154,10 +160,9 @@ export default class AddCourse extends React.Component {
     this.props.handleUpdate(course, 'edit');
   }
 
-  handleAdd() {
-    let th = this
-    let course = {}
-    console.log('id: ' + th.state.Name + '_' + th.state.Mode);
+  handleAdd(courseColumns) {
+    let th = this;
+    let course = {};
     course.ID = th.state.Name + '_' + th.state.Mode;
     course.Name = this.state.Name;
     course.Mode = this.state.Mode;
@@ -167,7 +172,13 @@ export default class AddCourse extends React.Component {
     course.Removed = false;
     course.Duration = this.state.Duration;
     course.History = '';
+    console.log('CourseColumns: ', courseColumns);
+    course.FeedbackFields = courseColumns.FeedbackFields;
+    course.EvaluationFields = courseColumns.EvaluationFields;
     this.props.handleAdd(course);
+    this.setState({
+      courseColumns: false
+    });
   }
 
   validationSuccess() {
@@ -184,6 +195,13 @@ export default class AddCourse extends React.Component {
       return true
     }
     return false
+  }
+
+  closeCourseColumns() {
+    this.setState({
+      courseColumns: false,
+      showDialog: true
+    });
   }
 
   render() {
@@ -237,10 +255,11 @@ export default class AddCourse extends React.Component {
                 <SelectField style={{
                   width: '100%'
                 }} hintText="Mode" floatingLabelText='Mode *' floatingLabelStyle={app.mandatoryField} value={this.state.Mode} onChange={this.onChangeMode} errorText={this.state.ModeErrorText} menuItemStyle={select.menu} listStyle={select.list} selectedMenuItemStyle={select.selectedMenu} maxHeight={600}>
-                  {CONFIG.MODES.map(function(mode, key) {
-                    return (<MenuItem key={key} value={mode} primaryText={mode}/>)
-                  })
-}
+                  {
+                    CONFIG.MODES.map(function(mode, key) {
+                      return (<MenuItem key={key} value={mode} primaryText={mode}/>)
+                    })
+                  }
                 </SelectField>
               </div>
             </div>
@@ -259,19 +278,25 @@ export default class AddCourse extends React.Component {
                 </IconButton>
                 <Paper style={styles.paper} zDepth={1}>
                   <div style={styles.wrapper}>
-                    {this.state.Skills.map(function(skill, index) {
-                      return (
-                        <Chip onRequestDelete={() => th.handleSkillDelete(skill)} style={styles.chip} key={index}>
-                          <span>{skill}</span>
-                        </Chip>
-                      )
-                    })
-}
+                    {
+                      this.state.Skills.map(function(skill, index) {
+                        return (
+                          <Chip onRequestDelete={() => th.handleSkillDelete(skill)} style={styles.chip} key={index}>
+                            <span>{skill}</span>
+                          </Chip>
+                        )
+                      })
+                   }
                   </div>
                 </Paper>
               </div>
             </div>
           </Dialog>
+          <CourseColumns
+          open={this.state.courseColumns}
+          onClose={this.closeCourseColumns}
+          onConfirmCourseAddition={this.handleAdd}
+          />
         </div>
       )
     }
