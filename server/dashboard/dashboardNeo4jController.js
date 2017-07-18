@@ -824,44 +824,49 @@ let deleteVersion = function(versionName, successCB, errorCB) {
 };
 
 let getProducts = function(successCB, errorCB) {
-  let session = driver.session();
-
-  let query = `
-    MATCH (product:${graphConsts.NODE_PRODUCT})
-    -[:${graphConsts.REL_HAS}]-> (version:${graphConsts.NODE_VERSION})
-    WITH COLLECT(version) AS versions, product AS product
-    UNWIND versions AS version
-    MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
-    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    WITH COLLECT(skill.Name) AS skills, version AS version, product AS product
-    WITH COLLECT({
-      name: version.name,
-      description: version.description,
-      wave: version.wave,
-      members: [],
-      skills: skills,
-      addedBy: version.addedBy,
-      addedOn: version.addedOn,
-      updated: version.updated
-    }) AS versions, product AS product
-    RETURN {
-      product: product.name,
-      description: product.description,
-      version: versions
-    }`;
-
-  session.run(query).then(function(resultObj, err) {
-    session.close();
-    if (err) {
-      errorCB('Error');
-    } else {
-      successCB(resultObj.records[0] ? resultObj.records[0]._fields : []);
-    }
-  }).catch(function(err) {
-    errorCB(err);
-  });
+ let session = driver.session();  let query = `
+   MATCH (product:${graphConsts.NODE_PRODUCT})
+   -[:${graphConsts.REL_HAS}]-> (version:${graphConsts.NODE_VERSION})
+   WITH COLLECT(version) AS versions, product AS product
+   UNWIND versions AS version
+   MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
+   -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+   OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+   -[:${graphConsts.REL_WORKEDON} {version: version.name}]-> (product)
+   WITH COLLECT(DISTINCT skill.Name) AS skills, version AS version, product AS product,
+   CASE WHEN candidate IS NULL THEN
+     []
+     ELSE
+     COLLECT (DISTINCT {
+       EmployeeID: candidate.EmployeeID,
+       EmployeeName: candidate.EmployeeName
+     })
+   END AS candidates
+   WITH COLLECT({
+     name: version.name,
+     description: version.description,
+     wave: version.wave,
+     members: candidates,
+     skills: skills,
+     addedBy: version.addedBy,
+     addedOn: version.addedOn,
+     updated: version.updated
+   }) AS versions, product AS product
+   RETURN {
+     product: product.name,
+     description: product.description,
+     version: versions
+   }`;  session.run(query).then(function(resultObj, err) {
+   session.close();
+   if (err) {
+     errorCB('Error');
+   } else {
+     successCB(resultObj.records);
+   }
+ }).catch(function(err) {
+   errorCB(err);
+ });
 };
-
 
 /**********************************************
 ************** Wave Management ****************

@@ -106,7 +106,7 @@ export default class Feedback extends React.Component {
 
   getFeedback(empID) {
     let th = this;
-    Request.get(`/dashboard/getFeedback?empID=${empID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get(`/dashboard/getfeedback?empID=${empID}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {

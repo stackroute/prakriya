@@ -9,6 +9,7 @@ const EvaluationModel = require('../../models/evaluation.js');
 const CourseModel = require('../../models/courses.js');
 const adminMongoController = require('../admin/adminMongoController.js');
 const UserModel = require('../../models/users.js');
+const CourseColumnsModel = require('../../models/coursecolumns.js');
 const CONFIG = require('../../config');
 const logger = require('./../../applogger');
 let mongoose = require('mongoose');
@@ -614,6 +615,20 @@ let getNonBillability = function (successCB, errorCB) {
 	});
 };
 
+/***************************************************
+*********          CourseColumns         ***********
+****************************************************/
+
+let saveCourseColumns = function (obj, successCB, errorCB) {
+	let modelObj = new CourseColumnsModel(obj);
+	modelObj.save(function (err, result) {
+		if(err) {
+			errorCB(err);
+		}
+		successCB(result);
+	});
+};
+
 module.exports = {
 	updateLastLogin,
 	getPermissions,
@@ -660,5 +675,6 @@ module.exports = {
 	getBillability,
 	getBillabilityFree,
 	getNonBillability,
-	getBillabilitySupport
+	getBillabilitySupport,
+	saveCourseColumns
 };

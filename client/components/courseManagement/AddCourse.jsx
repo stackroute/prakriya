@@ -105,8 +105,10 @@ export default class AddCourse extends React.Component {
   handleClose(e, action) {
     if (action == 'ADD') {
       if (this.validationSuccess()) {
-        this.handleAdd()
-        this.setState({showDialog: false})
+        this.setState({
+          showDialog: false,
+          courseColumns: true
+        });
         // this.resetFields()
       }
     } else if (action == 'EDIT') {
@@ -171,9 +173,7 @@ export default class AddCourse extends React.Component {
     course.Removed = false;
     course.Duration = this.state.Duration;
     course.History = '';
-    this.setState({
-      courseColumns: true
-    });
+    
     // this.props.handleAdd(course);
   }
 
@@ -289,7 +289,8 @@ export default class AddCourse extends React.Component {
           </Dialog>
           <CourseColumns
           open={this.state.courseColumns}
-          onClose={this.closeCourseColumns}/>
+          onClose={this.closeCourseColumns}
+          />
         </div>
       )
     }

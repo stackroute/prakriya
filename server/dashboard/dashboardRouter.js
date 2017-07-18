@@ -555,7 +555,7 @@ router.get('/feedbacksforwave', auth.canAccess(CONFIG.ADMIN), function (req, res
 });
 
 //get candidate specific feedback
-router.get('/getFeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+router.get('/getfeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
   try {
     dashboardMongoController.getFeedback(req.query.empID, function (feedback) {
       res.status(200).json(feedback);
@@ -1400,6 +1400,22 @@ router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
     });
   } catch(err) {
     logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// save course columns
+router.post('/savecoursecolumns', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+  try {
+    dashboardMongoController.saveCourseColumns(req.body, function (obj) {
+      res.status(200).json(obj);
+    }, function (err) {
+      logger.error('Save CourseColumns Error: ', err);
+      res.status(500).json({error: 'Cannot save coursecolumns in db...!'});
+    });
+  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
