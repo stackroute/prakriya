@@ -6,12 +6,12 @@ const graphConsts = require('./../common/graphConstants');
 
 let driver = neo4jDriver.driver(config.NEO4J.neo4jURL, neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
-let deleteDanglingSkills = function() {
-  let query = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
-  let session = driver.session();
-  session.run(query).then(function(result, err) {
-    session.close();
-  });
+let deleteDanglingNodes = function(label) {
+ let query = `MATCH (n:${label}) where SIZE((n)--())=0 DELETE n`;
+ let session = driver.session();
+ session.run(query).then(function(result, err) {
+   session.close();
+ });
 };
 
 /**********************************************
@@ -624,7 +624,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   version.name = versionObj.name;
   version.description = versionObj.description || '';
   version.wave = versionObj.wave || '';
-  version.members = productObj.version[0].members.map(function(member) {
+  version.members = versionObj.members.map(function(member) {
     return member.EmployeeName
   });
   version.skills = versionObj.skills;
@@ -649,7 +649,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
        WITH version AS version
        MERGE (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
        MERGE (version) <-[:${graphConsts.REL_HAS}]- (product)
-       WITH version AS version
+       WITH version AS version, product AS product
        UNWIND ${JSON.stringify(version.skills)} AS skillname
        MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
        MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
@@ -729,7 +729,7 @@ let updateVersion = function (version, successCB, errorCB) {
       if(err) {
         errorCB(err);
       } else {
-        deleteDanglingSkills();
+        deleteDanglingNodes(graphConsts.NODE_SKILL);
         successCB(version);
       }
     }).catch(function(err) {
@@ -775,7 +775,7 @@ let deleteProduct = function(productName, successCB, errorCB) {
     if(err) {
       errorCB(err);
     } else {
-      deleteDanglingSkills();
+      deleteDanglingNodes(graphConsts.NODE_SKILL);
       successCB(productName);
     }
   }).catch(function(err) {
@@ -815,7 +815,8 @@ let deleteVersion = function(versionName, successCB, errorCB) {
     if(err) {
       errorCB(err);
     } else {
-      deleteDanglingSkills();
+      deleteDanglingNodes(graphConsts.NODE_SKILL);
+      deleteDanglingNodes(graphConsts.NODE_PRODUCT);
       successCB(versionName);
     }
   }).catch(function(err) {
