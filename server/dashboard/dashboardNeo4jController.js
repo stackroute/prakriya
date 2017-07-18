@@ -177,6 +177,7 @@ let getNewCadets = function(successCB, errorCB) {
     })
 }
 
+// Get the filtered cadets
 let getFilteredCadets = function (filterQuery, successCB, errorCB) {
 
   logger.debug('Filter Query', filterQuery)
@@ -216,11 +217,20 @@ let getFilteredCadets = function (filterQuery, successCB, errorCB) {
     wave = `MATCH (n)-[:${graphConsts.REL_BELONGS_TO}]->
       (w: ${graphConsts.NODE_WAVE}{WaveID: '${filterQuery.Wave}'})`
   }
+
+  let skills = '';
+  if(filterQuery.Skills != '') {
+    skills = `WITH n as n
+      MATCH (n)-[: ${graphConsts.REL_KNOWS}]->(s: ${graphConsts.NODE_SKILL})
+      WHERE s.Name = '${filterQuery.Skills}'`
+  }
   
   let query = 
-    `MATCH(n: ${graphConsts.NODE_CANDIDATE})
+    `MATCH(n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->
+    (:${graphConsts.NODE_WAVE})
       ${condition}
       ${wave}
+      ${skills}
     RETURN n`;
 
   logger.debug('Query for the search', query);
@@ -238,6 +248,31 @@ let getFilteredCadets = function (filterQuery, successCB, errorCB) {
     }
   });
 }
+
+
+/**********************************************
+************ Candidate Management *************
+**********************************************/
+
+// Fetch all the skills
+let getSkills = function(successCB, errorCB) {
+
+  let session = driver.session();
+  let query = `MATCH (c: ${graphConsts.NODE_SKILL}) RETURN c`;
+
+  session.run(query).then(function(resultObj) {
+    session.close();
+    let skills = [];
+    for (let i = 0; i < resultObj.records.length; i++) {
+      let result = resultObj.records[i];
+      skills.push(result._fields[0].properties);
+    }
+    successCB(skills);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 
 
 /**********************************************
@@ -1210,6 +1245,7 @@ let getWaveOfCadet = function(EmailID, successCB, errorCB) {
     getCadet,
     getNewCadets,
     getFilteredCadets,
+    getSkills,
     addCourse,
     getCourses,
     updateCourse,
