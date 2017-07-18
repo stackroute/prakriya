@@ -48,6 +48,7 @@ export default class Candidates extends React.Component {
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
+			skills: [],
 			waves: [],
 			filtersCount: 0,
 			filteredCandidates: [],
@@ -66,6 +67,7 @@ export default class Candidates extends React.Component {
 		}
 
 		this.getCandidates = this.getCandidates.bind(this);
+		this.getSkills = this.getSkills.bind(this);
 		this.getWaves = this.getWaves.bind(this);
 		this.candidateView = this.candidateView.bind(this);
 		this.handleBack = this.handleBack.bind(this);
@@ -84,6 +86,7 @@ export default class Candidates extends React.Component {
 
 	componentWillMount() {
 		this.getCandidates();
+		this.getSkills();
 		this.getWaves();
 	}
 
@@ -166,6 +169,25 @@ export default class Candidates extends React.Component {
 						filteredCandidates: cadets
 		    	});
 					th.setPage(th.state.currentPage);
+		    }
+		  })
+	}
+
+	getSkills() {
+		let th = this;
+		Request
+			.get('/dashboard/skills')
+			.set({'Authorization': localStorage.getItem('token')})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	let skills = res.body.map(function (skill) {
+		    		return skill.Name;
+		    	})
+					th.setState({
+						skills: skills
+					})
 		    }
 		  })
 	}
@@ -427,7 +449,7 @@ export default class Candidates extends React.Component {
 								<FilterItem
 									title={'Skills'}
 									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('Skills')}
+									onGetAccordianValues={()=>th.state.skills}
 									onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
 									onOpenSnackbar={th.openSnackbar}
 								/>

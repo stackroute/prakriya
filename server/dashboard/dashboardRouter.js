@@ -133,6 +133,28 @@ router.get('/user', function (req, res) {
   }
 });
 
+
+/** **************************************************
+*******                 Wave                 ********
+****************************************************/
+
+// Fetch all the skills
+router.get('/skills', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+    try{
+      dashboardNeo4jController.getSkills(function (skills) {
+      res.status(201).json(skills);
+    }, function (err) {
+      logger.error('Get All Skills Error: ', err);
+      res.status(500).json({error: 'Cannot get all skills from neo4j...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
 /** **************************************************
 *******                 Wave                 ********
 ****************************************************/
