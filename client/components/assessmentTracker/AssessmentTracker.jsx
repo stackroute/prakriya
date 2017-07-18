@@ -3,7 +3,6 @@ import Request from 'superagent';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import {Grid, Row, Col} from 'react-flexbox-grid';
-import TrackItem from './TrackItem.jsx';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import app from '../../styles/app.json';
