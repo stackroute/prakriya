@@ -15,6 +15,7 @@ import Chip from 'material-ui/Chip';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import IconButton from 'material-ui/IconButton';
+import CourseColumns from './CourseColumns.jsx';
 
 const styles = {
   paper: {
@@ -38,6 +39,7 @@ export default class AddCourse extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      courseColumns: false,
       showDialog: false,
       Name: '',
       Mode: '',
@@ -45,7 +47,6 @@ export default class AddCourse extends React.Component {
       NameErrorText: '',
       ModeErrorText: '',
       DurationErrorText: '',
-      key: -1,
       Skills: [],
       SkillName: '',
       disableSave: true
@@ -63,6 +64,7 @@ export default class AddCourse extends React.Component {
     this.validationSuccess = this.validationSuccess.bind(this);
     this.handleSkillChange = this.handleSkillChange.bind(this);
     this.onAddSkill = this.onAddSkill.bind(this);
+    this.closeCourseColumns = this.closeCourseColumns.bind(this);
   }
 
   componentWillMount() {
@@ -105,7 +107,7 @@ export default class AddCourse extends React.Component {
       if (this.validationSuccess()) {
         this.handleAdd()
         this.setState({showDialog: false})
-        this.resetFields()
+        // this.resetFields()
       }
     } else if (action == 'EDIT') {
       if (this.validationSuccess()) {
@@ -135,6 +137,8 @@ export default class AddCourse extends React.Component {
       Name: '',
       Mode: '',
       Duration: '',
+      Skills: [],
+      SkillName: '',
       NameErrorText: '',
       ModeErrorText: '',
       DurationErrorText: ''
@@ -167,7 +171,10 @@ export default class AddCourse extends React.Component {
     course.Removed = false;
     course.Duration = this.state.Duration;
     course.History = '';
-    this.props.handleAdd(course);
+    this.setState({
+      courseColumns: true
+    });
+    // this.props.handleAdd(course);
   }
 
   validationSuccess() {
@@ -184,6 +191,13 @@ export default class AddCourse extends React.Component {
       return true
     }
     return false
+  }
+
+  closeCourseColumns() {
+    this.setState({
+      courseColumns: false,
+      showDialog: true
+    });
   }
 
   render() {
@@ -237,10 +251,11 @@ export default class AddCourse extends React.Component {
                 <SelectField style={{
                   width: '100%'
                 }} hintText="Mode" floatingLabelText='Mode *' floatingLabelStyle={app.mandatoryField} value={this.state.Mode} onChange={this.onChangeMode} errorText={this.state.ModeErrorText} menuItemStyle={select.menu} listStyle={select.list} selectedMenuItemStyle={select.selectedMenu} maxHeight={600}>
-                  {CONFIG.MODES.map(function(mode, key) {
-                    return (<MenuItem key={key} value={mode} primaryText={mode}/>)
-                  })
-}
+                  {
+                    CONFIG.MODES.map(function(mode, key) {
+                      return (<MenuItem key={key} value={mode} primaryText={mode}/>)
+                    })
+                  }
                 </SelectField>
               </div>
             </div>
@@ -272,6 +287,10 @@ export default class AddCourse extends React.Component {
               </div>
             </div>
           </Dialog>
+          <CourseColumns
+          open={this.state.courseColumns}
+          columnTitle={'Feedback'}
+          onClose={this.closeCourseColumns}/>
         </div>
       )
     }
