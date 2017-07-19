@@ -114,7 +114,7 @@ export default class WaveDetails extends React.Component {
 		CONFIG.FEEDBACK.CATEGORIES.map(function(CATEGORY) {
 			doc.rect(x, y+=6, 200, 6);
 			doc.setFontStyle('bold');
-			doc.text(x+2, y+4, CATEGORY.type.toUpperCase());
+			doc.text(x+2, y+4, CATEGORY.alias);
 			CATEGORY.options.map(function(option, index) {
 				doc.setFontStyle('default');
 				doc.rect(x, y+=6, 175, 6);
