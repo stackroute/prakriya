@@ -77,6 +77,7 @@ export default class Feedback extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.saveFeedback = this.saveFeedback.bind(this);
     this.getFeedback = this.getFeedback.bind(this);
+    this.getFeedbackFields = this.getFeedbackFields.bind(this);
   }
 
   componentWillMount() {
@@ -98,11 +99,28 @@ export default class Feedback extends React.Component {
         console.log(err);
       else {
         th.setState({cadet: res.body.data});
+        th.getFeedbackFields(res.body.data.Wave.WaveID);
         th.getFeedback(res.body.data.EmployeeID);
         console.log('getCadet: ', res.body.data);
       }
     })
   }
+
+  getFeedbackFields(waveID) {
+		let th = this;
+		console.log('should get feedback fields for ', waveID);
+		Request
+			.get('/dashboard/courseforwave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.query({waveID: waveID})
+			.end(function(err, res){
+				if(err)
+					console.log('Error in fetching feedback fields: ', err)
+				else {
+					console.log('All Feedback Fields: ', res.body.FeedbackFields);
+				}
+			});
+	}
 
   getFeedback(empID) {
     let th = this;

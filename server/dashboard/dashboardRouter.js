@@ -900,8 +900,8 @@ router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
 })
 
 // Get course for a given waveID
-router.get('/courseforwave', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
-  try{
+router.get('/courseforwave', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try {
     dashboardNeo4jController.getCourseForWave(req.query.waveID, function (course) {
       res.status(201).json(course);
     }, function (err) {

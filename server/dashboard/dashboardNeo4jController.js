@@ -1052,17 +1052,19 @@ let getWaves = function(successCB, errorCB) {
 let getCourseForWave = function(waveID, successCB, errorCB) {
   let query = `
     MATCH(wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
-    -[:${graphConsts.REL_HAS}] (course:${graphConsts.NODE_COURSE}) RETURN course
+    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE}) RETURN course
     `;
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
       logger.debug(resultObj);
+      successCB(resultObj.records[0]._fields[0].properties);
     } else {
       errorCB('Error');
     }
   });
+};
 
 // Update cadets for the wave
 let updateWaveCadets = function (cadets, waveID, successCB, errorCB) {
