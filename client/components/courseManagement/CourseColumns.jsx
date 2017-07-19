@@ -57,6 +57,7 @@ export default class CourseColumns extends React.Component {
   }
 
   handleContinue() {
+    let th = this;
     let type = this.state.currentColumn;
     if(this.validationSuccess()) {
       if(type == 'Feedback') {
@@ -64,7 +65,11 @@ export default class CourseColumns extends React.Component {
           currentColumn: 'Evaluations'
         });
       } else if(type == 'Evaluations') {
-
+        let obj = {
+          FeedbackFields: th.state.feedbackFields,
+          EvaluationFields: th.state.evaluationFields
+        };
+        this.props.onConfirmCourseAddition(obj);
       }
     }
   }

@@ -160,10 +160,9 @@ export default class AddCourse extends React.Component {
     this.props.handleUpdate(course, 'edit');
   }
 
-  handleAdd() {
-    let th = this
-    let course = {}
-    console.log('id: ' + th.state.Name + '_' + th.state.Mode);
+  handleAdd(courseColumns) {
+    let th = this;
+    let course = {};
     course.ID = th.state.Name + '_' + th.state.Mode;
     course.Name = this.state.Name;
     course.Mode = this.state.Mode;
@@ -173,8 +172,13 @@ export default class AddCourse extends React.Component {
     course.Removed = false;
     course.Duration = this.state.Duration;
     course.History = '';
-    
-    // this.props.handleAdd(course);
+    console.log('CourseColumns: ', courseColumns);
+    course.FeedbackFields = courseColumns.FeedbackFields;
+    course.EvaluationFields = courseColumns.EvaluationFields;
+    this.props.handleAdd(course);
+    this.setState({
+      courseColumns: false
+    });
   }
 
   validationSuccess() {
@@ -274,14 +278,15 @@ export default class AddCourse extends React.Component {
                 </IconButton>
                 <Paper style={styles.paper} zDepth={1}>
                   <div style={styles.wrapper}>
-                    {this.state.Skills.map(function(skill, index) {
-                      return (
-                        <Chip onRequestDelete={() => th.handleSkillDelete(skill)} style={styles.chip} key={index}>
-                          <span>{skill}</span>
-                        </Chip>
-                      )
-                    })
-}
+                    {
+                      this.state.Skills.map(function(skill, index) {
+                        return (
+                          <Chip onRequestDelete={() => th.handleSkillDelete(skill)} style={styles.chip} key={index}>
+                            <span>{skill}</span>
+                          </Chip>
+                        )
+                      })
+                   }
                   </div>
                 </Paper>
               </div>
@@ -290,6 +295,7 @@ export default class AddCourse extends React.Component {
           <CourseColumns
           open={this.state.courseColumns}
           onClose={this.closeCourseColumns}
+          onConfirmCourseAddition={this.handleAdd}
           />
         </div>
       )

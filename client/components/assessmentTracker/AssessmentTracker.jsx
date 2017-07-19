@@ -3,7 +3,6 @@ import Request from 'superagent';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import {Grid, Row, Col} from 'react-flexbox-grid';
-import TrackItem from './TrackItem.jsx';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import app from '../../styles/app.json';
@@ -84,6 +83,7 @@ export default class AssessmentTracker extends React.Component {
     let cadetsResult = th.state.cadetsResult;
     cadetsResult[index].implement = value
     th.setState({cadetsResult: cadetsResult})
+    th.save();
   }
 
   onCompleteChange(value, index) {
@@ -91,6 +91,7 @@ export default class AssessmentTracker extends React.Component {
     let cadetsResult = th.state.cadetsResult;
     cadetsResult[index].complete = value
     th.setState({cadetsResult: cadetsResult})
+    th.save();
   }
 
   onLearnChange(value, index) {
@@ -98,6 +99,7 @@ export default class AssessmentTracker extends React.Component {
     let cadetsResult = th.state.cadetsResult;
     cadetsResult[index].learn = value
     th.setState({cadetsResult: cadetsResult})
+    th.save();
   }
 
   save() {
@@ -121,8 +123,6 @@ export default class AssessmentTracker extends React.Component {
       Request.post('/dashboard/assessmentdetails').set({'Authorization': localStorage.getItem('token')}).send({assessment: assessmentArray, update: th.state.update}).end(function(err, res) {
         if (err) {
           console.log(err);
-        } else {
-          th.setState({wave: '', assessment: ''})
         }
       })
     } else {
@@ -213,7 +213,7 @@ export default class AssessmentTracker extends React.Component {
             <TableHeaderColumn style={{
               width: '350px'
             }}>Completion</TableHeaderColumn>
-            <TableHeaderColumn>learning</TableHeaderColumn>
+            <TableHeaderColumn>Learning</TableHeaderColumn>
           </TableHeader>
           <TableBody displayRowCheckbox={false} showRowHover={false}>
             {th.state.assessment && th.state.cadetsOfWave.map(function(cadet, index) {
@@ -228,7 +228,7 @@ export default class AssessmentTracker extends React.Component {
                   <TableRowColumn style={{
                     width: '350px'
                   }}>
-                    <SelectField onChange={(event, key, val) => th.onImplementChange(val, index)} floatingLabelText="Select Assessment" value={th.state.cadetsResult[index].implement} fullWidth='true'>
+                    <SelectField onChange={(event, key, val) => th.onImplementChange(val, index)} floatingLabelText="Select Implementation" value={th.state.cadetsResult[index].implement} fullWidth='true'>
                       {th.state.implementation.map(function(implement, key) {
                         return <MenuItem key={key} value={implement} primaryText={implement}/>
                       })
@@ -238,7 +238,7 @@ export default class AssessmentTracker extends React.Component {
                   <TableRowColumn style={{
                     width: '350px'
                   }}>
-                    <SelectField onChange={(event, key, val) => th.onCompleteChange(val, index)} floatingLabelText="Select Assessment" value={th.state.cadetsResult[index].complete} fullWidth='true'>
+                    <SelectField onChange={(event, key, val) => th.onCompleteChange(val, index)} floatingLabelText="Select Completion" value={th.state.cadetsResult[index].complete} fullWidth='true'>
                       {th.state.completion.map(function(complete, key) {
                         return <MenuItem key={key} value={complete} primaryText={complete}/>
                       })
@@ -246,7 +246,7 @@ export default class AssessmentTracker extends React.Component {
                     </SelectField>
                   </TableRowColumn>
                   <TableRowColumn>
-                    <SelectField onChange={(event, key, val) => th.onLearnChange(val, index)} floatingLabelText="Select learning" value={th.state.cadetsResult[index].learn}>
+                    <SelectField onChange={(event, key, val) => th.onLearnChange(val, index)} floatingLabelText="Select Learning" value={th.state.cadetsResult[index].learn}>
                       {th.state.learning.map(function(learn, key) {
                         return <MenuItem key={key} value={learn} primaryText={learn}/>
                       })
@@ -259,7 +259,6 @@ export default class AssessmentTracker extends React.Component {
 }
           </TableBody>
         </Table>
-        <RaisedButton label="Save" primary={true} onClick={th.save}/>
       </div>
     )
   }

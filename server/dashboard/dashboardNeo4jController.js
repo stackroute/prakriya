@@ -6,12 +6,12 @@ const graphConsts = require('./../common/graphConstants');
 
 let driver = neo4jDriver.driver(config.NEO4J.neo4jURL, neo4jDriver.auth.basic(config.NEO4J.usr, config.NEO4J.pwd), {encrypted: false});
 
-let deleteDanglingSkills = function() {
-  let query = `MATCH (n:${graphConsts.NODE_SKILL}) where SIZE((n)--())=0 DELETE n`;
-  let session = driver.session();
-  session.run(query).then(function(result, err) {
-    session.close();
-  });
+let deleteDanglingNodes = function(label) {
+ let query = `MATCH (n:${label}) where SIZE((n)--())=0 DELETE n`;
+ let session = driver.session();
+ session.run(query).then(function(result, err) {
+   session.close();
+ });
 };
 
 /**********************************************
@@ -283,7 +283,8 @@ let addCourse = function(CourseObj, successCB, errorCB) {
   logger.info(CourseObj);
   let query = `MERGE (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}',Name:'${CourseObj.Name}',
   Mode:'${CourseObj.Mode}',Duration:${CourseObj.Duration},History:'${CourseObj.History}',
-  Removed:${CourseObj.Removed}}) WITH c AS course
+  Removed:${CourseObj.Removed},FeedbackFields: ${JSON.stringify(CourseObj.FeedbackFields)},
+  EvaluationsFields:${JSON.stringify(CourseObj.EvaluationFields)}}) WITH c AS course
   UNWIND ${JSON.stringify(CourseObj.Skills)} AS skill
   MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
   MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(course);`;
@@ -533,19 +534,6 @@ let deleteAssignmentOrSchedule = function(obj, course, type, successCB, errorCB)
   }
 }
 
-let getCourse = function (courseID, successCB, errorCB) {
-  let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${courseID}'})<-[:${graphConsts.REL_HAS}]-(w:${graphConsts.NODE_WAVE}) return c;`
-  let session = driver.session();
-  session.run(query).then(function(resultObj, err) {
-    session.close();
-  if (err) {
-			errorCB(err);
-		}
-    successCB(resultObj.records[0]._fields[0].properties);
-	});
-};
-
-
 /**********************************************
 ************ Product Management ***************
 **********************************************/
@@ -624,7 +612,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   version.name = versionObj.name;
   version.description = versionObj.description || '';
   version.wave = versionObj.wave || '';
-  version.members = productObj.version[0].members.map(function(member) {
+  version.members = versionObj.members.map(function(member) {
     return member.EmployeeName
   });
   version.skills = versionObj.skills;
@@ -649,7 +637,7 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
        WITH version AS version
        MERGE (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
        MERGE (version) <-[:${graphConsts.REL_HAS}]- (product)
-       WITH version AS version
+       WITH version AS version, product AS product
        UNWIND ${JSON.stringify(version.skills)} AS skillname
        MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
        MERGE (version) -[:${graphConsts.REL_INCLUDES}]-> (skill)
@@ -729,7 +717,7 @@ let updateVersion = function (version, successCB, errorCB) {
       if(err) {
         errorCB(err);
       } else {
-        deleteDanglingSkills();
+        deleteDanglingNodes(graphConsts.NODE_SKILL);
         successCB(version);
       }
     }).catch(function(err) {
@@ -775,7 +763,7 @@ let deleteProduct = function(productName, successCB, errorCB) {
     if(err) {
       errorCB(err);
     } else {
-      deleteDanglingSkills();
+      deleteDanglingNodes(graphConsts.NODE_SKILL);
       successCB(productName);
     }
   }).catch(function(err) {
@@ -815,7 +803,8 @@ let deleteVersion = function(versionName, successCB, errorCB) {
     if(err) {
       errorCB(err);
     } else {
-      deleteDanglingSkills();
+      deleteDanglingNodes(graphConsts.NODE_SKILL);
+      deleteDanglingNodes(graphConsts.NODE_PRODUCT);
       successCB(versionName);
     }
   }).catch(function(err) {
@@ -1059,17 +1048,23 @@ let getWaves = function(successCB, errorCB) {
   });
 };
 
-// let getCoursesForWave = function(waveID, successCB, `errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n.CourseNames`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
+// Get course for a given waveID
+let getCourseForWave = function(waveID, successCB, errorCB) {
+  let query = `
+    MATCH(wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
+    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE}) RETURN course
+    `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      logger.debug(resultObj);
+      successCB(resultObj.records[0]._fields[0].properties);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
 
 // Update cadets for the wave
 let updateWaveCadets = function (cadets, waveID, successCB, errorCB) {
@@ -1361,7 +1356,8 @@ let deleteSession = function(waveObj,waveString, successCB, errorCB) {
     let query = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${waveObj.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}{WaveID:'${waveString}'})
                  DELETE r`;
     let session = driver.session();
-    session.run(query).then(function(resultObj,err) {
+    session.run(query).then(function(resultObj, err) {
+
       session.close();
       if (err) {
         errorCB('Error');
@@ -1411,5 +1407,6 @@ module.exports = {
     getBillabilityFree,
     getCadetProject,
     updateSession,
-    deleteSession
+    deleteSession,
+    getCourseForWave
   }

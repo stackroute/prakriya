@@ -539,7 +539,6 @@ router.get('/files', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 // get all feedbacks of a particular wave
 router.get('/feedbacksforwave', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try{
-    console.log('WAVEID: ', req.query.waveID)
     dashboardMongoController.getFeedbacks(req.query.waveID, function (feedbacks) {
       res.status(201).json(feedbacks);
     }, function (err) {
@@ -894,6 +893,23 @@ router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
     })
   } catch(err) {
     logger.error('Get Courses Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
+
+// Get course for a given waveID
+router.get('/courseforwave', auth.canAccess(CONFIG.ALL), function(req, res) {
+  try {
+    dashboardNeo4jController.getCourseForWave(req.query.waveID, function (course) {
+      res.status(201).json(course);
+    }, function (err) {
+      logger.error('Get CourseForWave Error: ', err);
+      res.status(500).json({error: 'Cannot get course for this wave from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get CourseForWave Error', err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -1400,22 +1416,6 @@ router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
     });
   } catch(err) {
     logger.error(err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
-
-// save course columns
-router.post('/savecoursecolumns', auth.canAccess(CONFIG.MENTOR), function (req, res) {
-  try {
-    dashboardMongoController.saveCourseColumns(req.body, function (obj) {
-      res.status(200).json(obj);
-    }, function (err) {
-      logger.error('Save CourseColumns Error: ', err);
-      res.status(500).json({error: 'Cannot save coursecolumns in db...!'});
-    });
-  } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
