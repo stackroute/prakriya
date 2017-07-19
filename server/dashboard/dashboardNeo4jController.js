@@ -1357,6 +1357,7 @@ let deleteSession = function(waveObj,waveString, successCB, errorCB) {
                  DELETE r`;
     let session = driver.session();
     session.run(query).then(function(resultObj, err) {
+
       session.close();
       if (err) {
         errorCB('Error');
