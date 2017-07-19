@@ -12,11 +12,11 @@ export default class Candidate extends React.Component {
 			<div>
 				<Grid>
           <Row>
-            <Col md={6}>
+            <Col md={12}>
 							<Calendar/>
 						</Col>
 					</Row>
-				</Grid>	
+				</Grid>
 			</div>
 		)
 	}

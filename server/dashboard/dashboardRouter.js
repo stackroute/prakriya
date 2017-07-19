@@ -400,6 +400,22 @@ router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   }
 });
 
+// Get cadet skill
+router.get('/cadetskills', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+  try {
+    dashboardNeo4jController.getCadetSkills(req.user.email, function (cadet) {
+      res.status(201).json(cadet);
+    }, function (err) {
+      logger.error('Get Cadet: ', err);
+      res.status(500).json({error: 'Cannot get the cadet from db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // Get cadet profile
 router.post('/cadetproject', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   try {
