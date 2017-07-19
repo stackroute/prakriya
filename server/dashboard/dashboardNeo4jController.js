@@ -147,11 +147,24 @@ let getCadets = function(successCB, errorCB) {
 // fetching candidate logged in
 let getCadet = function(email, successCB, errorCB) {
   let session = driver.session();
-  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w: '${graphConsts.NODE_WAVE}') return n`;
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return n`;
   session.run(query).then(function(resultObj) {
     session.close();
     console.log('done');
     successCB(resultObj.records[0]._fields[0].properties);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
+// fetching candidate's Skill
+let getCadetSkills = function(email, successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL}) return COLLECT(DISTINCT s.Name)`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    console.log('done');
+    successCB(resultObj.records[0]._fields[0]);
   }).catch(function(err) {
     errorCB(err);
   })
@@ -1378,6 +1391,7 @@ module.exports = {
     updateCadets,
     getCadets,
     getCadet,
+    getCadetSkills,
     getNewCadets,
     getFilteredCadets,
     getSkills,
@@ -1412,5 +1426,6 @@ module.exports = {
     getBillabilityFree,
     getCadetProject,
     updateSession,
-    deleteSession
+    deleteSession,
+
   }

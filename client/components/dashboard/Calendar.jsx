@@ -11,6 +11,15 @@ import {
   TableRowColumn
 } from 'material-ui/Table';
 import Moment from 'moment';
+import Avatar from 'material-ui/Avatar';
+
+const backgroundColors = [
+	'#F5DEBF',
+	'#DDDBF1',
+	'#CAF5B3',
+	'#C6D8D3'
+	]
+
 
 export default class Attendance extends React.Component {
   constructor(props) {
@@ -20,7 +29,10 @@ export default class Attendance extends React.Component {
       Cadet: {},
       startDate: '',
       endDate: '',
-      pointer: 'pointer'
+      pointer: 'pointer',
+      Billability: '',
+      AssetID: '',
+      Skills: []
     }
     this.formatDate = this.formatDate.bind(this);
     this.format = this.format.bind(this);
@@ -28,11 +40,13 @@ export default class Attendance extends React.Component {
     this.getCadet = this.getCadet.bind(this);
     this.handlePresent = this.handlePresent.bind(this);
     this.getUser = this.getUser.bind(this);
+    this.knowSkills = this.knowSkills.bind(this);
   }
 
   componentWillMount() {
     this.getCadet();
     this.getUser();
+    this.knowSkills();
   }
 
   getCadet() {
@@ -44,6 +58,8 @@ export default class Attendance extends React.Component {
         console.log(res.body);
         th.setState({
             CadetEmail: res.body.data.EmailID,
+            Billability: res.body.data.Billability,
+            AssetID: res.body.data.AssetID,
             startDate: res.body.data.Wave.StartDate,
             endDate: res.body.data.Wave.EndDate
           })
@@ -61,7 +77,20 @@ export default class Attendance extends React.Component {
         th.setState({
             Cadet: res.body
           })
-          console.log('done')
+      }
+    })
+  }
+
+  knowSkills() {
+    let th = this;
+    Request.get('/dashboard/cadetskills').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log(res.body);
+        th.setState({
+            Skills: res.body
+          })
       }
     })
   }
@@ -178,6 +207,14 @@ export default class Attendance extends React.Component {
             {week}
           </TableBody>
         </Table>
+        <p><b>Billability:</b> {this.state.Billability}</p>
+        <p><b>AssetID:</b> {this.state.AssetID}</p>
+        <h3>Skills Known:</h3>
+        <p>{this.state.Skills.map(function(skill, key) {
+          return <Avatar size='75' backgroundColor={backgroundColors[key%4]} style={{marginLeft:'20px'}}>
+            <span style={{fontSize:'20px'}}>{skill}</span>
+          </Avatar>
+        })}</p>
       </div>
     )
   }
