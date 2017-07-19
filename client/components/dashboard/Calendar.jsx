@@ -12,6 +12,10 @@ import {
 } from 'material-ui/Table';
 import Moment from 'moment';
 import Avatar from 'material-ui/Avatar';
+import IconButton from 'material-ui/IconButton';
+import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
+import {Grid, Row, Col} from 'react-flexbox-grid/lib';
+import Paper from 'material-ui/Paper';
 
 const backgroundColors = [
 	'#F5DEBF',
@@ -20,6 +24,13 @@ const backgroundColors = [
 	'#C6D8D3'
 	]
 
+  const styles = {
+  	container: {
+  		padding: 20,
+  		borderRadius: 5,
+  		backgroundColor: '#CCCCDDD'
+  	}
+  }
 
 export default class Attendance extends React.Component {
   constructor(props) {
@@ -194,8 +205,16 @@ export default class Attendance extends React.Component {
         )
       }
     }
+    let date = new Date(this.state.endDate) >= new Date();
+    let colspan = 12
+    if(date) {
+      colspan = 6
+    }
     return (
       <div>
+        <Grid>
+          <Row>
+            {date && <Col md={colspan}>
         <h3>Attendance:- </h3><p>( Click on today's date to mark attendance for today...<br/>&nbsp;&nbsp;For further updation contact SRAdmin )</p>
         <Table fixedHeader={true} height='300px'>
           <TableHeader colspan='12' displaySelectAll={false} adjustForCheckbox={false} style={{backgroundColor:'#EFEBE9'}}>
@@ -207,14 +226,23 @@ export default class Attendance extends React.Component {
             {week}
           </TableBody>
         </Table>
-        <p><b>Billability:</b> {this.state.Billability}</p>
-        <p><b>AssetID:</b> {this.state.AssetID}</p>
+      </Col>}
+      <Col md={colspan}>
+        <br/><br/><br/><br/><br/><br/>
+        <Paper style={styles.container}>
+          <p><b>Billability:</b> {this.state.Billability}</p>
+        <p><b>AssetID:</b> {this.state.AssetID}</p></Paper>
+        <br/>
+        <Paper style={styles.container}>
         <h3>Skills Known:</h3>
         <p>{this.state.Skills.map(function(skill, key) {
-          return <Avatar size='75' backgroundColor={backgroundColors[key%4]} style={{marginLeft:'20px'}}>
-            <span style={{fontSize:'20px'}}>{skill}</span>
+          return <Avatar size='75' backgroundColor={backgroundColors[key%4]} color='black' style={{marginLeft:'20px'}}>
+            <span style={{fontSize:'17px'}}>{skill}</span>
           </Avatar>
-        })}</p>
+        })}</p></Paper>
+      </Col>
+    </Row>
+  </Grid>
       </div>
     )
   }
