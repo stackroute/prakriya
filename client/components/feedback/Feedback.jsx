@@ -268,7 +268,7 @@ export default class Feedback extends React.Component {
             FEEDBACK.CATEGORIES.map(function(item, key) {
             return (
               <div key={key}>
-                <Row><Col md={8} mdOffset={2}><h4>{item.type.toUpperCase()}</h4></Col></Row>
+                <Row><Col md={8} mdOffset={2}><h4>{item.alias}</h4></Col></Row>
                 {
                   item.options.map(function(option, index) {
                     return (
@@ -295,7 +295,7 @@ export default class Feedback extends React.Component {
               </div>
             )})
           }
-
+          <Row><Col md={8} mdOffset={2}><h4>YOUR COMMENTS</h4></Col></Row>
           <Row><Col md={8} mdOffset={2}>
               <TextField hintText="Express your views" floatingLabelText="Things you liked most about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.mostLiked} onChange={this.handleMostLikedChange} disabled={th.state.oldFeedback}/>
           </Col></Row>
@@ -305,7 +305,7 @@ export default class Feedback extends React.Component {
           </Col></Row>
 
           <Row><Col md={8} mdOffset={2} style={styles.submit}>
-              <RaisedButton label="Submit" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled || this.state.invalidData}/>
+              <RaisedButton style={{width: '100%'}} label="Submit Feedback" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled || this.state.invalidData}/>
               <Snackbar open={this.state.open} message="Feedback submitted" autoHideDuration={2000}/>
           </Col></Row>
         </Grid>
