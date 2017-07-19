@@ -109,17 +109,13 @@ export default class Schedule extends React.Component {
 		let bgIcon = this.props.bgIcon;
     const actions = [
 			 < FlatButton label = "Cancel" primary = {true} onTouchTap = {this.handleClose}/>,
-			 < FlatButton label = "Submit" primary = {true} onTouchTap = {  this.handleClose } onClick = {this.handleDelete} />
+			 < FlatButton label = "Delete" primary = {true} onTouchTap = {  this.handleClose } onClick = {this.handleDelete} />
         ];
 
     let th = this
     console.log(this.state.wave, "wave@waveObj")
-    let date = '';
-    console.log(th.state.wave.SessionOn)
-    if(th.state.wave.SessionOn != 'null')
-    {
-      date = new Date(th.state.wave.SessionOn);
-    }
+
+
     return (
   <div>
   <Card style={{width:'300px',background: bgColor, marginRight:'20px'}}>
@@ -140,7 +136,7 @@ export default class Schedule extends React.Component {
                 }
               </ul>
               <TextField hintText="Who took session ?" value={th.state.wave.SessionBy} onChange={th.handleSessionByChange} onBlur={th.handleWaveUpdate}/>
-              <DatePicker hintText="Session On" value={date} onChange={th.handleSessionOnChange}/>
+              <DatePicker hintText="Session On" value={th.state.SessionOn} onChange={th.handleSessionOnChange}/>
               <SelectField hintText="What's the status?" value={th.state.wave.Status} onChange={th.handleStatusChange}>
                 {status}
               </SelectField>
