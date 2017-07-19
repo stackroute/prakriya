@@ -296,7 +296,8 @@ let addCourse = function(CourseObj, successCB, errorCB) {
   logger.info(CourseObj);
   let query = `MERGE (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}',Name:'${CourseObj.Name}',
   Mode:'${CourseObj.Mode}',Duration:${CourseObj.Duration},History:'${CourseObj.History}',
-  Removed:${CourseObj.Removed}}) WITH c AS course
+  Removed:${CourseObj.Removed},FeedbackFields: ${JSON.stringify(CourseObj.FeedbackFields)},
+  EvaluationsFields:${JSON.stringify(CourseObj.EvaluationFields)}}) WITH c AS course
   UNWIND ${JSON.stringify(CourseObj.Skills)} AS skill
   MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
   MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(course);`;
@@ -545,19 +546,6 @@ let deleteAssignmentOrSchedule = function(obj, course, type, successCB, errorCB)
     });
   }
 }
-
-let getCourse = function (courseID, successCB, errorCB) {
-  let query = `MATCH (c:${graphConsts.NODE_COURSE}{ID:'${courseID}'})<-[:${graphConsts.REL_HAS}]-(w:${graphConsts.NODE_WAVE}) return c;`
-  let session = driver.session();
-  session.run(query).then(function(resultObj, err) {
-    session.close();
-  if (err) {
-			errorCB(err);
-		}
-    successCB(resultObj.records[0]._fields[0].properties);
-	});
-};
-
 
 /**********************************************
 ************ Product Management ***************
@@ -1073,17 +1061,23 @@ let getWaves = function(successCB, errorCB) {
   });
 };
 
-// let getCoursesForWave = function(waveID, successCB, `errorCB) {
-//   let query = `MATCH(n:${graphConsts.NODE_WAVE}) WHERE n.WaveID='${waveID}' RETURN n.CourseNames`;
-//   let session = driver.session();
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     if (resultObj) {
-//       logger.debug(resultObj);
-//     } else {
-//       errorCB('Error');
-//     }
-//   });
+// Get course for a given waveID
+let getCourseForWave = function(waveID, successCB, errorCB) {
+  let query = `
+    MATCH(wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
+    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE}) RETURN course
+    `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      logger.debug(resultObj);
+      successCB(resultObj.records[0]._fields[0].properties);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
 
 // Update cadets for the wave
 let updateWaveCadets = function (cadets, waveID, successCB, errorCB) {
@@ -1376,6 +1370,7 @@ let deleteSession = function(waveObj,waveString, successCB, errorCB) {
                  DELETE r`;
     let session = driver.session();
     session.run(query).then(function(resultObj, err) {
+
       session.close();
       if (err) {
         errorCB('Error');
@@ -1427,5 +1422,5 @@ module.exports = {
     getCadetProject,
     updateSession,
     deleteSession,
-
+    getCourseForWave
   }

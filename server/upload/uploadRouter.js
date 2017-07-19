@@ -9,6 +9,7 @@ const dashboardNeo4jController = require('../dashboard/dashboardNeo4jController'
 let auth = require('../auth')();
 let CONFIG = require('../../config');
 
+// Adding the cadets for the mentor connect
 router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 	let form = new formidable.IncomingForm();
 	form.parse(req, function (err1, fields, files) {
@@ -38,6 +39,7 @@ router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res)
 	});
 });
 
+// Adding remarks in bulk
 router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 	let form = new formidable.IncomingForm();
 	form.parse(req, function (err1, fields, files) {
@@ -72,6 +74,20 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 					error: 'Internal error occurred, please report...!'
 				});
 			}
+		});
+	});
+});
+
+// Merging two files
+router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+	let form = new formidable.IncomingForm();
+	form.parse(req, function (err1, fields, files) {
+		fs.readFile(files.zcop.path, 'utf8', (err2, zcop_data) => {
+			fs.readFile(files.erd.path, 'utf8', (err2, erd_data) => {
+				logger.debug('zcop data', zcop_data)
+				logger.debug('erd data', erd_data)
+				
+			});
 		});
 	});
 });

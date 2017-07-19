@@ -1,4 +1,5 @@
 import React from 'react';
+import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import Calendar from './Calendar.jsx';
 
 export default class Candidate extends React.Component {
@@ -9,7 +10,13 @@ export default class Candidate extends React.Component {
 	render() {
 		return (
 			<div>
-				<Calendar/>
+				<Grid>
+          <Row>
+            <Col md={6}>
+							<Calendar/>
+						</Col>
+					</Row>
+				</Grid>	
 			</div>
 		)
 	}

@@ -13,19 +13,19 @@ import {
   TableRow,
   TableRowColumn
 } from 'material-ui/Table';
-import IconButton from 'material-ui/IconButton';
-import StarIcon from 'material-ui/svg-icons/toggle/star';
 import CONFIG from '../../config/index';
+
+let FEEDBACK = CONFIG.FEEDBACK;
 
 const StarsComponent = React.createClass({
   render: function() {
     let extraStars = [];
     for(let i=this.props.count; i>1; i--)
-    extraStars.push(<IconButton style={{marginLeft: '-20px'}}><StarIcon color='#FFE900'/></IconButton>)
+    extraStars.push(<span style={{color: '#00BCD4', fontSize: '28px'}} key={i}>{'\u263B'}</span>)
 
     return (
       <TableRowColumn style={{textAlign: 'center'}}>
-        <IconButton><StarIcon color='#FFE900'/></IconButton>
+        <span style={{color: '#00BCD4', fontSize: '28px'}}>{'\u263B'}</span>
         {extraStars}
       </TableRowColumn>
     )
@@ -77,6 +77,7 @@ export default class Feedback extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.saveFeedback = this.saveFeedback.bind(this);
     this.getFeedback = this.getFeedback.bind(this);
+    this.getFeedbackFields = this.getFeedbackFields.bind(this);
   }
 
   componentWillMount() {
@@ -84,7 +85,6 @@ export default class Feedback extends React.Component {
     this.setState({
       relevance: [0, 0, 0, 0, 0],
       training: [0, 0, 0, 0],
-      confidence: [0, 0, 0, 0, 0, 0],
       mentors: [0, 0, 0, 0, 0],
       facilities: [0, 0, 0, 0],
       overall: [0, 0, 0]
@@ -98,11 +98,36 @@ export default class Feedback extends React.Component {
         console.log(err);
       else {
         th.setState({cadet: res.body.data});
+        th.getFeedbackFields(res.body.data.Wave.WaveID);
         th.getFeedback(res.body.data.EmployeeID);
         console.log('getCadet: ', res.body.data);
       }
     })
   }
+
+  getFeedbackFields(waveID) {
+		let th = this;
+		console.log('should get feedback fields for ', waveID);
+		Request
+			.get('/dashboard/courseforwave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.query({waveID: waveID})
+			.end(function(err, res){
+				if(err)
+					console.log('Error in fetching feedback fields: ', err)
+				else {
+					// configuring the course specific feedback data
+          FEEDBACK.CATEGORIES[2].options = res.body.FeedbackFields;
+          let confidence = [];
+          res.body.FeedbackFields.map(function() {
+            confidence.push(0)
+          });
+          th.setState({
+            confidence: confidence
+          });
+				}
+			});
+	}
 
   getFeedback(empID) {
     let th = this;
@@ -206,7 +231,7 @@ export default class Feedback extends React.Component {
             <Col md={8} mdOffset={2} style={styles.name}>
               <h3>{this.state.cadet.EmployeeName}</h3>
               {
-                th.state.oldFeedback && <p style={{color:'yellow'}}> You have already filled your feedback </p>
+                th.state.oldFeedback && <p style={{color: '#00BCD4'}}> You have already filled your feedback...</p>
               }
             </Col>
           </Row>
@@ -217,15 +242,15 @@ export default class Feedback extends React.Component {
             enableSelectAll={false} style={{textAlign: 'center'}}>
               <TableRow style={{textAlign: 'center'}}>
                 <TableHeaderColumn style={{width: '50px', textAlign: 'center'}}>
-                Worst</TableHeaderColumn>
+                Strongly<br/>Disagree</TableHeaderColumn>
                 <TableHeaderColumn style={{width: '80px', textAlign: 'center'}}>
-                Bad</TableHeaderColumn>
+                Disagree</TableHeaderColumn>
                 <TableHeaderColumn style={{width: '110px', textAlign: 'center'}}>
-                Fair</TableHeaderColumn>
+                Somewhat</TableHeaderColumn>
                 <TableHeaderColumn style={{width: '120px', textAlign: 'center'}}>
-                Good</TableHeaderColumn>
+                Agree</TableHeaderColumn>
                 <TableHeaderColumn style={{textAlign: 'center'}}>
-                Excellent</TableHeaderColumn>
+                Strongly<br/>Agree</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false}>
@@ -240,7 +265,7 @@ export default class Feedback extends React.Component {
           </Table>
 
           {
-            CONFIG.FEEDBACK.CATEGORIES.map(function(item, key) {
+            FEEDBACK.CATEGORIES.map(function(item, key) {
             return (
               <div key={key}>
                 <Row><Col md={8} mdOffset={2}><h4>{item.type.toUpperCase()}</h4></Col></Row>
@@ -253,13 +278,14 @@ export default class Feedback extends React.Component {
                         </Col>
                         <Col md={2}>
                           <StarRating
-                            color1={'#ddd'} half={false} size={30}
+                            color1={'#DDDDDD'} color2={'#00BCD4'}
+                            half={false} size={30} char={'\u263B'}
                             value={th.state[item.type][index]}
                             onChange={(newVal) => th.handleChange(newVal, item.type, index)}
                           />
                           {
                             th.state.verify && th.state[item.type][index] === 0
-                            && <p>This is a required feild</p>
+                            && <p>This is a required field</p>
                           }
                         </Col>
                       </Row>
