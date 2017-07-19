@@ -33,14 +33,7 @@ const feedback = {
       ]
     }, {
       type: "confidence",
-      options: [
-        "Understanding of the technologies that are core to the MEAN or MERN stack",
-        "Develop and deploy JavaScript solution using MongoDB, Express and Node.js",
-        "Code using HTML / CSS",
-        "Code using JavaScript language",
-        "Code using Node.js and Express",
-        "Use MongoDB and Mongoose"
-      ]
+      options: []
     }, {
       type: "mentors",
       options: [
