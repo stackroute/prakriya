@@ -4,6 +4,7 @@ import PieChart from "react-svg-piechart";
 import Request from 'superagent';
 import RaisedButton from 'material-ui/RaisedButton';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
+import CSVLink from 'react-csv';
 import FileDrop from './FileDrop.jsx';
 
 const styles = {
@@ -20,6 +21,7 @@ export default class WiproAdmin extends React.Component {
         ZCOP: {},
         ERD: {}
       },
+
       disableMerge: true,
       expandedSector: '',
       billableCount: 0,
@@ -29,6 +31,7 @@ export default class WiproAdmin extends React.Component {
     }
     this.handleDrop = this.handleDrop.bind(this);
     this.handleMerge = this.handleMerge.bind(this);
+    this.handleDownload = this.handleDownload.bind(this);
     this.handleMouseEnterOnSector = this.handleMouseEnterOnSector.bind(this);
     this.getBillability = this.getBillability.bind(this);
     this.getNonBillability = this.getNonBillability.bind(this);
@@ -70,6 +73,9 @@ export default class WiproAdmin extends React.Component {
           th.getCadets();
         }
       })
+  }
+  handleDownload() {
+
   }
 
   handleMouseEnterOnSector(sector) {
@@ -140,6 +146,11 @@ export default class WiproAdmin extends React.Component {
       }
     ]
 
+    const csvData =[
+      ['firstname', 'lastname', 'email'] ,
+      ['Gajendra', 'Singh' , 'gajsa@gmail.com']
+    ];
+
     return (
       <div>
         <Grid>
@@ -178,16 +189,24 @@ export default class WiproAdmin extends React.Component {
             </Col>
             <Col md={3}>
               <FileDrop type="ZCOP" handleDrop={this.handleDrop} />
-            </Col>
-            <Col md={3}>
-              <FileDrop type="ERD" handleDrop={this.handleDrop} />
               <br/>
               <RaisedButton
-                label="Merge and Download"
+                label="Merge"
                 primary={true}
                 style={styles.button}
                 onClick={this.handleMerge}
               />
+            </Col>
+            <Col md={3}>
+              <FileDrop type="ERD" handleDrop={this.handleDrop} />
+              <br/>
+              <CSVLink data={csvData}>
+                <RaisedButton
+                  label="Download"
+                  primary={true}
+                  onClick={this.handleDownload}
+                /> 
+              </CSVLink>
             </Col>
           </Row>
         </Grid>

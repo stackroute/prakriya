@@ -82,8 +82,13 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 	let form = new formidable.IncomingForm();
 	form.parse(req, function (err1, fields, files) {
-		logger.debug('Files ZCOP',files.zcop);
-		logger.debug('Files ERD',files.erd);
+		fs.readFile(files.zcop.path, 'utf8', (err2, zcop_data) => {
+			fs.readFile(files.erd.path, 'utf8', (err2, erd_data) => {
+				logger.debug('zcop data', zcop_data)
+				logger.debug('erd data', erd_data)
+				
+			});
+		});
 	});
 });
 
