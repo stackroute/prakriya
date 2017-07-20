@@ -33,8 +33,8 @@ const styles = {
 		color: 'teal'
 	},
 	filters: {
-		// border: '2px solid silver', 
-		width: ' 100%', 
+		// border: '2px solid silver',
+		width: ' 100%',
 		padding: '3px'
 	}
 }
@@ -154,16 +154,13 @@ export default class Candidates extends React.Component {
 	getCandidates() {
 		let th = this;
 		Request
-			.get('/dashboard/cadets')
+			.get('/dashboard/allcadets')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-					let cadets = res.body.filter(function(cadet) {
-						// if(!(cadet.Wave == undefined))
-							return cadet;
-					})
+					let cadets = res.body;
 		    	th.setState({
 		    		candidates: cadets,
 						filteredCandidates: cadets
@@ -318,7 +315,7 @@ export default class Candidates extends React.Component {
 			    }
 				})
 		// }
-		
+
 	}
 
 	resetFilters() {

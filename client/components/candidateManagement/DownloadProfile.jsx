@@ -6,7 +6,7 @@ import {lightBlack} from 'material-ui/styles/colors';
 export default class DownloadProfile extends React.Component {
 	constructor(props) {
 		super(props);
-		this.downloadProfile = this.downloadProfile.bind(this);	
+		this.downloadProfile = this.downloadProfile.bind(this);
 	}
 	componentWillMount() {
 		this.setState({
@@ -47,6 +47,9 @@ export default class DownloadProfile extends React.Component {
 		doc.text(x, y+=10, 'Wave: ' + this.props.candidate.Wave)
 		doc.text(x, y+=10, 'Experience: ' + this.props.candidate.WorkExperience)
 		doc.text(x, y+=10, 'Digithon Score: ' + this.props.candidate.DigiThonScore+'')
+		doc.text(x, y+=10, 'Project Name: ' + this.props.candidate.ProjectName+'')
+		doc.text(x, y+=10, 'Project Description: ' + this.props.candidate.ProjectDescription+'')
+		doc.text(x, y+=10, 'Project Skills: ' + this.props.candidate.ProjectSkills+'')
 
 		doc.save(this.props.candidate.EmployeeID + '.pdf')
 	}
@@ -55,5 +58,5 @@ export default class DownloadProfile extends React.Component {
 		return(
 			<DownloadIcon style={this.props.style} color={this.props.color} onClick={this.downloadProfile}/>
 		)
-	}		
+	}
 }

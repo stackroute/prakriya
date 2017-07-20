@@ -25,11 +25,6 @@ const selectionStatus = [
   <MenuItem key={2} value="No" primaryText="No" />
 ];
 
-const trainingTrack = [
-  <MenuItem key={1} value="Immersive" primaryText="Immersive" />,
-  <MenuItem key={2} value="ML" primaryText="ML" />
-];
-
 export default class CandidateEdit extends React.Component {
 	constructor(props) {
 		super(props);
@@ -37,13 +32,7 @@ export default class CandidateEdit extends React.Component {
 			disableSave: true,
 			candidate: {}
 		}
-		this.handleStartDateChange = this.handleStartDateChange.bind(this);
-		this.handleEndDateChange = this.handleEndDateChange.bind(this);
-		this.handleSkillChange = this.handleSkillChange.bind(this);
-		this.handleRemarksChange = this.handleRemarksChange.bind(this);
 		this.handleSelectedChange = this.handleSelectedChange.bind(this);
-		this.handleTrainingTrackChange = this.handleTrainingTrackChange.bind(this);
-		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.handleSave = this.handleSave.bind(this);
 	}
 	componentWillMount() {
@@ -61,57 +50,9 @@ export default class CandidateEdit extends React.Component {
 			candidate: candidate
 		})
 	}
-	handleStartDateChange(event, date) {
-		let candidate = this.state.candidate;
-		candidate.StartDate = Moment(date).format('D-MM-YY');
-		this.setState({
-			candidate: candidate,
-			disableSave: false
-		})
-	}
-	handleEndDateChange(event, date) {
-		let candidate = this.state.candidate;
-		candidate.EndDate = Moment(date).format('D-MM-YY');
-		this.setState({
-			candidate: candidate,
-			disableSave: false
-		})
-	}
-	handleSkillChange(event) {
-		let candidate = this.state.candidate;
-		candidate.AcademyTrainingSkills = event.target.value;
-		this.setState({
-			candidate: candidate,
-			disableSave: false
-		})
-	}
-	handleRemarksChange(event) {
-		let candidate = this.state.candidate;
-		candidate.Remarks = event.target.value;
-		this.setState({
-			candidate: candidate,
-			disableSave: false
-		})
-	}
 	handleSelectedChange(event, key, value) {
 		let candidate = this.state.candidate;
 		candidate.Selected = value;
-		this.setState({
-			candidate: candidate,
-			disableSave: false
-		})
-	}
-	handleTrainingTrackChange(event, key, value) {
-		let candidate = this.state.candidate;
-		candidate.TrainingTrack = value;
-		this.setState({
-			candidate: candidate,
-			disableSave: false
-		})
-	}
-	handleWaveChange(event) {
-		let candidate = this.state.candidate;
-		candidate.Wave = event.target.value;
 		this.setState({
 			candidate: candidate,
 			disableSave: false
@@ -174,14 +115,12 @@ export default class CandidateEdit extends React.Component {
 				        </SelectField><br />
 				        {
 				        	this.state.candidate.Selected == 'Yes' &&
-				        	<SelectField
-					          value={this.state.candidate.TrainingTrack}
-					          onChange={this.handleSelectedChange}
-					          floatingLabelText="Training Track"
-					          style={styles.selectField}
-					        >
-					          {trainingTrack}
-					        </SelectField>
+									<TextField
+							      floatingLabelText="Mode"
+							      hintText="Mode"
+										disabled={true}
+							      value={this.state.candidate.Wave.Mode}
+							    />
 				        }
 				        <br />
 					      <TextField
@@ -189,29 +128,29 @@ export default class CandidateEdit extends React.Component {
 						      hintText="Mentor Track"
 						      rows={2}
 						      rowsMax={3}
+									disabled={true}
 						      value={this.state.candidate.Remarks}
-						      onChange={this.handleRemarksChange}
 						    /><br/>
 						    <DatePicker
 					        hintText="Start Date"
-					        autoOk={true}
-					        onChange={this.handleStartDateChange}
+									disabled={true}
+						      autoOk={true}
 					      />
 					      <DatePicker
 					        hintText="End Date"
-					        autoOk={true}
-					        onChange={this.handleEndDateChange}
+									disabled={true}
+						      autoOk={true}
 					      />
 					      <TextField
 					      	floatingLabelText="Wave"
 						      value={this.state.candidate.Wave}
-						      onChange={this.handleWaveChange}
-						    /><br/>
+									disabled={true}
+						    	/><br/>
 						    <TextField
 						      floatingLabelText="Academy Training Skills"
 						      hintText="Skills to showcase"
 						      value={this.state.candidate.AcademyTrainingSkills}
-						      onChange={this.handleSkillChange}
+									disabled={true}
 						    /><br/>
 						    <TextField
 						      disabled={true}
@@ -223,9 +162,9 @@ export default class CandidateEdit extends React.Component {
 						      value={this.state.candidate.ProjectSupervisor}
 						      floatingLabelText="Project Supervisor"
 						    /><br/>
-						    <RaisedButton 
-						    	label="Save Changes" 
-						    	disabled={this.state.disableSave} 
+						    <RaisedButton
+						    	label="Save Changes"
+						    	disabled={this.state.disableSave}
 						    	primary={true}
 						    	onClick={this.handleSave}
 						    />
