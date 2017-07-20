@@ -50,7 +50,9 @@ export default class DownloadProfile extends React.Component {
 		doc.text(x, y+=10, 'Project Name: ' + this.props.candidate.ProjectName+'')
 		doc.text(x, y+=10, 'Project Description: ' + this.props.candidate.ProjectDescription+'')
 		doc.text(x, y+=10, 'Project Skills: ' + this.props.candidate.ProjectSkills+'')
-
+		if(this.props.role === 'wiproadmin') {
+			doc.text(x, y+=10, 'Billability: ' + this.props.candidate.Billability+'')
+		}
 		doc.save(this.props.candidate.EmployeeID + '.pdf')
 	}
 

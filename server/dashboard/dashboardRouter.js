@@ -1360,6 +1360,22 @@ router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, 
   }
 });
 
+router.get('/billability', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardNeo4jController.allBillability(function (billable) {
+      res.status(201).json(billable);
+    }, function (err) {
+      logger.error('Get All billable Error: ', err);
+      res.status(500).json({error: 'Cannot get all billable count from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get All billable Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     dashboardNeo4jController.getBillability(function (billable) {
@@ -1375,6 +1391,7 @@ router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
     });
   }
 });
+
 router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     dashboardNeo4jController.getNonBillability(function (nonbillable) {

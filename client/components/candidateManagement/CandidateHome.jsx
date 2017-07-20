@@ -171,6 +171,7 @@ export default class CandidateHome extends React.Component {
 														style={styles.actionIcon}
 														candidate={this.props.candidate}
 														imageURL={this.state.imageURL}
+														role={this.props.role}
 													/>
 													<DeleteIcon
 														style={styles.actionIcon}
@@ -251,6 +252,13 @@ export default class CandidateHome extends React.Component {
 												return <li>{skill}</li>
 											})}</ul>
 										</p></div>
+										}
+										{
+											this.props.role == 'wiproadmin' &&
+											<div>
+												<h4>Billability:</h4>
+												<p style={styles.details}> Status: {this.props.candidate.Billability} </p>
+											</div>
 										}
 										<h4>Manager Details</h4>
 										<p style={styles.details}>

@@ -135,6 +135,7 @@ export default class CandidateCard extends React.Component {
 				      	color={lightBlack}
 				      	candidate={this.props.candidate}
 				      	imageURL={this.state.imageURL}
+								role={this.props.role}
 				      />
 				    </IconButton>
 				    <IconButton tooltip="Delete Candidate" onTouchTap={this.openDeleteDialog}>

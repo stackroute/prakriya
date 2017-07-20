@@ -273,7 +273,11 @@ let getFilteredCadets = function (filterQuery, successCB, errorCB) {
   }
   if(filterQuery.Wave != '') {
     addFilter = true;
-    condition += `w.WaveID = '${filterQuery.Wave}' AND`
+    condition += `w.WaveID = '${filterQuery.Wave}' AND `
+  }
+  if(filterQuery.Billability != '') {
+    addFilter = true;
+    condition += `n.Billability = '${filterQuery.Billability}' AND`
   }
 
   if(addFilter) {
@@ -1364,6 +1368,18 @@ let getBillabilityFree = function(successCB, errorCB) {
   })
 }
 
+//allBillability
+let allBillability = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return COLLECT(DISTINCT n.Billability)`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0]);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 let getCadetProject = function (empID,successCB, errorCB) {
    let session = driver.session();
    let query = `match (c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${empID}'})-[r:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})
@@ -1473,6 +1489,7 @@ module.exports = {
     getBillabilitySupport,
     getNonBillability,
     getBillabilityFree,
+    allBillability,
     getCadetProject,
     updateSession,
     deleteSession,
