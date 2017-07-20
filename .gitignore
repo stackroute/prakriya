@@ -22,3 +22,5 @@ npm-debug.log
 dist
 public/profilePics
 client/assets/bundle.js
+
+neo4jContainer/neo4j/data/databases/graph.db

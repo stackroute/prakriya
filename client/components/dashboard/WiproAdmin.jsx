@@ -4,7 +4,7 @@ import PieChart from "react-svg-piechart";
 import Request from 'superagent';
 import RaisedButton from 'material-ui/RaisedButton';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
-import CSVLink from 'react-csv';
+import {CSVLink, CSVDownload} from 'react-csv';
 import FileDrop from './FileDrop.jsx';
 
 const styles = {
@@ -21,7 +21,7 @@ export default class WiproAdmin extends React.Component {
         ZCOP: {},
         ERD: {}
       },
-
+      csvData: [],
       disableMerge: true,
       expandedSector: '',
       billableCount: 0,
@@ -38,7 +38,7 @@ export default class WiproAdmin extends React.Component {
     this.getBillabilitySupport = this.getBillabilitySupport.bind(this);
     this.getBillabilityFree = this.getBillabilityFree.bind(this)
   }
-  componentDidMount() {
+  componentWillMount() {
     this.getBillability();
     this.getNonBillability();
     this.getBillabilitySupport();
@@ -59,7 +59,7 @@ export default class WiproAdmin extends React.Component {
   }
 
   handleMerge() {
-    console.log('Files to merge', this.state.files)
+    let th = this;
     Request
       .post('/upload/merge')
       .set({'Authorization': localStorage.getItem('token')})
@@ -69,8 +69,9 @@ export default class WiproAdmin extends React.Component {
         if(err)
           console.log(err);
         else {
-          console.log('File uploaded and remarks saved')
-          th.getCadets();
+          th.setState({
+            csvData: res.body
+          })
         }
       })
   }
@@ -157,35 +158,35 @@ export default class WiproAdmin extends React.Component {
           <Row>
             <Col md={6}>
               <WaveDetails/>
-                <h2>Billability status</h2>
-                <PieChart 
-                  data={data} 
-                  expandedSector={this.state.expandedSector} 
-                  onSectorHover={this.handleMouseEnterOnSector} 
-                  sectorStrokeWidth={2} 
-                  expandOnHover={true}
-                /> 
-                {
-                  data.map((element, i) => (
-                    <div key={i}>
-                      <span style={{
-                        backgroundColor: element.color,
-                        height: '16px',
-                        width: '16px',
-                        display: 'inline-block'
-                      }}></span>
-                      <span style={{
-                        fontWeight: this.state.expandedSector === i
-                          ? "bold"
-                          : null
-                      }}>
-                        &nbsp;&nbsp;{element.label}
-                        : {element.value}
-                      </span>
+              <h2>Billability status</h2>
+              <PieChart 
+                data={data} 
+                expandedSector={this.state.expandedSector} 
+                onSectorHover={this.handleMouseEnterOnSector} 
+                sectorStrokeWidth={2} 
+                expandOnHover={true}
+              /> 
+              {
+                data.map((element, i) => (
+                  <div key={i}>
+                    <span style={{
+                      backgroundColor: element.color,
+                      height: '16px',
+                      width: '16px',
+                      display: 'inline-block'
+                    }}></span>
+                    <span style={{
+                      fontWeight: this.state.expandedSector === i
+                        ? "bold"
+                        : null
+                    }}>
+                      &nbsp;&nbsp;{element.label}
+                      : {element.value}
+                    </span>
 
-                    </div>
-                  ))
-                }
+                  </div>
+                ))
+              }
             </Col>
             <Col md={3}>
               <FileDrop type="ZCOP" handleDrop={this.handleDrop} />
@@ -200,12 +201,8 @@ export default class WiproAdmin extends React.Component {
             <Col md={3}>
               <FileDrop type="ERD" handleDrop={this.handleDrop} />
               <br/>
-              <CSVLink data={csvData}>
-                <RaisedButton
-                  label="Download"
-                  primary={true}
-                  onClick={this.handleDownload}
-                /> 
+              <CSVLink data={this.state.csvData} filename="da_db.csv">
+                Download
               </CSVLink>
             </Col>
           </Row>
