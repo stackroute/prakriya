@@ -11,6 +11,26 @@ import {
   TableRowColumn
 } from 'material-ui/Table';
 import Moment from 'moment';
+import Avatar from 'material-ui/Avatar';
+import IconButton from 'material-ui/IconButton';
+import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
+import {Grid, Row, Col} from 'react-flexbox-grid/lib';
+import Paper from 'material-ui/Paper';
+
+const backgroundColors = [
+	'#F5DEBF',
+	'#DDDBF1',
+	'#CAF5B3',
+	'#C6D8D3'
+	]
+
+  const styles = {
+  	container: {
+  		padding: 20,
+  		borderRadius: 5,
+  		backgroundColor: '#CCCCDDD'
+  	}
+  }
 
 export default class Attendance extends React.Component {
   constructor(props) {
@@ -20,7 +40,10 @@ export default class Attendance extends React.Component {
       Cadet: {},
       startDate: '',
       endDate: '',
-      pointer: 'pointer'
+      pointer: 'pointer',
+      Billability: '',
+      AssetID: '',
+      Skills: []
     }
     this.formatDate = this.formatDate.bind(this);
     this.format = this.format.bind(this);
@@ -28,11 +51,13 @@ export default class Attendance extends React.Component {
     this.getCadet = this.getCadet.bind(this);
     this.handlePresent = this.handlePresent.bind(this);
     this.getUser = this.getUser.bind(this);
+    this.knowSkills = this.knowSkills.bind(this);
   }
 
   componentWillMount() {
     this.getCadet();
     this.getUser();
+    this.knowSkills();
   }
 
   getCadet() {
@@ -44,6 +69,8 @@ export default class Attendance extends React.Component {
         console.log(res.body);
         th.setState({
             CadetEmail: res.body.data.EmailID,
+            Billability: res.body.data.Billability,
+            AssetID: res.body.data.AssetID,
             startDate: res.body.data.Wave.StartDate,
             endDate: res.body.data.Wave.EndDate
           })
@@ -61,7 +88,20 @@ export default class Attendance extends React.Component {
         th.setState({
             Cadet: res.body
           })
-          console.log('done')
+      }
+    })
+  }
+
+  knowSkills() {
+    let th = this;
+    Request.get('/dashboard/cadetskills').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log(res.body);
+        th.setState({
+            Skills: res.body
+          })
       }
     })
   }
@@ -165,8 +205,16 @@ export default class Attendance extends React.Component {
         )
       }
     }
+    let date = new Date(this.state.endDate) >= new Date();
+    let colspan = 12
+    if(date) {
+      colspan = 6
+    }
     return (
       <div>
+        <Grid>
+          <Row>
+            {date && <Col md={colspan}>
         <h3>Attendance:- </h3><p>( Click on today's date to mark attendance for today...<br/>&nbsp;&nbsp;For further updation contact SRAdmin )</p>
         <Table fixedHeader={true} height='300px'>
           <TableHeader colspan='12' displaySelectAll={false} adjustForCheckbox={false} style={{backgroundColor:'#EFEBE9'}}>
@@ -178,6 +226,23 @@ export default class Attendance extends React.Component {
             {week}
           </TableBody>
         </Table>
+      </Col>}
+      <Col md={colspan}>
+        <br/><br/><br/><br/><br/><br/>
+        <Paper style={styles.container}>
+          <p><b>Billability:</b> {this.state.Billability}</p>
+        <p><b>AssetID:</b> {this.state.AssetID}</p></Paper>
+        <br/>
+        <Paper style={styles.container}>
+        <h3>Skills Known:</h3>
+        <p>{this.state.Skills.map(function(skill, key) {
+          return <Avatar size='75' backgroundColor={backgroundColors[key%4]} color='black' style={{marginLeft:'20px'}}>
+            <span style={{fontSize:'17px'}}>{skill}</span>
+          </Avatar>
+        })}</p></Paper>
+      </Col>
+    </Row>
+  </Grid>
       </div>
     )
   }

@@ -268,7 +268,7 @@ export default class Feedback extends React.Component {
             FEEDBACK.CATEGORIES.map(function(item, key) {
             return (
               <div key={key}>
-                <Row><Col md={8} mdOffset={2}><h4>{item.type.toUpperCase()}</h4></Col></Row>
+                <Row><Col md={8} mdOffset={2}><h4>{item.alias}</h4></Col></Row>
                 {
                   item.options.map(function(option, index) {
                     return (
@@ -278,14 +278,15 @@ export default class Feedback extends React.Component {
                         </Col>
                         <Col md={2}>
                           <StarRating
-                            color1={'#DDDDDD'} color2={'#00BCD4'}
+                            color1={'#DDDDDD'}
+                            color2={'#00BCD4'}
                             half={false} size={30} char={'\u263B'}
                             value={th.state[item.type][index]}
                             onChange={(newVal) => th.handleChange(newVal, item.type, index)}
                           />
                           {
-                            th.state.verify && th.state[item.type][index] === 0
-                            && <p>This is a required field</p>
+                            th.state.verify && th.state[item.type][index] == 0
+                            && <span style={{color: '#DD0000'}}>Please provide a rating</span>
                           }
                         </Col>
                       </Row>
@@ -295,17 +296,35 @@ export default class Feedback extends React.Component {
               </div>
             )})
           }
-
+          <Row><Col md={8} mdOffset={2}><h4>YOUR COMMENTS</h4></Col></Row>
           <Row><Col md={8} mdOffset={2}>
-              <TextField hintText="Express your views" floatingLabelText="Things you liked most about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.mostLiked} onChange={this.handleMostLikedChange} disabled={th.state.oldFeedback}/>
+              <TextField
+                floatingLabelText={'Things you liked most about the program -- chars left: ' + (350 - th.state.mostLiked.length)}
+                multiLine={true}
+                rows={3}
+                rowsMax={3}
+                fullWidth={true}
+                value={this.state.mostLiked}
+                onChange={this.handleMostLikedChange}
+                disabled={th.state.oldFeedback}
+                maxLength="350" />
           </Col></Row>
 
           <Row><Col md={8} mdOffset={2}>
-              <TextField hintText="Express your views" floatingLabelText="Things you liked least about the program" multiLine={true} rows={3} rowsMax={3} fullWidth={true} value={this.state.leastLiked} onChange={this.handleLeastLikedChange} disabled={th.state.oldFeedback}/>
+              <TextField
+                floatingLabelText={'Things you liked least about the program -- chars left: ' + (350 - th.state.leastLiked.length)}
+                multiLine={true}
+                rows={3}
+                rowsMax={3}
+                fullWidth={true}
+                value={this.state.leastLiked}
+                onChange={this.handleLeastLikedChange}
+                disabled={th.state.oldFeedback}
+                maxLength="350" />
           </Col></Row>
 
           <Row><Col md={8} mdOffset={2} style={styles.submit}>
-              <RaisedButton label="Submit" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled || this.state.invalidData}/>
+              <RaisedButton style={{width: '100%'}} label="Submit Feedback" primary={true} onClick={this.handleSubmit} disabled={this.state.buttonDisabled || this.state.invalidData}/>
               <Snackbar open={this.state.open} message="Feedback submitted" autoHideDuration={2000}/>
           </Col></Row>
         </Grid>
