@@ -172,6 +172,7 @@ export default class CandidateHome extends React.Component {
 														candidate={this.props.candidate}
 														imageURL={this.state.imageURL}
 														role={this.props.role}
+														zip={false}
 													/>
 													<DeleteIcon
 														style={styles.actionIcon}

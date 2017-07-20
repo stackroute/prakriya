@@ -13,6 +13,9 @@ import FilterItem from './FilterItem.jsx';
 import Chip from 'material-ui/Chip';
 import Snackbar from 'material-ui/Snackbar';
 import app from '../../styles/app.json';
+import IconButton from 'material-ui/IconButton';
+import DownloadProfile from './DownloadProfile.jsx';
+import {lightBlack} from 'material-ui/styles/colors';
 
 const styles = {
 	filterBody: {
@@ -379,8 +382,23 @@ export default class Candidates extends React.Component {
 
 	render() {
 		let th = this;
+		console.log(this.state.filteredCandidates);
 		return(
 			<div>
+				{
+					th.state.filteredCandidates != undefined &&
+					<span>Download All Profiles:<IconButton
+						tooltip="Download Profile"
+						onTouchTap={this.downloadProfile}
+					>
+						<DownloadProfile
+							color={lightBlack}
+							candidate={this.state.filteredCandidates}
+							role={this.props.role}
+							zip={true}
+						/>
+					</IconButton></span>
+				}
 			<AddCandidate addCandidate={this.addCandidate}/>
 			{
 				!this.state.showCandidate ?
