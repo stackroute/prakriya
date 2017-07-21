@@ -59,6 +59,7 @@ export default class Candidates extends React.Component {
 			displayCandidates: [],
 			showCandidate: false,
 			displayCandidate: {},
+			imageURL: [],
 			appliedFilters: {
 				EmployeeID: '',
 				EmployeeName: '',
@@ -89,6 +90,7 @@ export default class Candidates extends React.Component {
 		this.resetFilters = this.resetFilters.bind(this);
 		this.setPage = this.setPage.bind(this);
 		this.getRole = this.getRole.bind(this);
+		this.getProfilePic = this.getProfilePic.bind(this);
 	}
 
 	componentWillMount() {
@@ -119,6 +121,46 @@ export default class Candidates extends React.Component {
         th.setState({Billability: res.body})
       }
     })
+	}
+
+	getProfilePic(emp) {
+		console.log('here/................................')
+		let th = this;
+		emp.map(function(employee){
+			let eid = employee.EmployeeID
+		Request
+			.get(`/dashboard/getimage?eid=${eid}`)
+			.set({'Authorization': localStorage.getItem('token')})
+			.query({q: eid})
+			.end(function(err, res) {
+				if(err) {
+					console.log('Image not found for ', eid);
+					let blobUrl = '../../assets/images/avt-default.jpg'
+					let imageURL = th.state.imageURL;
+					imageURL.push(blobUrl);
+					th.setState({
+						imageURL: imageURL
+					})
+				} else {
+		    	if(res.text) {
+		    		let array = new Uint8Array(res.text.length);
+		        for (var i = 0; i < res.text.length; i++){
+		            array[i] = res.text.charCodeAt(i);
+		        }
+		        var blob = new Blob([array], {type: 'image/jpeg'});
+			    	let blobUrl = URL.createObjectURL(blob);
+						console.log(blobUrl);
+						console.log(eid);
+						console.log(th.state.imageURL)
+						let imageURL = th.state.imageURL;
+						imageURL.push(blobUrl);
+			    	th.setState({
+			    		imageURL: imageURL
+			    	})
+		    	}
+		    }
+			})
+			})
 	}
 
 	addFilter(key, value) {
@@ -202,6 +244,7 @@ export default class Candidates extends React.Component {
 						filteredCandidates: cadets
 		    	});
 					th.setPage(th.state.currentPage);
+					th.getProfilePic(cadets);
 		    }
 		  })
 	}
@@ -394,13 +437,13 @@ export default class Candidates extends React.Component {
 					th.state.filteredCandidates != undefined &&
 					<span>Download All Profiles:<IconButton
 						tooltip="Download Profile"
-						onTouchTap={this.downloadProfile}
 					>
 						<DownloadProfile
 							color={lightBlack}
 							candidate={this.state.filteredCandidates}
 							role={this.props.role}
 							zip={true}
+							imageURL={th.state.imageURL}
 						/>
 					</IconButton></span>
 				}
