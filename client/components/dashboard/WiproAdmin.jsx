@@ -201,7 +201,7 @@ export default class WiproAdmin extends React.Component {
             <Col md={3}>
               <FileDrop type="ERD" handleDrop={this.handleDrop} />
               <br/>
-              <CSVLink data={this.state.csvData} filename="da_db.csv">
+              <CSVLink data={this.state.csvData} filename="da_db.xlsx">
                 Download
               </CSVLink>
             </Col>
