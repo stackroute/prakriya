@@ -87,18 +87,49 @@ router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) 
 				try {
 					let result = [];
 
-					let lines = zcop_data.split('\n');
-					let headers = lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-					lines.map(function (line, index) {
+					let zcop_lines = zcop_data.split('\n');
+					let erd_lines = erd_data.split('\n');
+					let zcop_headers = zcop_lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+					let erd_headers = erd_lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+					zcop_lines.map(function (line, index) {
 						if(index > 0 && line !== '') {
 							let lineCol = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 							let cadetObj = {};
 
-							headers.map(function (head, key) {
+							zcop_headers.map(function (head, key) {
 								if(lineCol[key] !== '') {
 									cadetObj[head] = lineCol[key];
 								}
 							});
+
+							let emp_key, proj_key, start_key, end_key;
+
+							erd_headers.map(function(head2, key2) {
+								switch (head2) {
+									case 'EMP_NO':
+										emp_key = key2;
+										break;
+									case 'PROJECT':
+										proj_key = key2;
+										break;
+									case 'ASSIGN_START':
+										start_key = key2;
+										break;
+									case 'ASSIGN_END':
+										end_key = key2;
+										break;
+								}
+							})
+							erd_lines.map(function (line2, index2) {
+								if(index2 > 0 && line2 !== '') {
+									let lineCol2 = line2.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+									if(lineCol2[emp_key] == cadetObj['EMP_CODE']) {
+										cadetObj['PROJECT'] = lineCol2[proj_key];
+										cadetObj['ASSIGN_START'] = lineCol2[start_key];
+										cadetObj['ASSIGN_END'] = lineCol2[end_key];
+									}
+								}
+							})
 
 							let obj = {};
 
@@ -133,12 +164,10 @@ router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) 
 							obj['Project - Billability'] = '';
 							obj['Remarks / Account Name'] = '';
 							obj['Project Name'] = '';
-							obj['Project Status'] = '';
-							obj['Project Status'] = '';
-							obj['sap'] = cadetObj['PROJECT'];
-							obj['Future Billability'] = '';
-							obj['Future BD'] = '';
-							obj['Project End date'] = '';
+							obj['sap'] = '';
+							obj['Future Billability'] = cadetObj['PROJECT'];
+							obj['Future BD'] = cadetObj['ASSIGN_START'];
+							obj['Project End date'] = cadetObj['ASSIGN_END'];
 							obj['Chk'] = '';
 							obj['Leadership Report'] = '';
 							obj['Resignation Reason'] = '';
@@ -158,6 +187,51 @@ router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) 
 							obj['FEP_ZCOP'] = '';
 							obj['FEP Tagging'] = '';
 							obj['FEP Reason'] = '';
+							obj['FEP Reason'] = '';
+							obj['FEP Reason'] = '';
+							obj['FEP Start Date'] = '';
+							obj['FEP End Date'] = '';
+							obj['Intern  Reporting Location'] = cadetObj['LOCATION'];
+							obj['college'] = '';
+							obj['CGPA'] = '';
+							obj["Jyothi's LBG Tracker"] = '';
+							obj['LBG Planning'] = '';
+							obj['TR #'] = '';
+							obj['TCD'] = '';
+							obj['TR# Angular / React / Cassandra / N2spring'] = '';
+							obj['TCD - A / R'] = '';
+							obj['BS, HTML, CSS'] = '';
+							obj['DOJ'] = cadetObj['DATE_OF_JOINING'];
+							obj['Intern / Star / Turbo / Non-Campus'] = '';
+							obj['Today'] = '';
+							obj['Ageing from DA Database'] = '';
+							obj['Ageing from ION'] = '';
+							obj['Actual Ageing (Days)'] = '';
+							obj['Ageing Bucket'] = '';
+							obj['PROP Lvl'] = '';
+							obj['VSL LVL'] = '';
+							obj['Digi-Thon Start Date'] = '';
+							obj['Digi-Thon End Date'] = '';
+							obj['Model'] = cadetObj['MODEL_TYPE'];
+							obj['Rookie Status'] = '';
+							obj['Current Suite ID'] = '';
+							obj['Current Skill'] = '';
+							obj['Updated Suite ID'] = cadetObj['DERIVED_SUITE_ID'];
+							obj['Updated Skill'] = cadetObj['DERIVED_SUITE_NAME'];
+							obj['CG Substream'] = '';
+							logger.debug('acquired skills', cadetObj['PROJECT_ACQUIRED_SKILL'])
+							// obj['Project_Acquired Skill'] = cadetObj['PROJECT_ACQUIRED_SKILL'];
+							obj['Quarter'] = '';
+							obj['Financial Year'] = '';
+							obj['laptop'] = '';
+							obj['Rental / Wipro'] = '';
+							obj['LAN'] = '';
+							obj['LSN'] = '';
+							obj['Project'] = '';
+							obj['Initial ERD'] = '';
+							obj['Current ERD'] = '';
+							obj['ERD Check'] = '';
+							obj['PCD'] = '';
 							result.push(obj);
 						}
 					});
