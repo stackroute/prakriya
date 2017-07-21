@@ -30,10 +30,13 @@ export default class DownloadProfile extends React.Component {
 
 	downloadCandidateProfile() {
 		let th = this;
+		console.log(th.props.imageURL)
 		if(this.props.zip) {
 			this.props.candidate.map(function(cadet, index) {
 				let candidate = cadet;
-				cadet.imageURL = '../../assets/images/avt-default.jpg'
+				console.log('Image URL', th.props.imageURL[index])
+				// cadet.imageURL = th.props.imageURL[index];
+				cadet.imageURL = '../../assets/images/avt-default.jpg';
 				th.downloadProfile(cadet, index)
 			})
 		}
@@ -49,7 +52,6 @@ export default class DownloadProfile extends React.Component {
 		let doc = new jsPDF()
 		let x = 95;
 		let y = 20;
-		console.log(this.getProfilePic(candidate.EmployeeID));
 
 		doc.setFillColor(85, 85, 85);
 		doc.setDrawColor(100, 100, 0);
