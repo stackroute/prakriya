@@ -13,6 +13,9 @@ import FilterItem from './FilterItem.jsx';
 import Chip from 'material-ui/Chip';
 import Snackbar from 'material-ui/Snackbar';
 import app from '../../styles/app.json';
+import IconButton from 'material-ui/IconButton';
+import DownloadProfile from './DownloadProfile.jsx';
+import {lightBlack} from 'material-ui/styles/colors';
 
 const styles = {
 	filterBody: {
@@ -33,8 +36,8 @@ const styles = {
 		color: 'teal'
 	},
 	filters: {
-		// border: '2px solid silver', 
-		width: ' 100%', 
+		// border: '2px solid silver',
+		width: ' 100%',
 		padding: '3px'
 	}
 }
@@ -50,6 +53,7 @@ export default class Candidates extends React.Component {
 			candidates: [],
 			skills: [],
 			waves: [],
+			Billability: [],
 			filtersCount: 0,
 			filteredCandidates: [],
 			displayCandidates: [],
@@ -62,13 +66,15 @@ export default class Candidates extends React.Component {
 				DigiThonPhase: '',
 				DigiThonScore: '',
 				Skills: '',
-				Wave: ''
+				Wave: '',
+				Billability: ''
 			}
 		}
 
 		this.getCandidates = this.getCandidates.bind(this);
 		this.getSkills = this.getSkills.bind(this);
 		this.getWaves = this.getWaves.bind(this);
+		this.getBillability = this.getBillability.bind(this);
 		this.candidateView = this.candidateView.bind(this);
 		this.handleBack = this.handleBack.bind(this);
 		this.deleteCandidate = this.deleteCandidate.bind(this);
@@ -82,12 +88,37 @@ export default class Candidates extends React.Component {
 		this.openSnackbar = this.openSnackbar.bind(this);
 		this.resetFilters = this.resetFilters.bind(this);
 		this.setPage = this.setPage.bind(this);
+		this.getRole = this.getRole.bind(this);
 	}
 
 	componentWillMount() {
+		this.getRole();
 		this.getCandidates();
 		this.getSkills();
 		this.getWaves();
+		this.getBillability();
+	}
+
+  getRole() {
+    let th = this
+    Request.get('/dashboard/userrole').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({role: res.body})
+      }
+    })
+  }
+
+	getBillability() {
+		let th = this
+    Request.get('/dashboard/billability').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({Billability: res.body})
+      }
+    })
 	}
 
 	addFilter(key, value) {
@@ -154,16 +185,13 @@ export default class Candidates extends React.Component {
 	getCandidates() {
 		let th = this;
 		Request
-			.get('/dashboard/cadets')
+			.get('/dashboard/allcadets')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-					let cadets = res.body.filter(function(cadet) {
-						// if(!(cadet.Wave == undefined))
-							return cadet;
-					})
+					let cadets = res.body;
 		    	th.setState({
 		    		candidates: cadets,
 						filteredCandidates: cadets
@@ -318,7 +346,7 @@ export default class Candidates extends React.Component {
 			    }
 				})
 		// }
-		
+
 	}
 
 	resetFilters() {
@@ -331,7 +359,8 @@ export default class Candidates extends React.Component {
 				DigiThonQualified: '',
 				DigiThonPhase: '',
 				Wave: '',
-				DigiThonScore: ''
+				DigiThonScore: '',
+				Billability: ''
 			},
 			filteredCandidates: th.state.candidates,
 			displayCandidates: th.state.candidates.slice(0, 3)
@@ -353,8 +382,23 @@ export default class Candidates extends React.Component {
 
 	render() {
 		let th = this;
+		console.log(this.state.filteredCandidates);
 		return(
 			<div>
+				{
+					th.state.filteredCandidates != undefined &&
+					<span>Download All Profiles:<IconButton
+						tooltip="Download Profile"
+						onTouchTap={this.downloadProfile}
+					>
+						<DownloadProfile
+							color={lightBlack}
+							candidate={this.state.filteredCandidates}
+							role={this.props.role}
+							zip={true}
+						/>
+					</IconButton></span>
+				}
 			<AddCandidate addCandidate={this.addCandidate}/>
 			{
 				!this.state.showCandidate ?
@@ -460,6 +504,15 @@ export default class Candidates extends React.Component {
 									onAddFilter={(filterValue)=>th.addFilter('Wave', filterValue)}
 									onOpenSnackbar={th.openSnackbar}
 								/>
+								{th.state.role == 'wiproadmin' &&
+								<FilterItem
+									title={'Billability'}
+									type={'AutoComplete'}
+									onGetAccordianValues={()=>th.state.Billability}
+									onAddFilter={(filterValue)=>th.addFilter('Billability', filterValue)}
+									onOpenSnackbar={th.openSnackbar}
+								/>
+								}
 							</Col>
 							<Col md={9}>
 								{
@@ -471,6 +524,7 @@ export default class Candidates extends React.Component {
 														handleDelete={th.deleteCandidate}
 														key={key}
 														k={key + th.state.currentPage}
+														role={th.state.role}
 													/>
 											)
 									})
@@ -501,6 +555,7 @@ export default class Candidates extends React.Component {
 						handleBack={this.handleBack}
 						handleDelete={this.deleteCandidate}
 						handleUpdate={this.updateCandidate}
+						role={this.state.role}
 					/>
 				</div>
 			}

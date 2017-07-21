@@ -124,6 +124,18 @@ let updateCadets = function(cadetArr, successCB, errorCB) {
   })
 }
 
+// delete cadets
+let deleteCadet = function(cadetObj, successCB, errorCB) {
+  let session = driver.session();
+  let query =
+    `MATCH (c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${cadetObj.EmployeeID}'}) DETACH DELETE c`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB({status:'success'});
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
 // fetching all the cadets
 let getCadets = function(successCB, errorCB) {
   let session = driver.session();
@@ -143,6 +155,46 @@ let getCadets = function(successCB, errorCB) {
     errorCB(err);
   })
 }
+
+// fetching all the cadets with wave and project details
+let getAllCadets = function(successCB, errorCB) {
+  let session = driver.session();
+  let query =
+    `match (c:${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE})
+    with c as candidate, w as wave
+    optional match (candidate)-[w:worked_on]->(p:${graphConsts.NODE_PRODUCT})-[:has]->(v:${graphConsts.NODE_VERSION}{name:w.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
+    with p as product, candidate as candidate, wave as wave, v as version, s as skill
+    return {
+    		candidate:candidate,
+    		product: version,
+        wave: wave,
+        skill: COLLECT(DISTINCT skill.Name)
+    }`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    let cadets = [];
+    let waves = [];
+    for (let i = 0; i < resultObj.records.length; i++) {
+      let result = resultObj.records[i];
+      cadets.push(result._fields[0].candidate.properties);
+      if(result._fields[0].product != null) {
+        cadets[i].ProjectName = result._fields[0].product.properties.name;
+        cadets[i].ProjectDescription = result._fields[0].product.properties.description;
+        cadets[i].ProjectSkills = result._fields[0].skill;
+      }
+      else {
+        cadets[i].ProjectName = '';
+        cadets[i].ProjectDescription = '';
+        cadets[i].ProjectSkills = '';
+      }
+      cadets[i].Wave = result._fields[0].wave.properties.WaveID;
+    }
+    successCB(cadets);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 
 // fetching candidate logged in
 let getCadet = function(email, successCB, errorCB) {
@@ -221,7 +273,11 @@ let getFilteredCadets = function (filterQuery, successCB, errorCB) {
   }
   if(filterQuery.Wave != '') {
     addFilter = true;
-    condition += `w.WaveID = '${filterQuery.Wave}' AND`
+    condition += `w.WaveID = '${filterQuery.Wave}' AND `
+  }
+  if(filterQuery.Billability != '') {
+    addFilter = true;
+    condition += `n.Billability = '${filterQuery.Billability}' AND`
   }
 
   if(addFilter) {
@@ -1312,6 +1368,18 @@ let getBillabilityFree = function(successCB, errorCB) {
   })
 }
 
+//allBillability
+let allBillability = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}) return COLLECT(DISTINCT n.Billability)`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0]);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 let getCadetProject = function (empID,successCB, errorCB) {
    let session = driver.session();
    let query = `match (c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${empID}'})-[r:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})
@@ -1384,8 +1452,10 @@ module.exports = {
     addCadet,
     updateCadet,
     updateCadets,
+    deleteCadet,
     getCadets,
     getCadet,
+    getAllCadets,
     getCadetSkills,
     getNewCadets,
     getFilteredCadets,
@@ -1419,6 +1489,7 @@ module.exports = {
     getBillabilitySupport,
     getNonBillability,
     getBillabilityFree,
+    allBillability,
     getCadetProject,
     updateSession,
     deleteSession,

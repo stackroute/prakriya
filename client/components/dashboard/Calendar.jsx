@@ -28,7 +28,7 @@ const backgroundColors = [
   	container: {
   		padding: 20,
   		borderRadius: 5,
-  		backgroundColor: '#CCCCDDD'
+  		backgroundColor: '#efebe9'
   	}
   }
 
