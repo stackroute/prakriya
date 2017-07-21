@@ -49,7 +49,6 @@ export default class DownloadProfile extends React.Component {
 		let doc = new jsPDF()
 		let x = 95;
 		let y = 20;
-		console.log(this.getProfilePic(candidate.EmployeeID));
 
 		doc.setFillColor(85, 85, 85);
 		doc.setDrawColor(100, 100, 0);
