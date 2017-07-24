@@ -124,43 +124,39 @@ export default class Candidates extends React.Component {
 	}
 
 	getProfilePic(emp) {
-		console.log('here/................................')
 		let th = this;
 		emp.map(function(employee){
 			let eid = employee.EmployeeID
-		Request
-			.get(`/dashboard/getimage?eid=${eid}`)
-			.set({'Authorization': localStorage.getItem('token')})
-			.query({q: eid})
-			.end(function(err, res) {
-				if(err) {
-					console.log('Image not found for ', eid);
-					let blobUrl = '../../assets/images/avt-default.jpg'
-					let imageURL = th.state.imageURL;
-					imageURL.push(blobUrl);
-					th.setState({
-						imageURL: imageURL
-					})
-				} else {
-		    	if(res.text) {
-		    		let array = new Uint8Array(res.text.length);
-		        for (var i = 0; i < res.text.length; i++){
-		            array[i] = res.text.charCodeAt(i);
-		        }
-		        var blob = new Blob([array], {type: 'image/jpeg'});
-			    	let blobUrl = URL.createObjectURL(blob);
-						console.log(blobUrl);
-						console.log(eid);
-						console.log(th.state.imageURL)
+			Request
+				.get(`/dashboard/getimage?eid=${eid}`)
+				.set({'Authorization': localStorage.getItem('token')})
+				.query({q: eid})
+				.end(function(err, res) {
+					if(err) {
+						let blobUrl = '../../assets/images/avt-default.jpg'
 						let imageURL = th.state.imageURL;
 						imageURL.push(blobUrl);
-			    	th.setState({
-			    		imageURL: imageURL
-			    	})
-		    	}
-		    }
-			})
-			})
+						th.setState({
+							imageURL: imageURL
+						})
+					} else {
+			    	if(res.text) {
+			    		let array = new Uint8Array(res.text.length);
+			        for (var i = 0; i < res.text.length; i++){
+			            array[i] = res.text.charCodeAt(i);
+			        }
+			        var blob = new Blob([array], {type: 'image/jpeg'});
+				    	let blobUrl = URL.createObjectURL(blob);
+							console.log(blobUrl);
+							let imageURL = th.state.imageURL;
+							imageURL.push(blobUrl);
+				    	th.setState({
+				    		imageURL: imageURL
+				    	})
+			    	}
+			    }
+				})
+		})
 	}
 
 	addFilter(key, value) {
@@ -375,7 +371,7 @@ export default class Candidates extends React.Component {
 	// fetching filtered candidates from db
 	getFilteredCandidates() {
 		let th = this;
-		console.log('FiltersCount: ', th.state.filtersCount)
+		console.log('Filters: ', th.state.appliedFilters)
 		// let filterQuery = th.state.filtersCount > 0 ? {'$or': th.state.appliedFilters} : {};
 		// if(this.state.filtersCount > 0) {
 			Request
@@ -435,17 +431,18 @@ export default class Candidates extends React.Component {
 			<div>
 				{
 					th.state.filteredCandidates != undefined &&
-					<span>Download All Profiles:<IconButton
-						tooltip="Download Profile"
-					>
-						<DownloadProfile
-							color={lightBlack}
-							candidate={this.state.filteredCandidates}
-							role={this.props.role}
-							zip={true}
-							imageURL={th.state.imageURL}
-						/>
-					</IconButton></span>
+					<span>
+						Download All Profiles:
+						<IconButton tooltip="Download Profile">
+							<DownloadProfile
+								color={lightBlack}
+								candidate={this.state.filteredCandidates}
+								role={this.props.role}
+								zip={true}
+								imageURL={th.state.imageURL}
+							/>
+						</IconButton>
+					</span>
 				}
 			<AddCandidate addCandidate={this.addCandidate}/>
 			{
@@ -488,7 +485,17 @@ export default class Candidates extends React.Component {
 									<div style={styles.filters}>
 									{
 										Object.keys(this.state.appliedFilters).map(function (filter, index) {
-											let val = th.state.appliedFilters[filter];
+											let val = '';
+											console.log('Filter applied', filter)
+											if(filter == 'Skills') {
+												th.state.appliedFilters[filter].map(function(skill) {
+													val += skill + ', ';
+												})
+												val = val.substring(0, val.length-2)
+											}
+											else {
+												val = th.state.appliedFilters[filter];
+											}
 											if(val != '') {
 												return (
 													<Chip

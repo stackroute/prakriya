@@ -288,10 +288,15 @@ let getFilteredCadets = function (filterQuery, successCB, errorCB) {
   }
 
   let skills = '';
-  if(filterQuery.Skills != '') {
+  let skill_arr = '';
+  if(filterQuery.Skills.length > 0) {
+    filterQuery.Skills.map(function(skill) {
+      skill_arr += "'" + skill +"', ";
+    })
+    skill_arr = skill_arr.substring(0, skill_arr.length-2);
     skills = `WITH n as n
       MATCH (n)-[: ${graphConsts.REL_KNOWS}]->(s: ${graphConsts.NODE_SKILL})
-      WHERE s.Name = '${filterQuery.Skills}'`
+      WHERE s.Name IN [${skill_arr}]`
   }
 
   let query =
