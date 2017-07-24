@@ -194,9 +194,6 @@ export default class CourseColumns extends React.Component {
             })
           }
           </div>
-          {/*<div style={{backgroundColor: 'teal', padding: '10px', textAlign: 'center', fontWeight: 'bold'}}>
-            ADD ONE MORE FIELD
-          </div>*/}
           <FlatButton
             label="Add One More Field"
             primary
