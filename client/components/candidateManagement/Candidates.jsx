@@ -68,7 +68,7 @@ export default class Candidates extends React.Component {
 				DigiThonScore: '',
 				Skills: [],
 				Wave: '',
-				Billability: ''
+				Billability: []
 			}
 		}
 
@@ -119,6 +119,7 @@ export default class Candidates extends React.Component {
         console.log(err);
       else {
         th.setState({Billability: res.body})
+        console.log('Billability', res.body);
       }
     })
 	}
@@ -163,6 +164,9 @@ export default class Candidates extends React.Component {
 		let appliedFilters = this.state.appliedFilters;
 
 		if(key == 'Skills') {
+			appliedFilters[key].push(value);
+		}
+		else if(key == 'Billability') {
 			appliedFilters[key].push(value);
 		}
 		else {
@@ -371,7 +375,6 @@ export default class Candidates extends React.Component {
 	// fetching filtered candidates from db
 	getFilteredCandidates() {
 		let th = this;
-		console.log('Filters: ', th.state.appliedFilters)
 		// let filterQuery = th.state.filtersCount > 0 ? {'$or': th.state.appliedFilters} : {};
 		// if(this.state.filtersCount > 0) {
 			Request
@@ -382,7 +385,6 @@ export default class Candidates extends React.Component {
 					if(err)
 			    	console.log(err);
 			    else {
-			    	console.log('Filtered candidates', res.body)
 						th.setState({
 							filteredCandidates: res.body
 						});
@@ -413,7 +415,6 @@ export default class Candidates extends React.Component {
 
 	setPage(pageNumber) {
 		let th = this;
-		console.log('Page Changed To -- ' + pageNumber);
 		let start = (pageNumber - 1) * 3;
 		let end = start + 3;
 		let sliced = th.state.filteredCandidates.slice(start, end);
@@ -421,12 +422,10 @@ export default class Candidates extends React.Component {
 			displayCandidates: sliced,
 			currentPage: pageNumber
 		});
-		console.log(sliced);
 	}
 
 	render() {
 		let th = this;
-		console.log(this.state.filteredCandidates);
 		return(
 			<div>
 				{
@@ -486,13 +485,13 @@ export default class Candidates extends React.Component {
 									{
 										Object.keys(this.state.appliedFilters).map(function (filter, index) {
 											let val = '';
-											console.log('Filter applied', filter)
-											if(filter == 'Skills') {
-												th.state.appliedFilters[filter].map(function(skill) {
-													val += skill + ', ';
+											if(filter == 'Skills' || filter == 'Billability') {
+												th.state.appliedFilters[filter].map(function(item) {
+													val += item + ', ';
 												})
 												val = val.substring(0, val.length-2)
 											}
+
 											else {
 												val = th.state.appliedFilters[filter];
 											}

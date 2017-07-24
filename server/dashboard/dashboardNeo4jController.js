@@ -275,9 +275,14 @@ let getFilteredCadets = function (filterQuery, successCB, errorCB) {
     addFilter = true;
     condition += `w.WaveID = '${filterQuery.Wave}' AND `
   }
-  if(filterQuery.Billability != '') {
+  if(filterQuery.Billability.length > 0) {
     addFilter = true;
-    condition += `n.Billability = '${filterQuery.Billability}' AND`
+    let bill_arr = '';
+    filterQuery.Billability.map(function (bill) {
+      bill_arr += "'" + bill + "', ";
+    })
+    bill_arr = bill_arr.substring(0, bill_arr.length-2);
+    condition += `n.Billability IN [${bill_arr}] AND`
   }
 
   if(addFilter) {
@@ -291,7 +296,7 @@ let getFilteredCadets = function (filterQuery, successCB, errorCB) {
   let skill_arr = '';
   if(filterQuery.Skills.length > 0) {
     filterQuery.Skills.map(function(skill) {
-      skill_arr += "'" + skill +"', ";
+      skill_arr += "'" + skill + "', ";
     })
     skill_arr = skill_arr.substring(0, skill_arr.length-2);
     skills = `WITH n as n
