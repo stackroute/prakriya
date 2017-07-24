@@ -1422,4 +1422,26 @@ router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
   }
 });
 
+//remove cadets from wave
+router.post('/removeCadetFromWave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+  try {
+    console.log(req.body.cadets)
+    console.log(req.body.waveID)
+    dashboardNeo4jController.removeCadetFromWave(req.body.cadets,req.body.waveID ,function (status) {
+      logger.info('Status: ', status);
+      res.status(201).json(status);
+    }, function (sessionerr) {
+      logger.error('err in delete cadet in wave', sessionerr);
+      res.status(500).json({error: 'Cannot delete cadet in wave...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
+
 module.exports = router;

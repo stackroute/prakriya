@@ -272,7 +272,7 @@ export default class AddCourse extends React.Component {
             </div>
             <div>
               <div style={dialog.box100}>
-                <TextField hintText="Skils" floatingLabelText="Skills" value={this.state.SkillName} onChange={this.handleSkillChange}/>
+                <TextField hintText="Skills" floatingLabelText="Skills" value={this.state.SkillName} onChange={this.handleSkillChange}/>
                 <IconButton tooltip="Add Skill" onClick={this.onAddSkill} disabled={this.state.disableSave}>
                   <AddIcon/>
                 </IconButton>

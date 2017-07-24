@@ -55,7 +55,7 @@ services:
     ports:
       - "6379:6379"
   neo4j:
-    image: neo4j:3.0.7
+    image: neo4j:3.1.5
     network_mode: host
     restart: always
     environment:
@@ -71,6 +71,6 @@ services:
       - "7687:7687"
       - "1337:1337"
     volumes:
-      - ./neo4jContainer/neo4j/plugins:/plugins
+#      - ./neo4jContainer/neo4j/plugins:/plugins
       - ./neo4jContainer/neo4j/data:/data
-      - ./neo4jContainer/neo4j/import:/var/lib/neo4j/import
+#      - ./neo4jContainer/neo4j/import:/var/lib/neo4j/import
