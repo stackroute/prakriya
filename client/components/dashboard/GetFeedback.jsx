@@ -114,7 +114,7 @@ export default class WaveDetails extends React.Component {
 		CONFIG.FEEDBACK.CATEGORIES.map(function(CATEGORY) {
 			doc.rect(x, y+=6, 200, 6);
 			doc.setFontStyle('bold');
-			doc.text(x+2, y+4, CATEGORY.type.toUpperCase());
+			doc.text(x+2, y+4, CATEGORY.alias);
 			CATEGORY.options.map(function(option, index) {
 				doc.setFontStyle('default');
 				doc.rect(x, y+=6, 175, 6);
@@ -149,12 +149,12 @@ export default class WaveDetails extends React.Component {
 		doc.rect(x, y+=4, 200, 6);
 		doc.text(x+2, y+4, 'Things you learnt / liked most about the program');
 		doc.rect(x, y+=6, 200, 14);
-		doc.text(x+2, y+4, feedback.mostLiked);
+		doc.text(x+2, y+4, doc.splitTextToSize(feedback.mostLiked, 200));
 
 		doc.rect(x, y+=14, 200, 6);
 		doc.text(x+2, y+4, 'Things you liked least about of the program');
 		doc.rect(x, y+=6, 200, 14);
-		doc.text(x+2, y+4, feedback.leastLiked);
+		doc.text(x+2, y+4, doc.splitTextToSize(feedback.leastLiked, 200));
 	}
 
 	getWaves() {

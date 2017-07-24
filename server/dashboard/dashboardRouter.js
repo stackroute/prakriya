@@ -400,6 +400,22 @@ router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   }
 });
 
+// Get cadet skill
+router.get('/cadetskills', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+  try {
+    dashboardNeo4jController.getCadetSkills(req.user.email, function (cadet) {
+      res.status(201).json(cadet);
+    }, function (err) {
+      logger.error('Get Cadet: ', err);
+      res.status(500).json({error: 'Cannot get the cadet from db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // Get cadet profile
 router.post('/cadetproject', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
   try {
@@ -433,7 +449,6 @@ router.get('/userrole', auth.canAccess(CONFIG.ALL), function (req, res) {
   }
 });
 
-
 // Get all the cadets
 router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
@@ -450,6 +465,25 @@ router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
     });
   }
 });
+
+
+// Get all the cadets with wave and project details
+router.get('/allcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+  try{
+    dashboardNeo4jController.getAllCadets(function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get All Cadets Error: ', err);
+      res.status(500).json({error: 'Cannot get all cadets from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get cadets error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 
 // Get all the cadets who are not part of any wave
 router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
@@ -503,7 +537,7 @@ router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function (req, res) {
 // Delete a cadet
 router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
-    dashboardMongoController.deleteCadet(req.body, function (status) {
+    dashboardNeo4jController.deleteCadet(req.body, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Delete Cadet Error: ', err);
@@ -674,6 +708,7 @@ res.send(data);
     });
   }
 });
+
 
 /** **************************************************
 *******          Attendance         ********
@@ -1326,6 +1361,22 @@ router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, 
   }
 });
 
+router.get('/billability', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardNeo4jController.allBillability(function (billable) {
+      res.status(201).json(billable);
+    }, function (err) {
+      logger.error('Get All billable Error: ', err);
+      res.status(500).json({error: 'Cannot get all billable count from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get All billable Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     dashboardNeo4jController.getBillability(function (billable) {
@@ -1341,6 +1392,7 @@ router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
     });
   }
 });
+
 router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     dashboardNeo4jController.getNonBillability(function (nonbillable) {

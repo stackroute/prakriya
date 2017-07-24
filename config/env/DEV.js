@@ -12,6 +12,7 @@ let mongo = {
 
 //@ TODO use mongo username & password in constructing the URL if given
 mongo['mongoURL'] = ('mongodb://' + mongo.host + ':' + mongo.port + '/' + mongo.masterDB);
+
 let neo4j = {
   host: process.env.NE04J_HOST || '127.0.0.1',
   http: process.env.NEO4J_HTTP_PORT || 7474,

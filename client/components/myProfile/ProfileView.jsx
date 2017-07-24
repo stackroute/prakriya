@@ -81,7 +81,7 @@ export default class ProfileView extends React.Component {
 			email: '',
 			contact: '',
 			Billability: '',
-			Billing: ['Billable', 'Non-billable', 'Support' , 'Free']
+			Billing: ['Billable', 'Non-billable(Internal-Project)', 'Non-billable(Customer-Project)', 'Support' , 'Free']
 		}
 		this.openAssetDialog = this.openAssetDialog.bind(this);
 		this.closeAssetDialog = this.closeAssetDialog.bind(this);

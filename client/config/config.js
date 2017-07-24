@@ -16,6 +16,7 @@ const feedback = {
   CATEGORIES: [
     {
       type: "relevance",
+      alias: "RELEVENCE",
       options: [
         "The objectives were clearly defined at the beginning of the program",
         "The stated objectives for the Immersive program have been met successfully",
@@ -25,6 +26,7 @@ const feedback = {
       ]
     }, {
       type: "training",
+      alias: "TRAINING METHODOLOGY",
       options: [
         "Program was stimulating and challenging",
         "Relevant learning material and reference materials were provided",
@@ -33,16 +35,11 @@ const feedback = {
       ]
     }, {
       type: "confidence",
-      options: [
-        "Understanding of the technologies that are core to the MEAN or MERN stack",
-        "Develop and deploy JavaScript solution using MongoDB, Express and Node.js",
-        "Code using HTML / CSS",
-        "Code using JavaScript language",
-        "Code using Node.js and Express",
-        "Use MongoDB and Mongoose"
-      ]
+      alias: "CONFIDENCE LEVEL GAINED ON THE TOPICS",
+      options: []
     }, {
       type: "mentors",
+      alias: "MENTORS",
       options: [
         "Mentor Knowledge of the Subject",
         "Ability to technically challenge and help learn",
@@ -51,6 +48,7 @@ const feedback = {
       ]
     }, {
       type: "facilities",
+      alias: "FACILITIES / INFRASTRUCTURE",
       options: [
         "Environment / Workspace",
         "Quality and speed of Internet / Network",
@@ -59,6 +57,7 @@ const feedback = {
       ]
     }, {
       type: "overall",
+      alias: "OVERALL SATISFACTION",
       options: [
         "How would you rate your overall satisfaction after completing this program",
         "How would you rate yourself in terms of confidence level",

@@ -1,19 +1,20 @@
 import React from 'react';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
 import Dialog from 'material-ui/Dialog';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import app from '../../styles/app.json';
 import dialog from '../../styles/dialog.json';
+import CloseIcon from 'material-ui/svg-icons/content/remove-circle-outline';
 
 export default class CourseColumns extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       currentColumn: 'Feedback',
-      feedbackFields: ['', '', '', '', '', ''],
-      feedbackFieldsError: ['', '', '', '', '', ''],
+      addFeedbackFieldDisabled: true,
+      feedbackFields: ['', '', ''],
+      feedbackFieldsError: ['', '', ''],
       evaluationFields: ['', '', '', '', '', ''],
       evaluationFieldsError: ['', '', '', '', '', '']
     }
@@ -21,22 +22,37 @@ export default class CourseColumns extends React.Component {
     this.handleBack = this.handleBack.bind(this);
     this.handleContinue = this.handleContinue.bind(this);
     this.onChangeField = this.onChangeField.bind(this);
+    this.addFeedbackField = this.addFeedbackField.bind(this);
+    this.deleteFeedbackField = this.deleteFeedbackField.bind(this);
     this.validationSuccess = this.validationSuccess.bind(this);
   }
 
   onChangeField(e, index) {
     let th = this;
     let type = this.state.currentColumn;
-    let fieldsError = ['', '', '', '', '', ''];
+    let addFeedbackFieldDisabled;
     if(type == 'Feedback') {
-      let fields = this.state.feedbackFields;
-      fields[index] = e.target.value;
+      let feedbackFields = this.state.feedbackFields;
+      let feedbackFieldsError = this.state.feedbackFieldsError;
+      feedbackFieldsError.map(function(ffError, indeX) {
+        feedbackFieldsError[indeX] = '';
+      });
+      feedbackFields[index] = e.target.value;
+      if(index == feedbackFields.length-1) {
+        if(e.target.value.trim().length == 0) {
+          addFeedbackFieldDisabled = true;
+        } else {
+          addFeedbackFieldDisabled = false;
+        }
+      }
       this.setState({
-        feedbackFields: fields,
-        feedbackFieldsError: fieldsError
+        feedbackFields: feedbackFields,
+        feedbackFieldsError: feedbackFieldsError,
+        addFeedbackFieldDisabled: addFeedbackFieldDisabled
       });
     } else if(type == 'Evaluations') {
       let fields = this.state.evaluationFields;
+      let fieldsError = ['', '', '', '', '', ''];
       fields[index] = e.target.value;
       this.setState({
         evaluationFields: fields,
@@ -74,21 +90,41 @@ export default class CourseColumns extends React.Component {
     }
   }
 
+  addFeedbackField() {
+    let feedbackFields = this.state.feedbackFields;
+    let feedbackFieldsError = this.state.feedbackFieldsError;
+    feedbackFields.push('');
+    feedbackFieldsError.push('');
+    this.setState({
+      feedbackFields: feedbackFields,
+      feedbackFieldsError: feedbackFieldsError,
+      addFeedbackFieldDisabled: true
+    });
+  }
+
+  deleteFeedbackField(index) {
+    console.log('deleteFeedbackField...');
+    let feedbackFields = this.state.feedbackFields;
+    feedbackFields.splice(index, 1);
+    this.setState({
+      feedbackFields: feedbackFields
+    });
+  }
+
   validationSuccess() {
     let type = this.state.currentColumn;
     if(type == 'Feedback') {
-      let fieldsError = this.state.feedbackFieldsError;
-      if (this.state.feedbackFields[0].length == 0) {
-        fieldsError[0] = 'This field cannot be empty.';
-      } else if (this.state.feedbackFields[1].length == 0) {
-        fieldsError[1] = 'This field cannot be empty.';
-      } else if (this.state.feedbackFields[2].length == 0) {
-        fieldsError[2] = 'This field cannot be empty.';
-      } else {
-        return true;
-      }
+      let feedbackFieldsError = this.state.feedbackFieldsError;
+      let feedbackFields = this.state.feedbackFields;
+
+      feedbackFields.some(function(feedbackField, index) {
+        if(feedbackField.trim().length == 0) {
+          feedbackFieldsError[index] = 'This field cannot be empty.';
+          return true;
+        }
+      });
       this.setState({
-        feedbackFieldsError: fieldsError
+        feedbackFieldsError: feedbackFieldsError
       });
     } else if(type == 'Evaluations') {
       let fieldsError = this.state.evaluationFieldsError;
@@ -109,6 +145,8 @@ export default class CourseColumns extends React.Component {
   }
 
   render() {
+    console.log('rendering...')
+    console.log(this.state.feedbackFields)
     let th = this;
     let actions, title;
     actions = [
@@ -136,22 +174,31 @@ export default class CourseColumns extends React.Component {
             th.state.feedbackFields.map(function(field, index) {
               let hintText = th.state.currentColumn + ' Field ' + (index + 1);
               let floatingLabelText = index > 2 ? hintText : hintText + ' *';
-              let floatingLabelStyle = index > 2 ? {} : app.mandatoryField;
+              let closeIcon = index <= 2 ? '' :
+              (<CloseIcon
+                style={{position: 'absolute', right: 0, top: 35, width: 20, height: 20, zIndex: 1, cursor: 'pointer'}}
+                onTouchTap={()=>th.deleteFeedbackField(index)}/>);
               return (
-                <div style={dialog.box100} key={index}>
-                  <TextField
-                    style={{width: '100%'}}
-                    hintText={hintText}
-                    floatingLabelText={floatingLabelText}
-                    floatingLabelStyle={floatingLabelStyle}
-                    value={th.state.feedbackFields[index]}
-                    onChange={(e)=>{th.onChangeField(e, index)}}
-                    errorText={th.state.feedbackFieldsError[index]}/>
+                <div style={{position: 'relative', display: 'inline-block', width: '100%'}}  key={index}>
+    							  {closeIcon}
+                    <TextField
+                      style={{width: '100%'}}
+                      hintText={hintText}
+                      floatingLabelText={floatingLabelText}
+                      floatingLabelStyle={app.mandatoryField}
+                      value={th.state.feedbackFields[index]}
+                      onChange={(e)=>{th.onChangeField(e, index)}}
+                      errorText={th.state.feedbackFieldsError[index]}/>
                 </div>
               )
             })
           }
           </div>
+          <FlatButton
+            label="Add One More Field"
+            primary
+            disabled={this.state.addFeedbackFieldDisabled}
+            onClick={this.addFeedbackField} />
         </Dialog>
 
         <Dialog

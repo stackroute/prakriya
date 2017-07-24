@@ -2,7 +2,6 @@ import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import {Card, CardMedia} from 'material-ui/Card';
 import {Grid, Row, Col} from 'react-flexbox-grid';
-import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import Dialog from 'material-ui/Dialog';
@@ -10,7 +9,6 @@ import DatePicker from 'material-ui/DatePicker';
 import {grey50} from 'material-ui/styles/colors';
 import Request from 'superagent';
 import Moment from 'moment';
-import CandidateEdit from './CandidateEdit.jsx';
 import PerformanceMatrix from './PerformanceMatrix.jsx';
 import DownloadProfile from './DownloadProfile.jsx';
 
@@ -45,9 +43,6 @@ const styles = {
 		marginLeft: 50,
 		fontSize: 13,
 		lineHeight: 1.5
-	},
-	editContainer: {
-		textAlign: 'center'
 	}
 }
 
@@ -59,17 +54,14 @@ export default class CandidateHome extends React.Component {
 			startDate: '',
 			endDate: '',
 			showDeleteDialog: false,
-			showEditDialog: false
+			mode: ''
 		}
 		this.getProfilePic = this.getProfilePic.bind(this);
 		this.getWave = this.getWave.bind(this);
 		this.handleBack = this.handleBack.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
-		this.handleUpdate = this.handleUpdate.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-		this.openEditDialog = this.openEditDialog.bind(this);
-		this.closeEditDialog = this.closeEditDialog.bind(this);
 		this.formatDate = this.formatDate.bind(this);
 	}
 	componentWillMount() {
@@ -111,6 +103,7 @@ export default class CandidateHome extends React.Component {
 		    else {
 		    	console.log(res.body);
 		    	th.setState({
+						mode: res.body.Mode,
 		    		startDate: res.body.StartDate,
 		    		endDate: res.body.EndDate
 		    	})
@@ -133,22 +126,6 @@ export default class CandidateHome extends React.Component {
 	}
 	handleDelete() {
 		this.props.handleDelete(this.props.candidate);
-	}
-	openEditDialog() {
-		this.setState({
-			showEditDialog: true
-		})
-	}
-	closeEditDialog() {
-		this.setState({
-			showEditDialog: false
-		})
-	}
-	handleUpdate(candidate) {
-		this.setState({
-			showEditDialog: false
-		})
-		this.props.handleUpdate(candidate);
 	}
 	formatDate(date) {
 		return Moment(date).format("MMM Do YYYY");
@@ -182,14 +159,6 @@ export default class CandidateHome extends React.Component {
 					</Row>
 					<div style={styles.container}>
 						{
-							this.state.showEditDialog &&
-							<CandidateEdit
-								candidate={this.props.candidate}
-								updateCandidate={this.handleUpdate}
-							/>
-						}
-						{
-							!this.state.showEditDialog &&
 							<Grid>
 								<Row>
 									<Col md={8} mdOffset={2} style={styles.name}>
@@ -201,8 +170,10 @@ export default class CandidateHome extends React.Component {
 														color={grey50}
 														style={styles.actionIcon}
 														candidate={this.props.candidate}
+														imageURL={this.state.imageURL}
+														role={this.props.role}
+														zip={false}
 													/>
-													<EditIcon style={styles.actionIcon} color={grey50} onClick={this.openEditDialog}/>
 													<DeleteIcon
 														style={styles.actionIcon}
 														color={grey50}
@@ -256,8 +227,8 @@ export default class CandidateHome extends React.Component {
 										}
 										<h4>Training Details</h4>
 										<p style={styles.details}>
-											Training Track: {this.props.candidate.TrainingTrack}<br/>
 											Wave: {this.props.candidate.Wave}<br/>
+											Mode: {this.state.mode}<br/>
 											Start Date: {this.formatDate(this.state.startDate)}<br/>
 											End Date: {this.formatDate(this.state.endDate)}
 										</p>
@@ -272,12 +243,24 @@ export default class CandidateHome extends React.Component {
 											</p>
 											</div>
 										}
+										{this.props.candidate.ProjectName != '' &&
+										<div>
 										<h4>Project Details</h4>
 										<p style={styles.details}>
 											Project Name: {this.props.candidate.ProjectName}<br/>
 											Project Description: {this.props.candidate.ProjectDescription}<br/>
-											Project Skills: {this.props.candidate.ProjectSkills}
-										</p>
+											Project Skills: <ul>{this.props.candidate.ProjectSkills.map(function(skill) {
+												return <li>{skill}</li>
+											})}</ul>
+										</p></div>
+										}
+										{
+											this.props.role == 'wiproadmin' &&
+											<div>
+												<h4>Billability:</h4>
+												<p style={styles.details}> Status: {this.props.candidate.Billability} </p>
+											</div>
+										}
 										<h4>Manager Details</h4>
 										<p style={styles.details}>
 											Primary Supervisor: {this.props.candidate.PrimarySupervisor}<br/>

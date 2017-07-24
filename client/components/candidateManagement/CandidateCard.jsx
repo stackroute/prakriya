@@ -129,12 +129,13 @@ export default class CandidateCard extends React.Component {
 			    	<IconButton
 			    		tooltip="Download Profile"
 			    		style={{float: 'left'}}
-			    		onTouchTap={this.downloadProfile}
 			    	>
 				      <DownloadProfile
 				      	color={lightBlack}
 				      	candidate={this.props.candidate}
 				      	imageURL={this.state.imageURL}
+								role={this.props.role}
+								zip = {false}
 				      />
 				    </IconButton>
 				    <IconButton tooltip="Delete Candidate" onTouchTap={this.openDeleteDialog}>
