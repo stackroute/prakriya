@@ -129,7 +129,6 @@ export default class CandidateCard extends React.Component {
 			    	<IconButton
 			    		tooltip="Download Profile"
 			    		style={{float: 'left'}}
-			    		onTouchTap={this.downloadProfile}
 			    	>
 				      <DownloadProfile
 				      	color={lightBlack}

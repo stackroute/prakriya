@@ -59,15 +59,16 @@ export default class Candidates extends React.Component {
 			displayCandidates: [],
 			showCandidate: false,
 			displayCandidate: {},
+			imageURL: [],
 			appliedFilters: {
 				EmployeeID: '',
 				EmployeeName: '',
 				DigiThonQualified: '',
 				DigiThonPhase: '',
 				DigiThonScore: '',
-				Skills: '',
+				Skills: [],
 				Wave: '',
-				Billability: ''
+				Billability: []
 			}
 		}
 
@@ -89,6 +90,7 @@ export default class Candidates extends React.Component {
 		this.resetFilters = this.resetFilters.bind(this);
 		this.setPage = this.setPage.bind(this);
 		this.getRole = this.getRole.bind(this);
+		this.getProfilePic = this.getProfilePic.bind(this);
 	}
 
 	componentWillMount() {
@@ -117,14 +119,59 @@ export default class Candidates extends React.Component {
         console.log(err);
       else {
         th.setState({Billability: res.body})
+        console.log('Billability', res.body);
       }
     })
+	}
+
+	getProfilePic(emp) {
+		let th = this;
+		emp.map(function(employee){
+			let eid = employee.EmployeeID
+			Request
+				.get(`/dashboard/getimage?eid=${eid}`)
+				.set({'Authorization': localStorage.getItem('token')})
+				.query({q: eid})
+				.end(function(err, res) {
+					if(err) {
+						let blobUrl = '../../assets/images/avt-default.jpg'
+						let imageURL = th.state.imageURL;
+						imageURL.push(blobUrl);
+						th.setState({
+							imageURL: imageURL
+						})
+					} else {
+			    	if(res.text) {
+			    		let array = new Uint8Array(res.text.length);
+			        for (var i = 0; i < res.text.length; i++){
+			            array[i] = res.text.charCodeAt(i);
+			        }
+			        var blob = new Blob([array], {type: 'image/jpeg'});
+				    	let blobUrl = URL.createObjectURL(blob);
+							console.log(blobUrl);
+							let imageURL = th.state.imageURL;
+							imageURL.push(blobUrl);
+				    	th.setState({
+				    		imageURL: imageURL
+				    	})
+			    	}
+			    }
+				})
+		})
 	}
 
 	addFilter(key, value) {
 		let appliedFilters = this.state.appliedFilters;
 
-		appliedFilters[key] = value;
+		if(key == 'Skills') {
+			appliedFilters[key].push(value);
+		}
+		else if(key == 'Billability') {
+			appliedFilters[key].push(value);
+		}
+		else {
+			appliedFilters[key] = value;
+		}
 		// switch(key) {
 		// 	case 'EmployeeID':
 		// 		if(appliedFilters.EmployeeID != value)
@@ -197,6 +244,7 @@ export default class Candidates extends React.Component {
 						filteredCandidates: cadets
 		    	});
 					th.setPage(th.state.currentPage);
+					th.getProfilePic(cadets);
 		    }
 		  })
 	}
@@ -327,7 +375,6 @@ export default class Candidates extends React.Component {
 	// fetching filtered candidates from db
 	getFilteredCandidates() {
 		let th = this;
-		console.log('FiltersCount: ', th.state.filtersCount)
 		// let filterQuery = th.state.filtersCount > 0 ? {'$or': th.state.appliedFilters} : {};
 		// if(this.state.filtersCount > 0) {
 			Request
@@ -338,7 +385,6 @@ export default class Candidates extends React.Component {
 					if(err)
 			    	console.log(err);
 			    else {
-			    	console.log('Filtered candidates', res.body)
 						th.setState({
 							filteredCandidates: res.body
 						});
@@ -358,7 +404,7 @@ export default class Candidates extends React.Component {
 				EmployeeName: '',
 				DigiThonQualified: '',
 				DigiThonPhase: '',
-				Wave: '',
+				Wave: [],
 				DigiThonScore: '',
 				Billability: ''
 			},
@@ -369,7 +415,6 @@ export default class Candidates extends React.Component {
 
 	setPage(pageNumber) {
 		let th = this;
-		console.log('Page Changed To -- ' + pageNumber);
 		let start = (pageNumber - 1) * 3;
 		let end = start + 3;
 		let sliced = th.state.filteredCandidates.slice(start, end);
@@ -377,27 +422,26 @@ export default class Candidates extends React.Component {
 			displayCandidates: sliced,
 			currentPage: pageNumber
 		});
-		console.log(sliced);
 	}
 
 	render() {
 		let th = this;
-		console.log(this.state.filteredCandidates);
 		return(
 			<div>
 				{
 					th.state.filteredCandidates != undefined &&
-					<span>Download All Profiles:<IconButton
-						tooltip="Download Profile"
-						onTouchTap={this.downloadProfile}
-					>
-						<DownloadProfile
-							color={lightBlack}
-							candidate={this.state.filteredCandidates}
-							role={this.props.role}
-							zip={true}
-						/>
-					</IconButton></span>
+					<span>
+						Download All Profiles:
+						<IconButton tooltip="Download Profile">
+							<DownloadProfile
+								color={lightBlack}
+								candidate={this.state.filteredCandidates}
+								role={this.props.role}
+								zip={true}
+								imageURL={th.state.imageURL}
+							/>
+						</IconButton>
+					</span>
 				}
 			<AddCandidate addCandidate={this.addCandidate}/>
 			{
@@ -440,7 +484,17 @@ export default class Candidates extends React.Component {
 									<div style={styles.filters}>
 									{
 										Object.keys(this.state.appliedFilters).map(function (filter, index) {
-											let val = th.state.appliedFilters[filter];
+											let val = '';
+											if(filter == 'Skills' || filter == 'Billability') {
+												th.state.appliedFilters[filter].map(function(item) {
+													val += item + ', ';
+												})
+												val = val.substring(0, val.length-2)
+											}
+
+											else {
+												val = th.state.appliedFilters[filter];
+											}
 											if(val != '') {
 												return (
 													<Chip

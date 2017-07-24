@@ -30,10 +30,12 @@ export default class DownloadProfile extends React.Component {
 
 	downloadCandidateProfile() {
 		let th = this;
+		console.log(th.props.imageURL)
 		if(this.props.zip) {
 			this.props.candidate.map(function(cadet, index) {
 				let candidate = cadet;
-				cadet.imageURL = '../../assets/images/avt-default.jpg'
+				// cadet.imageURL = th.props.imageURL[index];
+				cadet.imageURL = '../../assets/images/avt-default.jpg';
 				th.downloadProfile(cadet, index)
 			})
 		}
@@ -49,7 +51,6 @@ export default class DownloadProfile extends React.Component {
 		let doc = new jsPDF()
 		let x = 95;
 		let y = 20;
-		console.log(this.getProfilePic(candidate.EmployeeID));
 
 		doc.setFillColor(85, 85, 85);
 		doc.setDrawColor(100, 100, 0);
@@ -80,18 +81,19 @@ export default class DownloadProfile extends React.Component {
 		if(this.props.role === 'wiproadmin') {
 			doc.text(x, y+=10, 'Billability: ' + candidate.Billability+'')
 		}
-		if(this.props.zip) {
-			zip.file(candidate.EmployeeID + '.pdf', doc.output());
-			if(index === this.props.candidate.length-1) {
-				zip.generateAsync({ type: "blob" })
-				 .then(function (content) {
-					 FileSaver.saveAs(content, "cadetProfiles.zip");
-				 });
-			}
-		}
-		else {
+		console.log('Image URL', candidate.imageURL)
+		// if(this.props.zip) {
+		// 	zip.file(candidate.EmployeeID + '.pdf', doc.output());
+		// 	if(index === this.props.candidate.length-1) {
+		// 		zip.generateAsync({ type: "blob" })
+		// 		 .then(function (content) {
+		// 			 FileSaver.saveAs(content, "cadetProfiles.zip");
+		// 		 });
+		// 	}
+		// }
+		// else {
 			doc.save(candidate.EmployeeID + '.pdf')
-		}
+		// }
 	}
 
 	render() {
