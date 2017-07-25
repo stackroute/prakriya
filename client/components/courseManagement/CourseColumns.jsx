@@ -12,13 +12,10 @@ export default class CourseColumns extends React.Component {
     super(props);
     this.state = {
       currentColumn: 'Feedback',
-      addFeedbackFieldDisabled: true,
       feedbackFields: ['', '', ''],
       feedbackFieldsError: ['', '', ''],
-      evaluationFields: ['', '', '', '', '', ''],
-      evaluationFieldsError: ['', '', '', '', '', '']
-    }
-
+      addFeedbackFieldDisabled: true
+    };
     this.handleBack = this.handleBack.bind(this);
     this.handleContinue = this.handleContinue.bind(this);
     this.onChangeField = this.onChangeField.bind(this);
@@ -29,64 +26,40 @@ export default class CourseColumns extends React.Component {
 
   onChangeField(e, index) {
     let th = this;
-    let type = this.state.currentColumn;
-    let addFeedbackFieldDisabled;
-    if(type == 'Feedback') {
-      let feedbackFields = this.state.feedbackFields;
-      let feedbackFieldsError = this.state.feedbackFieldsError;
-      feedbackFieldsError.map(function(ffError, indeX) {
-        feedbackFieldsError[indeX] = '';
-      });
-      feedbackFields[index] = e.target.value;
-      if(index == feedbackFields.length-1) {
-        if(e.target.value.trim().length == 0) {
-          addFeedbackFieldDisabled = true;
-        } else {
-          addFeedbackFieldDisabled = false;
-        }
+    let feedbackFields = this.state.feedbackFields;
+    let feedbackFieldsError = this.state.feedbackFieldsError;
+    feedbackFieldsError.map(function(ffError, indeX) {
+      feedbackFieldsError[indeX] = '';
+    });
+    feedbackFields[index] = e.target.value;
+    if(index == feedbackFields.length-1) {
+      if(e.target.value.trim().length == 0) {
+        th.setState({
+          addFeedbackFieldDisabled: true
+        });
+      } else {
+        th.setState({
+          addFeedbackFieldDisabled: false
+        });
       }
-      this.setState({
-        feedbackFields: feedbackFields,
-        feedbackFieldsError: feedbackFieldsError,
-        addFeedbackFieldDisabled: addFeedbackFieldDisabled
-      });
-    } else if(type == 'Evaluations') {
-      let fields = this.state.evaluationFields;
-      let fieldsError = ['', '', '', '', '', ''];
-      fields[index] = e.target.value;
-      this.setState({
-        evaluationFields: fields,
-        evaluationFieldsError: fieldsError
-      });
     }
+    this.setState({
+      feedbackFields: feedbackFields,
+      feedbackFieldsError: feedbackFieldsError
+    });
   }
 
   handleBack() {
-    let type = this.state.currentColumn;
-    if(type == 'Feedback') {
-      this.props.onClose();
-    } else if(type == 'Evaluations') {
-      this.setState({
-        currentColumn: 'Feedback'
-      });
-    }
+    this.props.onClose();
   }
 
   handleContinue() {
     let th = this;
-    let type = this.state.currentColumn;
     if(this.validationSuccess()) {
-      if(type == 'Feedback') {
-        this.setState({
-          currentColumn: 'Evaluations'
-        });
-      } else if(type == 'Evaluations') {
-        let obj = {
-          FeedbackFields: th.state.feedbackFields,
-          EvaluationFields: th.state.evaluationFields
-        };
-        this.props.onConfirmCourseAddition(obj);
-      }
+      let obj = {
+        FeedbackFields: th.state.feedbackFields
+      };
+      this.props.onConfirmCourseAddition(obj);
     }
   }
 
@@ -112,41 +85,24 @@ export default class CourseColumns extends React.Component {
   }
 
   validationSuccess() {
-    let type = this.state.currentColumn;
-    if(type == 'Feedback') {
-      let feedbackFieldsError = this.state.feedbackFieldsError;
-      let feedbackFields = this.state.feedbackFields;
-
-      feedbackFields.some(function(feedbackField, index) {
-        if(feedbackField.trim().length == 0) {
-          feedbackFieldsError[index] = 'This field cannot be empty.';
-          return true;
-        }
-      });
-      this.setState({
-        feedbackFieldsError: feedbackFieldsError
-      });
-    } else if(type == 'Evaluations') {
-      let fieldsError = this.state.evaluationFieldsError;
-      if (this.state.evaluationFields[0].length == 0) {
-        fieldsError[0] = 'This field cannot be empty.';
-      } else if (this.state.evaluationFields[1].length == 0) {
-        fieldsError[1] = 'This field cannot be empty.';
-      } else if (this.state.evaluationFields[2].length == 0) {
-        fieldsError[2] = 'This field cannot be empty.';
-      } else {
+    let validationFailed = false;
+    let feedbackFieldsError = this.state.feedbackFieldsError;
+    let feedbackFields = this.state.feedbackFields;
+    feedbackFields.some(function(feedbackField, index) {
+      if(feedbackField.trim().length == 0) {
+        feedbackFieldsError[index] = 'This field cannot be empty.';
+        validationFailed = true;
         return true;
       }
-      this.setState({
-        evaluationFieldsError: fieldsError
-      });
-    }
-    return false;
+    });
+    this.setState({
+      feedbackFieldsError: feedbackFieldsError
+    });
+    console.log('validationFailed: ', validationFailed);
+    return !validationFailed;
   }
 
   render() {
-    console.log('rendering...')
-    console.log(this.state.feedbackFields)
     let th = this;
     let actions, title;
     actions = [
@@ -199,37 +155,6 @@ export default class CourseColumns extends React.Component {
             primary
             disabled={this.state.addFeedbackFieldDisabled}
             onClick={this.addFeedbackField} />
-        </Dialog>
-
-        <Dialog
-          bodyStyle={dialog.body}
-          title={title}
-          titleStyle={dialog.title}
-          actionsContainerStyle={dialog.actionsContainer}
-          open={this.props.open && this.state.currentColumn == 'Evaluations'}
-          autoScrollBodyContent={true}
-          actions={actions}>
-          <div>
-          {
-            th.state.evaluationFields.map(function(field, index) {
-              let hintText = th.state.currentColumn + ' Field ' + (index + 1);
-              let floatingLabelText = index > 2 ? hintText : hintText + ' *';
-              let floatingLabelStyle = index > 2 ? {} : app.mandatoryField;
-              return (
-                <div style={dialog.box100} key={index}>
-                  <TextField
-                    style={{width: '100%'}}
-                    hintText={hintText}
-                    floatingLabelText={floatingLabelText}
-                    floatingLabelStyle={floatingLabelStyle}
-                    value={th.state.evaluationFields[index]}
-                    onChange={(e)=>{th.onChangeField(e, index)}}
-                    errorText={th.state.evaluationFieldsError[index]}/>
-                </div>
-              )
-            })
-          }
-          </div>
         </Dialog>
       </div>
     )
