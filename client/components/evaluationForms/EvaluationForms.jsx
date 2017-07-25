@@ -7,6 +7,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import MenuItem from 'material-ui/MenuItem';
 import Snackbar from 'material-ui/Snackbar';
+import CONFIG from '../../config/index';
 
 const styles = {
 	heading: {
@@ -29,75 +30,7 @@ const styles = {
 	}
 }
 
-const evaluation = [
-	{
-		type: "programming",
-		options: [
-			"Ability to understand requirements during the last 12 weeks",
-			"Ability to translate requirements into an implementation",
-			"Problem solving ability (think, evaluate and choose among alternates, and innovation/creativity)",
-			"Debugging / troubleshooting skills",
-			"Quality of UX thinking demonstrated"
-		]
-	},
-	{
-		type: "code quality",
-		options: [
-			"Writes clean, well commented code",
-			"Effort made to optimize code",
-			"Code documentation, structure and maintainability",
-			"Defensive code focus – understands validations, handles negative scenarios"
-		]
-	},
-	{
-		type: "testability",
-		options: [
-			"Thinks and understand testing – has the “what-if” focus",
-			"Writing automated test cases for server side code",
-			"Writing automated test cases for client side code"
-		]
-	},
-	{
-		type: "engineering culture",
-		options: [
-			"Stand-up readiness – preparation and participation",
-			"Understands agile process",
-			"Understands agile thinking – takes ownership of requirements",
-			"Timeliness (meeting task timelines)",
-			"Devops understanding – CI processes"
-		]
-	},
-	{
-		type: "technology",
-		options: [
-			"HTML and CSS3, BootStrap and Material Design",
-			"JavaScript",
-			"Basic language command",
-			"Async behavior and callbacks",
-			"Working with objects",
-			"AngularJS or ReactJS",
-			"NodeJS architecture concepts – NPM and require, exports",
-			"Async Behavior in NodeJS",
-			"Express –writing middleware, routes, separation of code",
-			"MongoDB and Mongoose",
-			"Other tech like Neo4J",
-			"Docker/Vagrant and deployment environments",
-			"Passport/other authentication mechanisms",
-			"Websockets and/or REST APIs",
-			"Client side troubleshooting",
-			"Client side automated testing tools",
-			"Server side automated testing tools"
-		]
-	},
-	{
-		type: "communication",
-		options: [
-			"Presentation Skill",
-			"Confidence in communication",
-			"Leadership/Taking Initiative"
-		]
-	}
-]
+const EVALUATION = CONFIG.EVALUATION;
 
 export default class EvaluationForms extends React.Component {
 	constructor(props) {
@@ -110,12 +43,12 @@ export default class EvaluationForms extends React.Component {
 			cadetName: '',
 			attitude: 1,
 			punctuality: 1,
-			programming: {},
-			codequality: {},
-			testability: {},
-			engineeringculture: {},
-			technology: {},
-			communication: {},
+			programming: [],
+			codequality: [],
+			testability: [],
+			engineeringculture: [],
+			skills: [],
+			communication: [],
 			overall: 1,
 			doneWell: '',
 			improvement: '',
@@ -136,16 +69,11 @@ export default class EvaluationForms extends React.Component {
 	componentWillMount() {
 		this.getCadets();
 		this.setState({
-			programming: {'1':1, '2':1, '3':1, '4':1, '5':1},
-			codequality: {'1':1, '2':1, '3':1, '4':1},
-			testability: {'1':1, '2':1, '3':1, '4':1, '5':1, '6': 1},
-			engineeringculture: {'1':1, '2':1, '3':1, '4':1, '5':1},
-			technology: {
-				'1':1, '2':1, '3':1, '4':1, '5':1,
-				'6':1, '7':1, '8':1, '9':1, '10':1,
-				'11':1, '12':1, '13':1, '14':1, '15':1, '16': 1
-			},
-			communication: {'1':1, '2':1, '3':1}
+			programming: [0, 0, 0, 0, 0],
+			codequality: [0, 0, 0, 0],
+			testability: [0, 0, 0],
+			engineeringculture: [0, 0, 0, 0, 0],
+			communication: [0, 0, 0]
 		})
 	}
 	componentWillUpdate(nextProps, nextState) {
@@ -233,7 +161,7 @@ export default class EvaluationForms extends React.Component {
 		evaluationObj.codequality = this.state.codequality;
 		evaluationObj.testability = this.state.testability;
 		evaluationObj.engineeringculture = this.state.engineeringculture;
-		evaluationObj.technology = this.state.technology;
+		evaluationObj.skills = this.state.skills;
 		evaluationObj.communication = this.state.communication;
 		evaluationObj.overall = this.state.overall;
 		evaluationObj.doneWell = this.state.doneWell;
@@ -329,7 +257,7 @@ export default class EvaluationForms extends React.Component {
 						</Col>
 					</Row>
 					{
-						evaluation.map(function (item, key) {
+						EVALUATION.map(function (item, key) {
 							return (
 								<div key={key}>
 									<Row>
