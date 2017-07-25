@@ -1525,5 +1525,4 @@ module.exports = {
       deleteSession,
       getCourseForWave,
       removeCadetFromWave
-      }
   }
