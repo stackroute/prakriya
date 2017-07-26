@@ -1515,6 +1515,25 @@ router.post('/removeCadetFromWave', auth.canAccess(CONFIG.ADMINISTRATOR), functi
   }
 });
 
+/**********************************************
+************ Evaluation ***********************
+**********************************************/
 
+// Get evaluation skills for a given candidateID
+router.get('/evaluationfields', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    dashboardNeo4jController.getEvaluationSkills(req.query.candidateID, function (evaluationSkills) {
+      res.status(201).json(evaluationSkills);
+    }, function (err) {
+      logger.error('Get EvaluationSkills Error: ', err);
+      res.status(500).json({error: 'Cannot get evaluation skills for this candidate from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get EvaluationSkills Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
 
 module.exports = router;

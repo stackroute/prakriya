@@ -65,7 +65,9 @@ export default class EvaluationForms extends React.Component {
 		this.handleSuggestionsChange = this.handleSuggestionsChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.saveEvaluation = this.saveEvaluation.bind(this);
+		this.getEvaluationFields = this.getEvaluationFields.bind(this);
 	}
+
 	componentWillMount() {
 		this.getCadets();
 		this.setState({
@@ -74,8 +76,9 @@ export default class EvaluationForms extends React.Component {
 			testability: [0, 0, 0],
 			engineeringculture: [0, 0, 0, 0, 0],
 			communication: [0, 0, 0]
-		})
+		});
 	}
+
 	componentWillUpdate(nextProps, nextState) {
 		nextState.disableSave = !(
 			nextState.wave.trim() != '' &&
@@ -83,7 +86,8 @@ export default class EvaluationForms extends React.Component {
 			nextState.doneWell.trim() != '' &&
 			nextState.improvement.trim() != ''
 		)
-	}
+	};
+
 	getCadets() {
 		let th = this;
 		Request
@@ -104,19 +108,48 @@ export default class EvaluationForms extends React.Component {
 		    	})
 		    }
 		  })
-	}
+	};
+
+	getEvaluationFields(candidateID) {
+		let th = this;
+		console.log('should get evaluation fields for ', candidateID);
+		Request
+			.get('/dashboard/evaluationfields')
+			.set({'Authorization': localStorage.getItem('token')})
+			.query({candidateID: candidateID})
+			.end(function(err, res){
+				if(err)
+					console.log('Error in fetching evaluation fields: ', err)
+				else {
+					// configuring the candidate specific evaluation skills
+					console.log('data recieved: ', res.body)
+          EVALUATION[4].options = res.body;
+          let skills = [];
+          res.body.map(function() {
+            skills.push(0)
+          });
+          th.setState({
+            skills: skills
+          });
+				}
+			});
+	};
+
 	handleWaveChange(event, key, val) {
 		this.setState({
 			wave: val
 		})
-	}
+	};
+
 	handleCandidateChange(event, key, val) {
 		let newVal = val.split('-');
+		this.getEvaluationFields(newVal[0]);
 		this.setState({
 			cadetID: newVal[0],
 			cadetName: newVal[1]
 		})
-	}
+	};
+
 	handleChange(val, type, key) {
 		if(type == 'attitude') {
 			this.setState({
@@ -135,22 +168,26 @@ export default class EvaluationForms extends React.Component {
 				[type]: temp
 			})
 		}
-	}
+	};
+
 	handleDoneWellChange(event) {
 		this.setState({
 			doneWell: event.target.value
 		})
-	}
+	};
+
 	handleAreasOfImprovementChange(event) {
 		this.setState({
 			improvement: event.target.value
 		})
-	}
+	};
+
 	handleSuggestionsChange(event) {
 		this.setState({
 			suggestions: event.target.value
 		})
-	}
+	};
+
 	handleSubmit() {
 		let evaluationObj = {}
 		evaluationObj.cadetID = this.state.cadetID;
@@ -169,7 +206,8 @@ export default class EvaluationForms extends React.Component {
 		evaluationObj.suggestions = this.state.suggestions;
 		console.log('Evaluation Obj', evaluationObj);
 		this.saveEvaluation(evaluationObj);
-	}
+	};
+
 	saveEvaluation(evaluationObj) {
 		let th = this;
 		Request
@@ -185,8 +223,8 @@ export default class EvaluationForms extends React.Component {
 						open: true
 					})
 		    }
-		  })
-	}
+		  });
+	};
 
 	render() {
 		let th = this;
@@ -228,138 +266,150 @@ export default class EvaluationForms extends React.Component {
 			        </SelectField>
 						</Col>
 					</Row>
-					<Row>
-						<Col md={6} mdOffset={2} style={styles.single}>
-							Attitude – Interest, inclination and involvement
-						</Col>
-						<Col md={2}>
-							<StarRating
-								color1={'#ddd'}
-								half={false}
-								size={30}
-								value={this.state.attitude}
-								onChange={(newVal) => th.handleChange(newVal, 'attitude')}
-							/>
-						</Col>
-					</Row>
-					<Row>
-						<Col md={6} mdOffset={2} style={styles.single}>
-							Punctuality and attendance
-						</Col>
-						<Col md={2}>
-							<StarRating
-								color1={'#ddd'}
-								half={false}
-								size={30}
-								value={this.state.punctuality}
-								onChange={(newVal) => th.handleChange(newVal, 'punctuality')}
-							/>
-						</Col>
-					</Row>
 					{
-						EVALUATION.map(function (item, key) {
-							return (
-								<div key={key}>
-									<Row>
-										<Col md={8} mdOffset={2}>
-											<h3>{item.type.toUpperCase()}</h3>
-										</Col>
-									</Row>
-									{
-										item.options.map(function (option, index) {
-											return (
-												<Row key={index}>
-													<Col md ={6} mdOffset={2} style={styles.row}>
-														{index+1}. {option}
-													</Col>
-													<Col md={2}>
-														<StarRating
-															color1={'#ddd'}
-															half={false}
-															size={30}
-															value={th.state[item.type.replace(' ', '')][index+1]}
-															onChange={(newVal) => th.handleChange(newVal, item.type.replace(' ', ''), index+1)}
-														/>
-													</Col>
-												</Row>
-											)
-										})
-									}
-								</div>
-							)
-						})
+						th.state.cadetID == '' ?
+						<Row>
+							<Col md={8}  mdOffset={2} style={styles.single}>
+								<center>Please select a wave and a candidate to proceed.</center>
+							</Col>
+						</Row> :
+						<div>
+						<Row>
+							<Col md={6} mdOffset={2} style={styles.single}>
+								Attitude – Interest, inclination and involvement
+							</Col>
+							<Col md={2}>
+								<StarRating
+									color1={'#ddd'}
+									half={false}
+									size={30}
+									value={this.state.attitude}
+									onChange={(newVal) => th.handleChange(newVal, 'attitude')}
+								/>
+							</Col>
+						</Row>
+
+						<Row>
+							<Col md={6} mdOffset={2} style={styles.single}>
+								Punctuality and attendance
+							</Col>
+							<Col md={2}>
+								<StarRating
+									color1={'#ddd'}
+									half={false}
+									size={30}
+									value={this.state.punctuality}
+									onChange={(newVal) => th.handleChange(newVal, 'punctuality')}
+								/>
+							</Col>
+						</Row>
+						{
+							EVALUATION.map(function (item, key) {
+								return (
+									<div key={key}>
+										<Row>
+											<Col md={8} mdOffset={2}>
+												<h3>{item.type.toUpperCase()}</h3>
+											</Col>
+										</Row>
+										{
+											item.options.map(function (option, index) {
+												return (
+													<Row key={index}>
+														<Col md ={6} mdOffset={2} style={styles.row}>
+															{index+1}. {option}
+														</Col>
+														<Col md={2}>
+															<StarRating
+																color1={'#ddd'}
+																half={false}
+																size={30}
+																value={th.state[item.type.replace(' ', '')][index+1]}
+																onChange={(newVal) => th.handleChange(newVal, item.type.replace(' ', ''), index+1)}
+															/>
+														</Col>
+													</Row>
+												)
+											})
+										}
+									</div>
+								)
+							})
+						}
+						<Row>
+							<Col md={6} mdOffset={2} style={styles.single}>
+								OVERALL RATING ACROSS THE PROGRAM
+							</Col>
+							<Col md={2}>
+								<StarRating
+									color1={'#ddd'}
+									half={false}
+									size={30}
+									value={this.state.overall}
+									onChange={(newVal) => th.handleChange(newVal, 'overall')}
+								/>
+							</Col>
+						</Row>
+
+						<Row>
+							<Col md={8} mdOffset={2}>
+								<TextField
+						      floatingLabelText="Atleast two areas the participant has done well"
+						      multiLine={true}
+						      rows={3}
+						      rowsMax={3}
+						      fullWidth={true}
+						      value={this.state.doneWell}
+						      onChange={this.handleDoneWellChange}
+						    />
+							</Col>
+						</Row>
+
+						<Row>
+							<Col md={8} mdOffset={2}>
+								<TextField
+						      floatingLabelText="At least two areas of improvement"
+						      multiLine={true}
+						      rows={3}
+						      rowsMax={3}
+						      fullWidth={true}
+						      value={this.state.improvement}
+						      onChange={this.handleAreasOfImprovementChange}
+						    />
+						  </Col>
+						</Row>
+						<Row>
+							<Col md={8} mdOffset={2}>
+								<TextField
+									floatingLabelText="Suggestions"
+									multiLine={true}
+									rows={3}
+									rowsMax={3}
+									fullWidth={true}
+									value={this.state.suggestions}
+									onChange={this.handleSuggestionsChange}
+								/>
+							</Col>
+						</Row>
+
+						<Row>
+							<Col md={8} mdOffset={2} style={styles.submit}>
+								<RaisedButton
+									label="Submit"
+									primary={true}
+									onClick={this.handleSubmit}
+									disabled={this.state.disableSave}
+									style={{width: '100%'}}
+								/>
+								<Snackbar
+									open={this.state.open}
+	          			message="Cadet evaluation form submitted"
+									autoHideDuration={2000}
+	        			/>
+							</Col>
+						</Row>
+						</div>
 					}
-					<Row>
-						<Col md={6} mdOffset={2} style={styles.single}>
-							Overall Rating across the program
-						</Col>
-						<Col md={2}>
-							<StarRating
-								color1={'#ddd'}
-								half={false}
-								size={30}
-								value={this.state.overall}
-								onChange={(newVal) => th.handleChange(newVal, 'overall')}
-							/>
-						</Col>
-					</Row>
-
-					<Row>
-						<Col md={8} mdOffset={2}>
-							<TextField
-					      floatingLabelText="Atleast two areas the participant has done well"
-					      multiLine={true}
-					      rows={3}
-					      rowsMax={3}
-					      fullWidth={true}
-					      value={this.state.doneWell}
-					      onChange={this.handleDoneWellChange}
-					    />
-						</Col>
-					</Row>
-
-					<Row>
-						<Col md={8} mdOffset={2}>
-							<TextField
-					      floatingLabelText="At least two areas of improvement"
-					      multiLine={true}
-					      rows={3}
-					      rowsMax={3}
-					      fullWidth={true}
-					      value={this.state.improvement}
-					      onChange={this.handleAreasOfImprovementChange}
-					    />
-					  </Col>
-					</Row>
-					<Row>
-						<Col md={8} mdOffset={2}>
-							<TextField
-								floatingLabelText="Suggestions"
-								multiLine={true}
-								rows={3}
-								rowsMax={3}
-								fullWidth={true}
-								value={this.state.suggestions}
-								onChange={this.handleSuggestionsChange}
-							/>
-						</Col>
-					</Row>
-
-					<Row>
-						<Col md={8} mdOffset={2} style={styles.submit}>
-							<RaisedButton
-								label="Submit"
-								primary={true}
-								onClick={this.handleSubmit}
-								disabled={this.state.disableSave}
-							/>
-							<Snackbar
-								open={this.state.open}
-          			message="Cadet evaluation form submitted"
-								autoHideDuration={2000}
-        			/>
-						</Col>
-					</Row>
 				</Grid>
 			</div>
 		)
