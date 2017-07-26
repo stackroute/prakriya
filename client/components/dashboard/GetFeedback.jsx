@@ -16,6 +16,8 @@ const styles = {
 	}
 }
 
+const FEEDBACK_CATEGORIES = CONFIG.FEEDBACK.CATEGORIES;
+
 export default class WaveDetails extends React.Component {
 	constructor(props) {
 		super(props);
@@ -30,6 +32,7 @@ export default class WaveDetails extends React.Component {
 		this.getFeedbacks = this.getFeedbacks.bind(this);
 		this.createFeedback = this.createFeedback.bind(this);
 		this.downloadFeedbacks = this.downloadFeedbacks.bind(this);
+		this.getFeedbackFields = this.getFeedbackFields.bind(this);
 	}
 
 	componentWillMount() {
@@ -38,6 +41,7 @@ export default class WaveDetails extends React.Component {
 
 	onIDChange(val) {
 		let th = this;
+		this.getFeedbackFields(val);
 		this.setState({
 			waveID: val
 		})
@@ -111,7 +115,7 @@ export default class WaveDetails extends React.Component {
 		doc.rect(x+195, y, 5, 6);
 		doc.text(x+197, y+4, '5');
 
-		CONFIG.FEEDBACK.CATEGORIES.map(function(CATEGORY) {
+		FEEDBACK_CATEGORIES.map(function(CATEGORY) {
 			doc.rect(x, y+=6, 200, 6);
 			doc.setFontStyle('bold');
 			doc.text(x+2, y+4, CATEGORY.alias);
@@ -192,6 +196,23 @@ export default class WaveDetails extends React.Component {
 						feedbacks: res.body
 					});
 					console.log('All Feedbacks: ', res.body)
+				}
+			});
+	}
+
+	getFeedbackFields(waveID) {
+		let th = this;
+		console.log('should get feedback fields for ', waveID);
+		Request
+			.get('/dashboard/courseforwave')
+			.set({'Authorization': localStorage.getItem('token')})
+			.query({waveID: waveID})
+			.end(function(err, res){
+				if(err)
+					console.log('Error in fetching feedback fields: ', err)
+				else {
+					// configuring the course specific feedback data
+          FEEDBACK_CATEGORIES[2].options = res.body.FeedbackFields;
 				}
 			});
 	}
