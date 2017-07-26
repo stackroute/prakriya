@@ -1486,9 +1486,10 @@ let getEvaluationSkills = function(candidateID, successCB, errorCB) {
   let query = `
     MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: '${candidateID}'})
     WITH candidate AS candidate
-    MATCH (candidate) -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
+    OPTIONAL MATCH (candidate)
+    -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
     WITH v.version AS versionname, candidate AS candidate
-    MATCH (version:${graphConsts.NODE_VERSION} {name: versionname})
+    OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: versionname})
     -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
     WITH COLLECT(skill.Name) as skills1, candidate AS candidate
     MATCH (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
