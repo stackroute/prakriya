@@ -16,6 +16,7 @@ import app from '../../styles/app.json';
 import IconButton from 'material-ui/IconButton';
 import DownloadProfile from './DownloadProfile.jsx';
 import {lightBlack} from 'material-ui/styles/colors';
+import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 
 const styles = {
 	filterBody: {
@@ -90,7 +91,6 @@ export default class Candidates extends React.Component {
 		this.resetFilters = this.resetFilters.bind(this);
 		this.setPage = this.setPage.bind(this);
 		this.getRole = this.getRole.bind(this);
-		this.getProfilePic = this.getProfilePic.bind(this);
 	}
 
 	componentWillMount() {
@@ -122,42 +122,6 @@ export default class Candidates extends React.Component {
         console.log('Billability', res.body);
       }
     })
-	}
-
-	getProfilePic(emp) {
-		let th = this;
-		emp.map(function(employee){
-			let eid = employee.EmployeeID
-			Request
-				.get(`/dashboard/getimage?eid=${eid}`)
-				.set({'Authorization': localStorage.getItem('token')})
-				.query({q: eid})
-				.end(function(err, res) {
-					if(err) {
-						let blobUrl = '../../assets/images/avt-default.jpg'
-						let imageURL = th.state.imageURL;
-						imageURL.push(blobUrl);
-						th.setState({
-							imageURL: imageURL
-						})
-					} else {
-			    	if(res.text) {
-			    		let array = new Uint8Array(res.text.length);
-			        for (var i = 0; i < res.text.length; i++){
-			            array[i] = res.text.charCodeAt(i);
-			        }
-			        var blob = new Blob([array], {type: 'image/jpeg'});
-				    	let blobUrl = URL.createObjectURL(blob);
-							console.log(blobUrl);
-							let imageURL = th.state.imageURL;
-							imageURL.push(blobUrl);
-				    	th.setState({
-				    		imageURL: imageURL
-				    	})
-			    	}
-			    }
-				})
-		})
 	}
 
 	addFilter(key, value) {
@@ -244,7 +208,6 @@ export default class Candidates extends React.Component {
 						filteredCandidates: cadets
 		    	});
 					th.setPage(th.state.currentPage);
-					th.getProfilePic(cadets);
 		    }
 		  })
 	}
@@ -430,18 +393,17 @@ export default class Candidates extends React.Component {
 			<div>
 				{
 					th.state.filteredCandidates != undefined &&
-					<span>
-						Download All Profiles:
-						<IconButton tooltip="Download Profile">
-							<DownloadProfile
-								color={lightBlack}
-								candidate={this.state.filteredCandidates}
-								role={this.props.role}
-								zip={true}
-								imageURL={th.state.imageURL}
-							/>
-						</IconButton>
-					</span>
+					<span>Download All Profiles:<IconButton
+						tooltip="Download Profile"
+					>
+						<DownloadProfile
+							color={lightBlack}
+							candidate={th.state.filteredCandidates}
+							imageURL={null}
+							role={this.state.role}
+							zip = {true}
+						/>
+					</IconButton></span>
 				}
 			<AddCandidate addCandidate={this.addCandidate}/>
 			{

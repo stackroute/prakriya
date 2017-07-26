@@ -9,6 +9,7 @@ const adminMongoController = require('../admin/adminMongoController.js');
 const email = require('./../email');
 let auth = require('../auth')();
 let CONFIG = require('../../config');
+var base64Img = require('base64-img');
 
 /** **************************************************
 *******          Notification System         ********
@@ -692,6 +693,7 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function (req, res) 
   });
 });
 
+/*
 router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
     logger.debug('Req in getImage', req.query.eid);
@@ -699,7 +701,7 @@ router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
       if(err) {
         res.status(500).json({error: 'No image is available...!'});
       } else {
-res.send(data);
+        res.send(data);
 }
     });
   } catch(err) {
@@ -708,6 +710,25 @@ res.send(data);
     });
   }
 });
+*/
+
+router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try {
+    logger.debug('Req in getImage', req.query.eid);
+    base64Img.base64('public/profilePics/' + req.query.eid + '.jpeg', function (err, data) {
+      if(err) {
+        res.status(500).json({error: 'No image is available...!'});
+      } else {
+        res.send(data);
+      }
+    });
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+  });
 
 
 /** **************************************************
