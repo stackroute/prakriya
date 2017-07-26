@@ -1477,6 +1477,42 @@ let deleteSession = function(waveObj, waveString, successCB, errorCB) {
   });
 }
 
+/**********************************************
+************ Evaluation ***********************
+**********************************************/
+
+// Get evaluation skills
+let getEvaluationSkills = function(candidateID, successCB, errorCB) {
+  let query = `
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: '${candidateID}'})
+    WITH candidate AS candidate
+    MATCH (candidate) -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
+    WITH v.version AS versionname, candidate AS candidate
+    MATCH (version:${graphConsts.NODE_VERSION} {name: versionname})
+    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    WITH COLLECT(skill.Name) as skills1, candidate AS candidate
+    MATCH (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
+    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
+    WITH skills1 AS skills1, course AS course
+    MATCH (course) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    WITH COLLECT(skill.Name) AS skills2, skills1
+    WITH skills1 + skills2 AS skills
+    UNWIND skills AS skill
+    WITH COLLECT (DISTINCT skill) AS skillset
+    RETURN skillset
+    `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      logger.debug(resultObj);
+      successCB(resultObj.records[0]._fields[0]);
+    } else {
+      errorCB('getEvaluationSkills: Error');
+    }
+  });
+};
+
 module.exports = {
       addCadet,
       updateCadet,
@@ -1523,5 +1559,6 @@ module.exports = {
       updateSession,
       deleteSession,
       getCourseForWave,
-      removeCadetFromWave
+      removeCadetFromWave,
+      getEvaluationSkills
   }
