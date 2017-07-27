@@ -1,11 +1,13 @@
 import React from 'react';
 import WaveDetails from './WaveDetails.jsx';
-import PieChart from "react-svg-piechart";
 import Request from 'superagent';
 import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import {CSVLink, CSVDownload} from 'react-csv';
 import FileDrop from './FileDrop.jsx';
+import NVD3Chart from 'react-nvd3';
 
 const styles = {
   button: {
@@ -13,22 +15,34 @@ const styles = {
   }
 }
 
+const file_types = [
+  'ZCOP',
+  'ERD',
+  'Digi-Thon'
+]
+
 export default class WiproAdmin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       files: {
-        ZCOP: {},
-        ERD: {}
+        SRC: {},
+        REPORT: {}
       },
+      file: '',
       csvData: [],
       disableMerge: true,
       expandedSector: '',
       billableCount: 0,
       supportCount: 0,
       nonbillableCount: 0,
-      FreeCount: 0
+      FreeCount: 0,
+      bcadets: [],
+      nbCadets: [],
+      fCadets: [],
+      sCadets: []
     }
+    this.handleFileChange = this.handleFileChange.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
     this.handleMerge = this.handleMerge.bind(this);
     this.handleDownload = this.handleDownload.bind(this);
@@ -45,30 +59,39 @@ export default class WiproAdmin extends React.Component {
     this.getBillabilityFree();
   }
 
+  handleFileChange(event, key, val) {
+    console.log('File selected', val)
+    this.setState({
+      file: val
+    })
+  }
+
   handleDrop(acc, rej, type) {
     let files = this.state.files;
-    files[type] = acc[0];
+    if(type == 'REPORT') {
+      files[type] = acc[0];
+    }
+    else {
+      files['SRC'] = acc[0];
+    }
+    console.log('Files', files)
     this.setState({
       files: files
     })
-    if(Object.keys(this.state.files.ZCOP).length > 0 && Object.keys(this.state.files.ERD).length > 0) {
-      this.setState({
-        disableMerge: false
-      })
-    }
   }
 
   handleMerge() {
     let th = this;
     Request
-      .post('/upload/merge')
+      .post('/upload/merge?file='+th.state.file)
       .set({'Authorization': localStorage.getItem('token')})
-      .attach('zcop', this.state.files.ZCOP)
-      .attach('erd', this.state.files.ERD)
+      .attach('src', this.state.files.SRC)
+      .attach('report', this.state.files.REPORT)
       .end(function(err, res) {
         if(err)
           console.log(err);
         else {
+          console.log('File data', res.body)
           th.setState({
             csvData: res.body
           })
@@ -89,7 +112,10 @@ export default class WiproAdmin extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({billableCount: res.body})
+        th.setState({
+          bcadets:res.body,
+          billableCount: res.body.length
+        })
       }
     })
   }
@@ -100,7 +126,10 @@ export default class WiproAdmin extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({nonbillableCount: res.body})
+        th.setState({
+          nonbillableCount: res.body.length,
+          nbCadets: res.body
+        })
       }
     })
   }
@@ -111,7 +140,10 @@ export default class WiproAdmin extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({FreeCount: res.body})
+        th.setState({
+          FreeCount: res.body.length,
+        fCadets: res.body
+        })
       }
     })
   }
@@ -121,89 +153,76 @@ export default class WiproAdmin extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({supportCount: res.body})
+        th.setState({
+          supportCount: res.body.length,
+          sCadets: res.body
+        })
       }
     })
   }
   render() {
     console.log(this.state.billableCount,"billableCount")
+    console.log(this.state.nonbillableCount,"nbc")
+    console.log(this.state.FreeCount,"fCount")
+    console.log(this.state.supportCount,"sCount")
+
     const data = [
       {
-        label: "Billable",
+        label: 'Billability',
         value: this.state.billableCount,
-        color: "#F9CB40"
+        color: "#F9CB40",
+        members: this.state.bcadets
       }, {
         label: "Non-billable",
         value: this.state.nonbillableCount,
-        color: "#FF715B"
+        color: "#FF715B",
+        members: this.state.nbCadets
       }, {
         label: "Free",
         value: this.state.FreeCount,
-        color: "#BCED09"
+        color: "#BCED09",
+        members: this.state.fCadets
       }, {
         label: "Support",
         value: this.state.supportCount,
-        color: "#2F52E0"
+        color: "#2F52E0",
+        members: this.state.sCadets
       }
     ]
-
-    const csvData =[
-      ['firstname', 'lastname', 'email'] ,
-      ['Gajendra', 'Singh' , 'gajsa@gmail.com']
-    ];
 
     return (
       <div>
         <Grid>
           <Row>
-            <Col md={6}>
-              <WaveDetails/>
-              <h2>Billability status</h2>
-              <PieChart 
-                data={data} 
-                expandedSector={this.state.expandedSector} 
-                onSectorHover={this.handleMouseEnterOnSector} 
-                sectorStrokeWidth={2} 
-                expandOnHover={true}
-              /> 
-              {
-                data.map((element, i) => (
-                  <div key={i}>
-                    <span style={{
-                      backgroundColor: element.color,
-                      height: '16px',
-                      width: '16px',
-                      display: 'inline-block'
-                    }}></span>
-                    <span style={{
-                      fontWeight: this.state.expandedSector === i
-                        ? "bold"
-                        : null
-                    }}>
-                      &nbsp;&nbsp;{element.label}
-                      : {element.value}
-                    </span>
-
-                  </div>
-                ))
-              }
+            <Col md={5}>
+              <NVD3Chart id="pieChart" type="pieChart"  tooltip={{enabled:true}}   datum={data} x="label" y="value" width="500" height="500" />
             </Col>
-            <Col md={3}>
-              <FileDrop type="ZCOP" handleDrop={this.handleDrop} />
-              <br/>
+            <Col md={3} mdOffset={1}>
+              <SelectField
+                value={this.state.file}
+                onChange={this.handleFileChange}
+                floatingLabelText="Select File"
+              >
+                {
+                  file_types.map(function (file, key) {
+                    return <MenuItem key={key} value={file} primaryText={file} />
+                  })
+                }
+              </SelectField>
               <RaisedButton
                 label="Merge"
                 primary={true}
-                style={styles.button}
                 onClick={this.handleMerge}
               />
-            </Col>
-            <Col md={3}>
-              <FileDrop type="ERD" handleDrop={this.handleDrop} />
               <br/>
-              <CSVLink data={this.state.csvData} filename="da_db.xlsx">
+              <CSVLink data={this.state.csvData} filename="da_db.xlsx" style={styles.button}>
                 Download
               </CSVLink>
+            </Col>
+            <Col md={3}>
+              <FileDrop type={this.state.file} handleDrop={this.handleDrop} />
+              <br/>
+              <FileDrop type="REPORT" handleDrop={this.handleDrop} />
             </Col>
           </Row>
         </Grid>
