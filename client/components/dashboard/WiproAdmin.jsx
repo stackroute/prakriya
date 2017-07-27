@@ -195,6 +195,8 @@ export default class WiproAdmin extends React.Component {
         <Grid>
           <Row>
             <Col md={5}>
+              <WaveDetails/>
+              <h2>Billability status</h2>
               <NVD3Chart id="pieChart" type="pieChart"  tooltip={{enabled:true}}   datum={data} x="label" y="value" width="500" height="500" />
             </Col>
             <Col md={3} mdOffset={1}>

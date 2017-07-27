@@ -343,24 +343,21 @@ export default class Candidates extends React.Component {
 	// fetching filtered candidates from db
 	getFilteredCandidates() {
 		let th = this;
-		// let filterQuery = th.state.filtersCount > 0 ? {'$or': th.state.appliedFilters} : {};
-		// if(this.state.filtersCount > 0) {
-			Request
-				.post('/dashboard/filteredcandidates')
-				.set({'Authorization': localStorage.getItem('token')})
-				.send({'filterQuery': this.state.appliedFilters})
-				.end(function(err, res) {
-					if(err)
-			    	console.log(err);
-			    else {
-						th.setState({
-							filteredCandidates: res.body
-						});
-						th.setPage(th.state.currentPage)
-			    }
-				})
-		// }
-
+		Request
+			.post('/dashboard/filteredcandidates')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({'filterQuery': this.state.appliedFilters})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+					th.setState({
+						filteredCandidates: res.body
+					});
+					// th.setPage(th.state.currentPage)
+					th.setPage(1)
+		    }
+			})
 	}
 
 	resetFilters() {
