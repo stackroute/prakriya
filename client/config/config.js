@@ -66,7 +66,60 @@ const feedback = {
   ]
 };
 
+const evaluation = [
+	{
+		type: "programming",
+		options: [
+			"Ability to understand requirements during the last 12 weeks",
+			"Ability to translate requirements into an implementation",
+			"Problem solving ability (think, evaluate and choose among alternates, and innovation/creativity)",
+			"Debugging / troubleshooting skills",
+			"Quality of UX thinking demonstrated"
+		]
+	},
+	{
+		type: "code quality",
+		options: [
+			"Writes clean, well commented code",
+			"Effort made to optimize code",
+			"Code documentation, structure and maintainability",
+			"Defensive code focus – understands validations, handles negative scenarios"
+		]
+	},
+	{
+		type: "testability",
+		options: [
+			"Thinks and understand testing – has the “what-if” focus",
+			"Writing automated test cases for server side code",
+			"Writing automated test cases for client side code"
+		]
+	},
+	{
+		type: "engineering culture",
+		options: [
+			"Stand-up readiness – preparation and participation",
+			"Understands agile process",
+			"Understands agile thinking – takes ownership of requirements",
+			"Timeliness (meeting task timelines)",
+			"Devops understanding – CI processes"
+		]
+	},
+	{
+		type: "skills",
+		options: []
+	},
+	{
+		type: "communication",
+		options: [
+			"Presentation Skills",
+			"Confidence in communication",
+			"Leadership/Taking Initiative"
+		]
+	}
+];
+
 const config = {
+  EVALUATION: evaluation,
   FEEDBACK: feedback,
 	MODES: modes,
   LOCATIONS: locations

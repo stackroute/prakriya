@@ -1,6 +1,5 @@
 import React from 'react';
 import WaveDetails from './WaveDetails.jsx';
-import PieChart from "react-svg-piechart";
 import Request from 'superagent';
 import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
@@ -8,6 +7,7 @@ import MenuItem from 'material-ui/MenuItem';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import {CSVLink, CSVDownload} from 'react-csv';
 import FileDrop from './FileDrop.jsx';
+import NVD3Chart from 'react-nvd3';
 
 const styles = {
   button: {
@@ -36,7 +36,11 @@ export default class WiproAdmin extends React.Component {
       billableCount: 0,
       supportCount: 0,
       nonbillableCount: 0,
-      FreeCount: 0
+      FreeCount: 0,
+      bcadets: [],
+      nbCadets: [],
+      fCadets: [],
+      sCadets: []
     }
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
@@ -108,7 +112,10 @@ export default class WiproAdmin extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({billableCount: res.body})
+        th.setState({
+          bcadets:res.body,
+          billableCount: res.body.length
+        })
       }
     })
   }
@@ -119,7 +126,10 @@ export default class WiproAdmin extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({nonbillableCount: res.body})
+        th.setState({
+          nonbillableCount: res.body.length,
+          nbCadets: res.body
+        })
       }
     })
   }
@@ -130,7 +140,10 @@ export default class WiproAdmin extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({FreeCount: res.body})
+        th.setState({
+          FreeCount: res.body.length,
+        fCadets: res.body
+        })
       }
     })
   }
@@ -140,29 +153,40 @@ export default class WiproAdmin extends React.Component {
       if (err)
         console.log(err);
       else {
-        th.setState({supportCount: res.body})
+        th.setState({
+          supportCount: res.body.length,
+          sCadets: res.body
+        })
       }
     })
   }
   render() {
     console.log(this.state.billableCount,"billableCount")
+    console.log(this.state.nonbillableCount,"nbc")
+    console.log(this.state.FreeCount,"fCount")
+    console.log(this.state.supportCount,"sCount")
+
     const data = [
       {
-        label: "Billable",
+        label: 'Billability',
         value: this.state.billableCount,
-        color: "#F9CB40"
+        color: "#F9CB40",
+        members: this.state.bcadets
       }, {
         label: "Non-billable",
         value: this.state.nonbillableCount,
-        color: "#FF715B"
+        color: "#FF715B",
+        members: this.state.nbCadets
       }, {
         label: "Free",
         value: this.state.FreeCount,
-        color: "#BCED09"
+        color: "#BCED09",
+        members: this.state.fCadets
       }, {
         label: "Support",
         value: this.state.supportCount,
-        color: "#2F52E0"
+        color: "#2F52E0",
+        members: this.state.sCadets
       }
     ]
 
@@ -170,40 +194,10 @@ export default class WiproAdmin extends React.Component {
       <div>
         <Grid>
           <Row>
-            <Col md={6}>
-              <WaveDetails/>
-              <h2>Billability status</h2>
-              <PieChart 
-                data={data} 
-                expandedSector={this.state.expandedSector} 
-                onSectorHover={this.handleMouseEnterOnSector} 
-                sectorStrokeWidth={2} 
-                expandOnHover={true}
-                viewBoxWidth={300}
-              /> 
-              {
-                data.map((element, i) => (
-                  <div key={i}>
-                    <span style={{
-                      backgroundColor: element.color,
-                      height: '16px',
-                      width: '16px',
-                      display: 'inline-block'
-                    }}></span>
-                    <span style={{
-                      fontWeight: this.state.expandedSector === i
-                        ? "bold"
-                        : null
-                    }}>
-                      &nbsp;&nbsp;{element.label}
-                      : {element.value}
-                    </span>
-
-                  </div>
-                ))
-              }
+            <Col md={5}>
+              <NVD3Chart id="pieChart" type="pieChart"  tooltip={{enabled:true}}   datum={data} x="label" y="value" width="500" height="500" />
             </Col>
-            <Col md={3}>
+            <Col md={3} mdOffset={1}>
               <SelectField
                 value={this.state.file}
                 onChange={this.handleFileChange}

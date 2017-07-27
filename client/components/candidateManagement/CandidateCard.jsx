@@ -68,7 +68,7 @@ export default class CandidateCard extends React.Component {
 		        let blob = new Blob([array], {type: 'image/jpeg'});
 			    	let blobUrl = URL.createObjectURL(blob);
 			    	th.setState({
-			    		imageURL: blobUrl
+			    		imageURL: res.text
 			    	})
 		    	}
 		    }

@@ -9,6 +9,7 @@ const adminMongoController = require('../admin/adminMongoController.js');
 const email = require('./../email');
 let auth = require('../auth')();
 let CONFIG = require('../../config');
+var base64Img = require('base64-img');
 
 /** **************************************************
 *******          Notification System         ********
@@ -692,6 +693,7 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function (req, res) 
   });
 });
 
+/*
 router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
     logger.debug('Req in getImage', req.query.eid);
@@ -699,7 +701,7 @@ router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
       if(err) {
         res.status(500).json({error: 'No image is available...!'});
       } else {
-res.send(data);
+        res.send(data);
 }
     });
   } catch(err) {
@@ -708,6 +710,25 @@ res.send(data);
     });
   }
 });
+*/
+
+router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try {
+    logger.debug('Req in getImage', req.query.eid);
+    base64Img.base64('public/profilePics/' + req.query.eid + '.jpeg', function (err, data) {
+      if(err) {
+        res.status(500).json({error: 'No image is available...!'});
+      } else {
+        res.send(data);
+      }
+    });
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+  });
 
 
 /** **************************************************
@@ -1468,6 +1489,47 @@ router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
     });
   } catch(err) {
     logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+//remove cadets from wave
+router.post('/removeCadetFromWave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+  try {
+    console.log(req.body.cadets)
+    console.log(req.body.waveID)
+    dashboardNeo4jController.removeCadetFromWave(req.body.cadets,req.body.waveID ,function (status) {
+      logger.info('Status: ', status);
+      res.status(201).json(status);
+    }, function (sessionerr) {
+      logger.error('err in delete cadet in wave', sessionerr);
+      res.status(500).json({error: 'Cannot delete cadet in wave...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+/**********************************************
+************ Evaluation ***********************
+**********************************************/
+
+// Get evaluation skills for a given candidateID
+router.get('/evaluationfields', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    dashboardNeo4jController.getEvaluationSkills(req.query.candidateID, function (evaluationSkills) {
+      res.status(201).json(evaluationSkills);
+    }, function (err) {
+      logger.error('Get EvaluationSkills Error: ', err);
+      res.status(500).json({error: 'Cannot get evaluation skills for this candidate from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get EvaluationSkills Error', err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });

@@ -47,6 +47,7 @@ export default class AddCourse extends React.Component {
       NameErrorText: '',
       ModeErrorText: '',
       DurationErrorText: '',
+      SkillsErrorText: '',
       Skills: [],
       SkillName: '',
       disableSave: true
@@ -69,37 +70,37 @@ export default class AddCourse extends React.Component {
 
   componentWillMount() {
     if (this.props.openDialog) {
-      this.setState({showDialog: true, Name: this.props.course.Name, Mode: this.props.course.Mode, Duration: this.props.course.Duration.low, Skills: this.props.course.Skills})
+      this.setState({showDialog: true, Name: this.props.course.Name, Mode: this.props.course.Mode, Duration: this.props.course.Duration.low, Skills: this.props.course.Skills});
     }
   }
 
   onChangeName(e) {
-    this.setState({Name: e.target.value, NameErrorText: ''})
+    this.setState({Name: e.target.value, NameErrorText: ''});
   }
 
   onChangeMode(e, key, value) {
     console.log('mode e: ', value)
-    this.setState({Mode: value, ModeErrorText: ''})
+    this.setState({Mode: value, ModeErrorText: ''});
   }
 
   onChangeDuration(e) {
-    this.setState({Duration: e.target.value, DurationErrorText: ''})
+    this.setState({Duration: e.target.value, DurationErrorText: ''});
   }
 
   handleSkillChange(e) {
-    this.setState({SkillName: e.target.value, disableSave: false})
+    this.setState({SkillName: e.target.value, disableSave: false, SkillsErrorText: ''});
   }
 
   onAddSkill() {
     if (this.state.SkillName.trim().length != 0) {
-      let skill = this.state.Skills
-      skill.push(this.state.SkillName)
-      this.setState({Skills: skill, SkillName: '', disableSave: true})
+      let skill = this.state.Skills;
+      skill.push(this.state.SkillName);
+      this.setState({Skills: skill, SkillName: '', disableSave: true, SkillsErrorText: ''});
     }
   }
 
   handleOpen() {
-    this.setState({showDialog: true})
+    this.setState({showDialog: true});
   }
 
   handleClose(e, action) {
@@ -143,7 +144,8 @@ export default class AddCourse extends React.Component {
       SkillName: '',
       NameErrorText: '',
       ModeErrorText: '',
-      DurationErrorText: ''
+      DurationErrorText: '',
+      SkillsErrorText: ''
     })
   }
 
@@ -191,6 +193,8 @@ export default class AddCourse extends React.Component {
       this.setState({DurationErrorText: 'This field cannot be empty.'})
     } else if (!durationPattern.test(this.state.Duration)) {
       this.setState({DurationErrorText: 'Invalid input! Enter the number of weeks.'})
+    } else if (this.state.Skills.length == 0) {
+      this.setState({SkillsErrorText: 'Skillset cannot be empty. Add atleast one skill.'})
     } else {
       return true
     }
@@ -242,7 +246,7 @@ export default class AddCourse extends React.Component {
           <FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen}>
             <ContentAdd/>
           </FloatingActionButton>
-          <Dialog bodyStyle={dialog.body} title={title} titleStyle={dialog.title} actionsContainerStyle={dialog.actionsContainer} open={this.state.showDialog} autoScrollBodyContent={true} onRequestClose={() => this.handleClose('CLOSE')} actions={actions}>
+          <Dialog bodyStyle={dialog.body} title={title} titleStyle={dialog.title} actionsContainerStyle={dialog.actionsContainer} open={this.state.showDialog} autoScrollBodyContent={true} actions={actions}>
             <div>
               <div style={dialog.box100}>
                 <TextField style={{
@@ -272,7 +276,7 @@ export default class AddCourse extends React.Component {
             </div>
             <div>
               <div style={dialog.box100}>
-                <TextField hintText="Skils" floatingLabelText="Skills" value={this.state.SkillName} onChange={this.handleSkillChange}/>
+                <TextField hintText="Skills" floatingLabelText="Skills *" floatingLabelStyle={app.mandatoryField} value={this.state.SkillName} onChange={this.handleSkillChange} errorText={this.state.SkillsErrorText}/>
                 <IconButton tooltip="Add Skill" onClick={this.onAddSkill} disabled={this.state.disableSave}>
                   <AddIcon/>
                 </IconButton>
