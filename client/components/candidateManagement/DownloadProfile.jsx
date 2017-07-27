@@ -1,8 +1,11 @@
 import React from 'react';
 import jsPDF from 'jspdf';
 import DownloadIcon from 'material-ui/svg-icons/file/file-download';
+import JSZip from 'jszip';
+import FileSaver from 'file-saver';
 import Request from 'superagent';
 
+let zip = new JSZip();
 let imageURL = '';
 
 export default class DownloadProfile extends React.Component {
@@ -84,7 +87,18 @@ export default class DownloadProfile extends React.Component {
 		if(this.props.role === 'wiproadmin') {
 			doc.text(x, y+=10, 'Billability: ' + candidate.Billability+'')
 		}
-		doc.save(candidate.EmployeeID + '.pdf');
+		if(this.props.zip) {
+			zip.file(candidate.EmployeeID + '.pdf', doc.output('blob'));
+			if(index === this.props.candidate.length-1) {
+				zip.generateAsync({ type: "blob" })
+				 .then(function (content) {
+					 FileSaver.saveAs(content, "cadetProfiles.zip");
+				 });
+			}
+		}
+		else {
+			doc.save(candidate.EmployeeID + '.pdf')
+		}
 	}
 
 	render() {
