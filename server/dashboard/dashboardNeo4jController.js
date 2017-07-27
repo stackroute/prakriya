@@ -1369,23 +1369,42 @@ let getBillability = function(successCB, errorCB) {
 }
 
 
-//Non Billability
-let getNonBillability = function(successCB, errorCB) {
+//Non Billability Internal
+let getNonBillabilityInternal = function(successCB, errorCB) {
   let session = driver.session();
-  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{Billability:'Non-billable'}) return  n.EmployeeName`;
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{Billability:'Non-billable(Internal)'}) return  n.EmployeeName`;
   session.run(query).then(function(resultObj) {
     session.close();
-    let nbCadets=[]
+    let nbiCadets=[]
     for (let i = 0; i < resultObj.records.length; i++) {
       let result = resultObj.records[i];
-    nbCadets.push(result._fields[0]);
-      console.log(nbCadets);
+    nbiCadets.push(result._fields[0]);
+      console.log(nbiCadets);
     }
-    successCB(nbCadets);
+    successCB(nbiCadets);
   }).catch(function(err) {
     errorCB(err);
   })
 }
+
+//Non Billability Customer
+let getNonBillabilityCustomer = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{Billability:'Non-billable(Customer)'}) return  n.EmployeeName`;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    let nbcCadets=[]
+    for (let i = 0; i < resultObj.records.length; i++) {
+      let result = resultObj.records[i];
+    nbcCadets.push(result._fields[0]);
+      console.log(nbcCadets);
+    }
+    successCB(nbcCadets);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 
 //Support
 let getBillabilitySupport = function(successCB, errorCB) {
@@ -1577,7 +1596,8 @@ module.exports = {
       getCadetsAndWave,
       getBillability,
       getBillabilitySupport,
-      getNonBillability,
+      getNonBillabilityCustomer,
+      getNonBillabilityInternal,
       getBillabilityFree,
       allBillability,
       getCadetProject,

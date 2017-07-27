@@ -1414,10 +1414,25 @@ router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
   }
 });
 
-router.get('/nonbillable', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/nonbillableInternal', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardNeo4jController.getNonBillability(function (nonbillable) {
-      res.status(201).json(nonbillable);
+    dashboardNeo4jController.getNonBillabilityInternal(function (nonbillableInternal) {
+      res.status(201).json(nonbillableInternal);
+    }, function (err) {
+      logger.error('Get All non-billable Error: ', err);
+      res.status(500).json({error: 'Cannot get all non-billable count from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get All non-billable Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+router.get('/nonbillableCustomer', auth.canAccess(CONFIG.ALL), function (req, res) {
+  try{
+    dashboardNeo4jController.getNonBillabilityCustomer(function (nonbillableCustomer) {
+      res.status(201).json(nonbillableCustomer);
     }, function (err) {
       logger.error('Get All non-billable Error: ', err);
       res.status(500).json({error: 'Cannot get all non-billable count from db...!'});

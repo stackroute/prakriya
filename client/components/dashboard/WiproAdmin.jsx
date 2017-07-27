@@ -29,7 +29,8 @@ export default class WiproAdmin extends React.Component {
       nonbillableCount: 0,
       FreeCount: 0,
       bcadets: [],
-      nbCadets: [],
+      nbiCadets: [],
+      nbcCadets: [],
       fCadets: [],
       sCadets: []
     }
@@ -38,13 +39,15 @@ export default class WiproAdmin extends React.Component {
     this.handleDownload = this.handleDownload.bind(this);
     this.handleMouseEnterOnSector = this.handleMouseEnterOnSector.bind(this);
     this.getBillability = this.getBillability.bind(this);
-    this.getNonBillability = this.getNonBillability.bind(this);
+    this.getNonBillabilityInternal = this.getNonBillabilityInternal.bind(this);
+  this.getNonBillabilityCustomer = this.getNonBillabilityCustomer.bind(this);
     this.getBillabilitySupport = this.getBillabilitySupport.bind(this);
     this.getBillabilityFree = this.getBillabilityFree.bind(this)
   }
   componentWillMount() {
     this.getBillability();
-    this.getNonBillability();
+    this.getNonBillabilityInternal();
+    this.getNonBillabilityCustomer();
     this.getBillabilitySupport();
     this.getBillabilityFree();
   }
@@ -100,21 +103,36 @@ export default class WiproAdmin extends React.Component {
       }
     })
   }
-  getNonBillability() {
-    console.log("getnonBillability")
+  getNonBillabilityInternal() {
+    console.log("getNonBillabilityInternal")
     let th = this;
-    Request.get('/dashboard/nonbillable').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get('/dashboard/nonbillableInternal').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
         th.setState({
-          nonbillableCount: res.body.length,
+          nonbillableInternalCount: res.body.length,
           nbCadets: res.body
         })
+        console.log(th.state.nbiCadets)
       }
     })
   }
-
+  getNonBillabilityCustomer() {
+    console.log("getNonBillabilityCustomer")
+    let th = this;
+    Request.get('/dashboard/nonbillableCustomer').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({
+          nonbillableCustomerCount: res.body.length,
+          nbcCadets: res.body
+        })
+        console.log(th.state.nbcCadets)
+      }
+    })
+  }
   getBillabilityFree() {
     let th = this;
     Request.get('/dashboard/free').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
@@ -142,34 +160,44 @@ export default class WiproAdmin extends React.Component {
     })
   }
   render() {
-    console.log(this.state.billableCount,"billableCount")
-    console.log(this.state.nonbillableCount,"nbc")
-    console.log(this.state.FreeCount,"fCount")
-    console.log(this.state.supportCount,"sCount")
+    let th = this;
+  console.log(this.state.billableCount,"billableCount")
+  console.log(this.state.nonbillableInternalCount,"nbic")
+  console.log(this.state.nonbillableCustomerCount,"nbcc")
+  console.log(this.state.FreeCount,"fCount")
+  console.log(this.state.supportCount,"sCount")
 
-    const data = [
-      {
-        label: 'Billability',
-        value: this.state.billableCount,
-        color: "#F9CB40",
-        members: this.state.bcadets
-      }, {
-        label: "Non-billable",
-        value: this.state.nonbillableCount,
-        color: "#FF715B",
-        members: this.state.nbCadets
-      }, {
-        label: "Free",
-        value: this.state.FreeCount,
-        color: "#BCED09",
-        members: this.state.fCadets
-      }, {
-        label: "Support",
-        value: this.state.supportCount,
-        color: "#2F52E0",
-        members: this.state.sCadets
-      }
-    ]
+  const data = [
+    {
+      label: 'Billability',
+      value: this.state.billableCount,
+      color: "#F9CB40",
+      members: this.state.bcadets
+    }, {
+      label: "Non-billable(Internal)",
+      value: this.state.nonbillableInternalCount,
+      color: "#FF715B",
+      members: this.state.nbiCadets
+    },
+    {
+      label: "Non-billable(Customer)",
+      value: this.state.nonbillableCustomerCount,
+      color: "#06D6A0",
+      members: this.state.nbcCadets
+    },
+     {
+      label: "Free",
+      value: this.state.FreeCount,
+      color: "#BCED09",
+      members: this.state.fCadets
+    }, {
+      label: "Support",
+      value: this.state.supportCount,
+      color: "#2F52E0",
+      members: this.state.sCadets
+    }
+  ]
+
 
     const csvData =[
       ['firstname', 'lastname', 'email'] ,
@@ -180,8 +208,8 @@ export default class WiproAdmin extends React.Component {
       <div>
         <Grid>
           <Row>
-          <Col md={5}>
-<NVD3Chart id="pieChart" type="pieChart"  tooltip={{enabled:true}}   datum={data} x="label" y="value" width="500" height="500" />
+          <Col md={6}>
+<NVD3Chart id="pieChart" type="pieChart"  tooltip={{enabled:true}}   datum={data} x="label" y="value" width="550" height="600" />
           </Col>
 
             <Col md={3}>
