@@ -214,7 +214,12 @@ export default class Candidates extends React.Component {
 		// 	});
 		// 	appliedFilters[index][key].$in = $in
 		// }
-		appliedFilters[key] = '';
+		if(key == 'Skills' || key == 'Billability') {
+			appliedFilters[key] = [];
+		}
+		else {
+			appliedFilters[key] = '';
+		}
 		this.setState({
 			filtersCount: th.state.filtersCount - 1,
 			appliedFilters: appliedFilters
@@ -404,9 +409,10 @@ export default class Candidates extends React.Component {
 				EmployeeName: '',
 				DigiThonQualified: '',
 				DigiThonPhase: '',
-				Wave: [],
 				DigiThonScore: '',
-				Billability: ''
+				Skills: [],
+				Wave: '',
+				Billability: []
 			},
 			filteredCandidates: th.state.candidates,
 			displayCandidates: th.state.candidates.slice(0, 3)

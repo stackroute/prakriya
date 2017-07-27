@@ -3,6 +3,8 @@ import WaveDetails from './WaveDetails.jsx';
 import PieChart from "react-svg-piechart";
 import Request from 'superagent';
 import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import {CSVLink, CSVDownload} from 'react-csv';
 import FileDrop from './FileDrop.jsx';
@@ -13,14 +15,21 @@ const styles = {
   }
 }
 
+const file_types = [
+  'ZCOP',
+  'ERD',
+  'Digi-Thon'
+]
+
 export default class WiproAdmin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       files: {
-        ZCOP: {},
-        ERD: {}
+        SRC: {},
+        REPORT: {}
       },
+      file: '',
       csvData: [],
       disableMerge: true,
       expandedSector: '',
@@ -29,6 +38,7 @@ export default class WiproAdmin extends React.Component {
       nonbillableCount: 0,
       FreeCount: 0
     }
+    this.handleFileChange = this.handleFileChange.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
     this.handleMerge = this.handleMerge.bind(this);
     this.handleDownload = this.handleDownload.bind(this);
@@ -45,30 +55,39 @@ export default class WiproAdmin extends React.Component {
     this.getBillabilityFree();
   }
 
+  handleFileChange(event, key, val) {
+    console.log('File selected', val)
+    this.setState({
+      file: val
+    })
+  }
+
   handleDrop(acc, rej, type) {
     let files = this.state.files;
-    files[type] = acc[0];
+    if(type == 'REPORT') {
+      files[type] = acc[0];
+    }
+    else {
+      files['SRC'] = acc[0];
+    }
+    console.log('Files', files)
     this.setState({
       files: files
     })
-    if(Object.keys(this.state.files.ZCOP).length > 0 && Object.keys(this.state.files.ERD).length > 0) {
-      this.setState({
-        disableMerge: false
-      })
-    }
   }
 
   handleMerge() {
     let th = this;
     Request
-      .post('/upload/merge')
+      .post('/upload/merge?file='+th.state.file)
       .set({'Authorization': localStorage.getItem('token')})
-      .attach('zcop', this.state.files.ZCOP)
-      .attach('erd', this.state.files.ERD)
+      .attach('src', this.state.files.SRC)
+      .attach('report', this.state.files.REPORT)
       .end(function(err, res) {
         if(err)
           console.log(err);
         else {
+          console.log('File data', res.body)
           th.setState({
             csvData: res.body
           })
@@ -147,11 +166,6 @@ export default class WiproAdmin extends React.Component {
       }
     ]
 
-    const csvData =[
-      ['firstname', 'lastname', 'email'] ,
-      ['Gajendra', 'Singh' , 'gajsa@gmail.com']
-    ];
-
     return (
       <div>
         <Grid>
@@ -165,6 +179,7 @@ export default class WiproAdmin extends React.Component {
                 onSectorHover={this.handleMouseEnterOnSector} 
                 sectorStrokeWidth={2} 
                 expandOnHover={true}
+                viewBoxWidth={300}
               /> 
               {
                 data.map((element, i) => (
@@ -189,21 +204,31 @@ export default class WiproAdmin extends React.Component {
               }
             </Col>
             <Col md={3}>
-              <FileDrop type="ZCOP" handleDrop={this.handleDrop} />
-              <br/>
+              <SelectField
+                value={this.state.file}
+                onChange={this.handleFileChange}
+                floatingLabelText="Select File"
+              >
+                {
+                  file_types.map(function (file, key) {
+                    return <MenuItem key={key} value={file} primaryText={file} />
+                  })
+                }
+              </SelectField>
               <RaisedButton
                 label="Merge"
                 primary={true}
-                style={styles.button}
                 onClick={this.handleMerge}
               />
-            </Col>
-            <Col md={3}>
-              <FileDrop type="ERD" handleDrop={this.handleDrop} />
               <br/>
-              <CSVLink data={this.state.csvData} filename="da_db.xlsx">
+              <CSVLink data={this.state.csvData} filename="da_db.xlsx" style={styles.button}>
                 Download
               </CSVLink>
+            </Col>
+            <Col md={3}>
+              <FileDrop type={this.state.file} handleDrop={this.handleDrop} />
+              <br/>
+              <FileDrop type="REPORT" handleDrop={this.handleDrop} />
             </Col>
           </Row>
         </Grid>
