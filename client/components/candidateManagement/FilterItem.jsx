@@ -76,7 +76,8 @@ export default class FilterItem extends React.Component {
 
 	addFilter(value) {
 		this.setState({
-			selectedValue: value
+			selectedValue: value,
+			accordion: 'none'
 		});
 		console.log('Selected Value: ', this.state.selectedValue);
 		this.props.onAddFilter(value);

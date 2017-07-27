@@ -20,7 +20,7 @@ import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 
 const styles = {
 	filterBody: {
-		border: '1px solid #555'
+		border: '1px solid #555',
 	},
 	header: {
 		// backgroundColor: '#eeeeee',
@@ -178,7 +178,12 @@ export default class Candidates extends React.Component {
 		// 	});
 		// 	appliedFilters[index][key].$in = $in
 		// }
-		appliedFilters[key] = '';
+		if(key == 'Skills' || key == 'Billability') {
+			appliedFilters[key] = [];
+		}
+		else {
+			appliedFilters[key] = '';
+		}
 		this.setState({
 			filtersCount: th.state.filtersCount - 1,
 			appliedFilters: appliedFilters
@@ -338,24 +343,21 @@ export default class Candidates extends React.Component {
 	// fetching filtered candidates from db
 	getFilteredCandidates() {
 		let th = this;
-		// let filterQuery = th.state.filtersCount > 0 ? {'$or': th.state.appliedFilters} : {};
-		// if(this.state.filtersCount > 0) {
-			Request
-				.post('/dashboard/filteredcandidates')
-				.set({'Authorization': localStorage.getItem('token')})
-				.send({'filterQuery': this.state.appliedFilters})
-				.end(function(err, res) {
-					if(err)
-			    	console.log(err);
-			    else {
-						th.setState({
-							filteredCandidates: res.body
-						});
-						th.setPage(th.state.currentPage)
-			    }
-				})
-		// }
-
+		Request
+			.post('/dashboard/filteredcandidates')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({'filterQuery': this.state.appliedFilters})
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+					th.setState({
+						filteredCandidates: res.body
+					});
+					// th.setPage(th.state.currentPage)
+					th.setPage(1)
+		    }
+			})
 	}
 
 	resetFilters() {
@@ -367,9 +369,10 @@ export default class Candidates extends React.Component {
 				EmployeeName: '',
 				DigiThonQualified: '',
 				DigiThonPhase: '',
-				Wave: [],
 				DigiThonScore: '',
-				Billability: ''
+				Skills: [],
+				Wave: '',
+				Billability: []
 			},
 			filteredCandidates: th.state.candidates,
 			displayCandidates: th.state.candidates.slice(0, 3)
@@ -405,176 +408,176 @@ export default class Candidates extends React.Component {
 						/>
 					</IconButton></span>
 				}
-			<AddCandidate addCandidate={this.addCandidate}/>
-			{
-				!this.state.showCandidate ?
-				<div>
-					<h1 style={app.heading}>Candidate Management</h1>
-					<Grid>
-						<Row>
-							<Col md={3} style={styles.filterBody}>
-								<div style={styles.header}>
-									<h3 style={styles.name}>... FILTERS ...</h3>
-									<div>
-										<div style={{
-											width: '60%',
-											display: 'inline-block',
-											boxSizing: 'border-box',
-											padding: '2px'
-										}}>
-											Candidates Found: {this.state.filteredCandidates.length}
-										</div>
-										<div
-											style={{
-												cursor: 'pointer',
-												width: '40%',
+				<AddCandidate addCandidate={this.addCandidate}/>
+				{
+					!this.state.showCandidate ?
+					<div>
+						<h1 style={app.heading}>Candidate Management</h1>
+						<Grid>
+							<Row>
+								<Col md={3} style={styles.filterBody}>
+									<div style={styles.header}>
+										<h3 style={styles.name}>... FILTERS ...</h3>
+										<div>
+											<div style={{
+												width: '60%',
 												display: 'inline-block',
-												padding: '2px',
 												boxSizing: 'border-box',
-												textAlign: 'center',
-												borderRadius: '5px',
-												color: 'blue',
-												textDecoration: 'underline'
-											}}
-											onTouchTap={th.resetFilters}
-										>
-											Reset Filters
+												padding: '2px'
+											}}>
+												Candidates Found: {this.state.filteredCandidates.length}
+											</div>
+											<div
+												style={{
+													cursor: 'pointer',
+													width: '40%',
+													display: 'inline-block',
+													padding: '2px',
+													boxSizing: 'border-box',
+													textAlign: 'center',
+													borderRadius: '5px',
+													color: 'blue',
+													textDecoration: 'underline'
+												}}
+												onTouchTap={th.resetFilters}
+											>
+												Reset Filters
+											</div>
 										</div>
 									</div>
-								</div>
-								{
-									<div style={styles.filters}>
 									{
-										Object.keys(this.state.appliedFilters).map(function (filter, index) {
-											let val = '';
-											if(filter == 'Skills' || filter == 'Billability') {
-												th.state.appliedFilters[filter].map(function(item) {
-													val += item + ', ';
-												})
-												val = val.substring(0, val.length-2)
-											}
+										<div style={styles.filters}>
+										{
+											Object.keys(this.state.appliedFilters).map(function (filter, index) {
+												let val = '';
+												if(filter == 'Skills' || filter == 'Billability') {
+													th.state.appliedFilters[filter].map(function(item) {
+														val += item + ', ';
+													})
+													val = val.substring(0, val.length-2)
+												}
 
-											else {
-												val = th.state.appliedFilters[filter];
-											}
-											if(val != '') {
-												return (
-													<Chip
-														key={index}
-														style={{border: '2px solid grey'}}
-														onRequestDelete={()=>th.removeFilter(filter)}
-													>
-														<span style={{color: 'teal'}}>{filter}: {val}</span>
-													</Chip>
+												else {
+													val = th.state.appliedFilters[filter];
+												}
+												if(val != '') {
+													return (
+														<Chip
+															key={index}
+															style={{border: '2px solid grey'}}
+															onRequestDelete={()=>th.removeFilter(filter)}
+														>
+															<span style={{color: 'teal'}}>{filter}: {val}</span>
+														</Chip>
+													)
+												}
+											})
+										}
+										</div>
+									}
+									<hr />
+									<FilterItem
+										title={'EmployeeID'}
+										type={'AutoComplete'}
+										onGetAccordianValues={()=>th.getAccordianValues('EmployeeID')}
+										onAddFilter={(filterValue)=>th.addFilter('EmployeeID', filterValue)}
+										onOpenSnackbar={th.openSnackbar}
+									/>
+									<FilterItem
+										title={'EmployeeName'}
+										type={'AutoComplete'}
+										onGetAccordianValues={()=>th.getAccordianValues('EmployeeName')}
+										onAddFilter={(filterValue)=>th.addFilter('EmployeeName', filterValue)}
+										onOpenSnackbar={th.openSnackbar}
+									/>
+									<FilterItem
+										title={'DigithonQualified'}
+										type={'RadioButton'}
+										onGetAccordianValues={()=>['Yes', 'No']}
+										onAddFilter={(filterValue)=>th.addFilter('DigiThonQualified', filterValue)}
+									/>
+									<FilterItem
+										title={'DigithonPhase'}
+										type={'AutoComplete'}
+										onGetAccordianValues={()=>th.getAccordianValues('DigiThonPhase')}
+										onAddFilter={(filterValue)=>th.addFilter('DigiThonPhase', filterValue)}
+										onOpenSnackbar={th.openSnackbar}
+									/>
+									<FilterItem
+										title={'DigithonScore'}
+										type={'Slider'}
+										onGetAccordianValues={()=>[0, 200]}
+										onAddFilter={(filterValue)=>th.addFilter('DigiThonScore', filterValue)}
+									/>
+									<FilterItem
+										title={'Skills'}
+										type={'AutoComplete'}
+										onGetAccordianValues={()=>th.state.skills}
+										onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
+										onOpenSnackbar={th.openSnackbar}
+									/>
+									<FilterItem
+										title={'Wave'}
+										type={'AutoComplete'}
+										onGetAccordianValues={()=>th.state.waves}
+										onAddFilter={(filterValue)=>th.addFilter('Wave', filterValue)}
+										onOpenSnackbar={th.openSnackbar}
+									/>
+									{th.state.role == 'wiproadmin' &&
+									<FilterItem
+										title={'Billability'}
+										type={'AutoComplete'}
+										onGetAccordianValues={()=>th.state.Billability}
+										onAddFilter={(filterValue)=>th.addFilter('Billability', filterValue)}
+										onOpenSnackbar={th.openSnackbar}
+									/>
+									}
+								</Col>
+								<Col md={9}>
+									{
+										this.state.displayCandidates.map(function(candidate, key) {
+											return (
+														<CandidateCard
+															candidate={candidate}
+															handleCardClick={th.candidateView}
+															handleDelete={th.deleteCandidate}
+															key={key}
+															k={key + th.state.currentPage}
+															role={th.state.role}
+														/>
 												)
-											}
 										})
 									}
-									</div>
-								}
-								<hr />
-								<FilterItem
-									title={'EmployeeID'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('EmployeeID')}
-									onAddFilter={(filterValue)=>th.addFilter('EmployeeID', filterValue)}
-									onOpenSnackbar={th.openSnackbar}
+								</Col>
+							</Row>
+						</Grid>
+						{
+							this.state.filteredCandidates.length > 3 ?
+							<div style={app.pager}>
+								<Pagination
+					          total={
+											this.state.filteredCandidates.length%3>0?
+											parseInt(this.state.filteredCandidates.length/3 + 1):
+											parseInt(this.state.filteredCandidates.length/3)
+										}
+					          current={this.state.currentPage}
+					          display={3}
+					          onChange={this.setPage}
 								/>
-								<FilterItem
-									title={'EmployeeName'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('EmployeeName')}
-									onAddFilter={(filterValue)=>th.addFilter('EmployeeName', filterValue)}
-									onOpenSnackbar={th.openSnackbar}
-								/>
-								<FilterItem
-									title={'DigithonQualified'}
-									type={'RadioButton'}
-									onGetAccordianValues={()=>['Yes', 'No']}
-									onAddFilter={(filterValue)=>th.addFilter('DigiThonQualified', filterValue)}
-								/>
-								<FilterItem
-									title={'DigithonPhase'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.getAccordianValues('DigiThonPhase')}
-									onAddFilter={(filterValue)=>th.addFilter('DigiThonPhase', filterValue)}
-									onOpenSnackbar={th.openSnackbar}
-								/>
-								<FilterItem
-									title={'DigithonScore'}
-									type={'Slider'}
-									onGetAccordianValues={()=>[0, 200]}
-									onAddFilter={(filterValue)=>th.addFilter('DigiThonScore', filterValue)}
-								/>
-								<FilterItem
-									title={'Skills'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.state.skills}
-									onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
-									onOpenSnackbar={th.openSnackbar}
-								/>
-								<FilterItem
-									title={'Wave'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.state.waves}
-									onAddFilter={(filterValue)=>th.addFilter('Wave', filterValue)}
-									onOpenSnackbar={th.openSnackbar}
-								/>
-								{th.state.role == 'wiproadmin' &&
-								<FilterItem
-									title={'Billability'}
-									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.state.Billability}
-									onAddFilter={(filterValue)=>th.addFilter('Billability', filterValue)}
-									onOpenSnackbar={th.openSnackbar}
-								/>
-								}
-							</Col>
-							<Col md={9}>
-								{
-									this.state.displayCandidates.map(function(candidate, key) {
-										return (
-													<CandidateCard
-														candidate={candidate}
-														handleCardClick={th.candidateView}
-														handleDelete={th.deleteCandidate}
-														key={key}
-														k={key + th.state.currentPage}
-														role={th.state.role}
-													/>
-											)
-									})
-								}
-							</Col>
-						</Row>
-					</Grid>
-					{
-						this.state.filteredCandidates.length > 3 ?
-						<div style={app.pager}>
-							<Pagination
-				          total={
-										this.state.filteredCandidates.length%3>0?
-										parseInt(this.state.filteredCandidates.length/3 + 1):
-										parseInt(this.state.filteredCandidates.length/3)
-									}
-				          current={this.state.currentPage}
-				          display={3}
-				          onChange={this.setPage}
-							/>
-						</div> : ''
-					}
-				</div>
-				:
-				<div>
-					<CandidateHome
-						candidate={this.state.displayCandidate}
-						handleBack={this.handleBack}
-						handleDelete={this.deleteCandidate}
-						handleUpdate={this.updateCandidate}
-						role={this.state.role}
-					/>
-				</div>
-			}
+							</div> : ''
+						}
+					</div>
+					:
+					<div>
+						<CandidateHome
+							candidate={this.state.displayCandidate}
+							handleBack={this.handleBack}
+							handleDelete={this.deleteCandidate}
+							handleUpdate={this.updateCandidate}
+							role={this.state.role}
+						/>
+					</div>
+				}
 			</div>
 		)
 	}
