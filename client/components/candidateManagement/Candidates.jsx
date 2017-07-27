@@ -392,6 +392,7 @@ export default class Candidates extends React.Component {
 
 	render() {
 		let th = this;
+		console.log('Filtered candidates count', this.state.filteredCandidates.length)
 		return(
 			<div>
 				{
