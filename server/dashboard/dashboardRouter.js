@@ -197,7 +197,6 @@ router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 // Delete a wave
 router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
-    console.log(req.body.wave,"req.body.wave")
     dashboardNeo4jController.deleteWave(req.body.wave, function (wave) {
       res.status(201).json(wave);
     }, function (err) {

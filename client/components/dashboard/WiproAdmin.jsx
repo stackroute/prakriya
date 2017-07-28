@@ -213,6 +213,7 @@ export default class WiproAdmin extends React.Component {
 
     return (
       <div>
+<<<<<<< HEAD
         <Grid>
           <Row>
             <SelectField
@@ -228,8 +229,7 @@ export default class WiproAdmin extends React.Component {
               }
             </SelectField>
             <Col md={5}></Col>
-
-            <Col md={3}>
+            <Col md={3} mdOffset={1}>
               <FileDrop type="ZCOP" handleDrop={this.handleDrop}/>
               <br/>
               <RaisedButton label="Merge" primary={true} style={styles.button} onClick={this.handleMerge}/>
