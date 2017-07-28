@@ -1243,7 +1243,7 @@ router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req
 ****************************************************/
 
 // Get all the users
-router.get('/users', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.get('/users', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     adminMongoController.getUsers(function (users) {
       res.status(201).json(users);

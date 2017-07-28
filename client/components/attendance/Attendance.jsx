@@ -69,7 +69,9 @@ export default class Attendance extends React.Component {
       startDate: '',
       endDate: '',
       CadetEmail: '',
-      future: false
+      future: false,
+      admin: [],
+      email: ''
     }
     this.handleSelect = this.handleSelect.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -94,6 +96,9 @@ export default class Attendance extends React.Component {
     this.getUser = this.getUser.bind(this);
     this.getWaveCandidates = this.getWaveCandidates.bind(this);
     this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
+    this.getAdmin = this.getAdmin.bind(this);
+    this.handleEmailChange = this.handleEmailChange.bind(this);
+    this.pushNotification = this.pushNotification.bind(this);
   }
 
   componentWillMount() {
@@ -110,6 +115,7 @@ export default class Attendance extends React.Component {
         if (th.state.role === 'candidate') {
           th.getCadet();
           th.getUser();
+          th.getAdmin();
         } else {
           th.getAbsentees();
         }
@@ -233,6 +239,32 @@ export default class Attendance extends React.Component {
       })
     }
 
+    getAdmin() {
+  		let th = this;
+  		Request
+  			.get('/admin/users')
+  			.set({'Authorization': localStorage.getItem('token')})
+  			.end(function(err, res) {
+  				if(err)
+  		    	console.log(err);
+  		    else {
+  		    	let users = res.body.filter(function(user) {
+  		    		return user.role == 'sradmin'
+  		    	})
+  		    	th.setState({
+  		    		admin: users,
+              email: users[0].email
+  		    	})
+  		    }
+  		  })
+  	}
+
+    handleEmailChange(event, key, val) {
+  		this.setState({
+  			email: val
+  		})
+  	}
+
   updateabsentees() {
     let th = this;
     Request.post('/dashboard/updateabsentees').set({'Authorization': localStorage.getItem('token')}).send({
@@ -250,21 +282,59 @@ export default class Attendance extends React.Component {
       else {
         th.getCadet();
         th.getUser();
+        let timestamp = new Date()
+        let email = th.state.email;
+        let message = `${th.state.cadet.name} applied leave|${timestamp}`;
+        th.pushNotification(email, message);
+        let socket = io()
+        socket.emit('approval sent', {notification: message, to: email})
       }
     })
   }
 
+  pushNotification(to, message) {
+    console.log('push notification called: ', to , ' -- ', message)
+    let th = this
+    Request
+      .post('/dashboard/addnotification')
+      .set({'Authorization': localStorage.getItem('token')})
+      .send({to: to, message: message})
+      .end(function(err, res){
+        console.log('Notification pushed to server', res)
+      })
+  }
+
   handleSelect(range) {
-    let day = range.endDate._d - range.startDate._d;
-    day = day / 1000;
-    day = Math.floor(day / 86400) + 1;
+
     if(range.startDate._d < new Date() && this.formatDate(range.startDate)!=this.formatDate(new Date()))
     {
-      this.setState({future: true})
+      let day = range.endDate._d - new Date();
+      day = day / 1000;
+      day = Math.floor(day / 86400) + 1;
+      this.setState({future: true, days: day})
       return range.startDate._d = new Date()
     }
+    else if(range.endDate._d > new Date(this.state.endDate) || range.startDate._d > new Date(this.state.endDate)) {
+      if(range.endDate._d > new Date(this.state.endDate)) {
+        let day = new Date(this.state.endDate) - range.startDate._d;
+        day = day / 1000;
+        day = Math.floor(day / 86400) + 1;
+        this.setState({future: true, days: day})
+        return range.endDate._d = new Date(this.state.endDate)
+      }
+      else {
+        let day = range.endDate._d - new Date();
+        day = day / 1000;
+        day = Math.floor(day / 86400) + 1;
+        this.setState({future: true, days: day})
+        return range.startDate._d = new Date()
+      }
+    }
     else {
-    this.setState({fromDate: range.startDate._d, toDate: range.endDate._d, days: day})
+      let day = range.endDate._d - range.startDate._d;
+      day = day / 1000;
+      day = Math.floor(day / 86400) + 1;
+      this.setState({fromDate: range.startDate._d, toDate: range.endDate._d, days: day})
     }
   }
 
@@ -466,7 +536,7 @@ export default class Attendance extends React.Component {
                   <Step>
                     <StepLabel>Select DateRange</StepLabel>
                     <StepContent>
-                      <p style={{color:'red'}}><b>Leave can be applied only for future dates.</b></p>
+                      <p style={{color:'red'}}><b>Leave can be applied only for future dates(within the training period).</b></p>
                       <DateRange onInit={this.handleSelect} onChange={this.handleSelect}/>
                       <h3>Number of Days:{this.state.days}</h3>
                       {this.renderStepActions(1)}
@@ -475,6 +545,20 @@ export default class Attendance extends React.Component {
                   <Step>
                     <StepLabel>Approval</StepLabel>
                     <StepContent>
+                      <SelectField
+                       value={this.state.email}
+                       onChange={this.handleEmailChange}
+                       floatingLabelText="Notify to..."
+                       fullWidth={true}
+                     >
+                       {
+                         th.state.admin.map((user, i) => {
+                           return (
+                             <MenuItem key={i} value={user.email} primaryText={user.email} />
+                           )
+                         })
+                       }
+                     </SelectField>
                       <h4>Sure to submit for Approval?</h4>
                       {this.renderStepActions(2)}
                     </StepContent>
@@ -522,6 +606,7 @@ export default class Attendance extends React.Component {
           }
           <Dialog bodyStyle={styles.deleteDialog} actionsContainerStyle={styles.actionsContainer} actions={deleteDialogActions} modal={false} open={th.state.future} onRequestClose={this.closeDeleteDialog}>
             Leave can be applied only for future dates.
+            Within the Training Period.
           </Dialog>
           </div>
         )

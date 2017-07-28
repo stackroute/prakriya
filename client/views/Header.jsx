@@ -128,7 +128,7 @@ export default class Header extends React.Component {
     Request
       .post('/dashboard/deletenotification')
       .set({'Authorization': localStorage.getItem('token')})
-      .send({to: th.props.useremail, message: notifications[index]})
+      .send({to: th.props.user.email, message: notifications[index]})
       .end(function(err, res){
         console.log('Notification pushed to server', res)
       })
