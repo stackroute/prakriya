@@ -213,7 +213,6 @@ export default class WiproAdmin extends React.Component {
 
     return (
       <div>
-<<<<<<< HEAD
         <Grid>
           <Row>
             <SelectField
