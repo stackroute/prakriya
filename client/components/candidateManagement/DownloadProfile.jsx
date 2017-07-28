@@ -36,7 +36,6 @@ export default class DownloadProfile extends React.Component {
 		if(this.props.zip) {
 			zip = new JSZip();
 			this.state.candidates.map(function (cadet, index) {
-				console.log('Downloading profile for', cadet)
 				th.getProfilePic(cadet.EmployeeID, cadet, index);
 			})
 		}

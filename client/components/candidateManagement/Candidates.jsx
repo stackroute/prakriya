@@ -13,10 +13,10 @@ import FilterItem from './FilterItem.jsx';
 import Chip from 'material-ui/Chip';
 import Snackbar from 'material-ui/Snackbar';
 import app from '../../styles/app.json';
-import IconButton from 'material-ui/IconButton';
 import DownloadProfile from './DownloadProfile.jsx';
 import {lightBlack} from 'material-ui/styles/colors';
 import DownloadIcon from 'material-ui/svg-icons/file/file-download';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
 
 const styles = {
 	filterBody: {
@@ -40,6 +40,13 @@ const styles = {
 		// border: '2px solid silver',
 		width: ' 100%',
 		padding: '3px'
+	},
+	'fab': {
+		'position':'fixed',
+		'bottom': '80px',
+		'right': '15px',
+		'zIndex': 1,
+    'border': '2px solid teal'
 	}
 }
 export default class Candidates extends React.Component {
@@ -396,9 +403,7 @@ export default class Candidates extends React.Component {
 			<div>
 				{
 					th.state.filteredCandidates != undefined &&
-					<span>Download All Profiles:<IconButton
-						tooltip="Download Profile"
-					>
+					<FloatingActionButton mini={true} style={styles.fab} onTouchTap={this.handleOpen} title="Download All Profiles">
 						<DownloadProfile
 							color={lightBlack}
 							candidate={th.state.filteredCandidates}
@@ -406,7 +411,7 @@ export default class Candidates extends React.Component {
 							role={this.state.role}
 							zip = {true}
 						/>
-					</IconButton></span>
+			    </FloatingActionButton>
 				}
 				<AddCandidate addCandidate={this.addCandidate}/>
 				{
