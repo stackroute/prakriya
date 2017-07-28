@@ -385,6 +385,14 @@ export default class Attendance extends React.Component {
         let cadets = th.state.cadets;
         cadets[cadet].DaysAbsent[detailID].approved = approval;
         th.setState({cadets: cadets})
+        let message = '';
+        if(approval == 'yes') {
+          message = 'Leave has been approved'
+        }
+        else if(approval == 'rejected') {
+          message = 'Leave has been rejected'
+        }
+        th.pushNotification(cadets[cadet].email+message)
       }
     })
   }
