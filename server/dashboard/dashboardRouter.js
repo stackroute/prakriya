@@ -197,8 +197,8 @@ router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 // Delete a wave
 router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
-    dashboardNeo4jController.deleteWave(req.body.wave, function (wave) {
-      res.status(201).json(wave);
+    dashboardNeo4jController.deleteWave(req.body.wave, function (status) {
+      res.status(201).json(status);
     }, function (err) {
       logger.error('Delete Wave Error: ', err);
       res.status(500).json({error: 'Cannot delete the wave...!'});
@@ -727,7 +727,7 @@ router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
       error: 'Internal error occurred, please report...!'
     });
   }
-  });
+});
 
 
 /** **************************************************
@@ -1067,23 +1067,6 @@ router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function (req, res)
 });
 
 
-// Get course
-router.get('/course/:courseID', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
-  try{
-    dashboardMongoController.getCourse(req.params.courseID, function (data) {
-      res.status(201).json(data);
-    }, function (err) {
-      logger.error('Get Course:', err);
-      res.status(500).json({error: 'Cannot get course for specific course id from db...!'});
-    });
-  } catch(err) {
-    logger.error('Get Course Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
-
 // Get all courses for specific wave
 router.get('/assessment', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
@@ -1223,13 +1206,13 @@ router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req
   try {
     let cadet = req.body;
       dashboardNeo4jController.addCadet(cadet, function (result) {
-            logger.debug('Added the cadet', result)
-                res.status(200).json(result);
-            }, function(err) {
-            logger.error('Error in adding a cadet in the neo4j',  err)
-            res.status(500).json({error: 'Cannot save cadidate in neo4j...!'});
-          })
-        }
+          logger.debug('Added the cadet', result)
+              res.status(200).json(result);
+          }, function(err) {
+          logger.error('Error in adding a cadet in the neo4j',  err)
+          res.status(500).json({error: 'Cannot save cadidate in neo4j...!'});
+        })
+      }
       catch(err) {
         logger.error('Add Candidate Exception: ', err);
         res.status(500).json({
@@ -1302,23 +1285,6 @@ router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) 
   }
 });
 
-// Get all cadets of a particular project
-router.post('/cadetsofproj', auth.canAccess(CONFIG.MENTOR), function (req, res) {
-  try{
-    dashboardMongoController.getCadetsOfProj(req.body.name, function (cadets) {
-      res.status(201).json(cadets);
-    }, function (err) {
-      logger.error('Get Cadets of Project Error: ', err);
-      res.status(500).json({error: 'Cannot get all waves from db...!'});
-    });
-  } catch(err) {
-    logger.error('Get Cadets of Project Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
-
 // delete a wave
 router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
   try {
@@ -1361,12 +1327,6 @@ router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 // Get filtered candidates
 router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   try{
-    // dashboardMongoController.getFilteredCandidates(req.body.filterQuery, function (candidates) {
-    //   res.status(201).json(candidates);
-    // }, function (err) {
-    //   logger.error('Filter Candidates Error: ', err);
-    //   res.status(500).json({error: 'Cannot filter candidates from db...!'});
-    // });
     dashboardNeo4jController.getFilteredCadets(req.body.filterQuery, function (candidates) {
       res.status(201).json(candidates);
     }, function (err) {

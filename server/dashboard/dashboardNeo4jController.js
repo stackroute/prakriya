@@ -1059,18 +1059,34 @@ let updateWave = function(waveObj, successCB, errorCB) {
 
 // Delete a wave
 let deleteWave = function(waveObj, successCB, errorCB) {
-  console.log(waveObj, "waveObj")
-  let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'}) DETACH DELETE n `;
-  let session = driver.session();
-  session.run(query).then(function(resultObj) {
-    session.close();
-    if (resultObj) {
-      logger.debug(resultObj)
-    } else {
-      errorCB('Error');
-    }
-  });
-  successCB();
+  try {
+    let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'}) 
+      MATCH (c:${graphConsts.NODE_CANDIDATE})-[: ${graphConsts.REL_BELONGS_TO}]->(n)
+      DETACH DELETE n
+      RETURN c.EmailID`;
+    let session = driver.session();
+    session.run(query).then(function(resultObj) {
+      session.close();
+      if (resultObj) {
+        let count  = 0;
+        resultObj.records.map(function(record) {
+          adminMongoController.deleteUser({'email': record._fields[0]}, function (status) {
+            count++;
+            if(count == resultObj.records.length) {
+              successCB(count);
+            }
+          }, function (err) {
+            logger.error('Error', err);
+            errorCB('Error');
+          });
+        })
+      } else {
+        errorCB('Error');
+      }
+    });
+  } catch(err1) {
+    errorCB('Error');
+  }
 }
 
 // Fetch wave with waveid

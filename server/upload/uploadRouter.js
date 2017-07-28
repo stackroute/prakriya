@@ -3,7 +3,6 @@ const formidable = require('formidable');
 const fs = require('fs');
 const logger = require('./../../applogger');
 const client = require('redis').createClient();
-// const client = require('redis').createClient(6379,'redis');
 const uploadMongoController = require('./uploadMongoController');
 const dashboardNeo4jController = require('../dashboard/dashboardNeo4jController');
 let auth = require('../auth')();

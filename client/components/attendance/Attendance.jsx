@@ -218,20 +218,20 @@ export default class Attendance extends React.Component {
     })
   }
 
-    getUser() {
-      let th = this;
-      Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-        if (err)
-          console.log(err);
-        else {
-          console.log(res.body);
-          th.setState({
-              cadet: res.body
-            })
-            console.log('done')
-        }
-      })
-    }
+  getUser() {
+    let th = this;
+    Request.get('/dashboard/cadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        console.log(res.body);
+        th.setState({
+            cadet: res.body
+          })
+          console.log('done')
+      }
+    })
+  }
 
   updateabsentees() {
     let th = this;

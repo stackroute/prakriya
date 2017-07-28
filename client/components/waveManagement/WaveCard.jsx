@@ -102,7 +102,7 @@ export default class WaveCard extends React.Component {
 
   getCourses() {
     let th = this;
-    Request.get('/mentor/courses').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get('/dashboard/courses').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
