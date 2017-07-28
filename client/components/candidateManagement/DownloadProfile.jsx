@@ -5,7 +5,7 @@ import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import Request from 'superagent';
 
-let zip = new JSZip();
+let zip;
 let imageURL = '';
 
 export default class DownloadProfile extends React.Component {
@@ -34,7 +34,9 @@ export default class DownloadProfile extends React.Component {
 	downloadCandidateProfile() {
 		let th = this;
 		if(this.props.zip) {
+			zip = new JSZip();
 			this.state.candidates.map(function (cadet, index) {
+				console.log('Downloading profile for', cadet)
 				th.getProfilePic(cadet.EmployeeID, cadet, index);
 			})
 		}
@@ -85,7 +87,6 @@ export default class DownloadProfile extends React.Component {
 		var img = new Image();
 		img.src = imageURL;
 	  doc.addImage(img, 'jpeg', 20, y, 60, 70);
-		console.log(candidate.EmployeeID)
 
 		doc.setFontSize(12);
 		doc.setTextColor(0, 0, 0);

@@ -222,11 +222,11 @@ export default class WiproAdmin extends React.Component {
       <div>
           <Grid>
             <Row>
-            <Col md={5}>
-  <NVD3Chart id="pieChart" type="pieChart"  tooltip={{enabled:true}}   datum={data} x="label" y="value" width="500" height="500" />
-            </Col>
-
-              <Col md={3}>
+              <Col md={5}>
+                <WaveDetails />
+                <NVD3Chart id="pieChart" type="pieChart"  tooltip={{enabled:true}}   datum={data} x="label" y="value" width="500" height="500" />
+              </Col>
+              <Col md={3} mdOffset={1}>
                 <FileDrop type="ZCOP" handleDrop={this.handleDrop} />
                 <br/>
                 <RaisedButton
