@@ -355,7 +355,7 @@ let addCourse = function(CourseObj, successCB, errorCB) {
   Removed:${CourseObj.Removed},FeedbackFields: ${JSON.stringify(CourseObj.FeedbackFields)}}) WITH c AS course
   UNWIND ${JSON.stringify(CourseObj.Skills)} AS skill
   MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
-  MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(course);`;
+  MERGE (n)<-[:${graphConsts.REL_INCLUDES} {credit: 1}]-(course);`;
   let session = driver.session();
   session.run(query).then(function(resultObj, err) {
     session.close();
@@ -654,7 +654,7 @@ let addProduct = function(productObj, successCB, errorCB) {
      UNWIND ${JSON.stringify(version.skills)} AS skillname
      MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
      MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
-     MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
+     MERGE (skill) <-[:${graphConsts.REL_KNOWS} {totalCredits: 0, totalRating: 0}]- (employee)
      WITH product AS product
      UNWIND ${JSON.stringify(version.members)} AS employeeName
      MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
