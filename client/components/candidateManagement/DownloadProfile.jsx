@@ -8,33 +8,23 @@ import Request from 'superagent';
 let zip = new JSZip();
 let imageURL = '';
 
+let candidates = {};
+
 export default class DownloadProfile extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			candidates: {}
-		}
 		this.downloadProfile = this.downloadProfile.bind(this);
 		this.downloadCandidateProfile = this.downloadCandidateProfile.bind(this);
 		this.getProfilePic = this.getProfilePic.bind(this);
 	}
 
-	componentWillMount() {
-		this.setState({
-			candidates: this.props.candidate
-		})
-	}
-
-	componentWillReceiveProps(nextProps) {
-		this.setState({
-			candidates: nextProps.candidate
-		})
-	}
 
 	downloadCandidateProfile() {
 		let th = this;
+		candidates = this.props.candidate;
+		console.log('props: ', candidates)
 		if(this.props.zip) {
-			this.state.candidates.map(function (cadet, index) {
+			candidates.map(function (cadet, index) {
 				th.getProfilePic(cadet.EmployeeID, cadet, index);
 			})
 		}
@@ -103,13 +93,14 @@ export default class DownloadProfile extends React.Component {
 		}
 		if(this.props.zip) {
 			zip.file(candidate.EmployeeID + '.pdf', doc.output('blob'));
-			if(index === this.state.candidates.length-1) {
+			if(index === candidates.length-1) {
 				zip.generateAsync({ type: "blob" })
 				 .then(function (content) {
 					 FileSaver.saveAs(content, "cadetProfiles.zip");
 				 });
 			}
 		}
+
 		else {
 			doc.save(candidate.EmployeeID + '.pdf')
 		}
