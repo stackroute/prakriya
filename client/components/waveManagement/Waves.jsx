@@ -7,6 +7,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 import Pagination from 'material-ui-pagination';
 import AddWave from './AddWave.jsx';
 import app from '../../styles/app.json';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
 	col: {
@@ -62,7 +63,9 @@ export default class Waves extends React.Component {
 			courses: [],
 			waves : [],
 			displayWaves: [],
-			filteredWaves: []
+			filteredWaves: [],
+			open: false,
+			message: ''
 		}
 		this.getCourses = this.getCourses.bind(this);
 		this.getCadets = this.getCadets.bind(this);
@@ -72,6 +75,7 @@ export default class Waves extends React.Component {
 		this.addWave = this.addWave.bind(this);
 		this.onTabChange = this.onTabChange.bind(this);
 		this.setPage = this.setPage.bind(this);
+		this.handleRequestClose = this.handleRequestClose.bind(this);
 	}
 
 	componentWillMount() {
@@ -150,6 +154,10 @@ export default class Waves extends React.Component {
 		    else {
 		    	console.log('Successfully updated a project', res.body)
 		    	th.getWaves();
+					th.setState({
+			      open: true,
+						message: 'Wave Updated Successfully'
+			    });
 		    	}
 			})
 	}
@@ -165,7 +173,10 @@ export default class Waves extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully deleted a wave', res.body)
+					th.setState({
+			      open: true,
+						message: 'Wave Deleted Successfully'
+			    });
 		    		th.getWaves();
 		    	}
 			})
@@ -173,6 +184,14 @@ export default class Waves extends React.Component {
 
 	addWave(wave) {
 		let th = this;
+		let flag = false;
+		this.state.waves.filter(function(existingWave) {
+			if(wave.WaveID === existingWave.WaveID) {
+				flag = true;
+			}
+		})
+		if(!flag)
+		{
 		Request
 			.post('/dashboard/addwave')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -189,6 +208,12 @@ export default class Waves extends React.Component {
 		    	th.getWaves();
 		    }
 			});
+		} else {
+			th.setState({
+				open: true,
+				message: "Wave already exist"
+			})
+		}
 	}
 
 	onTabChange(tab) {
@@ -247,6 +272,13 @@ export default class Waves extends React.Component {
 		});
 		console.log(sliced);
 	}
+
+		handleRequestClose = () => {
+	    this.setState({
+	      open: false,
+				message: ''
+	    });
+	  };
 
 	render() {
 		let th = this;
@@ -317,6 +349,13 @@ export default class Waves extends React.Component {
 						handleWaveAdd={this.addWave}
 					/>
 				}
+
+				<Snackbar
+					open={this.state.open}
+					message={this.state.message}
+					autoHideDuration={4000}
+					onRequestClose={this.handleRequestClose}
+			 />
 			</div>
 		)
 	}
