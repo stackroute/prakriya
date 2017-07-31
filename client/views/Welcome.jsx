@@ -8,21 +8,22 @@ import Login from '../components/login/index.jsx';
 import {Card, CardMedia} from 'material-ui/Card';
 
 const styles = {
-	// container: {
-	// 	minHeight: '100%',
-	// 	position: 'relative'
-	// },
-	brief: {
-		marginTop: '70px',
-		fontSize: '16px'
+	container: {
+		height: '100%',
+		background: 'url("../assets/images/bg1.jpg")',
+		color: '#bbb'
+	},
+	appBar: {
+		background: '#202D3E'
 	},
 	body: {
+		marginTop: 70,
 		textAlign: 'center',
 		fontFamily: 'sans-serif'
 	},
-	customContent: {
-	  width: '400px',
-	  maxWidth: 'none'
+	login: {
+		width: 400,
+		margin: 'auto'
 	}
 };
 
@@ -62,25 +63,12 @@ export default class Welcome extends React.Component {
 				<AppBar
 	        title="Prakriya"
 	        showMenuIconButton={false}
-	        iconElementRight={<FlatButton label="Login" onClick={this.handleOpen} />}
+	        style={styles.appBar}
 		    />
 		    <div style={styles.body}>
-		    	<Dialog
-	          contentStyle={styles.customContent}
-	          open={this.state.open}
-          	onRequestClose={this.handleClose}
-	        >
-	        <Login />
-	        </Dialog>
-					<h1>Welcome To Prakriya</h1>
-					<Card style={{maxWidth: '650px', margin: 'auto'}} >
-						<CardMedia style={{maxWidth: '600px', margin: 'auto'}} >
-							<img src='../assets/images/home.png' alt='Home' />
-						</CardMedia>
-					</Card>
-					<p style={styles.brief}>
-						<em>It is a Wave Automation Tool</em>
-					</p>
+					<div style={styles.login}>
+						<Login />
+					</div>
 				</div>
 			</div>
 		)

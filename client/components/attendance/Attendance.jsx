@@ -392,7 +392,7 @@ export default class Attendance extends React.Component {
         else if(approval == 'rejected') {
           message = 'Leave has been rejected'
         }
-        th.pushNotification(cadets[cadet].email+message)
+        th.pushNotification(cadets[cadet].email, message)
       }
     })
   }
