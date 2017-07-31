@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, hashHistory} from 'react-router';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
+import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
+import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import Request from 'superagent';
@@ -27,7 +28,8 @@ import Wave from './components/waveManagement/index.jsx';
 
 injectTapEventPlugin();
 
-const muiTheme = getMuiTheme(baseTheme);
+const muiTheme = getMuiTheme(lightBaseTheme);
+muiTheme.baseTheme.palette.primary1Color = '#202D3E';
 
 var user;
 
@@ -53,6 +55,7 @@ let requireAuth = function(nextState, replace, callback) {
 }
 
 let alreadyLoggedIn = function(nextState, replace, callback) {
+	console.log('Theme', muiTheme)
   const token = localStorage.getItem('token')
   if(token) 
   	replace('/app')
