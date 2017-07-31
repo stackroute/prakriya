@@ -1183,7 +1183,6 @@ router.get('/waveobject/:waveID', auth.canAccess(CONFIG.ADMMEN), function (req, 
     console.log(req.params.waveID,"req.params.WAVEID")
     dashboardNeo4jController.getSessionForWave (req.params.waveID,
        function (wave) {
-         console.log(wave,"waveobj waveid")
          res.status(201).json({waveObject: wave});
     }, function (err) {
       logger.error('Get Wave Object Error: ', err);

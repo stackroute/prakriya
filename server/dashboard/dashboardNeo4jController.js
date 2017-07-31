@@ -1060,7 +1060,7 @@ let updateWave = function(waveObj, successCB, errorCB) {
 // Delete a wave
 let deleteWave = function(waveObj, successCB, errorCB) {
   try {
-    let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'}) 
+    let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'})
       MATCH (c:${graphConsts.NODE_CANDIDATE})-[: ${graphConsts.REL_BELONGS_TO}]->(n)
       DETACH DELETE n
       RETURN c.EmailID`;
@@ -1227,7 +1227,8 @@ let updateWaveCadets = function(cadets, waveID, successCB, errorCB) {
 // Getting the sessions for the wave
 let getSessionForWave = function(waveID, successCB, errorCB) {
   logger.debug('In get session Wave', waveID);
-  let query = `MATCH(n:${graphConsts.NODE_WAVE} {WaveID:'${waveID}'})-[:${graphConsts.REL_HAS}]->(m:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_HAS}]->(x:${graphConsts.NODE_SESSION})-[:${graphConsts.REL_INCLUDES}]->(y:${graphConsts.NODE_SKILL})
+  let query = `MATCH(w:${graphConsts.NODE_WAVE} {WaveID:'${waveID}'})-[:${graphConsts.REL_HAS}]->(m:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_HAS}]->(x:${graphConsts.NODE_SESSION}) with w as w, x as x
+  OPTIONAL MATCH (x)-[:${graphConsts.REL_INCLUDES}]->(y:${graphConsts.NODE_SKILL}) with w as w, y as y, x as x
   optional match (w)-[r:${graphConsts.REL_INCLUDES}]->(x)
   RETURN {skill:collect(y),session:x,r:r}`;
   let session = driver.session();
@@ -1239,7 +1240,6 @@ let getSessionForWave = function(waveID, successCB, errorCB) {
       waveobject.result = []
       resultObj.records.map(function(res) {
         res._fields.map(function(re) {
-          console.log(re)
           waveobject.result.push(re.session.properties)
           waveobject.result[waveobject.result.length - 1].skill = re.skill.map(function(skills) {
             return skills.properties.Name
@@ -1251,9 +1251,7 @@ let getSessionForWave = function(waveID, successCB, errorCB) {
           }
         })
       })
-      logger.debug(waveobject, "waveobject")
       successCB(waveobject);
-
     } else {
       errorCB('Error');
     }
