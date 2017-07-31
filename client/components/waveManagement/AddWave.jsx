@@ -168,15 +168,6 @@ export default class AddWave extends React.Component {
 
 	validationSuccess() {
 		let wavePattern = /[A-z]{4}-[0-9]{1,}/
-		// if(this.state.WaveID.trim().length == 0) {
-		// 	this.setState({
-		// 		WaveIDErrorText: 'This field cannot be empty.'
-		// 	})
-		// } else if(!wavePattern.test(this.state.WaveID.trim())) {
-		// 	this.setState({
-		// 		WaveIDErrorText: 'Invalid WaveID! Valid Example: IM-27 (Immersive Wave 27).'
-		// 	})
-		// } else
 		if(this.state.Mode.length == 0) {
 			this.setState({
 				ModeErrorText: 'Please select one mode'

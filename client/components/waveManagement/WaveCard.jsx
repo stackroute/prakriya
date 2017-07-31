@@ -459,7 +459,7 @@ export default class WaveCard extends React.Component {
               width: '100%'
             }}>
               {this.state.courses.map(function(course, i) {
-                return (<MenuItem key={i} insetChildren={true} checked={th.state.selectedCourse && th.state.selectefdCourse.includes(course.ID)} value={course.ID} primaryText={course.ID}/>)
+                return (<MenuItem key={i} insetChildren={true} checked={th.state.selectedCourse && th.state.selectedCourse.includes(course.ID)} value={course.ID} primaryText={course.ID}/>)
               })
 }
             </SelectField>

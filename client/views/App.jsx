@@ -4,12 +4,13 @@ import Footer from './Footer.jsx';
 
 const styles = {
 	container: {
-		minHeight: '100%',
-		position: 'relative'
+		minHeight: '100%'
 	},
 	body: {
 		fontFamily: 'sans-serif',
-		marginTop: 85,
+		height: '100%',
+		marginTop: 63,
+		paddingTop: 20
 	}
 };
 
