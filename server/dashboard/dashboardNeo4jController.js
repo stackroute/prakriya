@@ -1571,6 +1571,40 @@ let getEvaluationSkills = function(candidateID, successCB, errorCB) {
   });
 };
 
+// update rating
+let updateRating = function(employeeID, waveID, skillnames, ratings, successCB, errorCB) {
+  console.log('EmployeeID: ', employeeID);
+  console.log('WaveID: ', waveID);
+  console.log('Skills Array: ', skillnames);
+  console.log('Ratings Array: ', ratings);
+  let query = `
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: '${employeeID}'})
+    WITH candidate AS candidate
+    MATCH (wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
+    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
+    WITH course AS course, candidate AS candidate,
+    ${JSON.stringify(skillnames)} AS skillnames,
+    ${JSON.stringify(ratings)} AS ratings,
+    RANGE (0, ${skillnames.length}) AS indices
+    UNWIND indices AS index
+    MATCH (course) -[i:${graphConsts.REL_INCLUDES}]->
+    (:${graphConsts.NODE_SKILL} {Name: skillnames[index]})
+    <-[k:${graphConsts.REL_KNOWS}]-(candidate)
+    SET k.totalRating=k.totalRating+(ratings[index]*i.credit),k.totalCredits=k.totalCredits+i.credit
+    RETURN candidate
+    `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      logger.debug(resultObj);
+      successCB(resultObj);
+    } else {
+      errorCB('updateRating: Error');
+    }
+  });
+};
+
 module.exports = {
       addCadet,
       updateCadet,
@@ -1619,5 +1653,6 @@ module.exports = {
       deleteSession,
       getCourseForWave,
       removeCadetFromWave,
-      getEvaluationSkills
+      getEvaluationSkills,
+      updateRating
   }

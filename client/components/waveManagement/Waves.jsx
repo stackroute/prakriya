@@ -43,14 +43,14 @@ const backgroundColors = [
 	'#DDDBF1',
 	'#CAF5B3',
 	'#C6D8D3'
-	]
+]
 
 const backgroundIcons = [
 	'#847662',
 	'#666682',
 	'#4e5f46',
 	'#535f5b'
-	]
+]
 
 export default class Waves extends React.Component {
 

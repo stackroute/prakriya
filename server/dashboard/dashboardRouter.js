@@ -1509,4 +1509,26 @@ router.get('/evaluationfields', auth.canAccess(CONFIG.MENTOR), function(req, res
   }
 });
 
+// Update rating for the given candidate
+router.post('/updaterating', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    dashboardNeo4jController.updateRating(
+      req.body.employeeID,
+      req.body.waveID,
+      req.body.skills,
+      req.body.ratings,
+      function (candidate) {
+      res.status(201).json(candidate);
+    }, function (err) {
+      logger.error('UpdateRating Error: ', err);
+      res.status(500).json({error: 'Cannot update rating for this candidate in neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('UpdateRating Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 module.exports = router;

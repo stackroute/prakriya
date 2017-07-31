@@ -13,9 +13,6 @@ const styles = {
 		background: 'url("../assets/images/bg1.jpg")',
 		color: '#bbb'
 	},
-	appBar: {
-		background: '#202D3E'
-	},
 	body: {
 		marginTop: 70,
 		textAlign: 'center',

@@ -1,5 +1,4 @@
 module.exports = {
-
     NODE_CANDIDATE: 'Candidate',
     NODE_WAVE: 'Wave',
     NODE_ASSIGNMENT: 'Assignment',
