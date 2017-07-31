@@ -953,7 +953,8 @@ let addWave = function(waveObj, successCB, errorCB) {
       Mode: '${userObj.Mode}',
       Location: '${userObj.Location}',
       StartDate: '${userObj.StartDate}',
-      EndDate: '${userObj.EndDate}'
+      EndDate: '${userObj.EndDate}',
+      CourseName: '${userObj.Course.split("_")[0]}'
     })
     WITH wave AS wave
     MATCH (course: ${graphConsts.NODE_COURSE}{ID: '${userObj.Course}'})
