@@ -66,6 +66,7 @@ export default class EvaluationForms extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.saveEvaluation = this.saveEvaluation.bind(this);
 		this.getEvaluationFields = this.getEvaluationFields.bind(this);
+		this.saveRatingsInNeo4j = this.saveRatingsInNeo4j.bind(this);
 	}
 
 	componentWillMount() {
@@ -208,6 +209,7 @@ export default class EvaluationForms extends React.Component {
 		this.saveEvaluation(evaluationObj);
 	};
 
+  // saving evaluation results in mongodb
 	saveEvaluation(evaluationObj) {
 		let th = this;
 		Request
@@ -219,9 +221,33 @@ export default class EvaluationForms extends React.Component {
 		    	console.log(err);
 		    else {
 		    	console.log('Cadet evaluation form saved successfully', res.body);
-		    	th.setState({
+					th.saveRatingsInNeo4j();
+		    }
+		  });
+	};
+
+	// updating skill ratings in neo4j
+	saveRatingsInNeo4j() {
+		let th = this;
+		let skillNames = EVALUATION[4].options;
+		let skillRatings = this.state.skills;
+		let obj = {};
+		obj.employeeID = this.state.cadetID;
+		obj.waveID = this.state.wave;
+		obj.skills = skillNames;
+		obj.ratings = skillRatings;
+		Request
+			.post('/dashboard/updaterating')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(obj)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Rating updated successfully', res.body);
+					th.setState({
 						open: true
-					})
+					});
 		    }
 		  });
 	};
@@ -324,8 +350,8 @@ export default class EvaluationForms extends React.Component {
 																color1={'#ddd'}
 																half={false}
 																size={30}
-																value={th.state[item.type.replace(' ', '')][index+1]}
-																onChange={(newVal) => th.handleChange(newVal, item.type.replace(' ', ''), index+1)}
+																value={th.state[item.type.replace(' ', '')][index]}
+																onChange={(newVal) => th.handleChange(newVal, item.type.replace(' ', ''), index)}
 															/>
 														</Col>
 													</Row>
