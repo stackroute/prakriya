@@ -26,40 +26,40 @@ const styles = {
     cursor: 'pointer',
   },
   header: {
-			zIndex: 2,
-			fontFamily: 'sans-serif',
-			backgroundColor: 'rgb(0, 188, 212)',
-			color: '#fff',
-			position: 'fixed',
-			left: 0,
-			top: 0,
-	    height: '40px',
-	    width: '100%',
-		},
-    userMenu: {
-      backgroundColor: 'rgba(0, 188, 212, 0.10)',
-      width: '100%'
-    },
-    badge: {
-      width: '20px',
-      height: '20px',
-      backgroundColor: '#990000',
-      color: '#ffffff',
-      top: '5px',
-      right: '5px'
-    },
-    brief: {
-  		marginTop: '70px',
-  		fontSize: '16px'
-  	},
-  	body: {
-  		textAlign: 'center',
-  		fontFamily: 'sans-serif'
-  	},
-  	customContent: {
-  	  width: '400px',
-  	  maxWidth: 'none'
-  	}
+		zIndex: 2,
+		fontFamily: 'sans-serif',
+		backgroundColor: 'rgb(0, 188, 212)',
+		color: '#fff',
+		position: 'fixed',
+		left: 0,
+		top: 0,
+    height: '40px',
+    width: '100%',
+	},
+  userMenu: {
+    backgroundColor: 'rgba(0, 188, 212, 0.10)',
+    width: '100%'
+  },
+  badge: {
+    width: '20px',
+    height: '20px',
+    backgroundColor: '#990000',
+    color: '#ffffff',
+    top: '5px',
+    right: '5px'
+  },
+  brief: {
+		marginTop: '70px',
+		fontSize: '16px'
+	},
+	body: {
+		textAlign: 'center',
+		fontFamily: 'sans-serif'
+	},
+	customContent: {
+	  width: '400px',
+	  maxWidth: 'none'
+	}
 };
 
 export default class Header extends React.Component {

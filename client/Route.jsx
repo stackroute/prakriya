@@ -30,6 +30,12 @@ injectTapEventPlugin();
 
 const muiTheme = getMuiTheme(lightBaseTheme);
 muiTheme.baseTheme.palette.primary1Color = '#202D3E';
+muiTheme.appBar.color = '#202D3E';
+muiTheme.textField.floatingLabelColor = 'rgba(255, 255, 255, 0.7)';
+muiTheme.textField.hintColor = 'rgba(255, 255, 255, 0.7)';
+muiTheme.textField.textColor = 'rgba(255, 255, 255, 0.87)';
+muiTheme.svgIcon.color = 'rgba(255, 255, 255, 0.87)';
+
 
 var user;
 
