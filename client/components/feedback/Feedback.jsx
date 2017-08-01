@@ -24,7 +24,7 @@ const StarsComponent = React.createClass({
     extraStars.push(<span style={{color: '#00BCD4', fontSize: '28px'}} key={i}>{'\u263B'}</span>)
 
     return (
-      <TableRowColumn style={{textAlign: 'center'}}>
+      <TableRowColumn style={{textAlign: 'center', color: 'white', backgroundColor: '#202D3E'}}>
         <span style={{color: '#00BCD4', fontSize: '28px'}}>{'\u263B'}</span>
         {extraStars}
       </TableRowColumn>
@@ -240,17 +240,17 @@ export default class Feedback extends React.Component {
             <TableHeader
             displaySelectAll={false} adjustForCheckbox={false}
             enableSelectAll={false} style={{textAlign: 'center'}}>
-              <TableRow style={{textAlign: 'center'}}>
-                <TableHeaderColumn style={{width: '50px', textAlign: 'center'}}>
-                Strongly<br/>Disagree</TableHeaderColumn>
-                <TableHeaderColumn style={{width: '80px', textAlign: 'center'}}>
-                Disagree</TableHeaderColumn>
+              <TableRow style={{textAlign: 'center', backgroundColor: '#202D3E'}}>
                 <TableHeaderColumn style={{width: '110px', textAlign: 'center'}}>
-                Somewhat</TableHeaderColumn>
+                STRONGLY DISAGREE</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '80px', textAlign: 'center'}}>
+                DISAGREE</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '110px', textAlign: 'center'}}>
+                SOMEWHAT</TableHeaderColumn>
                 <TableHeaderColumn style={{width: '120px', textAlign: 'center'}}>
-                Agree</TableHeaderColumn>
+                AGREE</TableHeaderColumn>
                 <TableHeaderColumn style={{textAlign: 'center'}}>
-                Strongly<br/>Agree</TableHeaderColumn>
+                STRONGLY AGREE</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false}>

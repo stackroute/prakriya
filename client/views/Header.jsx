@@ -217,6 +217,7 @@ export default class Header extends React.Component {
 		      width={250}
 		      open={this.state.openDrawer}
 		      onRequestChange={(openDrawer) => this.setState({openDrawer})}
+          containerStyle={{backgroundColor: '#292A2C'}}
           >
           <Card>
              <CardMedia
@@ -238,6 +239,7 @@ export default class Header extends React.Component {
 		      			<Link to={th.state.routes[key]} key={key} style={{textDecoration: 'none'}} >
 					      	<MenuItem
                     primaryText={action}
+                    style={{color: 'white'}}
                     onTouchTap={th.handleDrawerClose}
                    />
 				      	</Link>
