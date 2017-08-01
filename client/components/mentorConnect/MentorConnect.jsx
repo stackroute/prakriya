@@ -144,6 +144,10 @@ export default class MentorConnect extends React.Component {
 				cadet.Selected = 'Yes'
 				saveCadets.push(cadet)
 			}
+			else {
+				cadet.Selected = 'No'
+				saveCadets.push(cadet)
+			}
 		})
 		this.saveAllRemarks(saveCadets);
 	}

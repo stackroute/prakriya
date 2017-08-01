@@ -8,19 +8,15 @@ import Slider from 'material-ui/Slider';
 
 const styles = {
 	filterBody: {
-		// border: '1px solid #eeeeee', 
-		// backgroundColor: '#ddd', 
 		padding: '5px', 
 		width: '100%'
 	},
 	autoComplete: {
 		width: '100%', 
-		// border: '2px solid silver', 
 		padding: '3px'
 	},
 	radioButton: {
 		width: '100%', 
-		// border: '2px solid silver', 
 		padding: '3px'
 	}
 }

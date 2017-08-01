@@ -41,7 +41,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
 
   let session = driver.session();
 
-  let query = `CREATE (n: ${graphConsts.NODE_CANDIDATE}
+  let query = `MERGE (n: ${graphConsts.NODE_CANDIDATE}
   	{
   		EmployeeID: '${cadet.EmployeeID}',
   		EmployeeName: '${cadet.EmployeeName}',
@@ -254,13 +254,9 @@ let getFilteredCadets = function(filterQuery, successCB, errorCB) {
     addFilter = true;
     condition += `n.EmployeeName = '${filterQuery.EmployeeName}' AND `
   }
-  if (filterQuery.DigiThonQualified != '') {
+  if (filterQuery.EmailID != '') {
     addFilter = true;
-    condition += `n.DigiThonQualified = '${filterQuery.DigiThonQualified}' AND `
-  }
-  if (filterQuery.DigiThonPhase != '') {
-    addFilter = true;
-    condition += `n.DigiThonPhase = '${filterQuery.DigiThonPhase}' AND `
+    condition += `n.EmailID = '${filterQuery.EmailID}' AND `
   }
   if (filterQuery.DigiThonScore != '') {
     addFilter = true;
