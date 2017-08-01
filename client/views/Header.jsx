@@ -37,8 +37,9 @@ const styles = {
     width: '100%',
 	},
   userMenu: {
-    backgroundColor: 'rgba(0, 188, 212, 0.10)',
-    width: '100%'
+    backgroundColor: '#C6D8D3',
+    width: '100%',
+    fontWeight: 'bold'
   },
   badge: {
     width: '20px',
@@ -270,7 +271,7 @@ export default class Header extends React.Component {
                         <ListItem
                           primaryText='No new notifications found'
                           key='-1'
-                          style={{textAlign: 'center'}}
+                          style={{textAlign: 'center', color: '#757575'}}
                         /> :
                         th.state.notifications.map(function(message, index) {
                           return (
@@ -298,8 +299,8 @@ export default class Header extends React.Component {
   					    anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
   					  >
                 <List>
-    					    <ListItem primaryText="Log Out" onClick={th.logout} leftIcon={<LogoutIcon />}/>
-                  <ListItem primaryText="Change Password" onClick={th.toggleChangePasswordDialog}  leftIcon={<ChangePasswordIcon />}/>
+    					    <ListItem primaryText="Log Out" onClick={th.logout} leftIcon={<LogoutIcon />} style={{color: '#757575'}}/>
+                  <ListItem primaryText="Change Password" onClick={th.toggleChangePasswordDialog}  leftIcon={<ChangePasswordIcon />} style={{color: '#757575'}}/>
                 </List>
   					  </IconMenu>
             </div>
