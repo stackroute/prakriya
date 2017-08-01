@@ -41,7 +41,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
 
   let session = driver.session();
 
-  let query = `MERGE (n: ${graphConsts.NODE_CANDIDATE}
+  let query = `CREATE (n: ${graphConsts.NODE_CANDIDATE}
   	{
   		EmployeeID: '${cadet.EmployeeID}',
   		EmployeeName: '${cadet.EmployeeName}',
