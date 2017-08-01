@@ -103,6 +103,9 @@ export default class AddUser extends React.Component {
   handleClose(e, action) {
     if(action == 'CLOSE') {
       this.resetFields()
+      if(this.props.openDialog) {
+      	this.props.closeDialog();
+      }
     } else if(action == 'ADD') {
       if(this.validationSuccess()) {
         this.handleSubmit()
@@ -270,9 +273,9 @@ export default class AddUser extends React.Component {
 		}
 		return(
 			<div>
-					<FloatingActionButton style={app.fab} mini={true} onTouchTap={this.handleOpen} >
-			      <ContentAdd />
-			    </FloatingActionButton>
+				<FloatingActionButton style={app.fab} mini={true} onTouchTap={this.handleOpen} >
+		      <ContentAdd />
+		    </FloatingActionButton>
 		    <Dialog
           bodyStyle={styles.dialog}
           title={dialogTitle}
@@ -329,33 +332,33 @@ export default class AddUser extends React.Component {
             />
           </div>
           <div>
-						    	<TextField
-						    		hintText="This will be unique"
-						    		floatingLabelText="Email *"
-                    floatingLabelStyle={app.mandatoryField}
-      			    		value={this.state.email}
-						    		onChange={this.onChangeEmail}
-                    errorText={this.state.emailErrorText}
-                    style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', top: '-22px'}}
-						    	/>
-						    	<SelectField
-                    errorText={this.state.roleErrorText}
-						        onChange={this.onChangeRole}
-						        floatingLabelText="Select Role *"
-                    floatingLabelStyle={app.mandatoryField}
-      			    		value={this.state.role}
-                    style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
-        						menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
-        						listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
-        						selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
-        						maxHeight={600}
-						      >
-						        {
-						        	this.state.roles.map(function(val, key) {
-						        		return <MenuItem key={key} value={val} primaryText={val} />
-						        	})
-						        }
-						      </SelectField>
+				    	<TextField
+				    		hintText="This will be unique"
+				    		floatingLabelText="Email *"
+                floatingLabelStyle={app.mandatoryField}
+  			    		value={this.state.email}
+				    		onChange={this.onChangeEmail}
+                errorText={this.state.emailErrorText}
+                style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px', top: '-22px'}}
+				    	/>
+				    	<SelectField
+                errorText={this.state.roleErrorText}
+				        onChange={this.onChangeRole}
+				        floatingLabelText="Select Role *"
+                floatingLabelStyle={app.mandatoryField}
+  			    		value={this.state.role}
+                style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
+    						menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
+    						listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
+    						selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
+    						maxHeight={600}
+				      >
+				        {
+				        	this.state.roles.map(function(val, key) {
+				        		return <MenuItem key={key} value={val} primaryText={val} />
+				        	})
+				        }
+				      </SelectField>
             </div>
         </Dialog>
 			</div>

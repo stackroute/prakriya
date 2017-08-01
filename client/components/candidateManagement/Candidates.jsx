@@ -21,6 +21,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 const styles = {
 	filterBody: {
 		border: '1px solid #555',
+		background: '#fff'
 	},
 	header: {
 		// backgroundColor: '#eeeeee',

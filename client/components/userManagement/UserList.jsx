@@ -48,6 +48,7 @@ export default class UserList extends React.Component {
 		this.handleUpdateUser = this.handleUpdateUser.bind(this);
 		this.handleAccountSuspension = this.handleAccountSuspension.bind(this);
 		this.disabledUser = this.disabledUser.bind(this);
+		this.handleEditClose = this.handleEditClose.bind(this);
 	}
 
 	disabledUser = () => {
@@ -95,6 +96,12 @@ export default class UserList extends React.Component {
 		this.props.updateUser(updatedUser);
 	}
 
+	handleEditClose() {
+		this.setState({
+			openDialog: false
+		})
+	}
+
 	render() {
 		const deleteActions = [
 	      <FlatButton
@@ -109,16 +116,16 @@ export default class UserList extends React.Component {
 	      />
 	  ];
 	  const lockActions = [
-	      <FlatButton
-	        label="Not sure. Maybe later."
-	        onTouchTap={this.handleCloseLock}
-					style={styles.actionButton}
-	      />,
-	      <FlatButton
-	        label="Yes"
-	        onClick={this.handleAccountSuspension}
-					style={styles.actionButton}
-	      />
+      <FlatButton
+        label="Not sure. Maybe later."
+        onTouchTap={this.handleCloseLock}
+				style={styles.actionButton}
+      />,
+      <FlatButton
+        label="Yes"
+        onClick={this.handleAccountSuspension}
+				style={styles.actionButton}
+      />
 	  ];
 		const color = this.disabledUser() ? red500 : lightBlack ;
 		const accountTooltip = this.disabledUser() ? 'Unlock Account' : 'Lock Account' ;
@@ -176,7 +183,13 @@ export default class UserList extends React.Component {
 						</CardActions>
 						{
 							this.state.openDialog &&
-							<AddUser user={this.props.currUser} roles={this.props.roles} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateUser} />
+							<AddUser 
+								user={this.props.currUser} 
+								roles={this.props.roles} 
+								openDialog={this.state.openDialog} 
+								handleUpdate={this.handleUpdateUser} 
+								closeDialog={this.handleEditClose}
+							/>
 						}
 				  </Card>
 			</div>
