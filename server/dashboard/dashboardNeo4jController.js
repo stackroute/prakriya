@@ -1538,7 +1538,7 @@ let deleteSession = function(waveObj, waveString, successCB, errorCB) {
 // Get evaluation skills
 let getEvaluationSkills = function(candidateID, successCB, errorCB) {
   let query = `
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: '${candidateID}'})
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${candidateID}'})
     WITH candidate AS candidate
     OPTIONAL MATCH (candidate)
     -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
