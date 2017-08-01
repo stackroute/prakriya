@@ -96,7 +96,6 @@ export default class Waves extends React.Component {
 		    	th.setState({
 		    		cadets: res.body
 		    	})
-		    	console.log('Cadets for wave', th.state.cadets);
 		    }
 		  })
 	}
@@ -111,7 +110,6 @@ export default class Waves extends React.Component {
 		    	console.log(err);
 		    else {
 					let filteredWaves = [];
-					console.log('All the waves', res.body)
 					res.body.map(function(wave, key) {
 						let today = Date.now();
 							if(new Date(wave.StartDate) <= today && new Date(wave.EndDate) >= today)
@@ -152,7 +150,6 @@ export default class Waves extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully updated a project', res.body)
 		    	th.getWaves();
 					th.setState({
 			      open: true,
