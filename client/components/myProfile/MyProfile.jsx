@@ -117,14 +117,8 @@ export default class MyProfile extends React.Component {
 		    	console.log(err);
 		    else {
 		    	if(res.text) {
-		    		let array = new Uint8Array(res.text.length);
-		        for (var i = 0; i < res.text.length; i++){
-		            array[i] = res.text.charCodeAt(i);
-		        }
-		        var blob = new Blob([array], {type: 'image/jpeg'});
-			    	let blobUrl = URL.createObjectURL(blob);
 			    	th.setState({
-			    		imageURL: blobUrl
+			    		imageURL: res.text
 			    	})
 		    	}
 		    }

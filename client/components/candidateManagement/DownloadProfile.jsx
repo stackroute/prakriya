@@ -91,7 +91,9 @@ export default class DownloadProfile extends React.Component {
 		doc.setTextColor(0, 0, 0);
 		doc.text(x, y+=10, 'Employee ID: ' + candidate.EmployeeID+'')
 		doc.text(x, y+=10, 'Email: ' + candidate.EmailID)
-		doc.text(x, y+=10, 'Band: ' + candidate.CareerBand)
+		if(this.props.role === 'wiproadmin') {
+			doc.text(x, y+=10, 'Band: ' + candidate.CareerBand)
+		}
 		doc.text(x, y+=10, 'Wave: ' + candidate.Wave)
 		doc.text(x, y+=10, 'Experience: ' + candidate.WorkExperience)
 		doc.text(x, y+=10, 'Digithon Score: ' + candidate.DigiThonScore+'')

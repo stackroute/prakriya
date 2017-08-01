@@ -49,7 +49,7 @@ export default class EvaluationForms extends React.Component {
 			engineeringculture: [],
 			skills: [],
 			communication: [],
-			overall: 1,
+			overall: '',
 			doneWell: '',
 			improvement: '',
 			suggestions: '',
@@ -57,6 +57,7 @@ export default class EvaluationForms extends React.Component {
 			disableSave: true
 		}
 		this.getCadets = this.getCadets.bind(this);
+		this.handleOverallRatingChange = this.handleOverallRatingChange.bind(this);
 		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.handleCandidateChange = this.handleCandidateChange.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -139,6 +140,12 @@ export default class EvaluationForms extends React.Component {
 	handleWaveChange(event, key, val) {
 		this.setState({
 			wave: val
+		})
+	};
+
+	handleOverallRatingChange(event, key, val) {
+		this.setState({
+			overall: val
 		})
 	};
 
@@ -366,18 +373,24 @@ export default class EvaluationForms extends React.Component {
 								)
 							})
 						}
+						<br />
 						<Row>
 							<Col md={6} mdOffset={2} style={styles.single}>
 								OVERALL RATING ACROSS THE PROGRAM
 							</Col>
 							<Col md={2}>
-								<StarRating
-									color1={'#ddd'}
-									half={false}
-									size={30}
-									value={this.state.overall}
-									onChange={(newVal) => th.handleChange(newVal, 'overall')}
-								/>
+							<SelectField
+								value={this.state.overall}
+								onChange={this.handleOverallRatingChange}
+								fullWidth={true}
+							>
+								{
+									['Top Gun', 'Good', 'Above Average', 'Average']
+									.map(function (value, index) {
+										return <MenuItem key={index} value={value} primaryText={value} />
+									})
+								}
+							</SelectField>
 							</Col>
 						</Row>
 
