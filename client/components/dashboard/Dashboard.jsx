@@ -62,7 +62,7 @@ export default class Dashboard extends React.Component {
 					  	</Paper>
 					  </Col>
 					</Row>
-					<br />
+					<br/>
 					<Row>
 						<Col md={12}>
 							{
