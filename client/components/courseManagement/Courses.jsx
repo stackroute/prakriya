@@ -8,6 +8,7 @@ import RestoreCourse from './RestoreCourse.jsx';
 import AddCourse from './AddCourse.jsx';
 import Assignments from './Assignments.jsx';
 import Schedule from './Schedule.jsx';
+import SkillSet from './SkillSet.jsx';
 import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
@@ -264,6 +265,7 @@ export default class Courses extends React.Component {
 				<div>
 				<h2 style={styles.heading}>Course Management</h2>
 				<AddCourse handleAdd={this.addCourse}/>
+				<SkillSet />
 				<Grid style={styles.grid}>
 					<Row>
 						{
