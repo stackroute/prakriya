@@ -1030,14 +1030,16 @@ let removeCadetFromWave = function(cadets, waveID, successCB, errorCB) {
 }
 
 // Update a wave
-let updateWave = function(waveObj, successCB, errorCB) {
+let updateWave = function(waveObj, oldCourse, successCB, errorCB) {
   let query = `MATCH(w:${graphConsts.NODE_WAVE}{WaveID: '${waveObj.WaveID}'})-
       [r:${graphConsts.REL_HAS}]->(c:${graphConsts.NODE_COURSE})
+      WHERE w.WaveID = '${waveObj.WaveID}' AND w.CourseName = '${oldCourse}'
     DELETE r
     SET
       w.Location = '${waveObj.Location}',
       w.StartDate = '${waveObj.StartDate}',
-      w.EndDate = '${waveObj.EndDate}'
+      w.EndDate = '${waveObj.EndDate}',
+      w.CourseName = '${waveObj.Course.split("_")[0]}'
     WITH w AS w
     MATCH (d:${graphConsts.NODE_COURSE}{ID:'${waveObj.Course}'})
     WITH w AS w, d AS d
@@ -1055,9 +1057,10 @@ let updateWave = function(waveObj, successCB, errorCB) {
 };
 
 // Delete a wave
-let deleteWave = function(waveObj, successCB, errorCB) {
+let deleteWave = function (waveObj, successCB, errorCB) {
   try {
-    let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'})
+    let query = `MATCH (n:${graphConsts.NODE_WAVE})
+      WHERE n.WaveID = '${waveObj.WaveID}' AND n.CourseName = '${waveObj.CourseName}'
       MATCH (c:${graphConsts.NODE_CANDIDATE})-[: ${graphConsts.REL_BELONGS_TO}]->(n)
       DETACH DELETE n
       RETURN c.EmailID`;
@@ -1121,8 +1124,10 @@ let getWaveIDs = function(successCB, errorCB) {
 };
 
 // Get cadets of wave
-let getCadetsOfWave = function(waveID, successCB, errorCB) {
-  let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'}) RETURN n`;
+let getCadetsOfWave = function(waveID, course, successCB, errorCB) {
+  let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
+    WHERE c.WaveID = '${waveID}' AND c.CourseName = '${course}'
+               RETURN n`;
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
@@ -1594,10 +1599,48 @@ let updateRating = function(employeeID, waveID, skillnames, ratings, successCB, 
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
-      logger.debug(resultObj);
-      successCB(resultObj);
+      successCB('SUCCESS');
     } else {
       errorCB('updateRating: Error');
+    }
+  });
+};
+
+/**********************************************
+************ SkillSet *************************
+**********************************************/
+
+
+// get all available skills
+let getSkillSet = function(successCB, errorCB) {
+  let query = `
+    MATCH (skill:${graphConsts.NODE_SKILL})
+    WITH skill.Name AS skillname ORDER BY skillname
+    RETURN COLLECT(skillname)
+    `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      successCB(resultObj.records[0]._fields[0]);
+    } else {
+      errorCB('getSkillSet: Error');
+    }
+  });
+};
+
+// create a new skill
+let createNewSkill = function(skill, successCB, errorCB) {
+  let query = `
+    CREATE (skill:${graphConsts.NODE_SKILL} {Name: '${skill}'})
+    `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      successCB('SUCCESS');
+    } else {
+      errorCB('createNewSkill: Error');
     }
   });
 };
@@ -1651,5 +1694,7 @@ module.exports = {
       getCourseForWave,
       removeCadetFromWave,
       getEvaluationSkills,
-      updateRating
+      updateRating,
+      getSkillSet,
+      createNewSkill
   }

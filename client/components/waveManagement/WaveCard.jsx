@@ -147,7 +147,7 @@ export default class WaveCard extends React.Component {
       wave.Course = this.state.selectedCourse;
     }
     console.log(wave);
-    this.props.handleUpdate(wave);
+    this.props.handleUpdate(wave, this.props.wave.CourseName);
     this.closeUpdateDialog();
   }
 
@@ -202,7 +202,7 @@ export default class WaveCard extends React.Component {
 
   getCadets(cadets) {
     let th = this;
-    Request.post('/dashboard/cadetsofwave').set({'Authorization': localStorage.getItem('token')}).send({waveid: this.props.wave.WaveID}).end(function(err, res) {
+    Request.post('/dashboard/cadetsofwave').set({'Authorization': localStorage.getItem('token')}).send({waveid: this.props.wave.WaveID, course:this.props.wave.CourseName}).end(function(err, res) {
       if (err)
         console.log(err);
       else {

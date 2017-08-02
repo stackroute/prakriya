@@ -180,7 +180,7 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 // Update a wave
 router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try {
-    dashboardNeo4jController.updateWave(req.body.wave, function (wave) {
+    dashboardNeo4jController.updateWave(req.body.wave, req.body.oldCourse, function (wave) {
       res.status(201).json(wave);
     }, function (err) {
       logger.error('Update Wave Error: ', err);
@@ -737,7 +737,7 @@ router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
 // get all candidates for specific wave
 router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardNeo4jController.getCadetsOfWave(req.query.waveID, function (data) {
+    dashboardNeo4jController.getCadetsOfWave(req.query.waveID, req.body.course, function (data) {
       res.status(201).json({data: data});
     }, function (err) {
       logger.error('Get Wave Specific Candidates Error: ', err);
@@ -1270,7 +1270,7 @@ router.get('/waves', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 // Get all cadets of a particular wave
 router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardNeo4jController.getCadetsOfWave(req.body.waveid, function (cadets) {
+    dashboardNeo4jController.getCadetsOfWave(req.body.waveid, req.body.course, function (cadets) {
       res.status(201).json(cadets);
     }, function (err) {
       logger.error('Get Cadets of Wave Error: ', err);
@@ -1296,23 +1296,6 @@ router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, 
     });
   } catch(err) {
     logger.error('Delete Wave Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
-
-// update a wave
-router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
-  try {
-    dashboardNeo4jController.updateWave(req.body.wave, function (wave) {
-      res.status(201).json(wave);
-    }, function (err) {
-      logger.error('Update Wave Error: ', err);
-      res.status(500).json({error: 'Cannot delete the wave...!'});
-    });
-  } catch(err) {
-    logger.error('Update Wave Exception: ', err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -1525,6 +1508,46 @@ router.post('/updaterating', auth.canAccess(CONFIG.MENTOR), function(req, res) {
     });
   } catch(err) {
     logger.debug('UpdateRating Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+/**********************************************
+************ SkillSet *************************
+**********************************************/
+
+// Get all skills
+router.get('/skillset', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
+  try {
+    dashboardNeo4jController.getSkillSet(function (skillset) {
+      res.status(201).json(skillset);
+    }, function (err) {
+      logger.error('Get SkillSet Error: ', err);
+      res.status(500).json({error: 'Cannot fetch all skills from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get SkillSet Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Create a new skill
+router.post('/createnewskill', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    dashboardNeo4jController.createNewSkill(
+      req.body.skill,
+      function (status) {
+      res.status(201).json(status);
+    }, function (err) {
+      logger.error('CreateNewSkill Error: ', err);
+      res.status(500).json({error: 'Cannot create a new skill in neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('CreateNewSkill Error', err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });

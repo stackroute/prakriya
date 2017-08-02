@@ -252,7 +252,12 @@ export default class CandidateHome extends React.Component {
 											this.props.role == 'wiproadmin' &&
 											<div>
 												<h4>Billability:</h4>
-												<p style={styles.details}> Status: {this.props.candidate.Billability} </p>
+												<p style={styles.details}><span>Status: {this.props.candidate.Billability.split('since')[0]} </span>
+												{
+													this.props.candidate.Billability.split('since').length > 1 &&
+														<span> since {this.formatDate(this.props.candidate.Billability.split('since')[1])}</span>
+												}
+												</p>
 											</div>
 										}
 										<h4>Manager Details</h4>

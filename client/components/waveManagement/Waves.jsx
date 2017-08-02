@@ -140,12 +140,12 @@ export default class Waves extends React.Component {
 		  })
 	}
 
-	handleUpdate(wave) {
+	handleUpdate(wave, oldCourse) {
 		let th = this;
 		Request
 			.post('/dashboard/updatewave')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send({wave: wave})
+			.send({wave: wave, oldCourse: oldCourse})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
@@ -182,8 +182,8 @@ export default class Waves extends React.Component {
 	addWave(wave) {
 		let th = this;
 		let flag = false;
-		this.state.waves.filter(function(existingWave) {
-			if(wave.WaveID === existingWave.WaveID) {
+		this.state.waves.filter(function (existingWave) {
+			if((wave.WaveID === existingWave.WaveID) && ( wave.Course.split('_')[0] === existingWave.CourseName)) {
 				flag = true;
 			}
 		})
@@ -199,7 +199,7 @@ export default class Waves extends React.Component {
 		    else {
 		    	th.setState({
 		    		open: true,
-		    		message: "Wave added successfully with Wave ID: " + res.body.WaveID
+		    		message: "Wave added successfully with Wave ID: " + wave.WaveID
 		    	})
 		    	th.getCadets();
 		    	th.getWaves();

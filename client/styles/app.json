@@ -10,6 +10,13 @@ module.exports = {
 		'zIndex': 1,
     'border': '2px solid teal'
 	},
+  'fab2': {
+		'position':'fixed',
+		'bottom': '80px',
+		'right': '15px',
+		'zIndex': 1,
+    'border': '2px solid teal'
+	},
   'pager': {
     'width': '200px',
     'border': '1px solid silver',
