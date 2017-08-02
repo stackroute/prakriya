@@ -2,18 +2,14 @@ import React from 'react';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import SkillsIcon from 'material-ui/svg-icons/action/stars';
 import Dialog from 'material-ui/Dialog';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
 import app from '../../styles/app.json';
-import select from '../../styles/select.json';
 import dialog from '../../styles/dialog.json';
 import Paper from 'material-ui/Paper';
 import Chip from 'material-ui/Chip';
-import SaveIcon from 'material-ui/svg-icons/content/save';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import IconButton from 'material-ui/IconButton';
+import Request from 'superagent';
 
 const styles = {
   paper: {
@@ -43,10 +39,46 @@ export default class SkillSet extends React.Component {
       disableAdd: true
     };
 
+    this.getSkillSet = this.getSkillSet.bind(this);
+    this.addNewSkill = this.addNewSkill.bind(this);
     this.onOpen = this.onOpen.bind(this);
     this.onClose = this.onClose.bind(this);
     this.onSkillChange = this.onSkillChange.bind(this);
     this.onSkillAddition = this.onSkillAddition.bind(this);
+  }
+
+  componentWillMount() {
+    this.getSkillSet();
+  }
+
+  getSkillSet() {
+    let th = this;
+    Request
+    .get('/dashboard/skillset')
+    .set({'Authorization': localStorage.getItem('token')})
+    .end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({skills: res.body});
+      }
+    });
+  }
+
+  addNewSkill(skill, skills) {
+    let th = this;
+    Request
+    .post('/dashboard/createnewskill')
+    .set({'Authorization': localStorage.getItem('token')})
+    .send({skill: skill})
+    .end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        skills.push(skill);
+        th.setState({skills: skills, skill: '', disableSave: true});
+      }
+    });
   }
 
   onSkillChange(e) {
@@ -54,10 +86,18 @@ export default class SkillSet extends React.Component {
   }
 
   onSkillAddition() {
+    let th = this;
     if (this.state.skill.trim().length != 0) {
+      let skill = this.state.skill;
       let skills = this.state.skills;
-      skills.push(this.state.skill);
-      this.setState({skills: skills, skill: '', disableSave: true});
+      let duplicateFound = skills.some(function(s) {
+        return s == skill
+      });
+      if(duplicateFound) {
+        console.log('Duplicate!')
+      } else {
+        th.addNewSkill(skill, skills);
+      }
     }
   }
 

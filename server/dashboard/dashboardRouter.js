@@ -1514,4 +1514,44 @@ router.post('/updaterating', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   }
 });
 
+/**********************************************
+************ SkillSet *************************
+**********************************************/
+
+// Get all skills
+router.get('/skillset', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
+  try {
+    dashboardNeo4jController.getSkillSet(function (skillset) {
+      res.status(201).json(skillset);
+    }, function (err) {
+      logger.error('Get SkillSet Error: ', err);
+      res.status(500).json({error: 'Cannot fetch all skills from neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('Get SkillSet Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Create a new skill
+router.post('/createnewskill', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+  try {
+    dashboardNeo4jController.createNewSkill(
+      req.body.skill,
+      function (status) {
+      res.status(201).json(status);
+    }, function (err) {
+      logger.error('CreateNewSkill Error: ', err);
+      res.status(500).json({error: 'Cannot create a new skill in neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('CreateNewSkill Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 module.exports = router;
