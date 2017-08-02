@@ -318,6 +318,7 @@ export default class CourseCard extends React.Component {
         )
       }
       return (
+        <div>
         <Dialog bodyStyle={styles.dialog}
           title={title}
           titleStyle={styles.dialogTitle}
@@ -368,6 +369,13 @@ export default class CourseCard extends React.Component {
             }
             </div>
           </Paper>
-        </Dialog>)
+        </Dialog>
+        <Snackbar
+          open={this.state.snackbarOpen}
+          message={this.state.snackbarMessage}
+          autoHideDuration={4000}
+          onRequestClose={th.hideSnackbar}
+       />
+       </div>)
   }
 }
