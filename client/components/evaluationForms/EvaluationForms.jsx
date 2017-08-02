@@ -151,10 +151,10 @@ export default class EvaluationForms extends React.Component {
 
 	handleCandidateChange(event, key, val) {
 		let newVal = val.split('-');
-		this.getEvaluationFields(newVal[0]);
+		this.getEvaluationFields(newVal[1]);
 		this.setState({
-			cadetID: newVal[0],
-			cadetName: newVal[1]
+			cadetName: newVal[0],
+			cadetID: newVal[1]
 		})
 	};
 
@@ -282,7 +282,7 @@ export default class EvaluationForms extends React.Component {
 						</Col>
 						<Col md={4}>
 							<SelectField
-			          value={this.state.cadetID+'-'+this.state.cadetName}
+			          value={this.state.cadetName+'-'+this.state.cadetID}
 			          onChange={this.handleCandidateChange}
 			          floatingLabelText="Select Candidate"
 			          fullWidth={true}
@@ -292,7 +292,11 @@ export default class EvaluationForms extends React.Component {
 			        	this.state.cadets.map(function (cadet, index) {
 			        		return (
 			        			cadet.Wave == th.state.wave &&
-			        			<MenuItem key={index} value={cadet.EmployeeID+'-'+cadet.EmployeeName} primaryText={cadet.EmployeeName} />
+			        			<MenuItem 
+			        				key={index} 
+			        				value={cadet.EmployeeName+'-'+cadet.EmailID} 
+			        				primaryText={cadet.EmployeeName+'-'+cadet.EmailID} 
+			        			/>
 			        		)
 			        	})
 			        }
