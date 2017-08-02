@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const crypto = require('crypto');
 const adminMongoController = require('./adminMongoController');
 let auth = require('../auth')();
 let CONFIG = require('../../config');
@@ -12,7 +13,19 @@ const logger = require('./../../applogger');
 router.get('/users', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     adminMongoController.getUsers(function (userColl) {
-      res.status(201).json(userColl);
+      
+      userColl.map(function (user, index) {
+        logger.debug('Password of the user', user.password)
+        const decipher = crypto.createDecipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
+        let decrypted = decipher.update(user.password, 'hex', 'utf8');
+        decrypted = decipher.final('utf8');
+        user.password = decrypted;
+
+        if(index == userColl.length-1) {
+          res.status(201).json(userColl);
+        }
+      })
+
     }, function (err) {
       logger.error('Error', err);
       res.status(500).json({error: 'Cannot get all users from db...!'});
@@ -28,6 +41,12 @@ router.get('/users', auth.canAccess(CONFIG.ALL), function (req, res) {
 router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   let userObj = req.body;
   try{
+    const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
+    let encrypted = cipher.update(userObj.password, 'utf8', 'hex');
+    encrypted = cipher.final('hex');
+
+    userObj.password = encrypted;
+
     adminMongoController.addUser(userObj, function (user) {
       res.status(200).json(user);
     }, function (err) {
@@ -35,6 +54,7 @@ router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
       res.status(500).json({error: 'Cannot add user in db...!'});
     });
   } catch(err) {
+    logger.error('Error in adding a user', err)
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
@@ -57,8 +77,15 @@ router.delete('/deleteuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
 });
 
 router.post('/updateuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
-  try {
-    adminMongoController.updateUser(req.body, function (status) {
+  let userObj = req.body;
+  try{
+    const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
+    let encrypted = cipher.update(userObj.password, 'utf8', 'hex');
+    encrypted = cipher.final('hex');
+
+    userObj.password = encrypted;
+
+    adminMongoController.updateUser(userObj, function (status) {
       res.status(200).json(status);
     }, function (err) {
       logger.error('Error', err);

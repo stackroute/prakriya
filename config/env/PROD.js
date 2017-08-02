@@ -146,6 +146,11 @@ let email = {
   SERVICE_PROVIDER: 'Gmail'
 }
 
+let crypto = {
+  ALGORITHM: 'aes192',
+  PASSWORD: 'password'
+}
+
 let config = {
   PRAKRIYA: prakriya,
   MONGO: mongo,
@@ -159,6 +164,7 @@ let config = {
   jwtSession: {
     session: false
   },
+  CRYPTO: crypto,
   ALL: ['admin', 'wiproadmin', 'sradmin', 'mentor', 'candidate'],
   ADMIN: ['admin', 'wiproadmin', 'sradmin'],
   ADMINISTRATOR: ['wiproadmin', 'sradmin'],

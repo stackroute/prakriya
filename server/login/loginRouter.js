@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const crypto = require('crypto');
 const userModel = require('../../models/users.js');
 let jwt = require('jwt-simple');
 let cfg = require('../../config');
@@ -17,13 +18,16 @@ const logger = require('./../../applogger');
 //   }
 // )
 
-
 // encoding tokens here!!!!!
 router.post('/', function (req, res) {
     if (req.body.username && req.body.password) {
+        
+        const cipher = crypto.createCipher(cfg.CRYPTO.ALGORITHM, cfg.CRYPTO.PASSWORD);
+        let encrypted = cipher.update(req.body.password, 'utf8', 'hex');
+        encrypted = cipher.final('hex');
+        
         let uname = req.body.username;
-        let password = req.body.password;
-
+        let password = encrypted;
         let query = userModel.findOne({username: uname, password: password});
 
         let promise = query.exec();

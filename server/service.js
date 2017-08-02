@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const flash = require('connect-flash');
 const neo4jDriver = require('neo4j-driver').v1;
+const crypto = require('crypto');
 const auth = require('./auth')();
 const CONFIG = require('../config');
 const logger = require('./../applogger');
@@ -119,7 +120,15 @@ let setupMongooseConnections = function() {
         logger.info('Role added', role.name);
       }
     });
-    let saveUser = new UserModel(CONFIG.BASEDATA.ADMIN_USER);
+
+    let admin = CONFIG.BASEDATA.ADMIN_USER;
+
+    const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
+    let encrypted = cipher.update(admin.password, 'utf8', 'hex');
+    encrypted = cipher.final('hex');
+    admin.password = encrypted;
+
+    let saveUser = new UserModel(admin);
     saveUser.save(function (err, user) {
       if(!err) {
         logger.info('User added', user.name);
