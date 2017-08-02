@@ -10,6 +10,7 @@ import dialog from '../../styles/dialog.json';
 import Paper from 'material-ui/Paper';
 import Chip from 'material-ui/Chip';
 import AutoComplete from 'material-ui/AutoComplete';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
   dialog: {
@@ -78,21 +79,26 @@ export default class CourseCard extends React.Component {
       DurationErrorText: '',
       searchPerm: '',
       Day: '',
-      DayErrorText: ''
+      DayErrorText: '',
+      snackbarOpen: false,
+			snackbarMessage: ''
 		}
-  this.handleClose = this.handleClose.bind(this);
-  this.handleSubmit = this.handleSubmit.bind(this);
-  this.onChangeType = this.onChangeType.bind(this);
-  this.resetFields = this.resetFields.bind(this);
-  this.validationSuccess = this.validationSuccess.bind(this);
-  this.onChangeName = this.onChangeName.bind(this);
-  this.onChangeDescription = this.onChangeDescription.bind(this);
-  this.onChangeDuration = this.onChangeDuration.bind(this);
-  this.onChangeWeek = this.onChangeWeek.bind(this);
-  this.onChangeDay = this.onChangeDay.bind(this);
-  this.handleUpdateInputPerm = this.handleUpdateInputPerm.bind(this);
-  this.handleAddNewPerm = this.handleAddNewPerm.bind(this);
-  this.handleSkillDelete = this.handleSkillDelete.bind(this);
+
+    this.handleClose = this.handleClose.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.onChangeType = this.onChangeType.bind(this);
+    this.resetFields = this.resetFields.bind(this);
+    this.validationSuccess = this.validationSuccess.bind(this);
+    this.onChangeName = this.onChangeName.bind(this);
+    this.onChangeDescription = this.onChangeDescription.bind(this);
+    this.onChangeDuration = this.onChangeDuration.bind(this);
+    this.onChangeWeek = this.onChangeWeek.bind(this);
+    this.onChangeDay = this.onChangeDay.bind(this);
+    this.handleUpdateInputPerm = this.handleUpdateInputPerm.bind(this);
+    this.handleAddNewPerm = this.handleAddNewPerm.bind(this);
+    this.handleSkillDelete = this.handleSkillDelete.bind(this);
+    this.hideSnackbar = this.hideSnackbar.bind(this);
+    this.openSnackbar = this.openSnackbar.bind(this);
 	}
 
   componentWillMount() {
@@ -100,6 +106,20 @@ export default class CourseCard extends React.Component {
       openDialog: this.props.openDialog
     })
   }
+
+  openSnackbar(message) {
+		this.setState({
+			snackbarMessage: message,
+			snackbarOpen: true
+		});
+	}
+
+	hideSnackbar() {
+		this.setState({
+			snackbarMessage: '',
+			snackbarOpen: false
+		});
+	}
 
   handleClose(e, action) {
     if (action == 'ADD') {
@@ -225,13 +245,22 @@ export default class CourseCard extends React.Component {
 	}
 
 	handleAddNewPerm() {
+    let th = this;
 		let perms = this.state.Skills
-		perms.push(this.state.searchPerm)
-		this.setState({
-			Skills: perms,
-			searchPerm: '',
-      SkillErrorText: ''
-		})
+    let perm = this.state.searchPerm;
+    let duplicateFound = perms.some(function(p) {
+      return p.toLowerCase() == perm.toLowerCase()
+    });
+    if(duplicateFound) {
+      th.openSnackbar('Duplicate Skill! Try adding a new skill.');
+    } else {
+      perms.push(perm)
+      th.setState({
+        Skills: perms,
+        searchPerm: '',
+        SkillErrorText: ''
+      })
+    }
 	}
 
   handleSkillDelete(perm) {

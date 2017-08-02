@@ -10,6 +10,7 @@ import Chip from 'material-ui/Chip';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import IconButton from 'material-ui/IconButton';
 import Request from 'superagent';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
   paper: {
@@ -36,7 +37,9 @@ export default class SkillSet extends React.Component {
       skills: [],
       skill: '',
       showDialog: false,
-      disableAdd: true
+      disableAdd: true,
+      snackbarOpen: false,
+			snackbarMessage: ''
     };
 
     this.getSkillSet = this.getSkillSet.bind(this);
@@ -45,6 +48,8 @@ export default class SkillSet extends React.Component {
     this.onClose = this.onClose.bind(this);
     this.onSkillChange = this.onSkillChange.bind(this);
     this.onSkillAddition = this.onSkillAddition.bind(this);
+    this.hideSnackbar = this.hideSnackbar.bind(this);
+    this.openSnackbar = this.openSnackbar.bind(this);
   }
 
   componentWillMount() {
@@ -91,10 +96,10 @@ export default class SkillSet extends React.Component {
       let skill = this.state.skill;
       let skills = this.state.skills;
       let duplicateFound = skills.some(function(s) {
-        return s == skill
+        return s.toLowerCase() == skill.toLowerCase()
       });
       if(duplicateFound) {
-        console.log('Duplicate!')
+        th.openSnackbar('Duplicate Skill! Try adding a new skill.');
       } else {
         th.addNewSkill(skill, skills);
       }
@@ -108,6 +113,20 @@ export default class SkillSet extends React.Component {
   onClose() {
     this.setState({showDialog: false})
   }
+
+  openSnackbar(message) {
+		this.setState({
+			snackbarMessage: message,
+			snackbarOpen: true
+		});
+	}
+
+	hideSnackbar() {
+		this.setState({
+			snackbarMessage: '',
+			snackbarOpen: false
+		});
+	}
 
   render() {
     let th = this;
@@ -146,6 +165,12 @@ export default class SkillSet extends React.Component {
               </div>
             </div>
           </Dialog>
+          <Snackbar
+  					open={this.state.snackbarOpen}
+  					message={this.state.snackbarMessage}
+  					autoHideDuration={4000}
+  					onRequestClose={th.hideSnackbar}
+  			 />
         </div>
       )
     }
