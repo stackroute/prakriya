@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const formidable = require('formidable');
 const fs = require('fs');
-const xlsx = require('xlsx');
 const logger = require('./../../applogger');
 const client = require('redis').createClient();
 const uploadMongoController = require('./uploadMongoController');
@@ -116,7 +115,7 @@ router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) 
 							else if(file_type == 'Digi-Thon') {
 								// Don't have the Digi-Thon file for the reference
 							}
-							
+
 							src_lines.map(function (line2, index2) {
 								if(index2 > 0 && line2 !== '') {
 									let lineCol2 = line2.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
