@@ -214,7 +214,7 @@ export default class Candidates extends React.Component {
 		    	console.log(err);
 		    else {
 		    	let waves = res.body.map(function (wave) {
-		    		return wave.WaveID;
+		    		return wave.WaveID + '(' + wave.CourseName + ')';
 		    	})
 					th.setState({
 						waves: waves

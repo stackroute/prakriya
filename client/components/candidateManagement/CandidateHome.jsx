@@ -87,9 +87,12 @@ export default class CandidateHome extends React.Component {
 			})
 	}
 	getWave(waveid) {
+		console.log(waveid);
 		let th = this;
+		let wave = waveid.split('(')[0].trim();
+    let course = waveid.split('(')[1].split(')')[0];
 		Request
-			.get(`/dashboard/wave?waveid=${waveid}`)
+			.get(`/dashboard/wave?waveid=${wave}&course=${course}`)
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
 				if(err)

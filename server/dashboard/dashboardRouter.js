@@ -214,7 +214,7 @@ router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, 
 // Fetch a wave with WaveID
 router.get('/wave', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
-    dashboardNeo4jController.getWave(req.query.waveid, function (wave) {
+    dashboardNeo4jController.getWave(req.query.waveid, req.query.course, function (wave) {
       res.status(201).json(wave);
     }, function (err) {
       logger.error('Error 1', err);
@@ -737,7 +737,7 @@ router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
 // get all candidates for specific wave
 router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
-    dashboardNeo4jController.getCadetsOfWave(req.query.waveID, req.body.course, function (data) {
+    dashboardNeo4jController.getCadetsOfWave(req.query.waveID, req.query.course, function (data) {
       res.status(201).json({data: data});
     }, function (err) {
       logger.error('Get Wave Specific Candidates Error: ', err);
@@ -1071,7 +1071,7 @@ router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function (req, res)
 router.get('/assessment', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   try{
     console.log(req.query.waveid);
-    dashboardNeo4jController.getAssessmentTrack(req.query.waveid, function (data) {
+    dashboardNeo4jController.getAssessmentTrack(req.query.waveid, req.query.course, function (data) {
       res.status(201).json({data: data});
     }, function (err) {
       logger.error('Get Courses For Wave Error: ', err);
@@ -1104,10 +1104,10 @@ router.post('/assessmentdetails', auth.canAccess(CONFIG.ADMMEN), function (req, 
 
 
 // map assessments
-router.get('/assessmentandcandidates/:waveID/:assessment', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/assessmentandcandidates/:waveID/:assessment/:course', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   console.log(req.params.waveID, req.params.assessment);
   try{
-    dashboardNeo4jController.assessmentsandcandidates(req.params.waveID, req.params.assessment,  function (data) {
+    dashboardNeo4jController.assessmentsandcandidates(req.params.waveID, req.params.assessment, req.params.course, function (data) {
       res.status(201).json({data});
     }, function (err) {
       logger.error('Get Candidates For Wave Error: ', err);
@@ -1162,7 +1162,6 @@ router.get('/waveids', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   logger.info('API HIT ===> GET WAVEIDS');
   try{
     dashboardNeo4jController.getWaveIDs(function (waveids) {
-      console.log(waveids,"waveids")
       res.status(201).json({waveids: waveids});
     }, function (err) {
       logger.error('Get All Wave IDs Error: ', err);
@@ -1177,11 +1176,11 @@ router.get('/waveids', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 });
 
 // Get a particular wave object based on wave id
-router.get('/waveobject/:waveID', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/waveobject/:waveID/:course', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
   logger.info('API HIT ===> GET Wave Object');
   try{
     console.log(req.params.waveID,"req.params.WAVEID")
-    dashboardNeo4jController.getSessionForWave (req.params.waveID,
+    dashboardNeo4jController.getSessionForWave (req.params.waveID, req.params.course,
        function (wave) {
          res.status(201).json({waveObject: wave});
     }, function (err) {
@@ -1418,7 +1417,7 @@ router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
 ///////////////////////program flow///////////////////
 router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
-    dashboardNeo4jController.updateSession(req.body.wave, req.body.waveString,function (status) {
+    dashboardNeo4jController.updateSession(req.body.wave, req.body.waveString, req.body.course, function (status) {
        console.log(req.body.waveString,"waveString")
       res.status(201).json({status:'success'});
     }, function (uperr) {
@@ -1436,7 +1435,7 @@ router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
 // delete session
 router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res) {
   try {
-    dashboardNeo4jController.deleteSession(req.body.wave,req.body.waveString ,function (status) {
+    dashboardNeo4jController.deleteSession(req.body.wave,req.body.waveString ,req.body.course, function (status) {
       logger.info('Status: ', status);
       res.status(201).json(status);
     }, function (sessionerr) {
