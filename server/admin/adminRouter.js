@@ -9,7 +9,7 @@ const logger = require('./../../applogger');
 ****************************************/
 
 // Get all the users
-router.get('/users', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.get('/users', auth.canAccess(CONFIG.ALL), function (req, res) {
   try{
     adminMongoController.getUsers(function (userColl) {
       res.status(201).json(userColl);
@@ -193,4 +193,3 @@ router.get('/accesscontrols', auth.canAccess(CONFIG.ADMIN), function (req, res) 
 });
 
 module.exports = router;
-

@@ -8,6 +8,8 @@ import RestoreCourse from './RestoreCourse.jsx';
 import AddCourse from './AddCourse.jsx';
 import Assignments from './Assignments.jsx';
 import Schedule from './Schedule.jsx';
+import SkillSet from './SkillSet.jsx';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
 	heading: {
@@ -45,7 +47,9 @@ export default class Courses extends React.Component {
 			currentCard: {},
 			openDialog: false,
 			assignmentsDialog: false,
-			scheduleDialog: false
+			scheduleDialog: false,
+			open: false,
+			message: ''
 		}
 		this.getCourses = this.getCourses.bind(this);
 		this.updateCourse = this.updateCourse.bind(this);
@@ -61,6 +65,7 @@ export default class Courses extends React.Component {
 		this.closeSchedule = this.closeSchedule.bind(this);
 		this.setCurrentCourse = this.setCurrentCourse.bind(this);
 		this.subDelete = this.subDelete.bind(this);
+		this.handleRequestClose = this.handleRequestClose.bind(this);
 	}
 
 	componentWillMount() {
@@ -105,18 +110,43 @@ export default class Courses extends React.Component {
 
 	addCourse(course){
 		let th = this;
-		Request
-			.post('/dashboard/addcourse')
-			.set({'Authorization': localStorage.getItem('token')})
-			.send(course)
-			.end(function(err, res){
-		    if(err)
-		    	console.log(err);
-		    else {
-		    	th.getCourses();
-		    }
-		  });
+		let flag = false;
+		this.state.courses.filter(function(existingCourse) {
+			if(course.ID === existingCourse.ID) {
+				flag = true;
+			}
+		})
+		if(!flag) {
+			Request
+				.post('/dashboard/addcourse')
+				.set({'Authorization': localStorage.getItem('token')})
+				.send(course)
+				.end(function(err, res){
+			    if(err)
+			    	console.log(err);
+			    else {
+			    	th.getCourses();
+						th.setState({
+							open: true,
+							message: 'Course Added Successfully'
+						})
+			    }
+			  });
+			}
+			else {
+				th.setState({
+					open: true,
+					message: 'Course already exists'
+				})
+			}
 	}
+
+	handleRequestClose = () => {
+    this.setState({
+      open: false,
+			message: ''
+    });
+  };
 
 	updateCourse(course, edit){
 		let th = this
@@ -130,6 +160,10 @@ export default class Courses extends React.Component {
 		    	console.log(err);
 		    else {
 		    	th.getCourses();
+					th.setState({
+			      open: true,
+						message: 'Course Updated Successfully'
+			    });
 		    }
 		  });
 	}
@@ -146,6 +180,10 @@ export default class Courses extends React.Component {
 		    	console.log(err);
 		    else {
 		    	th.getCourses();
+					th.setState({
+			      open: true,
+						message: 'Course Deleted Successfully'
+			    });
 		    }
 		  });
 	}
@@ -161,6 +199,10 @@ export default class Courses extends React.Component {
 		    	console.log(err);
 		    else {
 		    	th.getCourses();
+					th.setState({
+			      open: true,
+						message: 'Course Restored Successfully'
+			    });
 		    }
 		  });
 	}
@@ -223,6 +265,7 @@ export default class Courses extends React.Component {
 				<div>
 				<h2 style={styles.heading}>Course Management</h2>
 				<AddCourse handleAdd={this.addCourse}/>
+				<SkillSet />
 				<Grid style={styles.grid}>
 					<Row>
 						{
@@ -286,6 +329,13 @@ export default class Courses extends React.Component {
 						delete={this.subDelete}
 						openDialog={this.state.scheduleDialog}
 						closeDialog={this.closeSchedule} />
+
+				<Snackbar
+					open={this.state.open}
+					message={this.state.message}
+					autoHideDuration={4000}
+					onRequestClose={this.handleRequestClose}
+			 />
 			</div>
 		)
 	}

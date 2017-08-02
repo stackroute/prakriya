@@ -49,7 +49,7 @@ export default class EvaluationForms extends React.Component {
 			engineeringculture: [],
 			skills: [],
 			communication: [],
-			overall: 1,
+			overall: '',
 			doneWell: '',
 			improvement: '',
 			suggestions: '',
@@ -57,6 +57,7 @@ export default class EvaluationForms extends React.Component {
 			disableSave: true
 		}
 		this.getCadets = this.getCadets.bind(this);
+		this.handleOverallRatingChange = this.handleOverallRatingChange.bind(this);
 		this.handleWaveChange = this.handleWaveChange.bind(this);
 		this.handleCandidateChange = this.handleCandidateChange.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -66,6 +67,7 @@ export default class EvaluationForms extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.saveEvaluation = this.saveEvaluation.bind(this);
 		this.getEvaluationFields = this.getEvaluationFields.bind(this);
+		this.saveRatingsInNeo4j = this.saveRatingsInNeo4j.bind(this);
 	}
 
 	componentWillMount() {
@@ -141,12 +143,18 @@ export default class EvaluationForms extends React.Component {
 		})
 	};
 
+	handleOverallRatingChange(event, key, val) {
+		this.setState({
+			overall: val
+		})
+	};
+
 	handleCandidateChange(event, key, val) {
 		let newVal = val.split('-');
-		this.getEvaluationFields(newVal[0]);
+		this.getEvaluationFields(newVal[1]);
 		this.setState({
-			cadetID: newVal[0],
-			cadetName: newVal[1]
+			cadetName: newVal[0],
+			cadetID: newVal[1]
 		})
 	};
 
@@ -208,6 +216,7 @@ export default class EvaluationForms extends React.Component {
 		this.saveEvaluation(evaluationObj);
 	};
 
+  // saving evaluation results in mongodb
 	saveEvaluation(evaluationObj) {
 		let th = this;
 		Request
@@ -219,9 +228,33 @@ export default class EvaluationForms extends React.Component {
 		    	console.log(err);
 		    else {
 		    	console.log('Cadet evaluation form saved successfully', res.body);
-		    	th.setState({
+					th.saveRatingsInNeo4j();
+		    }
+		  });
+	};
+
+	// updating skill ratings in neo4j
+	saveRatingsInNeo4j() {
+		let th = this;
+		let skillNames = EVALUATION[4].options;
+		let skillRatings = this.state.skills;
+		let obj = {};
+		obj.employeeID = this.state.cadetID;
+		obj.waveID = this.state.wave;
+		obj.skills = skillNames;
+		obj.ratings = skillRatings;
+		Request
+			.post('/dashboard/updaterating')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send(obj)
+			.end(function(err, res) {
+				if(err)
+		    	console.log(err);
+		    else {
+		    	console.log('Rating updated successfully', res.body);
+					th.setState({
 						open: true
-					})
+					});
 		    }
 		  });
 	};
@@ -249,7 +282,7 @@ export default class EvaluationForms extends React.Component {
 						</Col>
 						<Col md={4}>
 							<SelectField
-			          value={this.state.cadetID+'-'+this.state.cadetName}
+			          value={this.state.cadetName+'-'+this.state.cadetID}
 			          onChange={this.handleCandidateChange}
 			          floatingLabelText="Select Candidate"
 			          fullWidth={true}
@@ -259,7 +292,11 @@ export default class EvaluationForms extends React.Component {
 			        	this.state.cadets.map(function (cadet, index) {
 			        		return (
 			        			cadet.Wave == th.state.wave &&
-			        			<MenuItem key={index} value={cadet.EmployeeID+'-'+cadet.EmployeeName} primaryText={cadet.EmployeeName} />
+			        			<MenuItem 
+			        				key={index} 
+			        				value={cadet.EmployeeName+'-'+cadet.EmailID} 
+			        				primaryText={cadet.EmployeeName+'-'+cadet.EmailID} 
+			        			/>
 			        		)
 			        	})
 			        }
@@ -324,8 +361,8 @@ export default class EvaluationForms extends React.Component {
 																color1={'#ddd'}
 																half={false}
 																size={30}
-																value={th.state[item.type.replace(' ', '')][index+1]}
-																onChange={(newVal) => th.handleChange(newVal, item.type.replace(' ', ''), index+1)}
+																value={th.state[item.type.replace(' ', '')][index]}
+																onChange={(newVal) => th.handleChange(newVal, item.type.replace(' ', ''), index)}
 															/>
 														</Col>
 													</Row>
@@ -336,18 +373,24 @@ export default class EvaluationForms extends React.Component {
 								)
 							})
 						}
+						<br />
 						<Row>
 							<Col md={6} mdOffset={2} style={styles.single}>
 								OVERALL RATING ACROSS THE PROGRAM
 							</Col>
 							<Col md={2}>
-								<StarRating
-									color1={'#ddd'}
-									half={false}
-									size={30}
-									value={this.state.overall}
-									onChange={(newVal) => th.handleChange(newVal, 'overall')}
-								/>
+							<SelectField
+								value={this.state.overall}
+								onChange={this.handleOverallRatingChange}
+								fullWidth={true}
+							>
+								{
+									['Top Gun', 'Good', 'Above Average', 'Average']
+									.map(function (value, index) {
+										return <MenuItem key={index} value={value} primaryText={value} />
+									})
+								}
+							</SelectField>
 							</Col>
 						</Row>
 

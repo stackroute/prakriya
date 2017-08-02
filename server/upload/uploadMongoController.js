@@ -1,24 +1,12 @@
-const CandidateModel = require('../../models/candidates.js');
 const FileModel = require('../../models/files.js');
 const logger = require('./../../applogger');
-
-let addCadet = function (cadetObj, successCB, errorCB) {
-	let saveCadet = new CandidateModel(cadetObj);
-	saveCadet.save(cadetObj, function (err, result) {
-		if(err) {
-			errorCB(err);
-		} else {
-			successCB(result);
-		}
-	});
-};
 
 let addFile = function (fileObj, successCB, errorCB) {
 	let saveFile = new FileModel(fileObj);
 	saveFile.save(fileObj, function (err, result) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(result);
 	});
 };
@@ -26,8 +14,8 @@ errorCB(err);
 let getFileById = function (fileId, successCB, errorCB) {
 	FileModel.findOne({fileId: fileId}, function (err, fileObj) {
 		if(err) {
-errorCB(err);
-}
+			errorCB(err);
+		}
 		successCB(fileObj);
 	});
 };
@@ -44,7 +32,6 @@ let updateFileStatus = function (fileObj) {
 };
 
 module.exports = {
-	addCadet: addCadet,
 	addFile: addFile,
 	getFileById: getFileById,
 	updateFileStatus: updateFileStatus

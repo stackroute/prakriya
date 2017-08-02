@@ -11,6 +11,15 @@ import {Card, CardMedia, CardText} from 'material-ui/Card';
 import VisibilityIcon from 'material-ui/svg-icons/action/visibility';
 import VisibilityOffIcon from 'material-ui/svg-icons/action/visibility-off';
 
+const styles = {
+	body: {
+		borderRadius: 10,
+	},
+	card: {
+		background: 'rgba(255,255,255,0.15)',
+	}
+}
+
 export default class Login extends React.Component {
 
 	constructor(props) {
@@ -96,43 +105,56 @@ export default class Login extends React.Component {
 	render() {
 
 		return(
-			<Card>
-				 <CardMedia>
-						 <img src="./assets/images/login_head.png"/>
-				 </CardMedia>
-				 <CardText>
-				 <form className="commentForm" onSubmit={this.onCommentSubmit}>
-					 <TextField
-					 	floatingLabelText="Username"
-					 	onChange={this.onChangeUsername}
-						style={{width: '100%'}}
-						errorText={this.state.usernameErrorText}/> <br />
-						<div style={{position: 'relative', display: 'inline-block', width: '100%'}}>
-							{
-								this.state.passwordType == 'password' ?
-								<VisibilityIcon style={{position: 'absolute', right: 0, top: 35, width: 20, height: 20, zIndex: 1, cursor: 'pointer'}} onTouchTap={this.toggleShowPassword}/> :
-								<VisibilityOffIcon style={{position: 'absolute', right: 0, top: 35, width: 20, height: 20, zIndex: 1, cursor: 'pointer'}} onTouchTap={this.toggleShowPassword}/>
-							}
-							<TextField
-	 					 	floatingLabelText="Password"
-	 						type={this.state.passwordType}
-	 						onChange={this.onChangePassword}
-	 						style={{width: '100%'}}
-	 						errorText={this.state.passwordErrorText}/>
-						</div>
-					 <br /><br />
-					 <RaisedButton
-					  type="submit"
-						primary={true}
-						onClick={this.login}
-						style={{width: '100%'}} >
-						LOGIN
-						</RaisedButton>
-						<br /><br />
-						</form>
-					 <div style={{color: 'red', fontWeight: 'bold', textAlign: 'center'}}>{this.state.errMsg}</div>
-				 </CardText>
-			</Card>
+			<div style={styles.body}>
+				<Card style={styles.card}>
+					<CardMedia>
+						<img src="./assets/images/login_head.png"/>
+					</CardMedia>
+					<CardText>
+						<TextField
+						 	floatingLabelText="Username"
+						 	onChange={this.onChangeUsername}
+							style={{width: '100%'}}
+							errorText={this.state.usernameErrorText}/> <br />
+							<div style={{position: 'relative', display: 'inline-block', width: '100%'}}>
+								{
+									this.state.passwordType == 'password' ?
+									<VisibilityIcon style={{
+										position: 'absolute',
+										right: 0, top: 35,
+										width: 20, height: 20,
+										zIndex: 1, cursor: 'pointer',
+										color: 'rgba(255, 255, 255, 0.87)'
+									}} onTouchTap={this.toggleShowPassword}/> :
+									<VisibilityOffIcon style={{
+										position: 'absolute',
+										right: 0, top: 35,
+										width: 20, height: 20,
+										zIndex: 1, cursor: 'pointer',
+										color: 'rgba(255, 255, 255, 0.87)'
+									}} onTouchTap={this.toggleShowPassword}/>
+								}
+								<TextField
+		 					 	floatingLabelText="Password"
+		 						type={this.state.passwordType}
+		 						onChange={this.onChangePassword}
+		 						style={{width: '100%'}}
+		 						errorText={this.state.passwordErrorText}/>
+							</div>
+						 	<br /><br />
+						 	<RaisedButton
+							  type="submit"
+								primary={true}
+								onClick={this.login}
+								style={{width: '100%'}}
+							>
+								LOGIN
+							</RaisedButton>
+							<br /><br />
+						<div style={{color: 'red', fontWeight: 'bold', textAlign: 'center'}}>{this.state.errMsg}</div>
+					</CardText>
+				</Card>
+			</div>
 		)
 	}
 }

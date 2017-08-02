@@ -57,6 +57,7 @@ export default class AddRole extends React.Component {
 	  this.onChangeRole = this.onChangeRole.bind(this);
 	  this.onChangeActions = this.onChangeActions.bind(this);
 	  this.handleSubmit = this.handleSubmit.bind(this);
+	  this.suggestedControls = this.suggestedControls.bind(this);
 	}
 
 	handleOpen() {
@@ -146,6 +147,28 @@ export default class AddRole extends React.Component {
 		return false
 	}
 
+	suggestedControls(control) {
+		console.log('Suggested controls are selected')
+		let role = this.state.role;
+		if(role.indexOf('mentor') > -1) {
+			if(control == 'Candidates' || control == 'Mentor Connect' || 
+				control == 'Projects' || control == 'Courses') {
+				return true;
+			}
+		}
+		else if(role.indexOf('admin') > -1) {
+			if(control == 'Candidates' || control == 'Attendance' || control == 'Waves') {
+				return true;
+			}
+		}
+		else if(role.indexOf('candidate') > -1) {
+			if(control == 'My Profile' || control == 'Attendance' || control == 'Feedback') {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	render() {
 		let th = this
 
@@ -195,6 +218,11 @@ export default class AddRole extends React.Component {
 									label={control.name}
 									value={control.name}
 									onCheck={th.onChangeActions}
+									checked={
+										th.state.role.length>0 ?
+										th.suggestedControls(control.name) :
+										false
+									}
 									key={index}
 									style={{width: '30%', display: 'inline-block'}}
 								/>

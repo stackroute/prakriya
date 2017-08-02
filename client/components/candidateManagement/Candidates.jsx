@@ -21,6 +21,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 const styles = {
 	filterBody: {
 		border: '1px solid #555',
+		background: '#fff'
 	},
 	header: {
 		// backgroundColor: '#eeeeee',
@@ -40,13 +41,6 @@ const styles = {
 		// border: '2px solid silver',
 		width: ' 100%',
 		padding: '3px'
-	},
-	'fab': {
-		'position':'fixed',
-		'bottom': '80px',
-		'right': '15px',
-		'zIndex': 1,
-    'border': '2px solid teal'
 	}
 }
 export default class Candidates extends React.Component {
@@ -71,8 +65,7 @@ export default class Candidates extends React.Component {
 			appliedFilters: {
 				EmployeeID: '',
 				EmployeeName: '',
-				DigiThonQualified: '',
-				DigiThonPhase: '',
+				EmailID: '',
 				DigiThonScore: '',
 				Skills: [],
 				Wave: '',
@@ -143,29 +136,6 @@ export default class Candidates extends React.Component {
 		else {
 			appliedFilters[key] = value;
 		}
-		// switch(key) {
-		// 	case 'EmployeeID':
-		// 		if(appliedFilters.EmployeeID != value)
-		// 			appliedFilters.EmployeeID = value;
-		// 		break;
-		// 	case 'EmployeeName':
-		// 		if(appliedFilters.EmployeeName != value))
-		// 			appliedFilters.EmployeeName = value;
-		// 		break;
-		// 	case 'DigiThonQualified':
-		// 		appliedFilters[2].DigiThonQualified = value;
-		// 		break;
-		// 	case 'DigiThonPhase':
-		// 		appliedFilters[3].DigiThonPhase = value;
-		// 		break;
-		// 	case 'Wave':
-		// 		appliedFilters[4].Wave = value;
-		// 		break;
-		// 	case 'DigiThonScore':
-		// 		appliedFilters[5].DigiThonScore.$gte = value;
-		// 	default:
-		// 		break;
-		// }
 		this.setState({
 			filtersCount: this.state.filtersCount+1,
 			appliedFilters: appliedFilters
@@ -176,15 +146,6 @@ export default class Candidates extends React.Component {
 	removeFilter(key) {
 		let th = this;
 		let appliedFilters = this.state.appliedFilters;
-		// if(appliedFilters[index][key].$in == undefined) {
-		// 	if(appliedFilters[index][key].$gte == undefined) appliedFilters[index][key] = '';
-		// 	else appliedFilters[index][key].$gte = 9999;
-		// } else {
-		// 	let $in = appliedFilters[index][key].$in.filter(function(element) {
-		// 		return element != value;
-		// 	});
-		// 	appliedFilters[index][key].$in = $in
-		// }
 		if(key == 'Skills' || key == 'Billability') {
 			appliedFilters[key] = [];
 		}
@@ -197,13 +158,6 @@ export default class Candidates extends React.Component {
 		});
 		this.getFilteredCandidates();
 	}
-
-	// duplicateFilterFound(arr, value) {
-
-		// return arr.some(function(element) {
-		// 	return element == value;
-		// });
-	// }
 
 	getCandidates() {
 		let th = this;
@@ -323,8 +277,12 @@ export default class Candidates extends React.Component {
 	getAccordianValues(key) {
 		let valueArr = [];
 		this.state.candidates.map(function(candidate, index) {
-			if(candidate[key]) valueArr.push(candidate[key].toString());
-			else valueArr.push(candidate[key]);
+			if(candidate[key]) {
+				valueArr.push(candidate[key].toString());
+			}
+			else {
+				valueArr.push(candidate[key]);
+			}
 		});
 		return valueArr.filter(this.distinctDefined);
 	}
@@ -374,8 +332,7 @@ export default class Candidates extends React.Component {
 			appliedFilters: {
 				EmployeeID: '',
 				EmployeeName: '',
-				DigiThonQualified: '',
-				DigiThonPhase: '',
+				EmailID: '',
 				DigiThonScore: '',
 				Skills: [],
 				Wave: '',
@@ -403,7 +360,7 @@ export default class Candidates extends React.Component {
 			<div>
 				{
 					th.state.filteredCandidates != undefined &&
-					<FloatingActionButton mini={true} style={styles.fab} onTouchTap={this.handleOpen} title="Download All Profiles">
+					<FloatingActionButton mini={true} style={app.fab2} onTouchTap={this.handleOpen} title="Download All Profiles">
 						<DownloadProfile
 							color={lightBlack}
 							candidate={th.state.filteredCandidates}
@@ -496,16 +453,10 @@ export default class Candidates extends React.Component {
 										onOpenSnackbar={th.openSnackbar}
 									/>
 									<FilterItem
-										title={'DigithonQualified'}
-										type={'RadioButton'}
-										onGetAccordianValues={()=>['Yes', 'No']}
-										onAddFilter={(filterValue)=>th.addFilter('DigiThonQualified', filterValue)}
-									/>
-									<FilterItem
-										title={'DigithonPhase'}
+										title={'EmailID'}
 										type={'AutoComplete'}
-										onGetAccordianValues={()=>th.getAccordianValues('DigiThonPhase')}
-										onAddFilter={(filterValue)=>th.addFilter('DigiThonPhase', filterValue)}
+										onGetAccordianValues={()=>th.getAccordianValues('EmailID')}
+										onAddFilter={(filterValue)=>th.addFilter('EmailID', filterValue)}
 										onOpenSnackbar={th.openSnackbar}
 									/>
 									<FilterItem

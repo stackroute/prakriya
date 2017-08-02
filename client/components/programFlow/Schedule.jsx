@@ -41,7 +41,6 @@ export default class Schedule extends React.Component {
     super(props);
     this.state = {
       wave: {},
-      session: {},
       SessionBy: '',
       SessionOn: null,
       Status: '',
@@ -60,11 +59,44 @@ export default class Schedule extends React.Component {
 
   componentWillMount() {
     let wave = this.props.wave;
-    this.setState({wave: wave, session: this.props.session})
+    let SessionBy = '', SessionOn = null, Status = '';
+    console.log(wave.SessionOn);
+    if(wave.SessionBy !== undefined && wave.SessionBy !== 'undefined') {
+      SessionBy = wave.SessionBy
+    }
+    if(wave.Status !== undefined && wave.Status !== 'undefined') {
+      Status = wave.Status
+    }
+    if(wave.SessionOn !== undefined && wave.SessionOn !== 'undefined') {
+      SessionOn = new Date(wave.SessionOn)
+    }
+    this.setState({
+      wave: wave,
+      SessionBy: SessionBy,
+      SessionOn: SessionOn,
+      Status: Status
+    })
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({wave: nextProps.wave, session: nextProps.session})
+    let wave = nextProps.wave;
+    let SessionBy = '', SessionOn = null, Status = '';
+    console.log(wave.SessionBy)
+    if(wave.SessionBy !== undefined && wave.SessionBy !== 'undefined') {
+      SessionBy = wave.SessionBy
+    }
+    if(wave.Status !== undefined && wave.Status !== 'undefined') {
+      Status = wave.Status
+    }
+    if(wave.SessionOn !== undefined && wave.SessionOn !== 'undefined') {
+      SessionOn = new Date(wave.SessionOn)
+    }
+    this.setState({
+      wave: wave,
+      SessionBy: SessionBy,
+      SessionOn: SessionOn,
+      Status: Status
+    })
   }
 
   handleSessionByChange(event) {
@@ -127,17 +159,18 @@ export default class Schedule extends React.Component {
       </Avatar>
     }/>
             <CardText>
+              {th.state.wave.skill.length > 0 && <h3>Skills</h3>}
               <ul>
-                {th.state.wave.skill.map(function(result) {
+                {th.state.wave.skill.length > 0 && th.state.wave.skill.map(function(result) {
                   return (
                     <li>{result}</li>
                   )
                 })
                 }
               </ul>
-              <TextField hintText="Who took session ?" value={th.state.wave.SessionBy} onChange={th.handleSessionByChange} onBlur={th.handleWaveUpdate}/>
-              <DatePicker hintText="Session On" value={th.state.SessionOn} onChange={th.handleSessionOnChange}/>
-              <SelectField hintText="What's the status?" value={th.state.wave.Status} onChange={th.handleStatusChange}>
+              <h3>Conducted By:</h3><TextField hintText="Who took session ?" value={th.state.SessionBy} onChange={th.handleSessionByChange} onBlur={th.handleWaveUpdate}/>
+              <h3>Conducted On:</h3><DatePicker hintText="Session On" value={th.state.SessionOn} onChange={th.handleSessionOnChange}/>
+              <h3>Status:</h3><SelectField hintText="What's the status?" value={th.state.Status} onChange={th.handleStatusChange}>
                 {status}
               </SelectField>
           </CardText>

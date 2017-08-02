@@ -8,19 +8,15 @@ import Slider from 'material-ui/Slider';
 
 const styles = {
 	filterBody: {
-		// border: '1px solid #eeeeee', 
-		// backgroundColor: 'silver', 
 		padding: '5px', 
 		width: '100%'
 	},
 	autoComplete: {
 		width: '100%', 
-		// border: '2px solid silver', 
 		padding: '3px'
 	},
 	radioButton: {
 		width: '100%', 
-		// border: '2px solid silver', 
 		padding: '3px'
 	}
 }
@@ -76,7 +72,7 @@ export default class FilterItem extends React.Component {
 
 	addFilter(value) {
 		this.setState({
-			selectedValue: value,
+			selectedValue: '',
 			accordion: 'none'
 		});
 		console.log('Selected Value: ', this.state.selectedValue);
@@ -95,7 +91,7 @@ export default class FilterItem extends React.Component {
 							searchText={this.state.selectedValue}
 							onNewRequest={this.addFilter}
 							style={styles.autoComplete}
-							/>
+						/>
 					</div>
 				);
 		} else if(this.props.type == 'CheckBox') {
@@ -165,7 +161,11 @@ export default class FilterItem extends React.Component {
         <div style={styles.filterBody}>
 					<div style={{width: '90%', display: 'inline-block'}}>{this.props.title}</div>
 					<div style={{display: 'inline-block'}} onTouchTap={this.toggleAccordion}>
-						{this.state.accordion == 'none' ? <ArrowDropDownIcon /> : <ArrowDropUpIcon />}
+						{
+							this.state.accordion == 'none' ? 
+							<ArrowDropDownIcon style={{color: '#000'}}/> : 
+							<ArrowDropUpIcon style={{color: '#000'}}/>
+						}
 					</div>
 				</div>
 				{content}

@@ -26,40 +26,41 @@ const styles = {
     cursor: 'pointer',
   },
   header: {
-			zIndex: 2,
-			fontFamily: 'sans-serif',
-			backgroundColor: 'rgb(0, 188, 212)',
-			color: '#fff',
-			position: 'fixed',
-			left: 0,
-			top: 0,
-	    height: '40px',
-	    width: '100%',
-		},
-    userMenu: {
-      backgroundColor: 'rgba(0, 188, 212, 0.10)',
-      width: '100%'
-    },
-    badge: {
-      width: '20px',
-      height: '20px',
-      backgroundColor: '#990000',
-      color: '#ffffff',
-      top: '5px',
-      right: '5px'
-    },
-    brief: {
-  		marginTop: '70px',
-  		fontSize: '16px'
-  	},
-  	body: {
-  		textAlign: 'center',
-  		fontFamily: 'sans-serif'
-  	},
-  	customContent: {
-  	  width: '400px',
-  	  maxWidth: 'none'
-  	}
+		zIndex: 2,
+		fontFamily: 'sans-serif',
+		backgroundColor: 'rgb(0, 188, 212)',
+		color: '#fff',
+		position: 'fixed',
+		left: 0,
+		top: 0,
+    height: '40px',
+    width: '100%',
+	},
+  userMenu: {
+    backgroundColor: '#C6D8D3',
+    width: '100%',
+    fontWeight: 'bold'
+  },
+  badge: {
+    width: '20px',
+    height: '20px',
+    backgroundColor: '#990000',
+    color: '#ffffff',
+    top: '5px',
+    right: '5px'
+  },
+  brief: {
+		marginTop: '70px',
+		fontSize: '16px'
+	},
+	body: {
+		textAlign: 'center',
+		fontFamily: 'sans-serif'
+	},
+	customContent: {
+	  width: '400px',
+	  maxWidth: 'none'
+	}
 };
 
 export default class Header extends React.Component {
@@ -128,7 +129,7 @@ export default class Header extends React.Component {
     Request
       .post('/dashboard/deletenotification')
       .set({'Authorization': localStorage.getItem('token')})
-      .send({to: th.props.useremail, message: notifications[index]})
+      .send({to: th.props.user.email, message: notifications[index]})
       .end(function(err, res){
         console.log('Notification pushed to server', res)
       })
@@ -217,6 +218,7 @@ export default class Header extends React.Component {
 		      width={250}
 		      open={this.state.openDrawer}
 		      onRequestChange={(openDrawer) => this.setState({openDrawer})}
+          containerStyle={{backgroundColor: '#292A2C'}}
           >
           <Card>
              <CardMedia
@@ -238,6 +240,7 @@ export default class Header extends React.Component {
 		      			<Link to={th.state.routes[key]} key={key} style={{textDecoration: 'none'}} >
 					      	<MenuItem
                     primaryText={action}
+                    style={{color: 'white'}}
                     onTouchTap={th.handleDrawerClose}
                    />
 				      	</Link>
@@ -258,7 +261,7 @@ export default class Header extends React.Component {
               >
     	        	<IconMenu
                   menuStyle={styles.userMenu}
-    					    iconButtonElement={<IconButton><NotificationsIcon /></IconButton>}
+    					    iconButtonElement={<IconButton><NotificationsIcon color={'rgba(255, 255, 255, 0.87)'}/></IconButton>}
     					    anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
     					  >
                   {
@@ -268,7 +271,7 @@ export default class Header extends React.Component {
                         <ListItem
                           primaryText='No new notifications found'
                           key='-1'
-                          style={{textAlign: 'center'}}
+                          style={{textAlign: 'center', color: '#757575'}}
                         /> :
                         th.state.notifications.map(function(message, index) {
                           return (
@@ -291,13 +294,13 @@ export default class Header extends React.Component {
   	        	<IconMenu
                 menuStyle={styles.userMenu}
   					    iconButtonElement={
-  					      <IconButton><ActionAccountCircle /></IconButton>
+  					      <IconButton><ActionAccountCircle  color={'rgba(255, 255, 255, 0.87)'}/></IconButton>
   					    }
   					    anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
   					  >
                 <List>
-    					    <ListItem primaryText="Log Out" onClick={th.logout} leftIcon={<LogoutIcon />}/>
-                  <ListItem primaryText="Change Password" onClick={th.toggleChangePasswordDialog}  leftIcon={<ChangePasswordIcon />}/>
+    					    <ListItem primaryText="Log Out" onClick={th.logout} leftIcon={<LogoutIcon />} style={{color: '#757575'}}/>
+                  <ListItem primaryText="Change Password" onClick={th.toggleChangePasswordDialog}  leftIcon={<ChangePasswordIcon />} style={{color: '#757575'}}/>
                 </List>
   					  </IconMenu>
             </div>

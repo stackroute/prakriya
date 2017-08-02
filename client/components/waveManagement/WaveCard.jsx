@@ -102,7 +102,7 @@ export default class WaveCard extends React.Component {
 
   getCourses() {
     let th = this;
-    Request.get('/mentor/courses').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+    Request.get('/dashboard/courses').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
@@ -147,7 +147,7 @@ export default class WaveCard extends React.Component {
       wave.Course = this.state.selectedCourse;
     }
     console.log(wave);
-    this.props.handleUpdate(wave);
+    this.props.handleUpdate(wave, this.props.wave.CourseName);
     this.closeUpdateDialog();
   }
 
@@ -202,7 +202,7 @@ export default class WaveCard extends React.Component {
 
   getCadets(cadets) {
     let th = this;
-    Request.post('/dashboard/cadetsofwave').set({'Authorization': localStorage.getItem('token')}).send({waveid: this.props.wave.WaveID}).end(function(err, res) {
+    Request.post('/dashboard/cadetsofwave').set({'Authorization': localStorage.getItem('token')}).send({waveid: this.props.wave.WaveID, course:this.props.wave.CourseName}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
@@ -459,7 +459,7 @@ export default class WaveCard extends React.Component {
               width: '100%'
             }}>
               {this.state.courses.map(function(course, i) {
-                return (<MenuItem key={i} insetChildren={true} checked={th.state.selectedCourse && th.state.selectefdCourse.includes(course.ID)} value={course.ID} primaryText={course.ID}/>)
+                return (<MenuItem key={i} insetChildren={true} checked={th.state.selectedCourse && th.state.selectedCourse.includes(course.ID)} value={course.ID} primaryText={course.ID}/>)
               })
 }
             </SelectField>

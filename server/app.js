@@ -4,7 +4,6 @@ const loginRoutes = require('./login');
 const dashboardRoutes = require('./dashboard');
 const adminRoutes = require('./admin');
 const uploadRoutes = require('./upload');
-const mentorRoutes = require('./mentor');
 const service = require('./service');
 
 function setupWebAppRESTRoutes(app) {
@@ -12,7 +11,6 @@ function setupWebAppRESTRoutes(app) {
   app.use('/dashboard', auth.authenticate(), dashboardRoutes);
   app.use('/admin', auth.authenticate(), adminRoutes);
   app.use('/upload', auth.authenticate(), uploadRoutes);
-  app.use('/mentor', auth.authenticate(), mentorRoutes);
   return app;
 }
 
@@ -35,6 +33,8 @@ module.exports = function () {
   app = setupWebAppRESTRoutes(app);
 
   app = service.setupRestRoutes(app);
+
+  service.addingNeo4jConstraints();
 
   service.setupMongooseConnections();
 

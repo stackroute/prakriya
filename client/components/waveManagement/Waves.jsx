@@ -7,6 +7,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 import Pagination from 'material-ui-pagination';
 import AddWave from './AddWave.jsx';
 import app from '../../styles/app.json';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
 	col: {
@@ -42,14 +43,14 @@ const backgroundColors = [
 	'#DDDBF1',
 	'#CAF5B3',
 	'#C6D8D3'
-	]
+]
 
 const backgroundIcons = [
 	'#847662',
 	'#666682',
 	'#4e5f46',
 	'#535f5b'
-	]
+]
 
 export default class Waves extends React.Component {
 
@@ -62,7 +63,9 @@ export default class Waves extends React.Component {
 			courses: [],
 			waves : [],
 			displayWaves: [],
-			filteredWaves: []
+			filteredWaves: [],
+			open: false,
+			message: ''
 		}
 		this.getCourses = this.getCourses.bind(this);
 		this.getCadets = this.getCadets.bind(this);
@@ -72,6 +75,7 @@ export default class Waves extends React.Component {
 		this.addWave = this.addWave.bind(this);
 		this.onTabChange = this.onTabChange.bind(this);
 		this.setPage = this.setPage.bind(this);
+		this.handleRequestClose = this.handleRequestClose.bind(this);
 	}
 
 	componentWillMount() {
@@ -92,7 +96,6 @@ export default class Waves extends React.Component {
 		    	th.setState({
 		    		cadets: res.body
 		    	})
-		    	console.log('Cadets for wave', th.state.cadets);
 		    }
 		  })
 	}
@@ -107,7 +110,6 @@ export default class Waves extends React.Component {
 		    	console.log(err);
 		    else {
 					let filteredWaves = [];
-					console.log('All the waves', res.body)
 					res.body.map(function(wave, key) {
 						let today = Date.now();
 							if(new Date(wave.StartDate) <= today && new Date(wave.EndDate) >= today)
@@ -138,18 +140,21 @@ export default class Waves extends React.Component {
 		  })
 	}
 
-	handleUpdate(wave) {
+	handleUpdate(wave, oldCourse) {
 		let th = this;
 		Request
 			.post('/dashboard/updatewave')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send({wave: wave})
+			.send({wave: wave, oldCourse: oldCourse})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully updated a project', res.body)
 		    	th.getWaves();
+					th.setState({
+			      open: true,
+						message: 'Wave Updated Successfully'
+			    });
 		    	}
 			})
 	}
@@ -165,7 +170,10 @@ export default class Waves extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Successfully deleted a wave', res.body)
+					th.setState({
+			      open: true,
+						message: 'Wave Deleted Successfully'
+			    });
 		    		th.getWaves();
 		    	}
 			})
@@ -173,6 +181,14 @@ export default class Waves extends React.Component {
 
 	addWave(wave) {
 		let th = this;
+		let flag = false;
+		this.state.waves.filter(function (existingWave) {
+			if((wave.WaveID === existingWave.WaveID) && ( wave.Course.split('_')[0] === existingWave.CourseName)) {
+				flag = true;
+			}
+		})
+		if(!flag)
+		{
 		Request
 			.post('/dashboard/addwave')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -183,12 +199,18 @@ export default class Waves extends React.Component {
 		    else {
 		    	th.setState({
 		    		open: true,
-		    		message: "Wave added successfully with Wave ID: " + res.body.WaveID
+		    		message: "Wave added successfully with Wave ID: " + wave.WaveID
 		    	})
 		    	th.getCadets();
 		    	th.getWaves();
 		    }
 			});
+		} else {
+			th.setState({
+				open: true,
+				message: "Wave already exist"
+			})
+		}
 	}
 
 	onTabChange(tab) {
@@ -247,6 +269,13 @@ export default class Waves extends React.Component {
 		});
 		console.log(sliced);
 	}
+
+		handleRequestClose = () => {
+	    this.setState({
+	      open: false,
+				message: ''
+	    });
+	  };
 
 	render() {
 		let th = this;
@@ -317,6 +346,13 @@ export default class Waves extends React.Component {
 						handleWaveAdd={this.addWave}
 					/>
 				}
+
+				<Snackbar
+					open={this.state.open}
+					message={this.state.message}
+					autoHideDuration={4000}
+					onRequestClose={this.handleRequestClose}
+			 />
 			</div>
 		)
 	}
