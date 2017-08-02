@@ -41,7 +41,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
 
   let session = driver.session();
 
-  let query = `MERGE (n: ${graphConsts.NODE_CANDIDATE}
+  let query = `CREATE (n: ${graphConsts.NODE_CANDIDATE}
   	{
   		EmployeeID: '${cadet.EmployeeID}',
   		EmployeeName: '${cadet.EmployeeName}',
@@ -1030,14 +1030,16 @@ let removeCadetFromWave = function(cadets, waveID, successCB, errorCB) {
 }
 
 // Update a wave
-let updateWave = function(waveObj, successCB, errorCB) {
+let updateWave = function(waveObj, oldCourse, successCB, errorCB) {
   let query = `MATCH(w:${graphConsts.NODE_WAVE}{WaveID: '${waveObj.WaveID}'})-
       [r:${graphConsts.REL_HAS}]->(c:${graphConsts.NODE_COURSE})
+      WHERE w.WaveID = '${waveObj.WaveID}' AND w.CourseName = '${oldCourse}'
     DELETE r
     SET
       w.Location = '${waveObj.Location}',
       w.StartDate = '${waveObj.StartDate}',
-      w.EndDate = '${waveObj.EndDate}'
+      w.EndDate = '${waveObj.EndDate}',
+      w.CourseName = '${waveObj.Course.split("_")[0]}'
     WITH w AS w
     MATCH (d:${graphConsts.NODE_COURSE}{ID:'${waveObj.Course}'})
     WITH w AS w, d AS d
@@ -1055,9 +1057,10 @@ let updateWave = function(waveObj, successCB, errorCB) {
 };
 
 // Delete a wave
-let deleteWave = function(waveObj, successCB, errorCB) {
+let deleteWave = function (waveObj, successCB, errorCB) {
   try {
-    let query = `MATCH (n:${graphConsts.NODE_WAVE}{WaveID:'${waveObj.WaveID}'})
+    let query = `MATCH (n:${graphConsts.NODE_WAVE})
+      WHERE n.WaveID = '${waveObj.WaveID}' AND n.CourseName = '${waveObj.CourseName}'
       MATCH (c:${graphConsts.NODE_CANDIDATE})-[: ${graphConsts.REL_BELONGS_TO}]->(n)
       DETACH DELETE n
       RETURN c.EmailID`;
@@ -1121,8 +1124,10 @@ let getWaveIDs = function(successCB, errorCB) {
 };
 
 // Get cadets of wave
-let getCadetsOfWave = function(waveID, successCB, errorCB) {
-  let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE}{WaveID:'${waveID}'}) RETURN n`;
+let getCadetsOfWave = function(waveID, course, successCB, errorCB) {
+  let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
+    WHERE c.WaveID = '${waveID}' AND c.CourseName = '${course}'
+               RETURN n`;
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
