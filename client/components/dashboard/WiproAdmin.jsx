@@ -40,7 +40,7 @@ export default class WiproAdmin extends React.Component {
       nbcCadets: [],
       fCadets: [],
       sCadets: [],
-      value: [],
+      value: null,
       billabilityGData: []
     }
     this.handleFileChange = this.handleFileChange.bind(this);
@@ -92,9 +92,7 @@ export default class WiproAdmin extends React.Component {
   }
   handleDownload() {}
 
-  handleMouseEnterOnSector(sector) {
-    this.setState({expandedSector: sector})
-  }
+  
   getBillability() {
     let th = this;
     Request.get('/dashboard/billable').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
@@ -151,36 +149,12 @@ export default class WiproAdmin extends React.Component {
     })
   }
   handleChange(event, key, values) {
-    let arr1 = [];
-    let arr2 = [];
-    if(this.state.value.length > values.length) {
-      arr1 = this.state.value;
-    }
-    else {
-      arr1 = values;
-    }
-    arr1.map(function(val1, index) {
-      if(arr2.indexOf(val1) == -1) {
-        key = items.indexOf(val1);
-      }
-    })
     console.log(values)
-    console.log(key, "ind")
-    console.log(this.state.billabilityGData, "index")
-    this.setState(
-      {
-        value:values,
-        billabilityGData :key
-      }
-    )
+    this.setState({value: values, billabilityGData: key})
   }
   render() {
     let th = this;
-    console.log(this.state.billableCount, "billableCount")
-    console.log(this.state.nonbillableInternalCount, "nbic")
-    console.log(this.state.nonbillableCustomerCount, "nbcc")
-    console.log(this.state.FreeCount, "fCount")
-    console.log(this.state.supportCount, "sCount")
+    console.log(this.state.value, "values")
 
     const data = [
       {
@@ -210,26 +184,36 @@ export default class WiproAdmin extends React.Component {
         members: this.state.sCadets
       }
     ]
-
+    var datavalue = [];
+    if (this.state.value != null) {
+      this.state.value.map(function(val, k) {
+  for (var i = 0; i < data.length; i++) {
+        if (data[i].label === val) {
+            console.log(data[i].label)
+            datavalue.push(data[i])
+          }
+        }
+      })
+    }
+    console.log(datavalue, "datavalue")
     return (
       <div>
-<<<<<<< HEAD
         <Grid>
           <Row>
-            <SelectField
-              value={this.state.value}
-              onChange={this.handleChange}
-              multiple={true}
-              floatingLabelText="Select Billability"
-            >
-              {
-                items.map(function(item, key) {
-                  return <MenuItem key={key} value={item} primaryText={item}/>
-                })
-              }
+            <SelectField value={this.state.value} onChange={this.handleChange} multiple={true} floatingLabelText="Select Billability">
+              {items.map(function(item, key) {
+                return <MenuItem key={key} value={item} primaryText={item}/>
+              })
+}
             </SelectField>
+
+            <NVD3Chart id="pieChart" type="pieChart" tooltip={{
+              enabled: true
+            }} datum={datavalue} x="label" y="value" width="550" height="600"/>
+
             <Col md={5}></Col>
-            <Col md={3} mdOffset={1}>
+
+            <Col md={3}>
               <FileDrop type="ZCOP" handleDrop={this.handleDrop}/>
               <br/>
               <RaisedButton label="Merge" primary={true} style={styles.button} onClick={this.handleMerge}/>
