@@ -607,7 +607,6 @@ let addProduct = function(productObj, successCB, errorCB) {
 
   let product = {};
   product.product = productObj.product;
-  product.description = productObj.description || '';
 
   let version = {};
   version.name = productObj.version[0].name;
@@ -626,8 +625,7 @@ let addProduct = function(productObj, successCB, errorCB) {
   let query = `CREATE
      (product:${graphConsts.NODE_PRODUCT}
        {
-        name: '${product.product}',
-        description: '${product.description}'
+        name: '${product.product}'
        }
      )
      -[:${graphConsts.REL_HAS}]->
