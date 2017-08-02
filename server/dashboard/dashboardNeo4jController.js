@@ -609,7 +609,6 @@ let addProduct = function(productObj, successCB, errorCB) {
 
   let product = {};
   product.product = productObj.product;
-  product.description = productObj.description || '';
 
   let version = {};
   version.name = productObj.version[0].name;
@@ -628,8 +627,7 @@ let addProduct = function(productObj, successCB, errorCB) {
   let query = `CREATE
      (product:${graphConsts.NODE_PRODUCT}
        {
-        name: '${product.product}',
-        description: '${product.description}'
+        name: '${product.product}'
        }
      )
      -[:${graphConsts.REL_HAS}]->
@@ -1610,10 +1608,48 @@ let updateRating = function(employeeID, waveID, skillnames, ratings, successCB, 
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
-      logger.debug(resultObj);
-      successCB(resultObj);
+      successCB('SUCCESS');
     } else {
       errorCB('updateRating: Error');
+    }
+  });
+};
+
+/**********************************************
+************ SkillSet *************************
+**********************************************/
+
+
+// get all available skills
+let getSkillSet = function(successCB, errorCB) {
+  let query = `
+    MATCH (skill:${graphConsts.NODE_SKILL})
+    WITH skill.Name AS skillname ORDER BY skillname
+    RETURN COLLECT(skillname)
+    `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      successCB(resultObj.records[0]._fields[0]);
+    } else {
+      errorCB('getSkillSet: Error');
+    }
+  });
+};
+
+// create a new skill
+let createNewSkill = function(skill, successCB, errorCB) {
+  let query = `
+    CREATE (skill:${graphConsts.NODE_SKILL} {Name: '${skill}'})
+    `;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      successCB('SUCCESS');
+    } else {
+      errorCB('createNewSkill: Error');
     }
   });
 };
@@ -1667,5 +1703,7 @@ module.exports = {
       getCourseForWave,
       removeCadetFromWave,
       getEvaluationSkills,
-      updateRating
+      updateRating,
+      getSkillSet,
+      createNewSkill
   }

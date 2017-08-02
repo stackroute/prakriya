@@ -261,7 +261,7 @@ export default class Header extends React.Component {
               >
     	        	<IconMenu
                   menuStyle={styles.userMenu}
-    					    iconButtonElement={<IconButton><NotificationsIcon /></IconButton>}
+    					    iconButtonElement={<IconButton><NotificationsIcon color={'rgba(255, 255, 255, 0.87)'}/></IconButton>}
     					    anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
     					  >
                   {
@@ -294,7 +294,7 @@ export default class Header extends React.Component {
   	        	<IconMenu
                 menuStyle={styles.userMenu}
   					    iconButtonElement={
-  					      <IconButton><ActionAccountCircle /></IconButton>
+  					      <IconButton><ActionAccountCircle  color={'rgba(255, 255, 255, 0.87)'}/></IconButton>
   					    }
   					    anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
   					  >

@@ -41,13 +41,6 @@ const styles = {
 		// border: '2px solid silver',
 		width: ' 100%',
 		padding: '3px'
-	},
-	'fab': {
-		'position':'fixed',
-		'bottom': '80px',
-		'right': '15px',
-		'zIndex': 1,
-    'border': '2px solid teal'
 	}
 }
 export default class Candidates extends React.Component {
@@ -367,7 +360,7 @@ export default class Candidates extends React.Component {
 			<div>
 				{
 					th.state.filteredCandidates != undefined &&
-					<FloatingActionButton mini={true} style={styles.fab} onTouchTap={this.handleOpen} title="Download All Profiles">
+					<FloatingActionButton mini={true} style={app.fab2} onTouchTap={this.handleOpen} title="Download All Profiles">
 						<DownloadProfile
 							color={lightBlack}
 							candidate={th.state.filteredCandidates}
