@@ -16,7 +16,6 @@ router.post('/', function (req, res) {
         let uname = req.body.username;
         let password = encrypted;
         let query = userModel.findOne({username: uname, password: password});
-
         let promise = query.exec();
 
         promise.then(function (user) {

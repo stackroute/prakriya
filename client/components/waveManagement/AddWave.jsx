@@ -109,19 +109,16 @@ export default class AddWave extends React.Component {
 		let th = this;
 		let dur = 0;
 		let startDate = new Date(date);
-		console.log(startDate)
 		this.state.courses.map(function (course, i) {
 			if(course.ID == th.state.Course) {
 				dur = course.Duration.low
 			}
 		})
-		console.log(dur+'dur');
 		let endDate = new Date(date.setDate(date.getDate() + dur*7));
 		this.setState({
 			StartDate: startDate,
 			EndDate: endDate
 		})
-		console.log(new Date(date.setDate(date.getDate() + dur*7)))
 	}
 
 	handleEndDateChange(event, date) {
@@ -196,9 +193,6 @@ export default class AddWave extends React.Component {
 
 	render() {
 		let th = this;
-		console.log('Courses', this.props.courses);
-		console.log('Courses', this.state.courses);
-		console.log('Cadets', this.state.cadets);
 		const dialogActions = [
       <FlatButton
         label="Cancel"
