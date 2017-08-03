@@ -9,7 +9,7 @@ let auth = require('../auth')();
 let CONFIG = require('../../config');
 
 // Adding the cadets for the mentor connect
-router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/cadets', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
 	let form = new formidable.IncomingForm();
 	form.parse(req, function (err1, fields, files) {
 		fs.readFile(files.file.path, 'utf8', (err2, data) => {
@@ -39,7 +39,7 @@ router.post('/cadets', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res)
 });
 
 // Adding remarks in bulk
-router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/remarks', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
 	let form = new formidable.IncomingForm();
 	form.parse(req, function (err1, fields, files) {
 		fs.readFile(files.file.path, 'utf8', (err2, data) => {
@@ -78,7 +78,7 @@ router.post('/remarks', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 });
 
 // Merging two files
-router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/merge', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
 	let form = new formidable.IncomingForm();
 	let file_type = req.query.file;
 	form.parse(req, function (err1, fields, files) {
@@ -122,7 +122,6 @@ router.post('/merge', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) 
 									let cadetObj2 = {};
 
 									if(lineCol2[eid_index] == cadetObj['Employee ID']) {
-										logger.info('comparing eid');
 										src_headers.map(function (head2, key2) {
 											if(lineCol2[key2] !== '') {
 												cadetObj2[head2] = lineCol2[key2];
