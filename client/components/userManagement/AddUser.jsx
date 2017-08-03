@@ -191,6 +191,9 @@ export default class AddUser extends React.Component {
 		user.password = this.state.password
 		user.role = this.state.role
 		this.resetFields()
+		if(this.props.openDialog) {
+    	this.props.closeDialog();
+    }
 		this.props.handleUpdate(user)
 	}
 
