@@ -15,9 +15,8 @@ var base64Img = require('base64-img');
 *******          Notification System         ********
 ****************************************************/
 
-router.post('/addnotification', auth.canAccess(CONFIG.ALL), function (req, res) {
-   logger.info('API HIT ==> ADD NOTIFICATION');
-   try {
+router.post('/addnotification', auth.accessedBy(['BULK_UPLOAD', 'ATTENDANCE']), function (req, res) {
+  try {
     dashboardMongoController.addNotification(req.body.to, req.body.message, function (status) {
       res.status(200).json(status);
     },
@@ -32,7 +31,7 @@ router.post('/addnotification', auth.canAccess(CONFIG.ALL), function (req, res) 
   }
 });
 
-router.post('/deletenotification', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.post('/deletenotification', function (req, res) {
    logger.info('API HIT ==> DELETE NOTIFICATION');
    try {
     dashboardMongoController.deleteNotification(req.body.to, req.body.message, function (status) {
@@ -49,7 +48,7 @@ router.post('/deletenotification', auth.canAccess(CONFIG.ALL), function (req, re
   }
 });
 
-router.get('/notifications', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/notifications', function (req, res) {
   try{
     dashboardMongoController.getNotifications(req.query.username, function (notifications) {
       res.status(201).json(notifications);
@@ -64,7 +63,7 @@ router.get('/notifications', auth.canAccess(CONFIG.ALL), function (req, res) {
   }
 });
 
-router.post('/changepassword', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.post('/changepassword', function (req, res) {
    try {
     dashboardMongoController.changePassword(req.body, function (status) {
       res.status(200).json(status);
@@ -81,7 +80,7 @@ router.post('/changepassword', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 
 // update last login
-router.post('/lastlogin', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.post('/lastlogin', function (req, res) {
   try {
     let user = req.user;
     user.lastLogin = req.body.lastLogin;
@@ -140,7 +139,7 @@ router.get('/user', function (req, res) {
 ****************************************************/
 
 // Fetch all the skills
-router.get('/skills', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.get('/skills', auth.accessedBy(['CANDIDATES']), function (req, res) {
     try{
       dashboardNeo4jController.getSkills(function (skills) {
       res.status(201).json(skills);
@@ -161,7 +160,7 @@ router.get('/skills', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) 
 ****************************************************/
 
 // Add a new wave
-router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/addwave', auth.accessedBy(['WAVES']), function (req, res) {
   try {
     dashboardNeo4jController.addWave(req.body, function (wave) {
       res.status(200).json(wave);
@@ -178,7 +177,7 @@ router.post('/addwave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 });
 
 // Update a wave
-router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.post('/updatewave', auth.accessedBy(['WAVES']), function (req, res) {
   try {
     dashboardNeo4jController.updateWave(req.body.wave, req.body.oldCourse, function (wave) {
       res.status(201).json(wave);
@@ -195,7 +194,7 @@ router.post('/updatewave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 });
 
 // Delete a wave
-router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/deletewave', auth.accessedBy(['WAVES']), function (req, res) {
   try {
     dashboardNeo4jController.deleteWave(req.body.wave, function (status) {
       res.status(201).json(status);
@@ -212,7 +211,7 @@ router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, 
 });
 
 // Fetch a wave with WaveID
-router.get('/wave', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/wave', function (req, res) {
   try{
     dashboardNeo4jController.getWave(req.query.waveid, req.query.course, function (wave) {
       res.status(201).json(wave);
@@ -230,7 +229,7 @@ router.get('/wave', auth.canAccess(CONFIG.ALL), function (req, res) {
 
 
 // Update the wave cadet's
-router.post('/updatewavecadets', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.post('/updatewavecadets', auth.accessedBy(['WAVES']), function (req, res) {
   try{
     dashboardNeo4jController.updateWaveCadets(req.body.cadets, req.body.waveID, function (status) {
       logger.debug('Update Cadet Status: ', status);
@@ -252,7 +251,7 @@ router.post('/updatewavecadets', auth.canAccess(CONFIG.ADMIN), function (req, re
 ****************************************************/
 
 // Get all projects
-router.get('/projects', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+router.get('/projects', auth.accessedBy(['PROJECTS']), function (req, res) {
     try{
       dashboardNeo4jController.getProducts(function (projects) {
       res.status(201).json(projects);
@@ -268,7 +267,7 @@ router.get('/projects', auth.canAccess(CONFIG.MENCAN), function (req, res) {
 });
 
 // Add project
-router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+router.post('/addproject', auth.accessedBy(['PROJECTS']), function (req, res) {
   try {
     let projectObj = req.body;
     projectObj.version[0].addedBy = req.user.name;
@@ -287,7 +286,7 @@ router.post('/addproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 });
 
 // update a project
-router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+router.post('/updateproject', auth.accessedBy(['PROJECTS']), function (req, res) {
   try {
     let version = req.body;
     version.addedBy = req.user.name;
@@ -311,7 +310,7 @@ router.post('/updateproject', auth.canAccess(CONFIG.MENTOR), function (req, res)
 });
 
 // add a new version
-router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+router.post('/addversion', auth.accessedBy(['PROJECTS']), function (req, res) {
   try {
     let versionObj = req.body.version;
     versionObj.addedBy = req.user.name;
@@ -331,7 +330,7 @@ router.post('/addversion', auth.canAccess(CONFIG.MENTOR), function (req, res) {
 });
 
 // delete a project
-router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+router.post('/deleteproject', auth.accessedBy(['PROJECTS']), function (req, res) {
   try {
     if(req.body.type === 'project') {
     let productName = req.body.project.product;
@@ -359,33 +358,17 @@ router.post('/deleteproject', auth.canAccess(CONFIG.MENTOR), function (req, res)
 });
 
 // Get the candidate template
-router.get('/candidatetemplate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.get('/candidatetemplate', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
   res.send(CONFIG.CANDIDATE_TEMPLATE);
 });
 
 // Get the remarks template
-router.get('/remarkstemplate', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/remarkstemplate', auth.accessedBy(['MENTOR_CONN']), function (req, res) {
   res.send(CONFIG.REMARKS_TEMPLATE);
 });
 
-// Get cadet Attendance
-router.get('/cadetProfile', auth.canAccess(CONFIG.ALL), function (req, res) {
-  try {
-    dashboardNeo4jController.getCadet(req.user.email, function (cadet) {
-      res.status(201).json(cadet);
-    }, function (err) {
-      logger.error('Get Cadet: ', err);
-      res.status(500).json({error: 'Cannot get the cadet from db...!'});
-    });
-  } catch(err) {
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
-
 // Get cadet profile
-router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.get('/cadet', auth.accessedBy(['ATTENDANCE']), function (req, res) {
   try {
     dashboardMongoController.getCadet(req.user.email, function (cadet) {
       res.status(201).json(cadet);
@@ -401,7 +384,7 @@ router.get('/cadet', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
 });
 
 // Get cadet skill
-router.get('/cadetskills', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.get('/cadetskills', auth.accessedBy(['ATTENDANCE']), function (req, res) {
   try {
     dashboardNeo4jController.getCadetSkills(req.user.email, function (cadet) {
       res.status(201).json(cadet);
@@ -417,7 +400,23 @@ router.get('/cadetskills', auth.canAccess(CONFIG.CANDIDATE), function (req, res)
 });
 
 // Get cadet profile
-router.post('/cadetproject', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+// router.get('/cadetProfile', auth.canAccess(CONFIG.ALL), function (req, res) {
+//   try {
+//     dashboardNeo4jController.getCadet(req.user.email, function (cadet) {
+//       res.status(201).json(cadet);
+//     }, function (err) {
+//       logger.error('Get Cadet: ', err);
+//       res.status(500).json({error: 'Cannot get the cadet from db...!'});
+//     });
+//   } catch(err) {
+//     res.status(500).json({
+//       error: 'Internal error occurred, please report...!'
+//     });
+//   }
+// });
+
+// Get cadet profile
+router.post('/cadetproject', auth.accessedBy(['MY_PROF']), function (req, res) {
   try {
     dashboardNeo4jController.getCadetProject(req.body.empid, function (cadet,err) {
       res.status(201).json(cadet);
@@ -434,7 +433,7 @@ router.post('/cadetproject', auth.canAccess(CONFIG.CANDIDATE), function (req, re
 
 
 // Get user Role
-router.get('/userrole', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/userrole', auth.accessedBy(['ATTENDANCE', 'CANDIDATES']), function (req, res) {
   try {
     dashboardMongoController.getUserRole(req.user.email, function (cadet) {
       res.status(201).json(cadet.role);
@@ -450,25 +449,25 @@ router.get('/userrole', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 
 // Get all the cadets
-router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
-  try{
-    dashboardNeo4jController.getCadets(function (cadets) {
-      res.status(201).json(cadets);
-    }, function (err) {
-      logger.error('Get All Cadets Error: ', err);
-      res.status(500).json({error: 'Cannot get all cadets from neo4j...!'});
-    });
-  } catch(err) {
-    logger.debug('Get cadets error', err)
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
+// router.get('/cadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+//   try{
+//     dashboardNeo4jController.getCadets(function (cadets) {
+//       res.status(201).json(cadets);
+//     }, function (err) {
+//       logger.error('Get All Cadets Error: ', err);
+//       res.status(500).json({error: 'Cannot get all cadets from neo4j...!'});
+//     });
+//   } catch(err) {
+//     logger.debug('Get cadets error', err)
+//     res.status(500).json({
+//       error: 'Internal error occurred, please report...!'
+//     });
+//   }
+// });
 
 
 // Get all the cadets with wave and project details
-router.get('/allcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/allcadets', auth.accessedBy(['CANDIDATES']), function (req, res) {
   try{
     dashboardNeo4jController.getAllCadets(function (cadets) {
       res.status(201).json(cadets);
@@ -486,7 +485,7 @@ router.get('/allcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 
 
 // Get all the cadets who are not part of any wave
-router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/newcadets', auth.accessedBy(['MENTOR_CONN', 'WAVES']), function (req, res) {
   try{
     dashboardNeo4jController.getNewCadets(function (cadets) {
       res.status(201).json(cadets);
@@ -503,7 +502,7 @@ router.get('/newcadets', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 });
 
 // Update a cadet
-router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.post('/updatecadet', auth.accessedBy(['MENTOR_CONN', 'CANDIDATES', 'MY_PROF']), function (req, res) {
   try {
     dashboardNeo4jController.updateCadet(req.body, function (status) {
       res.status(200).json(status);
@@ -519,7 +518,7 @@ router.post('/updatecadet', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 
 // Update many cadets
-router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.post('/updatecadets', auth.accessedBy(['MENTOR_CONN']), function (req, res) {
   try {
     dashboardNeo4jController.updateCadets(req.body, function (status) {
       res.status(200).json(status);
@@ -535,7 +534,7 @@ router.post('/updatecadets', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 
 // Delete a cadet
-router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.delete('/deletecadet', auth.accessedBy(['CANDIDATES']), function (req, res) {
   try {
     dashboardNeo4jController.deleteCadet(req.body, function (status) {
       res.status(200).json(status);
@@ -551,7 +550,7 @@ router.delete('/deletecadet', auth.canAccess(CONFIG.ADMINISTRATOR), function (re
 });
 
 // Get all the files
-router.get('/files', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.get('/files', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
   try{
     dashboardMongoController.getFiles(function (files) {
       res.status(201).json(files);
@@ -571,7 +570,7 @@ router.get('/files', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 *****************************************************/
 
 // get all feedbacks of a particular wave
-router.get('/feedbacksforwave', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.get('/feedbacksforwave', auth.accessedBy(['WAVES']), function (req, res) {
   try{
     dashboardMongoController.getFeedbacks(req.query.waveID, function (feedbacks) {
       res.status(201).json(feedbacks);
@@ -588,7 +587,7 @@ router.get('/feedbacksforwave', auth.canAccess(CONFIG.ADMIN), function (req, res
 });
 
 //get candidate specific feedback
-router.get('/getfeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) {
+router.get('/getfeedback', auth.accessedBy(['FEEDBACK']), function(req, res) {
   try {
     dashboardMongoController.getFeedback(req.query.empID, function (feedback) {
       res.status(200).json(feedback);
@@ -605,7 +604,7 @@ router.get('/getfeedback', auth.canAccess(CONFIG.CANDIDATE), function(req, res) 
 })
 
 // save candidate feedback
-router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.post('/savefeedback', auth.accessedBy(['FEEDBACK']), function (req, res) {
   try {
     dashboardMongoController.saveFeedback(req.body, function (feedback) {
       res.status(200).json(feedback);
@@ -621,7 +620,7 @@ router.post('/savefeedback', auth.canAccess(CONFIG.CANDIDATE), function (req, re
 });
 
 // Get all the cadets with wave details
-router.get('/cadetsandwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/cadetsandwave', auth.accessedBy(['EVAL_FORMS']), function (req, res) {
   try{
     dashboardNeo4jController.getCadetsAndWave(function (cadets) {
       res.status(201).json(cadets);
@@ -638,7 +637,7 @@ router.get('/cadetsandwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) 
 });
 
 // Save the cadet evaluation
-router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+router.post('/saveevaluation', auth.accessedBy(['EVAL_FORMS']), function (req, res) {
   try {
     dashboardMongoController.saveEvaluation(req.body, function (evalObj) {
       res.status(200).json(evalObj);
@@ -654,7 +653,7 @@ router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function (req, res
 });
 
 
-router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.post('/saveimage', auth.accessedBy(['MY_PROF']), function (req, res) {
   let form = new formidable.IncomingForm();
   form.parse(req, function (err, fields, files) {
     fs.readFile(files.file.path, 'binary', (readFileError, data) => {
@@ -711,23 +710,26 @@ router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 */
 
-router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
-  try {
-    logger.debug('Req in getImage', req.query.eid);
-    base64Img.base64('public/profilePics/' + req.query.eid + '.jpeg', function (err, data) {
-      if(err) {
-        res.status(500).json({error: 'No image is available...!'});
-      } else {
-        res.send(data);
-      }
-    });
-  } catch(err) {
-    console.log(err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
+router.get('/getimage', 
+  auth.accessedBy(['MY_PROF', 'CANDIDATES', 'WAVES', 'PROJECTS','EVAL_FORMS']), 
+  function (req, res) {
+    try {
+      logger.debug('Req in getImage', req.query.eid);
+      base64Img.base64('public/profilePics/' + req.query.eid + '.jpeg', function (err, data) {
+        if(err) {
+          res.status(500).json({error: 'No image is available...!'});
+        } else {
+          res.send(data);
+        }
+      });
+    } catch(err) {
+      console.log(err);
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      });
+    }
   }
-});
+);
 
 
 /** **************************************************
@@ -735,7 +737,7 @@ router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
 ****************************************************/
 
 // get all candidates for specific wave
-router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/wavespecificcandidates', auth.accessedBy(['ATTENDANCE']), function (req, res) {
   try{
     dashboardNeo4jController.getCadetsOfWave(req.query.waveID, req.query.course, function (data) {
       res.status(201).json({data: data});
@@ -752,24 +754,27 @@ router.get('/wavespecificcandidates', auth.canAccess(CONFIG.ADMMEN), function (r
 });
 
 // get all candidates for specific wave
-router.get('/getwaveofcadet', auth.canAccess(CONFIG.ALL), function (req, res) {
-  try{
-    dashboardNeo4jController.getWaveOfCadet(req.user.email, function (data) {
-      res.status(201).json({data: data});
-    }, function (err) {
-      logger.error('Get Wave Specific Candidates Error: ', err);
-      res.status(500).json({error: 'Cannot get all candidate for specific wave from db...!'});
-    });
-  } catch(err) {
-    logger.error('Get Wave Specific Candidates Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
+router.get('/getwaveofcadet', 
+  auth.accessedBy(['ATTENDANCE', 'FEEDBACK','MY_PROF']), 
+  function (req, res) {
+    try{
+      dashboardNeo4jController.getWaveOfCadet(req.user.email, function (data) {
+        res.status(201).json({data: data});
+      }, function (err) {
+        logger.error('Get Wave Specific Candidates Error: ', err);
+        res.status(500).json({error: 'Cannot get all candidate for specific wave from db...!'});
+      });
+    } catch(err) {
+      logger.error('Get Wave Specific Candidates Exception: ', err);
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      });
+    }
   }
-});
+);
 
 // update absentees
-router.post('/updateabsentees', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.post('/updateabsentees', auth.accessedBy(['ATTENDANCE']), function (req, res) {
   try{
     dashboardMongoController.updateAbsentees(req.body, function (status) {
       logger.info('Update Cadet Wave Status: ', status);
@@ -787,7 +792,7 @@ router.post('/updateabsentees', auth.canAccess(CONFIG.CANDIDATE), function (req,
 });
 
 // update present
-router.post('/updatepresent', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.post('/updatepresent', auth.accessedBy(['ATTENDANCE']), function (req, res) {
   try{
     dashboardMongoController.updatePresent(req.body.email, new Date(), function (status) {
       logger.info('Update Present Status: ', status);
@@ -804,7 +809,7 @@ router.post('/updatepresent', auth.canAccess(CONFIG.CANDIDATE), function (req, r
 });
 
 // update present
-router.post('/present', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/present', auth.accessedBy(['WAVES']), function (req, res) {
   try{
     dashboardMongoController.updatePresent(req.body.email, req.body.Date, function (status) {
       dashboardMongoController.cancelLeave({id:req.body.id}, function (cancelLeaveStatus) {
@@ -827,7 +832,7 @@ router.post('/present', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res
 });
 
 // update absent
-router.post('/absent', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/absent', auth.accessedBy(['WAVES']), function (req, res) {
   try{
     dashboardMongoController.
     updateAbsentees({details: req.body.details, absentee: req.body.email}, function (status) {
@@ -852,7 +857,7 @@ router.post('/absent', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res)
 });
 
 // cancelleave
-router.post('/cancelleave', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.post('/cancelleave', auth.accessedBy(['ATTENDANCE']), function (req, res) {
   try{
     dashboardMongoController.cancelLeave(req.body, function (status) {
       logger.info('Cancel Leave Status: ', status);
@@ -869,7 +874,7 @@ router.post('/cancelleave', auth.canAccess(CONFIG.CANDIDATE), function (req, res
 });
 
 // update absentees
-router.post('/updateapproval', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/updateapproval', auth.accessedBy(['ATTENDANCE']), function (req, res) {
   if(req.body.approval === 'closed') {
     try{
       dashboardMongoController.cancelLeave({id:{_id:req.body.id}}, function (status) {
@@ -904,7 +909,7 @@ router.post('/updateapproval', auth.canAccess(CONFIG.ADMINISTRATOR), function (r
 });
 
 // update absentees
-router.post('/getwavecandidates', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/getwavecandidates', auth.accessedBy(['WAVES']), function (req, res) {
   try{
     dashboardMongoController.getUser(req.body.email, function (data) {
       logger.info('get user : ', data);
@@ -921,7 +926,7 @@ router.post('/getwavecandidates', auth.canAccess(CONFIG.ADMINISTRATOR), function
   }
 });
 
-router.get('/getabsentees', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.get('/getabsentees', auth.accessedBy(['WAVES']), function (req, res) {
   try{
     dashboardMongoController.getAbsentees(function (cadets) {
       res.status(201).json(cadets);
@@ -938,7 +943,7 @@ router.get('/getabsentees', auth.canAccess(CONFIG.ADMINISTRATOR), function (req,
 });
 
 // Get all courses
-router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
+router.get('/courses', auth.accessedBy(['COURSES', 'WAVES']), function(req, res) {
   try {
     dashboardNeo4jController.getCourses(function(courses) {
       res.status(201).json(courses);
@@ -955,7 +960,7 @@ router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
 })
 
 // Get course for a given waveID
-router.get('/courseforwave', auth.canAccess(CONFIG.ALL), function(req, res) {
+router.get('/courseforwave', auth.accessedBy(['WAVES', 'FEEDBACK']), function(req, res) {
   try {
     dashboardNeo4jController.getCourseForWave(req.query.waveID, req.query.course, function (course) {
       res.status(201).json(course);
@@ -972,7 +977,7 @@ router.get('/courseforwave', auth.canAccess(CONFIG.ALL), function(req, res) {
 })
 
 // add courses
-router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+router.post('/addcourse', auth.accessedBy(['COURSES']), function (req, res) {
   try{
     let courseObj = req.body;
     courseObj.History = courseObj.History + ' added by ' +
@@ -992,7 +997,7 @@ router.post('/addcourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
 });
 
 // update courses
-router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+router.post('/updatecourse', auth.accessedBy(['COURSES']), function (req, res) {
   try{
     let courseObj = req.body.course;
     courseObj.History = courseObj.History + ' last update by ' +
@@ -1011,7 +1016,7 @@ router.post('/updatecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) 
 });
 
 // delete assignment or schedule
-router.post('/deleteassignmentorschedule', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+router.post('/deleteassignmentorschedule', auth.accessedBy(['COURSES']), function (req, res) {
   try{
     let obj = req.body.obj;
     console.log(req.body);
@@ -1030,7 +1035,7 @@ router.post('/deleteassignmentorschedule', auth.canAccess(CONFIG.MENCAN), functi
 });
 
 // Delete a course
-router.post('/deletecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+router.post('/deletecourse', auth.accessedBy(['COURSES']), function (req, res) {
   try {
     let courseObj = req.body;
     courseObj.History = courseObj.History + ' deleted by ' +
@@ -1049,7 +1054,7 @@ router.post('/deletecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) 
 });
 
 // restore a course
-router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function (req, res) {
+router.post('/restorecourse', auth.accessedBy(['COURSES']), function (req, res) {
   try {
     let courseObj = req.body;
     courseObj.History = 'restored by ' + req.user.name + ' on ' + new Date() + '\n';
@@ -1068,7 +1073,7 @@ router.post('/restorecourse', auth.canAccess(CONFIG.MENCAN), function (req, res)
 
 
 // Get all courses for specific wave
-router.get('/assessment', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/assessment', auth.accessedBy(['ASSG_TRACKER']), function (req, res) {
   try{
     console.log(req.query.waveid);
     dashboardNeo4jController.getAssessmentTrack(req.query.waveid, req.query.course, function (data) {
@@ -1086,7 +1091,7 @@ router.get('/assessment', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
 });
 
 // map assessments
-router.post('/assessmentdetails', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.post('/assessmentdetails', auth.accessedBy(['ASSG_TRACKER']), function (req, res) {
   try{
     dashboardNeo4jController.mapAssessmentTrack(req.body.assessment, req.body.update, function (data) {
       res.status(201).json({success: 'success'});
@@ -1104,79 +1109,84 @@ router.post('/assessmentdetails', auth.canAccess(CONFIG.ADMMEN), function (req, 
 
 
 // map assessments
-router.get('/assessmentandcandidates/:waveID/:assessment/:course', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
-  console.log(req.params.waveID, req.params.assessment);
-  try{
-    dashboardNeo4jController.assessmentsandcandidates(req.params.waveID, req.params.assessment, req.params.course, function (data) {
-      res.status(201).json({data});
-    }, function (err) {
-      logger.error('Get Candidates For Wave Error: ', err);
-      res.status(500).json({error: 'Cannot map to assessment...!'});
-    });
-  } catch(err) {
-    logger.error('Get candidates For Wave Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
+router.get('/assessmentandcandidates/:waveID/:assessment/:course', 
+  auth.accessedBy(['ASSG_TRACKER']), 
+  function (req, res) {
+    try{
+      dashboardNeo4jController.assessmentsandcandidates(req.params.waveID, req.params.assessment, req.params.course, function (data) {
+        res.status(201).json({data});
+      }, function (err) {
+        logger.error('Get Candidates For Wave Error: ', err);
+        res.status(500).json({error: 'Cannot map to assessment...!'});
+      });
+    } catch(err) {
+      logger.error('Get candidates For Wave Exception: ', err);
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      });
+    }
   }
-});
+);
 
 
 // Get all candidates and tracks
-router.
-get('/candidatesandtracks/:waveID/:courseName', auth.canAccess(CONFIG.MENTOR), function (req, res) {
-  logger.info('API HIT ===> GET Candidates And Tracks');
-  try{
-    dashboardNeo4jController.getWaveSpecificCandidates(req.params.waveID,
-       function (candidates) {
-         dashboardNeo4jController.getAssessmentTrack(req.params.courseName,
-           function (assessmentTrack) {
-              res.status(201).json({
-                candidates: candidates,
-                assessmentTrack: assessmentTrack.AssessmentCategories
-              });
-           },
-           function (err) {
-              logger.error('Get Assessment Tracks Error: ', err);
-              res.status(500).json({error: 'Cannot get the assessment track from db...!'});
-           }
-         );
-    }, function (err) {
-      logger.error('Get Candidates And Assessment Tracks Error: ', err);
-      res.status(500).json({error: 'Cannot get all candidates from db...!'});
-    });
-  } catch(err) {
-    logger.error('Get Candidates And Assessment Tracks Exception:', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
+// router.get('/candidatesandtracks/:waveID/:courseName', 
+//   auth.canAccess(CONFIG.MENTOR), 
+//   function (req, res) {
+//     try{
+//       dashboardNeo4jController.getWaveSpecificCandidates(req.params.waveID,
+//          function (candidates) {
+//            dashboardNeo4jController.getAssessmentTrack(req.params.courseName,
+//              function (assessmentTrack) {
+//                 res.status(201).json({
+//                   candidates: candidates,
+//                   assessmentTrack: assessmentTrack.AssessmentCategories
+//                 });
+//              },
+//              function (err) {
+//                 logger.error('Get Assessment Tracks Error: ', err);
+//                 res.status(500).json({error: 'Cannot get the assessment track from db...!'});
+//              }
+//            );
+//       }, function (err) {
+//         logger.error('Get Candidates And Assessment Tracks Error: ', err);
+//         res.status(500).json({error: 'Cannot get all candidates from db...!'});
+//       });
+//     } catch(err) {
+//       logger.error('Get Candidates And Assessment Tracks Exception:', err);
+//       res.status(500).json({
+//         error: 'Internal error occurred, please report...!'
+//       });
+//     }
+//   }
+// );
 
 /** **************************************************
 **************          Common Routes        ********
 ****************************************************/
 
 // get all unique waveid
-router.get('/waveids', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
-  logger.info('API HIT ===> GET WAVEIDS');
-  try{
-    dashboardNeo4jController.getWaveIDs(function (waveids) {
-      res.status(201).json({waveids: waveids});
-    }, function (err) {
-      logger.error('Get All Wave IDs Error: ', err);
-      res.status(500).json({error: 'Cannot get all unique waveIDs from db...!'});
-    });
-  } catch(err) {
-    logger.error('Get All Wave IDs Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
+router.get('/waveids', 
+  auth.accessedBy(['ASSG_TRACKER', 'ATTENDANCE', 'PROG_FLOW', 'PROJECTS']), 
+  function (req, res) {
+    try{
+      dashboardNeo4jController.getWaveIDs(function (waveids) {
+        res.status(201).json({waveids: waveids});
+      }, function (err) {
+        logger.error('Get All Wave IDs Error: ', err);
+        res.status(500).json({error: 'Cannot get all unique waveIDs from db...!'});
+      });
+    } catch(err) {
+      logger.error('Get All Wave IDs Exception: ', err);
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      });
+    }
   }
-});
+);
 
 // Get a particular wave object based on wave id
-router.get('/waveobject/:waveID/:course', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.get('/waveobject/:waveID/:course', auth.accessedBy(['PROG_FLOW']), function (req, res) {
   logger.info('API HIT ===> GET Wave Object');
   try{
     console.log(req.params.waveID,"req.params.WAVEID")
@@ -1200,7 +1210,7 @@ router.get('/waveobject/:waveID/:course', auth.canAccess(CONFIG.ADMMEN), functio
 ****************************************************/
 
 // Save the cadet information
-router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/addcandidate', auth.accessedBy(['CANDIDATES']), function (req, res) {
   try {
     let cadet = req.body;
       dashboardNeo4jController.addCadet(cadet, function (result) {
@@ -1224,24 +1234,24 @@ router.post('/addcandidate', auth.canAccess(CONFIG.ADMINISTRATOR), function (req
 ****************************************************/
 
 // Get all the users
-router.get('/users', auth.canAccess(CONFIG.ALL), function (req, res) {
-  try{
-    adminMongoController.getUsers(function (users) {
-      res.status(201).json(users);
-    }, function (err) {
-      logger.error('Get All Users Error: ', err);
-      res.status(500).json({error: 'Cannot get all users from db...!'});
-    });
-  } catch(err) {
-    logger.error('Get All Users Exception: ', err);
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
+// router.get('/users', auth.canAccess(CONFIG.ALL), function (req, res) {
+//   try{
+//     adminMongoController.getUsers(function (users) {
+//       res.status(201).json(users);
+//     }, function (err) {
+//       logger.error('Get All Users Error: ', err);
+//       res.status(500).json({error: 'Cannot get all users from db...!'});
+//     });
+//   } catch(err) {
+//     logger.error('Get All Users Exception: ', err);
+//     res.status(500).json({
+//       error: 'Internal error occurred, please report...!'
+//     });
+//   }
+// });
 
 // Send a new mail
-router.post('/sendmail', function (req, res) {
+router.post('/sendmail', auth.accessedBy(['BULK_UPLOAD']),function (req, res) {
   logger.debug('Email request', req.body);
   email.sendEmail(req.body).then(function (result) {
     logger.debug('Email status', result.msg);
@@ -1250,7 +1260,7 @@ router.post('/sendmail', function (req, res) {
 });
 
 // Get all waves
-router.get('/waves', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.get('/waves', auth.accessedBy(['CANDIDATES', 'WAVES']), function (req, res) {
   try{
     dashboardNeo4jController.getWaves(function (waves) {
       res.status(201).json(waves);
@@ -1267,7 +1277,7 @@ router.get('/waves', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
 });
 
 // Get all cadets of a particular wave
-router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) {
+router.post('/cadetsofwave', auth.accessedBy(['PROJECTS', 'WAVES']), function (req, res) {
   try{
     dashboardNeo4jController.getCadetsOfWave(req.body.waveid, req.body.course, function (cadets) {
       res.status(201).json(cadets);
@@ -1284,7 +1294,7 @@ router.post('/cadetsofwave', auth.canAccess(CONFIG.ADMMEN), function (req, res) 
 });
 
 // delete a wave
-router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/deletewave', auth.accessedBy(['WAVES']), function (req, res) {
   try {
     console.log(req.body.wave,"req.body.wave")
     dashboardNeo4jController.deleteWave(req.body.wave, function (wave) {
@@ -1306,7 +1316,7 @@ router.post('/deletewave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, 
 ****************************************************/
 
 // Get filtered candidates
-router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.post('/filteredcandidates', auth.accessedBy(['CANDIDATES']), function (req, res) {
   try{
     dashboardNeo4jController.getFilteredCadets(req.body.filterQuery, function (candidates) {
       res.status(201).json(candidates);
@@ -1322,7 +1332,7 @@ router.post('/filteredcandidates', auth.canAccess(CONFIG.ADMIN), function (req, 
   }
 });
 
-router.get('/billability', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/billability', auth.accessedBy(['CANDIDATES']), function (req, res) {
   try{
     dashboardNeo4jController.allBillability(function (billable) {
       res.status(201).json(billable);
@@ -1338,7 +1348,7 @@ router.get('/billability', auth.canAccess(CONFIG.ALL), function (req, res) {
   }
 });
 
-router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/billable', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
   try{
     dashboardNeo4jController.getBillability(function (billable) {
       res.status(201).json(billable);
@@ -1354,7 +1364,7 @@ router.get('/billable', auth.canAccess(CONFIG.ALL), function (req, res) {
   }
 });
 
-router.get('/nonbillableInternal', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/nonbillableInternal', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
   try{
     dashboardNeo4jController.getNonBillabilityInternal(function (nonbillableInternal) {
       res.status(201).json(nonbillableInternal);
@@ -1369,7 +1379,7 @@ router.get('/nonbillableInternal', auth.canAccess(CONFIG.ALL), function (req, re
     });
   }
 });
-router.get('/nonbillableCustomer', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/nonbillableCustomer', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
   try{
     dashboardNeo4jController.getNonBillabilityCustomer(function (nonbillableCustomer) {
       res.status(201).json(nonbillableCustomer);
@@ -1384,7 +1394,7 @@ router.get('/nonbillableCustomer', auth.canAccess(CONFIG.ALL), function (req, re
     });
   }
 });
-router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/free', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
   try{
     dashboardNeo4jController.getBillabilityFree(function (free) {
       res.status(201).json(free);
@@ -1399,7 +1409,7 @@ router.get('/free', auth.canAccess(CONFIG.ALL), function (req, res) {
     });
   }
 });
-router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/support', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
   try{
     dashboardNeo4jController.getBillabilitySupport(function (support) {
       res.status(201).json(support);
@@ -1415,7 +1425,7 @@ router.get('/support', auth.canAccess(CONFIG.ALL), function (req, res) {
   }
 });
 ///////////////////////program flow///////////////////
-router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+router.post('/updatesession', auth.accessedBy(['PROG_FLOW']), function (req, res) {
   try {
     dashboardNeo4jController.updateSession(req.body.wave, req.body.waveString, req.body.course, function (status) {
        console.log(req.body.waveString,"waveString")
@@ -1433,7 +1443,7 @@ router.post('/updatesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
 });
 
 // delete session
-router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res) {
+router.post('/deletesession', auth.accessedBy(['PROG_FLOW']), function (req, res) {
   try {
     dashboardNeo4jController.deleteSession(req.body.wave,req.body.waveString ,req.body.course, function (status) {
       logger.info('Status: ', status);
@@ -1451,7 +1461,7 @@ router.post('/deletesession', auth.canAccess(CONFIG.MENTOR), function (req, res)
 });
 
 //remove cadets from wave
-router.post('/removeCadetFromWave', auth.canAccess(CONFIG.ADMINISTRATOR), function (req, res) {
+router.post('/removeCadetFromWave', auth.accessedBy(['WAVES']), function (req, res) {
   try {
     console.log(req.body.cadets)
     console.log(req.body.waveID)
@@ -1475,7 +1485,7 @@ router.post('/removeCadetFromWave', auth.canAccess(CONFIG.ADMINISTRATOR), functi
 **********************************************/
 
 // Get evaluation skills for a given candidateID
-router.get('/evaluationfields', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+router.get('/evaluationfields', auth.accessedBy(['EVAL_FORMS']), function(req, res) {
   try {
     dashboardNeo4jController.getEvaluationSkills(req.query.candidateID, function (evaluationSkills) {
       res.status(201).json(evaluationSkills);
@@ -1492,7 +1502,7 @@ router.get('/evaluationfields', auth.canAccess(CONFIG.MENTOR), function(req, res
 });
 
 // Update rating for the given candidate
-router.post('/updaterating', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+router.post('/updaterating', auth.accessedBy(['EVAL_FORMS']), function(req, res) {
   try {
     dashboardNeo4jController.updateRating(
       req.body.emailID,
@@ -1518,7 +1528,7 @@ router.post('/updaterating', auth.canAccess(CONFIG.MENTOR), function(req, res) {
 **********************************************/
 
 // Get all skills
-router.get('/skillset', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
+router.get('/skillset', auth.accessedBy(['COURSES']), function(req, res) {
   try {
     dashboardNeo4jController.getSkillSet(function (skillset) {
       res.status(201).json(skillset);
@@ -1535,7 +1545,7 @@ router.get('/skillset', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
 });
 
 // Create a new skill
-router.post('/createnewskill', auth.canAccess(CONFIG.MENTOR), function(req, res) {
+router.post('/createnewskill', auth.accessedBy(['COURSES']), function(req, res) {
   try {
     dashboardNeo4jController.createNewSkill(
       req.body.skill,

@@ -135,23 +135,23 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
   })
 }
 // fetching all the cadets
-let getCadets = function(successCB, errorCB) {
-  let session = driver.session();
-  let query = `MATCH (c: ${graphConsts.NODE_CANDIDATE}),(w: ${graphConsts.NODE_WAVE})
-    MATCH (c)-[:${graphConsts.REL_BELONGS_TO}]->(w)
-    RETURN c`;
-  session.run(query).then(function(resultObj) {
-    session.close();
-    let cadets = [];
-    for (let i = 0; i < resultObj.records.length; i++) {
-      let result = resultObj.records[i];
-      cadets.push(result._fields[0].properties);
-    }
-    successCB(cadets);
-  }).catch(function(err) {
-    errorCB(err);
-  })
-}
+// let getCadets = function(successCB, errorCB) {
+//   let session = driver.session();
+//   let query = `MATCH (c: ${graphConsts.NODE_CANDIDATE}),(w: ${graphConsts.NODE_WAVE})
+//     MATCH (c)-[:${graphConsts.REL_BELONGS_TO}]->(w)
+//     RETURN c`;
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     let cadets = [];
+//     for (let i = 0; i < resultObj.records.length; i++) {
+//       let result = resultObj.records[i];
+//       cadets.push(result._fields[0].properties);
+//     }
+//     successCB(cadets);
+//   }).catch(function(err) {
+//     errorCB(err);
+//   })
+// }
 
 // fetching all the cadets with wave and project details
 let getAllCadets = function(successCB, errorCB) {
@@ -194,17 +194,17 @@ let getAllCadets = function(successCB, errorCB) {
 
 
 // fetching candidate logged in
-let getCadet = function(email, successCB, errorCB) {
-  let session = driver.session();
-  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return n`;
-  session.run(query).then(function(resultObj) {
-    session.close();
-    console.log('done');
-    successCB(resultObj.records[0]._fields[0].properties);
-  }).catch(function(err) {
-    errorCB(err);
-  })
-}
+// let getCadet = function(email, successCB, errorCB) {
+//   let session = driver.session();
+//   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return n`;
+//   session.run(query).then(function(resultObj) {
+//     session.close();
+//     console.log('done');
+//     successCB(resultObj.records[0]._fields[0].properties);
+//   }).catch(function(err) {
+//     errorCB(err);
+//   })
+// }
 
 // fetching candidate's Skill
 let getCadetSkills = function(email, successCB, errorCB) {
@@ -1676,8 +1676,8 @@ module.exports = {
       updateCadet,
       updateCadets,
       deleteCadet,
-      getCadets,
-      getCadet,
+      // getCadets,
+      // getCadet,
       getAllCadets,
       getCadetSkills,
       getNewCadets,
