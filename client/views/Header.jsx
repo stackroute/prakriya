@@ -82,19 +82,23 @@ export default class Header extends React.Component {
       notifications: [],
       imageURL: "../assets/images/avt-default.jpg"
 		}
+
 		this.logout = this.logout.bind(this);
     this.toggleDialog = this.toggleDialog.bind(this)
 		this.getActions = this.getActions.bind(this);
+    this.getProfilePic = this.getProfilePic.bind(this);
 		this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
 		this.handleDrawerClose = this.handleDrawerClose.bind(this);
 		this.openDashboard = this.openDashboard.bind(this);
     this.getNotifications = this.getNotifications.bind(this);
     this.dropNotification = this.dropNotification.bind(this);
+    this.updateProfilePic = this.updateProfilePic.bind(this);
 	}
 
   componentWillMount() {
 		if(localStorage.getItem('token')) {
 			this.getActions()
+      this.getProfilePic(this.props.user.username)
       this.getNotifications(this.props.user.username)
 		}
     let th = this
@@ -109,6 +113,30 @@ export default class Header extends React.Component {
       }
     })
 	}
+
+  getProfilePic(username) {
+  	let th = this;
+  	Request
+  		.get(`/dashboard/getimage?filename=${username}`)
+  		.set({'Authorization': localStorage.getItem('token')})
+  		.end(function(err, res) {
+  			if(err)
+  	    	console.log(err);
+  	    else {
+  	    	if(res.text) {
+  		    	th.setState({
+  		    		imageURL: res.text
+  		    	})
+  	    	}
+  	    }
+  		})
+  }
+
+  updateProfilePic(newImageURL) {
+    this.setState({
+      imageURL: newImageURL
+    })
+  }
 
   getNotifications(username) {
     let th = this
@@ -231,7 +259,7 @@ export default class Header extends React.Component {
 					      />
               }
              >
-                 <img src="./assets/images/drawer_top.jpg" style={{width: '100%'}}/>
+                 <img src={this.state.imageURL} style={{width: '100%', border: '2px solid black', height: 250}}/>
              </CardMedia>
           </Card>
 		      {
@@ -322,7 +350,11 @@ export default class Header extends React.Component {
           open={th.state.openProfilePicDialog}
           onRequestClose={()=>th.toggleDialog('ProfilePic')}
         >
-          <UpdateProfilePic username={this.props.user.username} handleClose={()=>th.toggleDialog('ProfilePic')}/>
+          <UpdateProfilePic
+            username={this.props.user.username}
+            currentImage={this.state.imageURL}
+            handleClose={()=>th.toggleDialog('ProfilePic')}
+            handleUpdate={th.updateProfilePic}/>
         </Dialog>
       </div>
 		)

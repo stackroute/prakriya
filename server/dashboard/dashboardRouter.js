@@ -654,18 +654,20 @@ router.post('/saveevaluation', auth.canAccess(CONFIG.MENTOR), function (req, res
 });
 
 
-router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function (req, res) {
+router.post('/saveimage', function (req, res) {
   let form = new formidable.IncomingForm();
   form.parse(req, function (err, fields, files) {
     fs.readFile(files.file.path, 'binary', (readFileError, data) => {
       try {
         let buffer = new Buffer(data, 'binary');
-        let cadet = JSON.parse(fields.cadet);
+        let user = fields.cadet ? JSON.parse(fields.cadet) :JSON.parse(fields.non_cadet);
+        // let cadet = JSON.parse(fields.cadet);
         let img = {};
         let dir = './public/profilePics/';
         img.data = buffer;
         img.contentType = files.file.type;
-        cadet.ProfilePic = img;
+        // cadet.ProfilePic = img;
+        user.ProfilePic = img;
         if (!fs.existsSync('./public/')) {
           logger.debug('Public Directory not present');
           mkdirp.sync('./public/');
@@ -674,7 +676,8 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function (req, res) 
           logger.debug('ProfilePics Directory not present');
           mkdirp(dir);
         }
-        let imagePath = dir + cadet.EmployeeID + '.jpeg';
+        // let imagePath = dir + cadet.EmployeeID + '.jpeg';
+        let imagePath = dir + (user.EmployeeID || user.username) + '.jpeg';
         logger.debug('Image Path', imagePath);
         fs.writeFile(imagePath, data, 'binary', function (writeFileError) {
             if(writeFileError) {
@@ -692,29 +695,10 @@ router.post('/saveimage', auth.canAccess(CONFIG.CANDIDATE), function (req, res) 
   });
 });
 
-/*
 router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    logger.debug('Req in getImage', req.query.eid);
-    fs.readFile('public/profilePics/' + req.query.eid + '.jpeg', 'binary', (err, data) => {
-      if(err) {
-        res.status(500).json({error: 'No image is available...!'});
-      } else {
-        res.send(data);
-}
-    });
-  } catch(err) {
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
-  }
-});
-*/
-
-router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
-  try {
-    logger.debug('Req in getImage', req.query.eid);
-    base64Img.base64('public/profilePics/' + req.query.eid + '.jpeg', function (err, data) {
+    let filename = req.query.eid || req.query.filename;
+    base64Img.base64('public/profilePics/' + filename + '.jpeg', function (err, data) {
       if(err) {
         res.status(500).json({error: 'No image is available...!'});
       } else {

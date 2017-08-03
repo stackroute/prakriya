@@ -23,13 +23,11 @@ export default class UpdateProfilePic extends React.Component {
 		super(props)
 		this.state = {
 			disableUpdatePicture: true,
-			defaultProfilePic: '../../assets/images/avt-default.jpg',
 			picFile: {},
 			picPreview: '',
 		};
 
 		this.onDrop = this.onDrop.bind(this);
-		this.getPicture = this.getPicture.bind(this);
 		this.updatePicture = this.updatePicture.bind(this);
 	}
 
@@ -39,10 +37,6 @@ export default class UpdateProfilePic extends React.Component {
 			picPreview: acceptedFiles[0].preview,
 			disableUpdatePicture: false
 		});
-	}
-
-	getPicture() {
-
 	}
 
 	updatePicture() {
@@ -68,9 +62,7 @@ export default class UpdateProfilePic extends React.Component {
 	        }
 	        var blob = new Blob([array], {type: 'image/jpeg'});
 		    	let blobUrl = URL.createObjectURL(blob);
-		    	th.setState({
-		    		imageURL: blobUrl
-		    	});
+		    	th.props.handleUpdate(blobUrl);
 		    }
 			});
 		th.props.handleClose();
@@ -85,7 +77,7 @@ export default class UpdateProfilePic extends React.Component {
 					style={styles.dropzone}
 				>
 					<CardMedia>
-						<img src={this.state.picPreview} style={styles.picPreview}/>
+						<img src={this.state.picPreview || this.props.currentImage} style={styles.picPreview}/>
 					</CardMedia>
 				</Dropzone>
 				 <CardText>
