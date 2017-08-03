@@ -1495,7 +1495,7 @@ router.get('/evaluationfields', auth.canAccess(CONFIG.MENTOR), function(req, res
 router.post('/updaterating', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
     dashboardNeo4jController.updateRating(
-      req.body.employeeID,
+      req.body.emailID,
       req.body.waveID,
       req.body.skills,
       req.body.ratings,
