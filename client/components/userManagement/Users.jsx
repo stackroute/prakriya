@@ -6,6 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import AddUser from './AddUser.jsx';
 import UserList from './UserList.jsx';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
 	heading: {
@@ -28,20 +29,22 @@ const style = {
   display: 'inline-block',
 }
 
-
-
 export default class Users extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			users: [],
-			roles: []
+			roles: [],
+      snackbarOpen: false,
+			snackbarMessage: ''
 		}
 		this.addUser = this.addUser.bind(this);
 		this.deleteUser = this.deleteUser.bind(this);
 		this.updateUser = this.updateUser.bind(this);
 		this.lockUser = this.lockUser.bind(this);
 		this.unlockUser = this.unlockUser.bind(this);
+    this.hideSnackbar = this.hideSnackbar.bind(this);
+    this.openSnackbar = this.openSnackbar.bind(this);
 	}
 
 	componentWillMount() {
@@ -93,6 +96,7 @@ export default class Users extends React.Component {
 		    if(err)
 		    	console.log(err);
 		    else {
+					th.openSnackbar('New user added successfully.');
 		    	th.getUsers();
 		    }
 		  });
@@ -158,6 +162,20 @@ export default class Users extends React.Component {
 		  });
 	}
 
+	openSnackbar(message) {
+		this.setState({
+			snackbarMessage: message,
+			snackbarOpen: true
+		});
+	}
+
+	hideSnackbar() {
+		this.setState({
+			snackbarMessage: '',
+			snackbarOpen: false
+		});
+	}
+
 	render() {
 		let th = this;
 		return (
@@ -183,6 +201,12 @@ export default class Users extends React.Component {
 						</Col>
 					</Row>
 				</Grid>
+				<Snackbar
+          open={this.state.snackbarOpen}
+          message={this.state.snackbarMessage}
+          autoHideDuration={4000}
+          onRequestClose={this.hideSnackbar}
+       />
 			</div>
 		);
 	}
