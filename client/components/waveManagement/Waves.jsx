@@ -159,8 +159,7 @@ export default class Waves extends React.Component {
 			})
 	}
 
-	handleDelete(wave)
-	{
+	handleDelete(wave) {
 		let th = this;
 		Request
 			.post('/dashboard/deletewave')
@@ -227,7 +226,6 @@ export default class Waves extends React.Component {
 				displayWaves: filteredWaves.slice(0, 3),
 				pageNumber: 1
 			});
-			console.log('Ongoing: ', filteredWaves);
 		} else if(tab === 'Upcoming') {
 			this.state.waves.map(function(wave, key) {
 				if(new Date(wave.StartDate) > Date.now() || wave.StartDate === null)
@@ -238,7 +236,6 @@ export default class Waves extends React.Component {
 				displayWaves: filteredWaves.slice(0, 3),
 				pageNumber: 1
 			});
-			console.log('Upcoming: ', filteredWaves);
 		} else if(tab === 'Completed') {
 			this.state.waves.map(function(wave, key) {
 				if(new Date(wave.EndDate) < Date.now()  && wave.StartDate !== null)
@@ -249,7 +246,6 @@ export default class Waves extends React.Component {
 				displayWaves: filteredWaves.slice(0, 3),
 				pageNumber: 1
 			});
-			console.log('Completed: ', filteredWaves);
 		}
 		this.setState({
 			tab: tab
@@ -258,8 +254,6 @@ export default class Waves extends React.Component {
 
 	setPage(pageNumber) {
 		let th = this;
-		console.log(th.state);
-		console.log('Page Changed To -- ' + pageNumber);
 		let start = (pageNumber - 1) * 3;
 		let end = start + 3;
 		let sliced = th.state.filteredWaves.slice(start, end);
@@ -267,7 +261,6 @@ export default class Waves extends React.Component {
 			displayWaves: sliced,
 			currentPage: pageNumber
 		});
-		console.log(sliced);
 	}
 
 		handleRequestClose = () => {
@@ -340,6 +333,7 @@ export default class Waves extends React.Component {
 				}
 				{
 					this.props.user.role == "sradmin" &&
+					this.state.courses.length > 0 &&
 					<AddWave
 						cadets={this.state.cadets}
 						courses={this.state.courses}

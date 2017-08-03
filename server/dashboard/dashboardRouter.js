@@ -2,6 +2,8 @@ const router = require('express').Router();
 const formidable = require('formidable');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
+const crypto = require('crypto');
+const base64Img = require('base64-img');
 const logger = require('./../../applogger');
 const dashboardMongoController = require('./dashboardMongoController');
 const dashboardNeo4jController = require('./dashboardNeo4jController');
@@ -9,7 +11,6 @@ const adminMongoController = require('../admin/adminMongoController.js');
 const email = require('./../email');
 let auth = require('../auth')();
 let CONFIG = require('../../config');
-var base64Img = require('base64-img');
 
 /** **************************************************
 *******          Notification System         ********
@@ -65,7 +66,14 @@ router.get('/notifications', function (req, res) {
 
 router.post('/changepassword', function (req, res) {
    try {
-    dashboardMongoController.changePassword(req.body, function (status) {
+      let userObj = req.body;
+      
+      const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
+      let encrypted = cipher.update(userObj.password, 'utf8', 'hex');
+      encrypted = cipher.final('hex');
+      userObj.password = encrypted;
+
+      dashboardMongoController.changePassword(userObj, function (status) {
       res.status(200).json(status);
     },
     function (err) {

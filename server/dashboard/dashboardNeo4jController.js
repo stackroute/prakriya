@@ -1,4 +1,5 @@
 const neo4jDriver = require('neo4j-driver').v1;
+const crypto = require('crypto');
 const logger = require('./../../applogger');
 const config = require('./../../config');
 const adminMongoController = require('../admin/adminMongoController.js');
@@ -990,7 +991,12 @@ let addWave = function(waveObj, successCB, errorCB) {
         userObj.name = cadetObj.EmployeeName;
         userObj.email = cadetObj.EmailID;
         userObj.username = cadetObj.EmailID.split('@')[0];
-        userObj.password = config.DEFAULT_PASS;
+
+        const cipher = crypto.createCipher(config.CRYPTO.ALGORITHM, config.CRYPTO.PASSWORD);
+        let encrypted = cipher.update(config.DEFAULT_PASS, 'utf8', 'hex');
+        encrypted = cipher.final('hex');
+        userObj.password = encrypted;
+
         userObj.role = 'candidate';
         logger.debug('User obj created', userObj);
         adminMongoController.addUser(userObj, function(savedUser) {
