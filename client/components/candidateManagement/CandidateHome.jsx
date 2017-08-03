@@ -66,14 +66,15 @@ export default class CandidateHome extends React.Component {
 	}
 	componentWillMount() {
 		this.getWave(this.props.candidate.Wave)
-		this.getProfilePic(this.props.candidate.EmployeeID)
+		this.getProfilePic(this.props.candidate.EmailID)
 	}
-	getProfilePic(eid) {
+	getProfilePic(emailID) {
 		let th = this;
+		let username = emailID.split("@wipro.com")[0];
 		Request
-			.get(`/dashboard/getimage?eid=${eid}`)
+			.get(`/dashboard/getimage`)
 			.set({'Authorization': localStorage.getItem('token')})
-			.query({q: eid})
+			.query({filename: username})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);

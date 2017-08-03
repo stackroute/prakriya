@@ -20,15 +20,16 @@ export default class CandidateCard extends React.Component {
 	}
 
 	componentWillMount() {
-		this.getProfilePic(this.props.cadet.EmployeeID)
+		this.getProfilePic(this.props.cadet.EmailID)
 	}
 
-	getProfilePic(eid) {
+	getProfilePic(emailID) {
 		let th = this;
+		let username = emailID.split("@wipro.com")[0];
 		Request
-			.get(`/dashboard/getimage?eid=${eid}`)
+			.get(`/dashboard/getimage`)
 			.set({'Authorization': localStorage.getItem('token')})
-			.query({q: eid})
+			.query({filename: username})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);

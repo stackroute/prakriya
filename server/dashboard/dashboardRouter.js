@@ -683,13 +683,11 @@ router.post('/saveimage', function (req, res) {
     fs.readFile(files.file.path, 'binary', (readFileError, data) => {
       try {
         let buffer = new Buffer(data, 'binary');
-        let user = fields.cadet ? JSON.parse(fields.cadet) :JSON.parse(fields.non_cadet);
-        // let cadet = JSON.parse(fields.cadet);
+        let user = JSON.parse(fields.user);
         let img = {};
         let dir = './public/profilePics/';
         img.data = buffer;
         img.contentType = files.file.type;
-        // cadet.ProfilePic = img;
         user.ProfilePic = img;
         if (!fs.existsSync('./public/')) {
           logger.debug('Public Directory not present');
@@ -699,7 +697,6 @@ router.post('/saveimage', function (req, res) {
           logger.debug('ProfilePics Directory not present');
           mkdirp(dir);
         }
-        // let imagePath = dir + cadet.EmployeeID + '.jpeg';
         let imagePath = dir + (user.EmployeeID || user.username) + '.jpeg';
         logger.debug('Image Path', imagePath);
         fs.writeFile(imagePath, data, 'binary', function (writeFileError) {
@@ -720,7 +717,7 @@ router.post('/saveimage', function (req, res) {
 
 router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    let filename = req.query.eid || req.query.filename;
+    let filename = req.query.filename;
     base64Img.base64('public/profilePics/' + filename + '.jpeg', function (err, data) {
       if(err) {
         res.status(500).json({error: 'No image is available...!'});

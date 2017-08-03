@@ -119,6 +119,7 @@ export default class Header extends React.Component {
   	Request
   		.get(`/dashboard/getimage?filename=${username}`)
   		.set({'Authorization': localStorage.getItem('token')})
+      .query({filename: username})
   		.end(function(err, res) {
   			if(err)
   	    	console.log(err);

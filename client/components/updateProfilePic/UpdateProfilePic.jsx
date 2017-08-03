@@ -43,14 +43,13 @@ export default class UpdateProfilePic extends React.Component {
 		let th = this;
 		let picFile = this.state.picFile;
 		let username = this.props.username;
-		let non_cadet = {
+		let user = {
 			username: username
 		};
-
 		Request
 			.post('/dashboard/saveimage')
 			.set({'Authorization': localStorage.getItem('token')})
-			.field('non_cadet', JSON.stringify(non_cadet))
+			.field('user', JSON.stringify(user))
 			.attach('file', picFile)
 			.end(function(err, res) {
 				if(err)
