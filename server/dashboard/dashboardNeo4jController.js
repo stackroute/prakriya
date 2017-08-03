@@ -1604,13 +1604,9 @@ let getEvaluationSkills = function(candidateID, successCB, errorCB) {
 };
 
 // update rating
-let updateRating = function(employeeID, waveID, skillnames, ratings, successCB, errorCB) {
-  console.log('EmployeeID: ', employeeID);
-  console.log('WaveID: ', waveID);
-  console.log('Skills Array: ', skillnames);
-  console.log('Ratings Array: ', ratings);
+let updateRating = function(emailID, waveID, skillnames, ratings, successCB, errorCB) {
   let query = `
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: '${employeeID}'})
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${emailID}'})
     WITH candidate AS candidate
     MATCH (wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
     -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})

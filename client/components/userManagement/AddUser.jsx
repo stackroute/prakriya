@@ -13,13 +13,6 @@ import Dialog from 'material-ui/Dialog';
 import Request from 'superagent';
 import app from '../../styles/app.json';
 
-const items = [
-  <MenuItem key={1} value={"mentor"} primaryText="Mentor" />,
-  <MenuItem key={2} value={"administrator"} primaryText="Administrator" />,
-  <MenuItem key={3} value={"sradministrator"} primaryText="Sr. Administrator" />,
-  <MenuItem key={4} value={"sponsor"} primaryText="Sponsor" />
-];
-
 const styles = {
     dialog: {
   		backgroundColor: '#DDDBF1',
@@ -198,6 +191,9 @@ export default class AddUser extends React.Component {
 		user.password = this.state.password
 		user.role = this.state.role
 		this.resetFields()
+		if(this.props.openDialog) {
+    	this.props.closeDialog();
+    }
 		this.props.handleUpdate(user)
 	}
 
