@@ -8,15 +8,15 @@ import Slider from 'material-ui/Slider';
 
 const styles = {
 	filterBody: {
-		padding: '5px', 
+		padding: '5px',
 		width: '100%'
 	},
 	autoComplete: {
-		width: '100%', 
+		width: '100%',
 		padding: '3px'
 	},
 	radioButton: {
-		width: '100%', 
+		width: '100%',
 		padding: '3px'
 	}
 }
@@ -139,10 +139,10 @@ export default class FilterItem extends React.Component {
 		} else if(this.props.type == 'Slider') {
 			content = (
 				<div style={{
-					display: this.state.accordion, 
-					width: '100%', 
-					// border: '2px solid silver', 
-					padding: '3px', 
+					display: this.state.accordion,
+					width: '100%',
+					// border: '2px solid silver',
+					padding: '3px',
 					height: '70px'
 				}}>
 					<span style={{padding: '2px'}}>Above: {this.state.selectedValue}</span>
@@ -162,8 +162,8 @@ export default class FilterItem extends React.Component {
 					<div style={{width: '90%', display: 'inline-block'}}>{this.props.title}</div>
 					<div style={{display: 'inline-block'}} onTouchTap={this.toggleAccordion}>
 						{
-							this.state.accordion == 'none' ? 
-							<ArrowDropDownIcon style={{color: '#000'}}/> : 
+							this.state.accordion == 'none' ?
+							<ArrowDropDownIcon style={{color: '#000'}}/> :
 							<ArrowDropUpIcon style={{color: '#000'}}/>
 						}
 					</div>

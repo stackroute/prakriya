@@ -300,7 +300,14 @@ let getFilteredCadets = function(filterQuery, successCB, errorCB) {
     (w:${graphConsts.NODE_WAVE})
       ${condition}
       ${skills}
-    RETURN n`;
+      optional match (n)-[ver:worked_on]->(p:${graphConsts.NODE_PRODUCT})-[:has]->(v:${graphConsts.NODE_VERSION}{name:ver.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
+      with p as product, n as candidate, w as wave, v as version, s as skill
+    RETURN {
+      candidate: candidate,
+      wave: wave,
+      product: version,
+      skill: COLLECT(DISTINCT skill.Name)
+    }`;
 
   logger.debug('Query for the search', query);
 
@@ -308,8 +315,20 @@ let getFilteredCadets = function(filterQuery, successCB, errorCB) {
     session.close();
     if (resultObj) {
       let cadets = [];
-      resultObj.records.map(function(record) {
-        cadets.push(record._fields[0].properties);
+      console.log(resultObj.records[0]._fields[0])
+      resultObj.records.map(function(record, key) {
+        cadets.push(record._fields[0].candidate.properties);
+        cadets[key].Wave = record._fields[0].wave.properties.WaveID + ' (' + record._fields[0].wave.properties.CourseName + ')';
+        if(record._fields[0].product !== null && record._fields[0].product !== undefined) {
+          cadets[key].ProjectName = record._fields[0].product.properties.name;
+          cadets[key].ProjectDescription = record._fields[0].product.properties.description;
+          cadets[key].ProjectSkills = record._fields[0].skill;
+        }
+        else {
+          cadets[key].ProjectName = '';
+          cadets[key].ProjectDescription = '';
+          cadets[key].ProjectSkills = '';
+        }
       })
       successCB(cadets);
     } else {
@@ -1171,10 +1190,12 @@ let getWaves = function(successCB, errorCB) {
 };
 
 // Get course for a given waveID
-let getCourseForWave = function(waveID, successCB, errorCB) {
+let getCourseForWave = function (waveID, course, successCB, errorCB) {
   let query = `
-    MATCH(wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
-    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE}) RETURN course
+    MATCH(wave:${graphConsts.NODE_WAVE})
+    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
+    WHERE wave.WaveID = '${waveID}' AND wave.CourseName = '${course}'
+    RETURN course
     `;
   let session = driver.session();
   session.run(query).then(function(resultObj) {
