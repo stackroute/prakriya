@@ -231,7 +231,7 @@ router.get('/wave', function (req, res) {
 // Update the wave cadet's
 router.post('/updatewavecadets', auth.accessedBy(['WAVES']), function (req, res) {
   try{
-    dashboardNeo4jController.updateWaveCadets(req.body.cadets, req.body.waveID, function (status) {
+    dashboardNeo4jController.updateWaveCadets(req.body.cadets, req.body.waveID, req.body.course, function (status) {
       logger.debug('Update Cadet Status: ', status);
       res.status(201);
     }, function (err) {
@@ -652,6 +652,22 @@ router.post('/saveevaluation', auth.accessedBy(['EVAL_FORMS']), function (req, r
   }
 });
 
+//get candidate specific evaluation
+router.get('/getevaluation', auth.accessedBy(['EVAL_FORMS']), function(req, res) {
+  try {
+    dashboardMongoController.getEvaluation(req.query.emailID, function (evaluation) {
+      res.status(200).json(evaluation);
+    }, function (err) {
+      logger.error('Get evaluation Error: ', err);
+      res.status(500).json({error: 'Cannot get evaluation from db...!'});
+    });
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
 
 router.post('/saveimage', auth.accessedBy(['MY_PROF']), function (req, res) {
   let form = new formidable.IncomingForm();
@@ -710,8 +726,8 @@ router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 */
 
-router.get('/getimage', 
-  auth.accessedBy(['MY_PROF', 'CANDIDATES', 'WAVES', 'PROJECTS','EVAL_FORMS']), 
+router.get('/getimage',
+  auth.accessedBy(['MY_PROF', 'CANDIDATES', 'WAVES', 'PROJECTS','EVAL_FORMS']),
   function (req, res) {
     try {
       logger.debug('Req in getImage', req.query.eid);
@@ -754,8 +770,8 @@ router.get('/wavespecificcandidates', auth.accessedBy(['ATTENDANCE']), function 
 });
 
 // get all candidates for specific wave
-router.get('/getwaveofcadet', 
-  auth.accessedBy(['ATTENDANCE', 'FEEDBACK','MY_PROF']), 
+router.get('/getwaveofcadet',
+  auth.accessedBy(['ATTENDANCE', 'FEEDBACK','MY_PROF']),
   function (req, res) {
     try{
       dashboardNeo4jController.getWaveOfCadet(req.user.email, function (data) {
@@ -1109,8 +1125,8 @@ router.post('/assessmentdetails', auth.accessedBy(['ASSG_TRACKER']), function (r
 
 
 // map assessments
-router.get('/assessmentandcandidates/:waveID/:assessment/:course', 
-  auth.accessedBy(['ASSG_TRACKER']), 
+router.get('/assessmentandcandidates/:waveID/:assessment/:course',
+  auth.accessedBy(['ASSG_TRACKER']),
   function (req, res) {
     try{
       dashboardNeo4jController.assessmentsandcandidates(req.params.waveID, req.params.assessment, req.params.course, function (data) {
@@ -1130,8 +1146,8 @@ router.get('/assessmentandcandidates/:waveID/:assessment/:course',
 
 
 // Get all candidates and tracks
-// router.get('/candidatesandtracks/:waveID/:courseName', 
-//   auth.canAccess(CONFIG.MENTOR), 
+// router.get('/candidatesandtracks/:waveID/:courseName',
+//   auth.canAccess(CONFIG.MENTOR),
 //   function (req, res) {
 //     try{
 //       dashboardNeo4jController.getWaveSpecificCandidates(req.params.waveID,
@@ -1166,8 +1182,8 @@ router.get('/assessmentandcandidates/:waveID/:assessment/:course',
 ****************************************************/
 
 // get all unique waveid
-router.get('/waveids', 
-  auth.accessedBy(['ASSG_TRACKER', 'ATTENDANCE', 'PROG_FLOW', 'PROJECTS']), 
+router.get('/waveids',
+  auth.accessedBy(['ASSG_TRACKER', 'ATTENDANCE', 'PROG_FLOW', 'PROJECTS']),
   function (req, res) {
     try{
       dashboardNeo4jController.getWaveIDs(function (waveids) {
@@ -1465,7 +1481,7 @@ router.post('/removeCadetFromWave', auth.accessedBy(['WAVES']), function (req, r
   try {
     console.log(req.body.cadets)
     console.log(req.body.waveID)
-    dashboardNeo4jController.removeCadetFromWave(req.body.cadets,req.body.waveID ,function (status) {
+    dashboardNeo4jController.removeCadetFromWave(req.body.cadets, req.body.waveID, req.body.course, function (status) {
       logger.info('Status: ', status);
       res.status(201).json(status);
     }, function (sessionerr) {
