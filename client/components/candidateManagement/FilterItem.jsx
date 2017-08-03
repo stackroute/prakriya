@@ -35,6 +35,7 @@ export default class FilterItem extends React.Component {
 		this.getSliderValue = this.getSliderValue.bind(this);
 		this.addFilter = this.addFilter.bind(this);
     this.getAccordianValues = this.getAccordianValues.bind(this);
+		this.handleUpdate = this.handleUpdate.bind(this);
   }
 
   toggleAccordion() {
@@ -49,8 +50,8 @@ export default class FilterItem extends React.Component {
 			}
     } else {
       this.setState({
-        accordion: 'none',
-				selectedValue: ''
+				selectedValue: '',
+				accordion: 'none'
       });
     }
   }
@@ -70,6 +71,12 @@ export default class FilterItem extends React.Component {
   	})
   }
 
+	handleUpdate(value) {
+		this.setState({
+			selectedValue: value
+		})
+	}
+
 	addFilter(value) {
 		this.setState({
 			selectedValue: '',
@@ -87,9 +94,10 @@ export default class FilterItem extends React.Component {
 					<div style={{display: this.state.accordion}}>
 						<AutoComplete
 							filter={AutoComplete.fuzzyFilter}
-							dataSource={this.state.values}
-							searchText={this.state.selectedValue}
-							onNewRequest={this.addFilter}
+							dataSource={th.state.values}
+							searchText={th.state.selectedValue}
+							onUpdateInput={th.handleUpdate}
+							onNewRequest={th.addFilter}
 							style={styles.autoComplete}
 						/>
 					</div>

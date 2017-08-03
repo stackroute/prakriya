@@ -16,10 +16,11 @@ import CancelIcon from 'material-ui/svg-icons/navigation/cancel';
 import ChangePasswordIcon from 'material-ui/svg-icons/action/lock';
 import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import ChangePassword from '../components/changePassword/index.jsx';
+import UpdateProfilePic from '../components/updateProfilePic/index.jsx';
 import {List, ListItem} from 'material-ui/List';
 import {Link} from 'react-router';
 import Request from 'superagent';
-
+import ProfilePicIcon from 'material-ui/svg-icons/image/portrait';
 
 const styles = {
   title: {
@@ -68,7 +69,8 @@ export default class Header extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-      openDialog: false,
+      openChangePasswordDialog: false,
+      openProfilePicDialog: false,
 			openDrawer: false,
 			actionMenu: '',
 			actions: [],
@@ -81,12 +83,11 @@ export default class Header extends React.Component {
       imageURL: "../assets/images/avt-default.jpg"
 		}
 		this.logout = this.logout.bind(this);
-    this.toggleChangePasswordDialog = this.toggleChangePasswordDialog.bind(this)
+    this.toggleDialog = this.toggleDialog.bind(this)
 		this.getActions = this.getActions.bind(this);
 		this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
 		this.handleDrawerClose = this.handleDrawerClose.bind(this);
 		this.openDashboard = this.openDashboard.bind(this);
-		this.handleClose = this.handleClose.bind(this);
     this.getNotifications = this.getNotifications.bind(this);
     this.dropNotification = this.dropNotification.bind(this);
 	}
@@ -196,17 +197,17 @@ export default class Header extends React.Component {
 		this.context.router.push('/app')
 	}
 
-	handleClose() {
-		this.setState({
-			openDialog: !this.state.openDialog
-		})
-	}
-
-  toggleChangePasswordDialog() {
-    console.log('toggle changePassword: ', this.state.openDialog)
-    this.setState({
-      openDialog: !this.state.openDialog
-    })
+  toggleDialog(dialogType) {
+    let th = this;
+    if(dialogType == 'ChangePassword') {
+      th.setState({
+        openChangePasswordDialog: !this.state.openChangePasswordDialog
+      });
+    } else if(dialogType == 'ProfilePic') {
+      th.setState({
+        openProfilePicDialog: !this.state.openProfilePicDialog
+      });
+    }
   }
 
 	render() {
@@ -299,8 +300,9 @@ export default class Header extends React.Component {
   					    anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
   					  >
                 <List>
-    					    <ListItem primaryText="Log Out" onClick={th.logout} leftIcon={<LogoutIcon />} style={{color: '#757575'}}/>
-                  <ListItem primaryText="Change Password" onClick={th.toggleChangePasswordDialog}  leftIcon={<ChangePasswordIcon />} style={{color: '#757575'}}/>
+                  <ListItem primaryText="Update Profile Pic" onClick={()=>th.toggleDialog('ProfilePic')}  leftIcon={<ProfilePicIcon />} style={{color: '#757575'}}/>
+                  <ListItem primaryText="Change Password" onClick={()=>th.toggleDialog('ChangePassword')}  leftIcon={<ChangePasswordIcon />} style={{color: '#757575'}}/>
+                  <ListItem primaryText="Log Out" onClick={th.logout} leftIcon={<LogoutIcon />} style={{color: '#757575'}}/>
                 </List>
   					  </IconMenu>
             </div>
@@ -309,10 +311,18 @@ export default class Header extends React.Component {
 
         <Dialog
           contentStyle={styles.customContent}
-          open={th.state.openDialog}
-          onRequestClose={th.toggleChangePasswordDialog}
+          open={th.state.openChangePasswordDialog}
+          onRequestClose={()=>th.toggleDialog('ChangePassword')}
         >
-          <ChangePassword username={this.props.user.username} handleClose={th.handleClose}/>
+          <ChangePassword username={this.props.user.username} handleClose={()=>th.toggleDialog('ChangePassword')}/>
+        </Dialog>
+
+        <Dialog
+          contentStyle={styles.customContent}
+          open={th.state.openProfilePicDialog}
+          onRequestClose={()=>th.toggleDialog('ProfilePic')}
+        >
+          <UpdateProfilePic username={this.props.user.username} handleClose={()=>th.toggleDialog('ProfilePic')}/>
         </Dialog>
       </div>
 		)
