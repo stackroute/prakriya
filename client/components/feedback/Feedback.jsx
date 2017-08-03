@@ -98,20 +98,22 @@ export default class Feedback extends React.Component {
         console.log(err);
       else {
         th.setState({cadet: res.body.data});
-        th.getFeedbackFields(res.body.data.Wave.WaveID);
+        th.getFeedbackFields(res.body.data.Wave);
         th.getFeedback(res.body.data.EmployeeID);
         console.log('getCadet: ', res.body.data);
       }
     })
   }
 
-  getFeedbackFields(waveID) {
+  getFeedbackFields(wave) {
 		let th = this;
+    let waveID = wave.WaveID;
+    let course = wave.CourseName;
 		console.log('should get feedback fields for ', waveID);
 		Request
 			.get('/dashboard/courseforwave')
 			.set({'Authorization': localStorage.getItem('token')})
-			.query({waveID: waveID})
+			.query({waveID: waveID, course: course})
 			.end(function(err, res){
 				if(err)
 					console.log('Error in fetching feedback fields: ', err)
@@ -185,7 +187,6 @@ export default class Feedback extends React.Component {
   }
 
   handleMostLikedChange(event) {
-    console.log(this.state.open);
     this.setState({mostLiked: event.target.value})
   }
   handleLeastLikedChange(event) {
@@ -203,7 +204,7 @@ export default class Feedback extends React.Component {
     let feedbackObj = {};
     feedbackObj.cadetID = this.state.cadet.EmployeeID;
     feedbackObj.cadetName = this.state.cadet.EmployeeName;
-    feedbackObj.waveID = this.state.cadet.Wave.WaveID;
+    feedbackObj.waveID = this.state.cadet.Wave.WaveID + ' (' + this.state.cadet.Wave.CourseName + ')';
     feedbackObj.relevance = this.state.relevance;
     feedbackObj.training = this.state.training;
     feedbackObj.confidence = this.state.confidence;

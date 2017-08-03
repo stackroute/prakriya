@@ -239,7 +239,7 @@ export default class EvaluationForms extends React.Component {
 		let skillNames = EVALUATION[4].options;
 		let skillRatings = this.state.skills;
 		let obj = {};
-		obj.employeeID = this.state.cadetID;
+		obj.emailID = this.state.cadetID;
 		obj.waveID = this.state.wave;
 		obj.skills = skillNames;
 		obj.ratings = skillRatings;
@@ -292,10 +292,10 @@ export default class EvaluationForms extends React.Component {
 			        	this.state.cadets.map(function (cadet, index) {
 			        		return (
 			        			cadet.Wave == th.state.wave &&
-			        			<MenuItem 
-			        				key={index} 
-			        				value={cadet.EmployeeName+'-'+cadet.EmailID} 
-			        				primaryText={cadet.EmployeeName+'-'+cadet.EmailID} 
+			        			<MenuItem
+			        				key={index}
+			        				value={cadet.EmployeeName+'-'+cadet.EmailID}
+			        				primaryText={cadet.EmployeeName+'-'+cadet.EmailID}
 			        			/>
 			        		)
 			        	})

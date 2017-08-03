@@ -957,7 +957,7 @@ router.get('/courses', auth.canAccess(CONFIG.ADMMEN), function(req, res) {
 // Get course for a given waveID
 router.get('/courseforwave', auth.canAccess(CONFIG.ALL), function(req, res) {
   try {
-    dashboardNeo4jController.getCourseForWave(req.query.waveID, function (course) {
+    dashboardNeo4jController.getCourseForWave(req.query.waveID, req.query.course, function (course) {
       res.status(201).json(course);
     }, function (err) {
       logger.error('Get CourseForWave Error: ', err);
@@ -1495,7 +1495,7 @@ router.get('/evaluationfields', auth.canAccess(CONFIG.MENTOR), function(req, res
 router.post('/updaterating', auth.canAccess(CONFIG.MENTOR), function(req, res) {
   try {
     dashboardNeo4jController.updateRating(
-      req.body.employeeID,
+      req.body.emailID,
       req.body.waveID,
       req.body.skills,
       req.body.ratings,

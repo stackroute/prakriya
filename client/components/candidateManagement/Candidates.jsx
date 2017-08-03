@@ -217,6 +217,7 @@ export default class Candidates extends React.Component {
 	}
 
 	candidateView(candidate) {
+		console.log(candidate)
 		this.setState({
 			showCandidate: true,
 			displayCandidate: candidate
@@ -327,6 +328,7 @@ export default class Candidates extends React.Component {
 
 	resetFilters() {
 		let th = this;
+		console.log('here');
 		this.setState({
 			filtersCount: 0,
 			appliedFilters: {
