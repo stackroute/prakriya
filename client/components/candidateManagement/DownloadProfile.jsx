@@ -4,6 +4,7 @@ import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import Request from 'superagent';
+import CONFIG from '../../config/index';
 
 let zip;
 let imageURL = '';
@@ -72,6 +73,7 @@ export default class DownloadProfile extends React.Component {
 		let x = 95;
 		let y = 20;
 
+
 		doc.setFillColor(85, 85, 85);
 		doc.setDrawColor(100, 100, 0);
 		doc.setLineWidth(1);
@@ -99,9 +101,29 @@ export default class DownloadProfile extends React.Component {
 		doc.text(x, y+=10, 'Digithon Score: ' + candidate.DigiThonScore+'')
 		if((this.props.candidate.ProjectName !== '' && this.props.candidate.ProjectName !== undefined))
 		{
-		doc.text(x, y+=10, 'Project Name: ' + candidate.ProjectName+'')
-		doc.text(x, y+=10, 'Project Description: ' + candidate.ProjectDescription+'')
-		doc.text(x, y+=10, 'Project Skills: ' + candidate.ProjectSkills+'')
+		doc.text(x, y+=10, 'Project Details: ')
+		doc.text(x, y+=10, 'Name: ' + candidate.ProjectName+'')
+		doc.text(x, y+=10, 'Description: ')
+		let desc = doc.splitTextToSize(candidate.ProjectDescription + '', 100);
+		doc.text(x, y+=5, desc);
+		let height = doc.getTextDimensions(candidate.ProjectDescription + '').h;
+		y = y + height - 10;
+		doc.text(x, y+=10, 'Skills:');
+		let skillString = '';
+		candidate.ProjectSkills.map(function(skill, key) {
+			if(key !== candidate.ProjectSkills.length-1 && key !== candidate.ProjectSkills.length-2) {
+				skillString = skillString + skill + ', ';
+			}	else if(key === candidate.ProjectSkills.length-2) {
+							skillString = skillString + skill + ' and ';
+			}
+			else {
+				skillString = skillString + skill;
+			}
+		})
+		let skills = doc.splitTextToSize(skillString, 100);
+		doc.text(x, y+=5, skills);
+		height = doc.getTextDimensions(candidate.ProjectSkills+'').h;
+		y = y + height
 		}
 		if(this.props.zip) {
 			zip.file(candidate.EmployeeID + '.pdf', doc.output('blob'));
