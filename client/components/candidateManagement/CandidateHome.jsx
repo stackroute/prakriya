@@ -87,6 +87,7 @@ export default class CandidateHome extends React.Component {
 			})
 	}
 	getWave(waveid) {
+		console.log('here');
 		console.log(waveid);
 		let th = this;
 		let wave = waveid.split('(')[0].trim();
@@ -240,7 +241,7 @@ export default class CandidateHome extends React.Component {
 											</p>
 											</div>
 										}
-										{this.props.candidate.ProjectName != '' &&
+										{(this.props.candidate.ProjectName !== '' && this.props.candidate.ProjectName !== undefined) &&
 										<div>
 										<h4>Project Details</h4>
 										<p style={styles.details}>

@@ -5,19 +5,6 @@ let jwt = require('jwt-simple');
 let cfg = require('../../config');
 const logger = require('./../../applogger');
 
-// router.post('/',
-//   passport.authenticate(
-//   	'local',
-//   	{
-//   		failureFlash : 'Invalid login attempt..!',
-//   		successFlash: 'Welcome to Prakriya'
-//   	}
-//   ),
-//   function(req, res) {
-//     res.send(true);
-//   }
-// )
-
 // encoding tokens here!!!!!
 router.post('/', function (req, res) {
     if (req.body.username && req.body.password) {

@@ -192,30 +192,27 @@ export default class WiproAdmin extends React.Component {
       <div>
         <Grid>
           <Row>
-            <SelectField value={this.state.value} onChange={this.handleChange} multiple={true} floatingLabelText="Select Billability">
-              {items.map(function(item, key) {
-                return <MenuItem key={key} value={item} primaryText={item}/>
-              })
-}
-            </SelectField>
+            <Col md={5}>
+              <SelectField value={this.state.value} onChange={this.handleChange} multiple={true} floatingLabelText="Select Billability">
+                {
+                  items.map(function(item, key) {
+                    return <MenuItem key={key} value={item} primaryText={item}/>
+                  })
+                }
+              </SelectField>
 
-            <NVD3Chart id="pieChart" type="pieChart" tooltip={{
-              enabled: true
-            }} datum={datavalue} x="label" y="value" width="550" height="600"/>
-
-            <Col md={5}></Col>
-
-            <Col md={3}>
-              <FileDrop type="ZCOP" handleDrop={this.handleDrop}/>
-              <br/>
-              <RaisedButton label="Merge" primary={true} style={styles.button} onClick={this.handleMerge}/>
+              <NVD3Chart id="pieChart" type="pieChart" tooltip={{
+                enabled: true
+              }} datum={datavalue} x="label" y="value" width="550" height="600"/>
             </Col>
+
             <Col md={3} mdOffset={1}>
               <SelectField value={this.state.file} onChange={this.handleFileChange} floatingLabelText="Select File">
-                {file_types.map(function(file, key) {
-                  return <MenuItem key={key} value={file} primaryText={file}/>
-                })
-}
+                {
+                  file_types.map(function(file, key) {
+                    return <MenuItem key={key} value={file} primaryText={file}/>
+                  })
+                }
               </SelectField>
               <RaisedButton label="Merge" primary={true} onClick={this.handleMerge}/>
               <br/>

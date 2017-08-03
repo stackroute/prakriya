@@ -10,7 +10,7 @@ const logger = require('./../../applogger');
 ****************************************/
 
 // Get all the users
-router.get('/users', auth.canAccess(CONFIG.ALL), function (req, res) {
+router.get('/users', function (req, res) {
   try{
     adminMongoController.getUsers(function (userColl) {
       
@@ -38,7 +38,7 @@ router.get('/users', auth.canAccess(CONFIG.ALL), function (req, res) {
 });
 
 // Add a new user
-router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.post('/adduser', auth.accessedBy(['USERS']), function (req, res) {
   let userObj = req.body;
   try{
     const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
@@ -61,7 +61,7 @@ router.post('/adduser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   }
 });
 
-router.delete('/deleteuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.delete('/deleteuser', auth.accessedBy(['USERS']), function (req, res) {
   try {
     adminMongoController.deleteUser(req.body, function (status) {
       res.status(200).json(status);
@@ -76,7 +76,7 @@ router.delete('/deleteuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   }
 });
 
-router.post('/updateuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.post('/updateuser', auth.accessedBy(['USERS']), function (req, res) {
   let userObj = req.body;
   try{
     const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
@@ -98,7 +98,7 @@ router.post('/updateuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   }
 });
 
-router.post('/lockuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.post('/lockuser', auth.accessedBy(['USERS']), function (req, res) {
   try {
     adminMongoController.lockUser(req.body, function (status) {
       res.status(200).json(status);
@@ -113,7 +113,7 @@ router.post('/lockuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
   }
 });
 
-router.post('/unlockuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.post('/unlockuser', auth.accessedBy(['USERS']), function (req, res) {
   try {
     adminMongoController.unlockUser(req.body, function (status) {
       res.status(200).json(status);
@@ -133,7 +133,7 @@ router.post('/unlockuser', auth.canAccess(CONFIG.ADMIN), function (req, res) {
 ****************************************/
 
 // Get all the roles
-router.get('/roles', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.get('/roles', auth.accessedBy(['ROLES']), function (req, res) {
   try{
     adminMongoController.getRoles(function (roles) {
       res.status(201).json(roles);
@@ -149,7 +149,7 @@ router.get('/roles', auth.canAccess(CONFIG.ADMIN), function (req, res) {
 });
 
 // Add a new role
-router.post('/addrole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.post('/addrole', auth.accessedBy(['ROLES']), function (req, res) {
     try {
       adminMongoController.addRole(req.body, function (role) {
         res.status(200).json(role);
@@ -166,7 +166,7 @@ router.post('/addrole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
 );
 
 // Update role
-router.post('/updaterole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.post('/updaterole', auth.accessedBy(['ROLES']), function (req, res) {
     try {
       adminMongoController.updateRole(req.body, function (status) {
         res.status(200).json(status);
@@ -183,7 +183,7 @@ router.post('/updaterole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
 );
 
 // Delete a role
-router.delete('/deleterole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.delete('/deleterole', auth.accessedBy(['ROLES']), function (req, res) {
     try {
       adminMongoController.deleteRole(req.body, function (status) {
         res.status(200).json(status);
@@ -204,7 +204,7 @@ router.delete('/deleterole', auth.canAccess(CONFIG.ADMIN), function (req, res) {
 ****************************************/
 
 // Get all the access controls
-router.get('/accesscontrols', auth.canAccess(CONFIG.ADMIN), function (req, res) {
+router.get('/accesscontrols', auth.accessedBy(['ROLES']), function (req, res) {
   try{
     adminMongoController.getAccessControls(function (controls) {
       res.status(201).json(controls);
