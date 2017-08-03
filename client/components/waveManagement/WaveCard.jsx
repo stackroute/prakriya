@@ -106,7 +106,6 @@ export default class WaveCard extends React.Component {
       if (err)
         console.log(err);
       else {
-        console.log('Successfully fetched all courses', res.body)
         th.setState({courses: res.body, selectedCourse: th.state.wave.Course})
       }
     })
@@ -146,7 +145,6 @@ export default class WaveCard extends React.Component {
       wave = this.state.wave;
       wave.Course = this.state.selectedCourse;
     }
-    console.log(wave);
     this.props.handleUpdate(wave, this.props.wave.CourseName);
     this.closeUpdateDialog();
   }
@@ -206,7 +204,6 @@ export default class WaveCard extends React.Component {
       if (err)
         console.log(err);
       else {
-        console.log('Successfully fetched all cadets', res.body)
         th.setState({cadets: res.body, cadetFetch: false, dialog: true})
       }
     })
@@ -233,7 +230,6 @@ export default class WaveCard extends React.Component {
     this.setState({wave: wave})
   }
   handleCourseChange(event, key, val) {
-    console.log(this.state.selectedCourse + 'selected');
     this.setState({selectedCourse: val})
   }
 
@@ -247,21 +243,17 @@ export default class WaveCard extends React.Component {
   }
 
   handleremovecadets() {
-    console.log('here')
     let th = this;
     Request.post('/dashboard/removeCadetFromWave').set({'Authorization': localStorage.getItem('token')}).send({cadets: this.state.cadetsToRemove, waveID: this.props.wave.WaveID}).end(function(err, res) {
-      console.log(res)
       if (err)
         console.log(err);
       else {
-        console.log('Successfully deleted from wave')
         th.handleClose();
       }
     })
   }
 
   render() {
-    console.log(this.state.cadets, "cadets")
     let startdate = new Date(this.props.wave.StartDate);
     startdate = startdate.getFullYear() + '/' + (startdate.getMonth() + 1) + '/' + startdate.getDate();
     let enddate = new Date(this.props.wave.EndDate);
