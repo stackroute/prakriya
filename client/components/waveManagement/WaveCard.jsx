@@ -151,7 +151,9 @@ export default class WaveCard extends React.Component {
 
   updateCadets(cadets) {
     let th = this;
-    Request.post('/dashboard/updatewavecadets').set({'Authorization': localStorage.getItem('token')}).send({cadets: cadets, waveID: this.props.wave.WaveID}).end(function(err, res) {
+    let wave = this.props.wave.WaveID;
+    let course = this.props.wave.CourseName;
+    Request.post('/dashboard/updatewavecadets').set({'Authorization': localStorage.getItem('token')}).send({cadets: cadets, waveID: wave, course: course}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
@@ -244,7 +246,10 @@ export default class WaveCard extends React.Component {
 
   handleremovecadets() {
     let th = this;
-    Request.post('/dashboard/removeCadetFromWave').set({'Authorization': localStorage.getItem('token')}).send({cadets: this.state.cadetsToRemove, waveID: this.props.wave.WaveID}).end(function(err, res) {
+    let wave = this.props.wave.WaveID;
+    let course = this.props.wave.CourseName;
+    Request.post('/dashboard/removeCadetFromWave').set({'Authorization': localStorage.getItem('token')}).send({cadets: this.state.cadetsToRemove, waveID: wave, course: course}).end(function(err, res) {
+      console.log(res)
       if (err)
         console.log(err);
       else {

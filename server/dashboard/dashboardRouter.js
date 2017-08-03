@@ -67,7 +67,7 @@ router.get('/notifications', function (req, res) {
 router.post('/changepassword', function (req, res) {
    try {
       let userObj = req.body;
-      
+
       const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
       let encrypted = cipher.update(userObj.password, 'utf8', 'hex');
       encrypted = cipher.final('hex');
@@ -239,7 +239,7 @@ router.get('/wave', function (req, res) {
 // Update the wave cadet's
 router.post('/updatewavecadets', auth.accessedBy(['WAVES']), function (req, res) {
   try{
-    dashboardNeo4jController.updateWaveCadets(req.body.cadets, req.body.waveID, function (status) {
+    dashboardNeo4jController.updateWaveCadets(req.body.cadets, req.body.waveID, req.body.course, function (status) {
       logger.debug('Update Cadet Status: ', status);
       res.status(201);
     }, function (err) {
@@ -660,19 +660,37 @@ router.post('/saveevaluation', auth.accessedBy(['EVAL_FORMS']), function (req, r
   }
 });
 
+//get candidate specific evaluation
+router.get('/getevaluation', auth.accessedBy(['EVAL_FORMS']), function(req, res) {
+  try {
+    dashboardMongoController.getEvaluation(req.query.emailID, function (evaluation) {
+      res.status(200).json(evaluation);
+    }, function (err) {
+      logger.error('Get evaluation Error: ', err);
+      res.status(500).json({error: 'Cannot get evaluation from db...!'});
+    });
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+})
 
-router.post('/saveimage', auth.accessedBy(['MY_PROF']), function (req, res) {
+router.post('/saveimage', function (req, res) {
   let form = new formidable.IncomingForm();
   form.parse(req, function (err, fields, files) {
     fs.readFile(files.file.path, 'binary', (readFileError, data) => {
       try {
         let buffer = new Buffer(data, 'binary');
-        let cadet = JSON.parse(fields.cadet);
+        let user = fields.cadet ? JSON.parse(fields.cadet) :JSON.parse(fields.non_cadet);
+        // let cadet = JSON.parse(fields.cadet);
         let img = {};
         let dir = './public/profilePics/';
         img.data = buffer;
         img.contentType = files.file.type;
-        cadet.ProfilePic = img;
+        // cadet.ProfilePic = img;
+        user.ProfilePic = img;
         if (!fs.existsSync('./public/')) {
           logger.debug('Public Directory not present');
           mkdirp.sync('./public/');
@@ -681,7 +699,8 @@ router.post('/saveimage', auth.accessedBy(['MY_PROF']), function (req, res) {
           logger.debug('ProfilePics Directory not present');
           mkdirp(dir);
         }
-        let imagePath = dir + cadet.EmployeeID + '.jpeg';
+        // let imagePath = dir + cadet.EmployeeID + '.jpeg';
+        let imagePath = dir + (user.EmployeeID || user.username) + '.jpeg';
         logger.debug('Image Path', imagePath);
         fs.writeFile(imagePath, data, 'binary', function (writeFileError) {
             if(writeFileError) {
@@ -699,47 +718,23 @@ router.post('/saveimage', auth.accessedBy(['MY_PROF']), function (req, res) {
   });
 });
 
-/*
 router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    logger.debug('Req in getImage', req.query.eid);
-    fs.readFile('public/profilePics/' + req.query.eid + '.jpeg', 'binary', (err, data) => {
+    let filename = req.query.eid || req.query.filename;
+    base64Img.base64('public/profilePics/' + filename + '.jpeg', function (err, data) {
       if(err) {
         res.status(500).json({error: 'No image is available...!'});
       } else {
         res.send(data);
-}
+      }
     });
   } catch(err) {
+    console.log(err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });
   }
 });
-*/
-
-router.get('/getimage', 
-  auth.accessedBy(['MY_PROF', 'CANDIDATES', 'WAVES', 'PROJECTS','EVAL_FORMS']), 
-  function (req, res) {
-    try {
-      logger.debug('Req in getImage', req.query.eid);
-      base64Img.base64('public/profilePics/' + req.query.eid + '.jpeg', function (err, data) {
-        if(err) {
-          res.status(500).json({error: 'No image is available...!'});
-        } else {
-          res.send(data);
-        }
-      });
-    } catch(err) {
-      console.log(err);
-      res.status(500).json({
-        error: 'Internal error occurred, please report...!'
-      });
-    }
-  }
-);
-
-
 /** **************************************************
 *******          Attendance         ********
 ****************************************************/
@@ -762,8 +757,8 @@ router.get('/wavespecificcandidates', auth.accessedBy(['ATTENDANCE']), function 
 });
 
 // get all candidates for specific wave
-router.get('/getwaveofcadet', 
-  auth.accessedBy(['ATTENDANCE', 'FEEDBACK','MY_PROF']), 
+router.get('/getwaveofcadet',
+  auth.accessedBy(['ATTENDANCE', 'FEEDBACK','MY_PROF']),
   function (req, res) {
     try{
       dashboardNeo4jController.getWaveOfCadet(req.user.email, function (data) {
@@ -1117,8 +1112,8 @@ router.post('/assessmentdetails', auth.accessedBy(['ASSG_TRACKER']), function (r
 
 
 // map assessments
-router.get('/assessmentandcandidates/:waveID/:assessment/:course', 
-  auth.accessedBy(['ASSG_TRACKER']), 
+router.get('/assessmentandcandidates/:waveID/:assessment/:course',
+  auth.accessedBy(['ASSG_TRACKER']),
   function (req, res) {
     try{
       dashboardNeo4jController.assessmentsandcandidates(req.params.waveID, req.params.assessment, req.params.course, function (data) {
@@ -1138,8 +1133,8 @@ router.get('/assessmentandcandidates/:waveID/:assessment/:course',
 
 
 // Get all candidates and tracks
-// router.get('/candidatesandtracks/:waveID/:courseName', 
-//   auth.canAccess(CONFIG.MENTOR), 
+// router.get('/candidatesandtracks/:waveID/:courseName',
+//   auth.canAccess(CONFIG.MENTOR),
 //   function (req, res) {
 //     try{
 //       dashboardNeo4jController.getWaveSpecificCandidates(req.params.waveID,
@@ -1174,8 +1169,8 @@ router.get('/assessmentandcandidates/:waveID/:assessment/:course',
 ****************************************************/
 
 // get all unique waveid
-router.get('/waveids', 
-  auth.accessedBy(['ASSG_TRACKER', 'ATTENDANCE', 'PROG_FLOW', 'PROJECTS']), 
+router.get('/waveids',
+  auth.accessedBy(['ASSG_TRACKER', 'ATTENDANCE', 'PROG_FLOW', 'PROJECTS']),
   function (req, res) {
     try{
       dashboardNeo4jController.getWaveIDs(function (waveids) {
@@ -1473,7 +1468,7 @@ router.post('/removeCadetFromWave', auth.accessedBy(['WAVES']), function (req, r
   try {
     console.log(req.body.cadets)
     console.log(req.body.waveID)
-    dashboardNeo4jController.removeCadetFromWave(req.body.cadets,req.body.waveID ,function (status) {
+    dashboardNeo4jController.removeCadetFromWave(req.body.cadets, req.body.waveID, req.body.course, function (status) {
       logger.info('Status: ', status);
       res.status(201).json(status);
     }, function (sessionerr) {

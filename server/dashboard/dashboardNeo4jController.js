@@ -1013,13 +1013,14 @@ let addWave = function(waveObj, successCB, errorCB) {
 }
 
 //removeCadet from wave
-let removeCadetFromWave = function(cadets, waveID, successCB, errorCB) {
+let removeCadetFromWave = function(cadets, waveID, course, successCB, errorCB) {
   console.log(cadets)
   console.log(waveID)
   let query = `UNWIND ${JSON.stringify(cadets)} as cadet
-   match(n:${graphConsts.NODE_WAVE} {WaveID:'${waveID}'})
+   match(n:${graphConsts.NODE_WAVE})
    <-[r:${graphConsts.REL_BELONGS_TO}]-(c:${graphConsts.NODE_CANDIDATE} {EmployeeID:cadet})
-    match (c)-[r]->() delete r return c`
+   WHERE n.WaveID = '${waveID}' AND n.CourseName = '${course}'
+   delete r return c`
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
@@ -1210,13 +1211,14 @@ let getCourseForWave = function (waveID, course, successCB, errorCB) {
 };
 
 // Update cadets for the wave
-let updateWaveCadets = function(cadets, waveID, successCB, errorCB) {
+let updateWaveCadets = function(cadets, waveID, course, successCB, errorCB) {
 
   let session = driver.session();
 
   let query = `UNWIND ${JSON.stringify(cadets)} AS empID
         MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: empID}),
-          (wave: ${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
+          (wave: ${graphConsts.NODE_WAVE})
+          WHERE wave.WaveID = '${waveID}' AND wave.CourseName = '${course}'
         MERGE (candidate)-[:${graphConsts.REL_BELONGS_TO}]->(wave)
         RETURN candidate`;
 
@@ -1376,7 +1378,7 @@ let getWaveOfCadet = function(EmailID, successCB, errorCB) {
 //evaluation
 let getCadetsAndWave = function(successCB, errorCB) {
   let session = driver.session();
-  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return {candidate:n,wave:w.WaveID}`;
+  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return {candidate:n,wave:w}`;
   session.run(query).then(function(resultObj) {
     session.close();
     let cadets = [];
@@ -1384,7 +1386,7 @@ let getCadetsAndWave = function(successCB, errorCB) {
       let result = resultObj.records[i];
       cadets.push(result._fields[0].candidate.properties);
       console.log(cadets);
-      cadets[i].Wave = result._fields[0].wave;
+      cadets[i].Wave = result._fields[0].wave.properties.WaveID + ' (' + result._fields[0].wave.properties.CourseName + ')';
     }
     successCB(cadets);
   }).catch(function(err) {
