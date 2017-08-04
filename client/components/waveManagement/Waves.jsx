@@ -59,6 +59,7 @@ export default class Waves extends React.Component {
 		this.state = {
 			tab: 'Ongoing',
 			currentPage: 1,
+			noCadets: false,
 			cadets: [],
 			courses: [],
 			waves : [],
@@ -93,9 +94,17 @@ export default class Waves extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	th.setState({
-		    		cadets: res.body
-		    	})
+		    	if(res.body.length == 0) {
+		    		th.setState({
+			    		cadets: [],
+			    		noCadets: true
+			    	})
+		    	} else {
+		    		th.setState({
+			    		cadets: res.body,
+			    		noCadets: false
+			    	})
+		    	}
 		    }
 		  })
 	}
@@ -336,6 +345,8 @@ export default class Waves extends React.Component {
 				{
 					this.props.user.role == "sradmin" &&
 					this.state.courses.length > 0 &&
+					(this.state.cadets.length > 0 ||
+					this.state.noCadets) &&
 					<AddWave
 						cadets={this.state.cadets}
 						courses={this.state.courses}

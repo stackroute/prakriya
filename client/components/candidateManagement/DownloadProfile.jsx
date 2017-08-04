@@ -37,7 +37,7 @@ export default class DownloadProfile extends React.Component {
 		if(this.props.zip) {
 			zip = new JSZip();
 			this.state.candidates.map(function (cadet, index) {
-				th.getProfilePic(cadet.EmployeeID, cadet, index);
+				th.getProfilePic(cadet.EmailID, cadet, index);
 			})
 		}
 		else {
@@ -47,11 +47,13 @@ export default class DownloadProfile extends React.Component {
 		}
 	}
 
-	getProfilePic(eid, cadet, index) {
+	getProfilePic(emailID, cadet, index) {
 		let th = this;
+		let username = emailID.split("@wipro.com")[0];
 		Request
-			.get(`/dashboard/getimage?eid=${eid}`)
+			.get(`/dashboard/getimage`)
 			.set({'Authorization': localStorage.getItem('token')})
+			.query({filename: username})
 			.end(function(err, res) {
 				if(err) {
 		    	console.log('Image not found for ', eid);

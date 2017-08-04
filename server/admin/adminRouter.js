@@ -39,14 +39,7 @@ router.get('/users', function (req, res) {
 
 // Add a new user
 router.post('/adduser', auth.accessedBy(['USERS']), function (req, res) {
-  let userObj = req.body;
   try{
-    const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
-    let encrypted = cipher.update(userObj.password, 'utf8', 'hex');
-    encrypted = cipher.final('hex');
-
-    userObj.password = encrypted;
-
     adminMongoController.addUser(userObj, function (user) {
       res.status(200).json(user);
     }, function (err) {
