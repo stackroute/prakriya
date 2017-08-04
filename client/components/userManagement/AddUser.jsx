@@ -12,33 +12,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import Dialog from 'material-ui/Dialog';
 import Request from 'superagent';
 import app from '../../styles/app.json';
-
-const styles = {
-    dialog: {
-  		backgroundColor: '#DDDBF1',
-  		borderLeft: '10px solid teal',
-      borderRight: '10px solid teal',
-      borderBottom: '3px solid teal'
-  	},
-  	dialogTitle: {
-  		fontWeight: 'bold',
-  		backgroundColor: 'teal',
-  		color: '#DDDBF1',
-  		textAlign: 'center'
-  	},
-  	actionsContainer: {
-  		backgroundColor: 'teal',
-  		borderTop: '0px',
-  		marginTop: '0px'
-  	},
-  	actionButton: {
-  		backgroundColor: '#DDDBF1',
-  		width: '50%',
-  		color: 'teal',
-  		border: '1px solid teal',
-  		height: '100%'
-  	}
-};
+import dialog from '../../styles/dialog.json';
 
 export default class AddUser extends React.Component {
 
@@ -242,12 +216,12 @@ export default class AddUser extends React.Component {
 			actions = [
         <FlatButton
 	    	 		label='Cancel'
-	    	   	style={styles.actionButton}
+	    	   	style={dialog.actionButton}
 	    			onTouchTap={(e) => this.handleClose(e, 'CLOSE')}
 	    	 	/>,
         <FlatButton
       	 		label='Update User'
-      	   	style={styles.actionButton}
+      	   	style={dialog.actionButton}
       			onTouchTap={(e) => this.handleClose(e, 'EDIT')}
       	 	/>
       ]
@@ -257,12 +231,12 @@ export default class AddUser extends React.Component {
       actions = [
         <FlatButton
 	    	 		label='Cancel'
-	    	   	style={styles.actionButton}
+	    	   	style={dialog.actionButton}
 	    			onTouchTap={(e) => this.handleClose(e, 'CLOSE')}
 	    	 	/>,
         <FlatButton
       	 		label='Add User'
-      	   	style={styles.actionButton}
+      	   	style={dialog.actionButton}
       			onTouchTap={(e) => this.handleClose(e, 'ADD')}
       	 	/>
       ]
@@ -273,15 +247,15 @@ export default class AddUser extends React.Component {
 		      <ContentAdd />
 		    </FloatingActionButton>
 		    <Dialog
-          bodyStyle={styles.dialog}
+          bodyStyle={dialog.body}
           title={dialogTitle}
-          titleStyle={styles.dialogTitle}
+          titleStyle={dialog.title}
           modal={false}
           open={this.state.open}
           autoScrollBodyContent={true}
           onRequestClose={(e) => this.handleClose(e, 'CLOSE')}
           actions={actions}
-          actionsContainerStyle={styles.actionsContainer}
+          actionsContainerStyle={dialog.actionsContainer}
         >
           <div>
 						<TextField

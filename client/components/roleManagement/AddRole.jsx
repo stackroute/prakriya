@@ -7,32 +7,9 @@ import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import app from '../../styles/app.json';
+import dialog from '../../styles/dialog.json';
 
 const styles = {
-	dialog: {
-		backgroundColor: '#DDDBF1',
-		borderBottom: '3px solid teal',
-		borderRight: '10px solid teal',
-		borderLeft: '10px solid teal'
-	},
-	dialogTitle: {
-		fontWeight: 'bold',
-		backgroundColor: 'teal',
-		color: '#DDDBF1',
-		textAlign: 'center'
-	},
-	actionsContainer: {
-		backgroundColor: 'teal',
-		borderTop: '0px',
-		marginTop: '0px'
-	},
-	actionButton: {
-		backgroundColor: '#DDDBF1',
-		width: '50%',
-		color: 'teal',
-		border: '1px solid teal',
-		height: '100%'
-	},
 	accessControlsNoError: {
 
 	},
@@ -148,10 +125,9 @@ export default class AddRole extends React.Component {
 	}
 
 	suggestedControls(control) {
-		console.log('Suggested controls are selected')
 		let role = this.state.role;
 		if(role.indexOf('mentor') > -1) {
-			if(control == 'Candidates' || control == 'Mentor Connect' || 
+			if(control == 'Candidates' || control == 'Mentor Connect' ||
 				control == 'Projects' || control == 'Courses') {
 				return true;
 			}
@@ -176,12 +152,12 @@ export default class AddRole extends React.Component {
       <FlatButton
         label='Cancel'
         onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />,
       <FlatButton
         label='Add'
         onTouchTap={(e)=>{this.handleClose(e, 'ADD')}}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />,
     ]
 
@@ -191,15 +167,15 @@ export default class AddRole extends React.Component {
 		      <ContentAdd />
 		    </FloatingActionButton>
 		    <Dialog
-					bodyStyle={styles.dialog}
+					bodyStyle={dialog.body}
           title='ADD A NEW ROLE'
-					titleStyle={styles.dialogTitle}
+					titleStyle={dialog.title}
           actions={dialogActions}
           modal={false}
           open={this.state.open}
           onRequestClose={(e)=>{this.handleClose(e, 'CLOSE')}}
           autoScrollBodyContent={true}
-					actionsContainerStyle={styles.actionsContainer}
+					actionsContainerStyle={dialog.actionsContainer}
         >
           <TextField
           	floatingLabelText='Role *'
