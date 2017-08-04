@@ -41,7 +41,8 @@ router.get('/users', function (req, res) {
 router.post('/adduser', auth.accessedBy(['USERS']), function (req, res) {
   let userObj = req.body;
   try{
-    adminMongoController.addUser(userObj, function (user) {
+    console.log(req.body)
+    adminMongoController.addUser(req.body, function (user) {
       res.status(200).json(user);
     }, function (err) {
       logger.error('Error', err);

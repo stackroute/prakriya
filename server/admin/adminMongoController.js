@@ -15,7 +15,7 @@ let getUsers = function (successCB, errorCB) {
 };
 
 let addUser = function (userObj, successCB, errorCB) {
-	
+
 	const cipher = crypto.createCipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
   let encrypted = cipher.update(userObj.password, 'utf8', 'hex');
   encrypted = cipher.final('hex');
@@ -25,6 +25,7 @@ let addUser = function (userObj, successCB, errorCB) {
 	let saveUser = new UserModel(userObj);
 	saveUser.save(userObj, function (err, result) {
 		if(err) {
+			console.log(err);
 			errorCB(err);
 		}
 		successCB(result);
