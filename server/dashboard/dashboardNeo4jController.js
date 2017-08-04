@@ -21,6 +21,8 @@ let deleteDanglingNodes = function(label) {
 // adding cadet
 let addCadet = function(cadetObj, successCB, errorCB) {
 
+  console.log(cadetObj);
+
   let cadet = {};
 
   cadet.EmployeeID = cadetObj.EmployeeID || '';
@@ -63,6 +65,7 @@ let addCadet = function(cadetObj, successCB, errorCB) {
     session.close();
     successCB(cadetObj);
   }).catch(function(err) {
+    console.log(err);
     errorCB(err);
   });
 }

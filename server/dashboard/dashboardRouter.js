@@ -1073,7 +1073,7 @@ router.post('/restorecourse', auth.accessedBy(['COURSES']), function (req, res) 
 
 
 // Get all courses for specific wave
-router.get('/assessment', auth.accessedBy(['ASSG_TRACKER']), function (req, res) {
+router.get('/assessment', function (req, res) {
   try{
     console.log(req.query.waveid);
     dashboardNeo4jController.getAssessmentTrack(req.query.waveid, req.query.course, function (data) {
@@ -1186,7 +1186,7 @@ router.get('/waveids',
 );
 
 // Get a particular wave object based on wave id
-router.get('/waveobject/:waveID/:course', auth.accessedBy(['PROG_FLOW']), function (req, res) {
+router.get('/waveobject/:waveID/:course', function (req, res) {
   logger.info('API HIT ===> GET Wave Object');
   try{
     console.log(req.params.waveID,"req.params.WAVEID")

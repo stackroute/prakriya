@@ -13,7 +13,7 @@ const logger = require('./../../applogger');
 router.get('/users', function (req, res) {
   try{
     adminMongoController.getUsers(function (userColl) {
-      
+
       userColl.map(function (user, index) {
         logger.debug('Password of the user', user.password)
         const decipher = crypto.createDecipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
@@ -40,7 +40,8 @@ router.get('/users', function (req, res) {
 // Add a new user
 router.post('/adduser', auth.accessedBy(['USERS']), function (req, res) {
   try{
-    adminMongoController.addUser(userObj, function (user) {
+    console.log(req.body)
+    adminMongoController.addUser(req.body, function (user) {
       res.status(200).json(user);
     }, function (err) {
       logger.error('Error', err);
