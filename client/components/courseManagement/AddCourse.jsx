@@ -55,7 +55,8 @@ export default class AddCourse extends React.Component {
       SkillSet: [],
       SkillName: '',
       snackbarOpen: false,
-			snackbarMessage: ''
+			snackbarMessage: '',
+      snackbarAction: ''
     }
 
     this.handleOpen = this.handleOpen.bind(this);
@@ -74,6 +75,7 @@ export default class AddCourse extends React.Component {
     this.getSkillSet = this.getSkillSet.bind(this);
     this.hideSnackbar = this.hideSnackbar.bind(this);
     this.openSnackbar = this.openSnackbar.bind(this);
+    this.snackbarAction = this.snackbarAction.bind(this);
   }
 
   componentWillMount() {
@@ -98,9 +100,10 @@ export default class AddCourse extends React.Component {
     });
   }
 
-  openSnackbar(message) {
+  openSnackbar(message, action) {
 		this.setState({
 			snackbarMessage: message,
+      snackbarAction: action,
 			snackbarOpen: true
 		});
 	}
@@ -108,9 +111,37 @@ export default class AddCourse extends React.Component {
 	hideSnackbar() {
 		this.setState({
 			snackbarMessage: '',
+      snackbarAction: '',
 			snackbarOpen: false
 		});
 	}
+
+  snackbarAction() {
+    let th = this;
+    let skill = this.state.SkillName;
+    let skills = this.state.Skills;
+    let skillSet = this.state.SkillSet;
+    Request
+    .post('/dashboard/createnewskill')
+    .set({'Authorization': localStorage.getItem('token')})
+    .send({skill: skill})
+    .end(function(err, res) {
+      if (err) {
+        console.log(err);
+      } else {
+        skills.push(skill);
+        skillSet.push(skill);
+        th.setState({
+          Skills: skills,
+          SkillSet: skillSet,
+          SkillName: '',
+          SkillsErrorText: ''
+        });
+        th.hideSnackbar();
+        th.openSnackbar(skill + ' is added to the superset.', '');
+      }
+    });
+  }
 
   onChangeName(e) {
     this.setState({Name: e.target.value, NameErrorText: ''});
@@ -142,12 +173,13 @@ export default class AddCourse extends React.Component {
         return s.toLowerCase() == skill.toLowerCase()
       });
       if(duplicateFound) {
-        th.openSnackbar('Duplicate Skill! Try adding a new skill.');
+        th.openSnackbar('Duplicate Skill! Try adding a new skill.', '');
       } else if (!matchFound){
-        th.openSnackbar('Please choose a value from the drop down.');
+        // th.openSnackbar('Please choose a value from the drop down.', '');
+        th.openSnackbar('New Skill! Wanna move it to the superset?', 'YES');
       } else {
         skills.push(skill);
-        this.setState({Skills: skills, SkillName: '', SkillsErrorText: ''});
+        th.setState({Skills: skills, SkillName: '', SkillsErrorText: ''});
       }
     }
   }
@@ -362,10 +394,12 @@ export default class AddCourse extends React.Component {
           onConfirmCourseAddition={this.handleAdd}
           />
           <Snackbar
-  					open={this.state.snackbarOpen}
-  					message={this.state.snackbarMessage}
+  					open={th.state.snackbarOpen}
+  					message={th.state.snackbarMessage}
   					autoHideDuration={4000}
   					onRequestClose={th.hideSnackbar}
+            action={th.state.snackbarAction}
+            onActionTouchTap={th.snackbarAction}
   			 />
         </div>
       )

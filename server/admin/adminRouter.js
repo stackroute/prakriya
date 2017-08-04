@@ -39,6 +39,7 @@ router.get('/users', function (req, res) {
 
 // Add a new user
 router.post('/adduser', auth.accessedBy(['USERS']), function (req, res) {
+  let userObj = req.body;
   try{
     console.log(req.body)
     adminMongoController.addUser(req.body, function (user) {
@@ -56,6 +57,7 @@ router.post('/adduser', auth.accessedBy(['USERS']), function (req, res) {
 });
 
 router.delete('/deleteuser', auth.accessedBy(['USERS']), function (req, res) {
+  console.log('DELETEUSER: ', req.body)
   try {
     adminMongoController.deleteUser(req.body, function (status) {
       res.status(200).json(status);
