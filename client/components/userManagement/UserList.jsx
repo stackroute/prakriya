@@ -131,11 +131,12 @@ export default class UserList extends React.Component {
 		const accountTooltip = this.disabledUser() ? 'Unlock Account' : 'Lock Account' ;
 		const disabled = this.disabledUser()
 		let type = typeof color;
+		let th = this;
 		return (
 			<div>
 					<Card>
 						<CardMedia overlay={<CardTitle title={this.props.currUser.username} subtitle={this.props.currUser.role.toUpperCase()} />}>
-				      <img src="../../../assets/images/avt-default.jpg" />
+				      <img src={th.props.currUser.profilePic || '../../../assets/images/avt-default.jpg'} style={{height: 250}}/>
 				    </CardMedia>
 				    <CardTitle title={this.props.currUser.name} subtitle={this.props.currUser.email} />
 						<CardActions style={styles.cardActions}>
@@ -183,11 +184,11 @@ export default class UserList extends React.Component {
 						</CardActions>
 						{
 							this.state.openDialog &&
-							<AddUser 
-								user={this.props.currUser} 
-								roles={this.props.roles} 
-								openDialog={this.state.openDialog} 
-								handleUpdate={this.handleUpdateUser} 
+							<AddUser
+								user={this.props.currUser}
+								roles={this.props.roles}
+								openDialog={this.state.openDialog}
+								handleUpdate={this.handleUpdateUser}
 								closeDialog={this.handleEditClose}
 							/>
 						}

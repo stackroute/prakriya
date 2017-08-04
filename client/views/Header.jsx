@@ -117,7 +117,7 @@ export default class Header extends React.Component {
   getProfilePic(username) {
   	let th = this;
   	Request
-  		.get(`/dashboard/getimage?filename=${username}`)
+  		.get(`/dashboard/getimage`)
   		.set({'Authorization': localStorage.getItem('token')})
       .query({filename: username})
   		.end(function(err, res) {

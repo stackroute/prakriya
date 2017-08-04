@@ -29,6 +29,9 @@ const style = {
   display: 'inline-block',
 }
 
+
+let USERS = [];
+
 export default class Users extends React.Component {
 	constructor(props) {
 		super(props)
@@ -38,6 +41,9 @@ export default class Users extends React.Component {
       snackbarOpen: false,
 			snackbarMessage: ''
 		}
+		this.getRoles = this.getRoles.bind(this);
+		this.getUsers = this.getUsers.bind(this);
+		this.getProfilePic = this.getProfilePic.bind(this);
 		this.addUser = this.addUser.bind(this);
 		this.deleteUser = this.deleteUser.bind(this);
 		this.updateUser = this.updateUser.bind(this);
@@ -48,8 +54,8 @@ export default class Users extends React.Component {
 	}
 
 	componentWillMount() {
-		this.getRoles()
 		this.getUsers()
+		this.getRoles()
 	}
 
 	getRoles() {
@@ -71,20 +77,45 @@ export default class Users extends React.Component {
 		    }
 			})
 	}
+
 	getUsers() {
 		let th = this;
 		Request
 			.get('/admin/users')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
-		    if(err)
-		    	console.log(err)
-		    else
-		    	th.setState({
-		    		users: res.body
-		    	})
+		    if(err) {
+					console.log(err)
+				} else {
+					res.body.map(function(user) {
+						th.getProfilePic(user)
+					})
+					console.log('res.body: ', res.body)
+					th.setState({
+						users: res.body
+					})
+					console.log('users: ', th.state.users)
+				}
 		  })
 	}
+
+	getProfilePic(user, i, arr) {
+  	Request
+  		.get(`/dashboard/getimage`)
+  		.set({'Authorization': localStorage.getItem('token')})
+      .query({filename: user.username})
+  		.end(function(err, res) {
+  			if(err) {
+					user.profilePic = '../../../assets/images/avt-default.jpg'
+				} else {
+  	    	if(res.text) {
+  		    	user.profilePic = res.text
+  	    	} else {
+						user.profilePic = '../../../assets/images/avt-default.jpg'
+					}
+  	    }
+  		})
+  }
 
 	addUser(user) {
 		let th = this
