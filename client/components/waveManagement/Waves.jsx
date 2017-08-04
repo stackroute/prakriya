@@ -120,6 +120,7 @@ export default class Waves extends React.Component {
 						filteredWaves: filteredWaves,
 						displayWaves: filteredWaves.slice(0, 3)
 		    	})
+					th.onTabChange('Ongoing');
 		    }
 			})
 	}
@@ -290,6 +291,7 @@ export default class Waves extends React.Component {
 								handleDelete={th.handleDelete}
 								bgColor={backgroundColors[key%4]}
 								bgIcon={backgroundIcons[key%4]}
+								getWaves={th.getWaves}
 							/>
 						)
 					})

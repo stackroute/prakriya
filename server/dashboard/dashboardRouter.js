@@ -241,7 +241,7 @@ router.post('/updatewavecadets', auth.accessedBy(['WAVES']), function (req, res)
   try{
     dashboardNeo4jController.updateWaveCadets(req.body.cadets, req.body.waveID, req.body.course, function (status) {
       logger.debug('Update Cadet Status: ', status);
-      res.status(201);
+      res.status(201).json({success:'success'});
     }, function (err) {
       logger.error('Update Cadet Wave Error: ', err);
       res.status(500).json({error: 'Cannot update cadet wave...!'});

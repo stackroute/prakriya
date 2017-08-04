@@ -157,7 +157,7 @@ export default class WaveCard extends React.Component {
       if (err)
         console.log(err);
       else {
-        console.log('Successfully updated')
+        th.props.getWaves();
       }
     })
   }
@@ -254,6 +254,7 @@ export default class WaveCard extends React.Component {
         console.log(err);
       else {
         th.handleClose();
+        th.props.getWaves();
       }
     })
   }
