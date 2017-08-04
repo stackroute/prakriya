@@ -43,6 +43,8 @@ export default class UserList extends React.Component {
 		}
 		this.handleOpen = this.handleOpen.bind(this);
 	  this.handleClose = this.handleClose.bind(this);
+		this.handleOpenLock = this.handleOpenLock.bind(this);
+	  this.handleCloseLock = this.handleCloseLock.bind(this);
 		this.handleRemoveUser = this.handleRemoveUser.bind(this);
 		this.handleEditUser = this.handleEditUser.bind(this);
 		this.handleUpdateUser = this.handleUpdateUser.bind(this);
@@ -58,19 +60,19 @@ export default class UserList extends React.Component {
 			return true
 	}
 
-	handleOpen = () => {
+	handleOpen() {
     this.setState({deleteConfirm: true});
   };
 
-  handleClose = () => {
+  handleClose() {
     this.setState({deleteConfirm: false});
   };
 
-  handleOpenLock = () => {
+  handleOpenLock() {
     this.setState({lockConfirm: true});
   };
 
-  handleCloseLock = () => {
+  handleCloseLock() {
     this.setState({lockConfirm: false});
   };
 
@@ -83,6 +85,7 @@ export default class UserList extends React.Component {
 	}
 
 	handleRemoveUser() {
+		this.handleClose();
 		this.props.deleteUser(this.props.currUser);
 	}
 

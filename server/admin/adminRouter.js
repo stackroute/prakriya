@@ -13,7 +13,7 @@ const logger = require('./../../applogger');
 router.get('/users', function (req, res) {
   try{
     adminMongoController.getUsers(function (userColl) {
-      
+
       userColl.map(function (user, index) {
         logger.debug('Password of the user', user.password)
         const decipher = crypto.createDecipher(CONFIG.CRYPTO.ALGORITHM, CONFIG.CRYPTO.PASSWORD);
@@ -39,6 +39,7 @@ router.get('/users', function (req, res) {
 
 // Add a new user
 router.post('/adduser', auth.accessedBy(['USERS']), function (req, res) {
+  let userObj = req.body;
   try{
     adminMongoController.addUser(userObj, function (user) {
       res.status(200).json(user);
@@ -55,6 +56,7 @@ router.post('/adduser', auth.accessedBy(['USERS']), function (req, res) {
 });
 
 router.delete('/deleteuser', auth.accessedBy(['USERS']), function (req, res) {
+  console.log('DELETEUSER: ', req.body)
   try {
     adminMongoController.deleteUser(req.body, function (status) {
       res.status(200).json(status);
