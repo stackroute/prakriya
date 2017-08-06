@@ -56,7 +56,7 @@ export default class CandidateCard extends React.Component {
 			.query({filename: username})
 			.end(function(err, res) {
 				if(err) {
-		    	console.log('Image not found for ', eid);
+		    	console.log('Image not found for ', username);
 					th.setState({
 						imageURL: '../../assets/images/avt-default.jpg'
 					})
