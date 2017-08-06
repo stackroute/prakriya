@@ -52,7 +52,6 @@ export default class AddCourse extends React.Component {
       DurationErrorText: '',
       SkillsErrorText: '',
       Skills: [],
-      SkillSet: [],
       SkillName: '',
       snackbarOpen: false,
 			snackbarMessage: '',
@@ -72,32 +71,15 @@ export default class AddCourse extends React.Component {
     this.handleSkillChange = this.handleSkillChange.bind(this);
     this.onAddSkill = this.onAddSkill.bind(this);
     this.closeCourseColumns = this.closeCourseColumns.bind(this);
-    this.getSkillSet = this.getSkillSet.bind(this);
     this.hideSnackbar = this.hideSnackbar.bind(this);
     this.openSnackbar = this.openSnackbar.bind(this);
     this.snackbarAction = this.snackbarAction.bind(this);
   }
 
   componentWillMount() {
-    this.getSkillSet();
     if (this.props.openDialog) {
       this.setState({showDialog: true, Name: this.props.course.Name, Mode: this.props.course.Mode, Duration: this.props.course.Duration.low, Skills: this.props.course.Skills});
     }
-  }
-
-  getSkillSet() {
-    let th = this;
-    Request
-    .get('/dashboard/skillset')
-    .set({'Authorization': localStorage.getItem('token')})
-    .end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        console.log('SkillSet: ', res.body);
-        th.setState({SkillSet: res.body});
-      }
-    });
   }
 
   openSnackbar(message, action) {
@@ -120,7 +102,7 @@ export default class AddCourse extends React.Component {
     let th = this;
     let skill = this.state.SkillName;
     let skills = this.state.Skills;
-    let skillSet = this.state.SkillSet;
+    let skillSet = this.props.skills;
     Request
     .post('/dashboard/createnewskill')
     .set({'Authorization': localStorage.getItem('token')})
@@ -163,7 +145,7 @@ export default class AddCourse extends React.Component {
   onAddSkill() {
     let th = this;
     if (this.state.SkillName.trim().length != 0) {
-      let skillSet = this.state.SkillSet;
+      let skillSet = this.props.skills;
       let skills = this.state.Skills;
       let skill = this.state.SkillName;
       let duplicateFound = skills.some(function(s) {
@@ -368,7 +350,7 @@ export default class AddCourse extends React.Component {
                   searchText={th.state.SkillName}
                   onUpdateInput={th.handleSkillChange}
                   onNewRequest={th.onAddSkill}
-                  dataSource={th.state.SkillSet}
+                  dataSource={th.props.skills}
                   errorText={th.state.SkillsErrorText}
                   maxSearchResults={5}
                 />
