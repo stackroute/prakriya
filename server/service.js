@@ -106,19 +106,23 @@ let setupMongooseConnections = function() {
     const ControlsModel = require('../models/accesscontrols.js');
     const RoleModel = require('../models/roles.js');
     const UserModel = require('../models/users.js');
+
     CONFIG.BASEDATA.ACCESS_CONTROLS.map(function (controlObj) {
       let saveControl = new ControlsModel(controlObj);
       saveControl.save(function (err, control) {
         if(!err) {
-          logger.info('Access Control added', control.name);
+          logger.info('Access Control Added -- ', control.name);
         }
       });
     });
-    let saveRole = new RoleModel(CONFIG.BASEDATA.ADMIN_ROLE);
-    saveRole.save(function (err, role) {
-      if(!err) {
-        logger.info('Role added', role.name);
-      }
+
+    CONFIG.BASEDATA.BASIC_ROLES.map(function(roleObj) {
+      let saveRole = new RoleModel(roleObj);
+      saveRole.save(function (err, role) {
+        if(!err) {
+          logger.info('Role Added --', role.name);
+        }
+      });
     });
 
     let admin = CONFIG.BASEDATA.ADMIN_USER;
@@ -131,7 +135,7 @@ let setupMongooseConnections = function() {
     let saveUser = new UserModel(admin);
     saveUser.save(function (err, user) {
       if(!err) {
-        logger.info('User added', user.name);
+        logger.info('User Added -- ', user.name);
       }
     });
   });
@@ -155,9 +159,9 @@ let setupMongooseConnections = function() {
 }
 
 let addingNeo4jConstraints = function () {
-  let driver = neo4jDriver.driver(CONFIG.NEO4J.neo4jURL, 
+  let driver = neo4jDriver.driver(CONFIG.NEO4J.neo4jURL,
     neo4jDriver.auth.basic(CONFIG.NEO4J.usr, CONFIG.NEO4J.pwd), {encrypted: false});
-  let query = `CREATE CONSTRAINT ON (n:${graphConsts.NODE_CANDIDATE}) 
+  let query = `CREATE CONSTRAINT ON (n:${graphConsts.NODE_CANDIDATE})
     ASSERT n.EmailID IS UNIQUE`;
   let session = driver.session();
   session.run(query).then(function(result, err) {
