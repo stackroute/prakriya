@@ -18,6 +18,16 @@ const styles = {
 	}
 };
 
+let wiproadminControls = ['Candidates', 'Bulk Upload'];
+let sradminControls = [
+	'Waves', 'Candidates', 'Mentor Connect', 'Attendance'
+];
+let mentorControls = [
+	'Projects', 'Courses', 'Assessment Tracker', 'Evaluation Forms',
+	'Mentor Connect', 'Program Flow'
+];
+let candidateControls = ['My Profile', 'Attendace', 'Feedback'];
+
 export default class AddRole extends React.Component {
 	constructor(props) {
 		super(props)
@@ -25,6 +35,7 @@ export default class AddRole extends React.Component {
 	    open: false,
 	    role:'',
 			roleErrorText: '',
+			controls: [],
 	    actions: [],
 			accessControlsText: 'Access Controls',
 			accessControlsStyle: styles.accessControlsNoError
@@ -34,7 +45,17 @@ export default class AddRole extends React.Component {
 	  this.onChangeRole = this.onChangeRole.bind(this);
 	  this.onChangeActions = this.onChangeActions.bind(this);
 	  this.handleSubmit = this.handleSubmit.bind(this);
-	  this.suggestedControls = this.suggestedControls.bind(this);
+	  this.setRecommendedControls = this.setRecommendedControls.bind(this);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		let controls = nextProps.controls;
+		controls.map(function(control) {
+			control.checked = false
+		});
+		this.setState({
+			controls: controls
+		});
 	}
 
 	handleOpen() {
@@ -64,32 +85,35 @@ export default class AddRole extends React.Component {
   }
 
   onChangeRole(e) {
+		this.setRecommendedControls(e.target.value.toLowerCase());
   	this.setState({
   		role: e.target.value,
 			roleErrorText: ''
-  	})
+  	});
   }
 
   onChangeActions(event, isChecked) {
-		let actionList = this.state.actions
+		event.persist();
+		let val = event.target.value;
+		let actionList = this.state.actions;
+		let controls = this.state.controls;
+		controls.some(function(control) {
+			if(control.name == val) control.checked = isChecked;
+			return control.name == val;
+		});
 		if(isChecked) {
 			actionList.push(event.target.value)
-			this.setState({
-				actions: actionList,
-				accessControlsText: 'Access Controls',
-				accessControlsStyle: styles.accessControlsNoError
-			})
-		}
-		else {
+		} else {
 			actionList = this.state.actions.filter(function(item) {
 				return item != event.target.value;
 			})
-			this.setState({
-				actions: actionList,
-				accessControlsText: 'Access Controls',
-				accessControlsStyle: styles.accessControlsNoError
-			})
 		}
+		this.setState({
+			controls: controls,
+			actions: actionList,
+			accessControlsText: 'Access Controls',
+			accessControlsStyle: styles.accessControlsNoError
+		})
 	}
 
 	handleSubmit() {
@@ -100,7 +124,7 @@ export default class AddRole extends React.Component {
 			if(th.state.actions.indexOf(control.name) >= 0)
 				controlsCode.push(control.code)
 		})
-		roleObj.name = this.state.role.toLowerCase()
+		roleObj.name = this.state.role.toLowerCase();
 		roleObj.controls = controlsCode
 		this.setState({
 			actions: []
@@ -124,30 +148,38 @@ export default class AddRole extends React.Component {
 		return false
 	}
 
-	suggestedControls(control) {
-		let role = this.state.role;
-		if(role.indexOf('mentor') > -1) {
-			if(control == 'Candidates' || control == 'Mentor Connect' ||
-				control == 'Projects' || control == 'Courses') {
-				return true;
+	setRecommendedControls(role) {
+
+		let controls = this.state.controls;
+		let actions = this.state.actions;
+
+		controls.map(function(control) {
+			if(role == 'mentor') {
+				if(mentorControls.indexOf(control.name) > -1) {
+					control.checked = true;
+					actions.push(control.name);
+				}
+			} else if(role == 'wiproadmin') {
+				if(wiproadminControls.indexOf(control.name) > -1) {
+					control.checked = true;
+					actions.push(control.name);
+				}
+			} else if(role == 'sradmin') {
+				if(sradminControls.indexOf(control.name) > -1) {
+					control.checked = true;
+					actions.push(control.name);
+				}
+			} else if(role == 'candidate') {
+				if(candidateControls.indexOf(control.name) > -1) {
+					control.checked = true;
+					actions.push(control.name);
+				}
 			}
-		}
-		else if(role.indexOf('admin') > -1) {
-			if(control == 'Candidates' || control == 'Attendance' || control == 'Waves') {
-				return true;
-			}
-		}
-		else if(role.indexOf('candidate') > -1) {
-			if(control == 'My Profile' || control == 'Attendance' || control == 'Feedback') {
-				return true;
-			}
-		}
-		return false;
+		})
 	}
 
 	render() {
 		let th = this
-
 		const dialogActions = [
       <FlatButton
         label='Cancel'
@@ -188,17 +220,13 @@ export default class AddRole extends React.Component {
 					<div style={{border: '2px solid white', padding: '5px', textAlign: 'justify', boxSizing: 'border-box'}}>
           <p style={this.state.accessControlsStyle}>{this.state.accessControlsText}</p>
           {
-          	this.props.controls.map(function(control, index) {
+          	this.state.controls.map(function(control, index) {
           		return(
 	          		<Checkbox
 									label={control.name}
 									value={control.name}
 									onCheck={th.onChangeActions}
-									checked={
-										th.state.role.length>0 ?
-										th.suggestedControls(control.name) :
-										false
-									}
+									checked={control.checked}
 									key={index}
 									style={{width: '30%', display: 'inline-block'}}
 								/>
