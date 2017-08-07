@@ -56,7 +56,6 @@ export default class Candidates extends React.Component {
 			skills: [],
 			waves: [],
 			Billability: [],
-			MentorReview: ['Top Gun', 'Good', 'Above Average', 'Average'],
 			filtersCount: 0,
 			filteredCandidates: [],
 			displayCandidates: [],
@@ -70,8 +69,7 @@ export default class Candidates extends React.Component {
 				DigiThonScore: '',
 				Skills: [],
 				Wave: '',
-				Billability: [],
-				MentorReview: ''
+				Billability: []
 			}
 		}
 
@@ -483,14 +481,6 @@ export default class Candidates extends React.Component {
 										onAddFilter={(filterValue)=>th.addFilter('Wave', filterValue)}
 										onOpenSnackbar={th.openSnackbar}
 									/>
-									{th.state.role == 'wiproadmin' &&
-									<FilterItem
-										title={'Mentor Review'}
-										type={'AutoComplete'}
-										onGetAccordianValues={()=>th.state.MentorReview}
-										onAddFilter={(filterValue)=>th.addFilter('MentorReview', filterValue)}
-										onOpenSnackbar={th.openSnackbar}
-									/>}
 									{th.state.role == 'wiproadmin' &&
 									<FilterItem
 										title={'Billability Status'}
