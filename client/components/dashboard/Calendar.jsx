@@ -230,7 +230,12 @@ export default class Attendance extends React.Component {
       <Col md={colspan}>
         <br/><br/><br/><br/><br/><br/>
         <Paper style={styles.container}>
-          <p><b>Billability:</b> {this.state.Billability}</p>
+          <p><b>Billability:</b>
+          {
+            this.state.Billability.split('since').length > 1 &&
+              <span> since {this.format(this.state.Billability.split('since')[1])}</span>
+          }
+          </p>
         <p><b>AssetID:</b> {this.state.AssetID}</p></Paper>
         <br/>
         <Paper style={styles.container}>
