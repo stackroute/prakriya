@@ -6,4 +6,4 @@ const flushMongo = require('./flushMongo');
 
 flushMongo(logger, CONFIG);
 // flushNeo4j(logger, CONFIG);
-// flushRedis(logger);
+// flushRedis();
