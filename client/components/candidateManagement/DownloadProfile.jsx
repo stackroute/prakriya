@@ -56,7 +56,6 @@ export default class DownloadProfile extends React.Component {
 			.query({filename: username})
 			.end(function(err, res) {
 				if(err) {
-		    	console.log('Image not found for ', eid);
 					imageURL = '../../assets/images/avt-default.jpg';
 					th.downloadProfile(cadet, index);
 				}
@@ -110,12 +109,13 @@ export default class DownloadProfile extends React.Component {
 		doc.text(x, y+=5, desc);
 		let height = doc.getTextDimensions(candidate.ProjectDescription + '').h;
 		y = y + height - 10;
+		}
 		doc.text(x, y+=10, 'Skills:');
 		let skillString = '';
-		candidate.ProjectSkills.map(function(skill, key) {
-			if(key !== candidate.ProjectSkills.length-1 && key !== candidate.ProjectSkills.length-2) {
+		candidate.Skills.map(function(skill, key) {
+			if(key !== candidate.Skills.length-1 && key !== candidate.Skills.length-2) {
 				skillString = skillString + skill + ', ';
-			}	else if(key === candidate.ProjectSkills.length-2) {
+			}	else if(key === candidate.Skills.length-2) {
 							skillString = skillString + skill + ' and ';
 			}
 			else {
@@ -124,9 +124,8 @@ export default class DownloadProfile extends React.Component {
 		})
 		let skills = doc.splitTextToSize(skillString, 100);
 		doc.text(x, y+=5, skills);
-		height = doc.getTextDimensions(candidate.ProjectSkills+'').h;
-		y = y + height
-		}
+		let height = doc.getTextDimensions(candidate.Skills+'').h;
+		y = y + height;
 		if(this.props.zip) {
 			zip.file(candidate.EmployeeID + '.pdf', doc.output('blob'));
 			if(index === this.state.candidates.length-1) {

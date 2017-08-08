@@ -319,6 +319,7 @@ export default class Courses extends React.Component {
 												closeAssignments={th.closeAssignments}
 												openSchedule={th.openSchedule}
 												closeSchedule={th.closeSchedule}
+												skills={th.state.skills}
 												setCurrentCourse={()=>{th.setCurrentCourse(course, backgroundColors[key%4], backgroundIcons[key%4])}}
 												/>
 											</Col>

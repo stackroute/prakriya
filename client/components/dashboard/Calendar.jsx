@@ -16,6 +16,7 @@ import IconButton from 'material-ui/IconButton';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import Paper from 'material-ui/Paper';
+import HorizontalTimeline from 'react-horizontal-timeline';
 
 const backgroundColors = [
 	'#F5DEBF',
@@ -32,6 +33,8 @@ const backgroundColors = [
   	}
   }
 
+const VALUES = []
+
 export default class Attendance extends React.Component {
   constructor(props) {
     super(props);
@@ -43,7 +46,26 @@ export default class Attendance extends React.Component {
       pointer: 'pointer',
       Billability: '',
       AssetID: '',
-      Skills: []
+      Skills: [],
+      Wave: '',
+      Course: '',
+      value: 0,
+      previous: 0,
+      Assignments: [],
+      Schedule: [],
+      minEventPadding: 20,
+      maxEventPadding: 120,
+      linePadding: 100,
+      labelWidth: 100,
+      fillingMotionStiffness: 150,
+      fillingMotionDamping: 25,
+      slidingMotionStiffness: 150,
+      slidingMotionDamping: 25,
+      stylesBackground: '#f8f8f8',
+      stylesForeground: '#7b9d6f',
+      stylesOutline: '#dfdfdf',
+      isTouchEnabled: true,
+      isKeyboardEnabled: true
     }
     this.formatDate = this.formatDate.bind(this);
     this.format = this.format.bind(this);
@@ -52,6 +74,9 @@ export default class Attendance extends React.Component {
     this.handlePresent = this.handlePresent.bind(this);
     this.getUser = this.getUser.bind(this);
     this.knowSkills = this.knowSkills.bind(this);
+    this.formatProgress = this.formatProgress.bind(this);
+    this.fetchAssessments = this.fetchAssessments.bind(this);
+    this.fetchSessions = this.fetchSessions.bind(this);
   }
 
   componentWillMount() {
@@ -67,16 +92,44 @@ export default class Attendance extends React.Component {
         console.log(err);
       else {
         console.log(res.body);
+        for (let d = Moment(res.body.data.Wave.StartDate); d <= Moment(res.body.data.Wave.EndDate); d.add('days', 7)) {
+          VALUES.push(th.formatProgress(d));
+        }
         th.setState({
             CadetEmail: res.body.data.EmailID,
             Billability: res.body.data.Billability,
             AssetID: res.body.data.AssetID,
             startDate: res.body.data.Wave.StartDate,
-            endDate: res.body.data.Wave.EndDate
+            endDate: res.body.data.Wave.EndDate,
+            Wave: res.body.data.Wave.WaveID,
+            Course: res.body.data.Wave.CourseName
           })
+
+        th.fetchAssessments();
+        th.fetchSessions();
       }
     })
   }
+
+
+  fetchAssessments() {
+      let th = this
+      let wave = th.state.Wave;
+      let course = th.state.Course;
+      Request.get(`/dashboard/assessment?waveid=${wave}&course=${course}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+        th.setState({Assignments: res.body.data})
+      })
+  }
+
+  fetchSessions() {
+    let th = this
+    let wave = th.state.Wave;
+    let course = th.state.Course;
+    Request.get(`/dashboard/waveobject/${wave}/${course}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      th.setState({Schedule: res.body.waveObject.result, open: th.props.open})
+    })
+  }
+
 
   getUser() {
     let th = this;
@@ -118,6 +171,9 @@ export default class Attendance extends React.Component {
     return Moment(date).format("MMM Do YYYY");
   }
 
+  formatProgress(date) {
+    return Moment(date).format("YYYY-MM-DD");
+  }
 
   handlePresent(EmailID) {
       let th = this
@@ -210,6 +266,9 @@ export default class Attendance extends React.Component {
     if(date) {
       colspan = 6
     }
+    console.log(VALUES);
+    let assignment = 0;
+    let session = 0;
     return (
       <div>
         <Grid>
@@ -245,6 +304,71 @@ export default class Attendance extends React.Component {
             <span style={{fontSize:'17px'}}>{skill}</span>
           </Avatar>
         })}</p></Paper>
+      </Col>
+    </Row>
+    <Row>
+      <Col md={12}>
+        <br/>
+        <Paper style={styles.container}>
+        <div style={{width: '100%', height: '100px', margin: '0 auto'}}>
+          <HorizontalTimeline
+          index = {this.state.value}
+          indexClick={(index) => {
+            assignment = 0;
+            session = 0;
+            this.setState({value: index, previous: this.state.value});
+          }}
+          values={ VALUES }
+          isOpenEnding= 'true'
+          isOpenBeginning= 'true'
+          labelWidth={th.state.labelWidth}
+          linePadding={th.state.linePadding}
+          maxEventPadding={th.state.maxEventPadding}
+          minEventPadding={th.state.minEventPadding}
+          slidingMotion={{ stiffness: th.state.slidingMotionStiffness, damping: th.state.slidingMotionDamping }}
+          styles={{
+            background: th.state.stylesBackground,
+            foreground: th.state.stylesForeground,
+            outline: th.state.stylesOutline
+          }}
+          isOpenEnding={th.state.isOpenEnding}
+          isOpenBeginning={th.state.isOpenBeginning} />
+        </div>
+      <div className='text-center'>
+        <b>Assignments</b>
+        <ul>
+          {
+              th.state.Assignments.map(function (assg) {
+                if(assg.Week.low === (th.state.value + 1)) {
+                  assignment = assignment + 1;
+                  return <li>{assg.Name}</li>
+                }
+              })
+            }
+            {
+                assignment === 0 && <li>No Assignments for the week</li>
+            }
+        </ul>
+        <b>Sessions</b>
+        <ul>
+          {
+            th.state.Schedule.map(function (sess) {
+              let week = (parseInt(sess.Day.low / 7));
+              if((th.state.value) <= week && week < (th.state.value + 1)) {
+                session = session + 1;
+                if(sess.Status) {
+                    return <li>{sess.Name} - {sess.Status}</li>
+                }
+                return <li>{sess.Name} - Yet to start</li>
+              }
+            })
+          }
+          {
+              session === 0 && <li>No Sessions scheduled for the week</li>
+          }
+        </ul>
+      </div>
+    </Paper>
       </Col>
     </Row>
   </Grid>

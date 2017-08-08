@@ -231,6 +231,14 @@ export default class CandidateHome extends React.Component {
 											Start Date: {this.formatDate(this.state.startDate)}<br/>
 											End Date: {this.formatDate(this.state.endDate)}
 										</p>
+										{
+											<div>
+												<h4>Skills:</h4>
+												<ul>{this.props.candidate.Skills.map(function(skill) {
+													return <li>{skill}</li>
+												})}</ul>
+											</div>
+										}
 
 										{
 											this.props.candidate.AcademyTrainingSkills != undefined &&
@@ -248,9 +256,6 @@ export default class CandidateHome extends React.Component {
 										<p style={styles.details}>
 											Project Name: {this.props.candidate.ProjectName}<br/>
 											Project Description: {this.props.candidate.ProjectDescription}<br/>
-											Project Skills: <ul>{this.props.candidate.ProjectSkills.map(function(skill) {
-												return <li>{skill}</li>
-											})}</ul>
 										</p></div>
 										}
 										{

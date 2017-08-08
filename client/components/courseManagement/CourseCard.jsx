@@ -238,7 +238,7 @@ export default class CourseCard extends React.Component {
           }} onClick={this.openDeleteDialog}>
             <DeleteIcon/>
           </IconButton>
-          {this.state.openDialog && <AddCourse course={this.props.course} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateCourse} handleClose={this.handleClose}/>
+          {this.state.openDialog && <AddCourse course={this.props.course} openDialog={this.state.openDialog} skills={th.props.skills} handleUpdate={this.handleUpdateCourse} handleClose={this.handleClose}/>
 }
 					{this.state.showDetailDialog && <CourseSubCard course={this.props.course} openDialog={this.state.showDetailDialog} handleUpdate={this.handleUpdateCourse} handleClose={this.closeDetailDialog} title="ADD"
 

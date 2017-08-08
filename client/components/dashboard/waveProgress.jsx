@@ -88,9 +88,6 @@ export default class App extends React.Component {
     ];
     let th = this;
 
-
-    console.log(VALUES);
-
     let title = 'Detais of ' + this.props.wave.WaveID + '-' +this.props.wave.CourseName;
     let assignment = 0;
     let session = 0;

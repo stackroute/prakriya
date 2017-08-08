@@ -30,8 +30,6 @@ const styles = {
 
 const file_types = ['ZCOP', 'ERD', 'Digi-Thon']
 
-const items = ['Billable', 'Non-billable(Internal)', 'Non-billable(Customer)', 'Support', 'Free']
-
 export default class WiproAdmin extends React.Component {
   constructor(props) {
     super(props);
@@ -57,11 +55,6 @@ export default class WiproAdmin extends React.Component {
     this.handleDrop = this.handleDrop.bind(this);
     this.handleMerge = this.handleMerge.bind(this);
     this.handleDownload = this.handleDownload.bind(this);
-    // this.getBillability = this.getBillability.bind(this);
-    // this.getNonBillabilityInternal = this.getNonBillabilityInternal.bind(this);
-    // this.getNonBillabilityCustomer = this.getNonBillabilityCustomer.bind(this);
-    // this.getBillabilitySupport = this.getBillabilitySupport.bind(this);
-    // this.getBillabilityFree = this.getBillabilityFree.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.addGraph = this.addGraph.bind(this);
     this.removeGraph = this.removeGraph.bind(this);
@@ -71,11 +64,6 @@ export default class WiproAdmin extends React.Component {
   }
 
   componentWillMount() {
-    // this.getBillability();
-    // this.getNonBillabilityInternal();
-    // this.getNonBillabilityCustomer();
-    // this.getBillabilitySupport();
-    // this.getBillabilityFree();
     this.getBillabilityStats();
   }
 
@@ -116,66 +104,30 @@ export default class WiproAdmin extends React.Component {
        if (err)
          console.log(err);
        else {
-         console.log(res.body)
-         th.setState({billabilityStats: res.body})
+         let billabilityStats = JSON.parse(JSON.stringify(res.body))
+         let billabilityStatsWithoutCandidates = res.body
+         billabilityStatsWithoutCandidates.map(function(element) {
+           if(element.label == 'Billable') {
+             element.color = '#F9CB40'
+           } else if(element.label == 'Non-Billable (Internal)') {
+             element.color = '#FF715B'
+           } else if(element.label == 'Non-Billable (Customer)') {
+             element.color = '#06D6A0'
+           } else if(element.label == 'Free') {
+             element.color = '#BCED09'
+           } else if(element.label == 'Support') {
+             element.color = '#2F52E0'
+           }
+           element.value = element.value.length
+         })
+         let newState = {
+           billabilityStats: billabilityStats,
+           billabilityStatsWithoutCandidates: billabilityStatsWithoutCandidates
+         }
+         th.setState(newState)
        }
      })
   }
-
-  // getBillability() {
-  //   let th = this;
-  //   Request.get('/dashboard/billable').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-  //     if (err)
-  //       console.log(err);
-  //     else {
-  //       th.setState({bcadets: res.body, billableCount: res.body.length})
-  //     }
-  //   })
-  // }
-
-  // getNonBillabilityInternal() {
-  //   let th = this;
-  //   Request.get('/dashboard/nonbillableInternal').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-  //     if (err)
-  //       console.log(err);
-  //     else {
-  //       th.setState({nonbillableInternalCount: res.body.length, nbCadets: res.body})
-  //     }
-  //   })
-  // }
-
-  // getNonBillabilityCustomer() {
-  //   let th = this;
-  //   Request.get('/dashboard/nonbillableCustomer').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-  //     if (err)
-  //       console.log(err);
-  //     else {
-  //       th.setState({nonbillableCustomerCount: res.body.length, nbcCadets: res.body})
-  //     }
-  //   })
-  // }
-
-  // getBillabilityFree() {
-  //   let th = this;
-  //   Request.get('/dashboard/free').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-  //     if (err)
-  //       console.log(err);
-  //     else {
-  //       th.setState({FreeCount: res.body.length, fCadets: res.body})
-  //     }
-  //   })
-  // }
-
-  // getBillabilitySupport() {
-  //   let th = this;
-  //   Request.get('/dashboard/support').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-  //     if (err)
-  //       console.log(err);
-  //     else {
-  //       th.setState({supportCount: res.body.length, sCadets: res.body})
-  //     }
-  //   })
-  // }
 
   handleChange(event, key, values) {
     console.log(values)
@@ -189,29 +141,7 @@ export default class WiproAdmin extends React.Component {
     console.log('gTitle: ', th.state.gTitle)
     if(th.state.gTitle == 'billability') {
       graph.title = th.state.gTitle;
-      graph.data = [
-          {
-            label: 'Billable',
-            value: this.state.billableCount,
-            color: "#F9CB40"
-          }, {
-            label: "Non-billable (Internal)",
-            value: this.state.nonbillableInternalCount,
-            color: "#FF715B"
-          }, {
-            label: "Non-billable (Customer)",
-            value: this.state.nonbillableCustomerCount,
-            color: "#06D6A0"
-          }, {
-            label: "Free",
-            value: this.state.FreeCount,
-            color: "#BCED09"
-          }, {
-            label: "Support",
-            value: this.state.supportCount,
-            color: "#2F52E0"
-          }
-        ];
+      graph.data = th.state.billabilityStatsWithoutCandidates;
         if(!th.isADuplicateGraph(th.state.gTitle)) graphs.push(graph);
         th.setState({
           graphs: graphs
@@ -240,6 +170,7 @@ export default class WiproAdmin extends React.Component {
     }
     console.log('graphs: ', th.state.graphs)
   }
+
   removeGraph(title) {
     let graphs = this.state.graphs;
     let filteredGraphs = graphs.filter(function (graph) {
@@ -250,12 +181,14 @@ export default class WiproAdmin extends React.Component {
     });
     console.log('remove graph called');
   }
+
   isADuplicateGraph(title) {
     let graphs = this.state.graphs;
     return graphs.some(function(graph) {
       return graph.title == title
     });
   }
+
   handleGPropChange(prop, value) {
     let th = this;
     let newState = {};
@@ -265,37 +198,10 @@ export default class WiproAdmin extends React.Component {
     console.log('newState: ', newState)
 
   }
+
   render() {
     let th = this;
 
-    // const data = [
-    //   {
-    //     label: 'Billable',
-    //     value: this.state.billableCount,
-    //     color: "#F9CB40",
-    //     members: this.state.bcadets
-    //   }, {
-    //     label: "Non-billable(Internal)",
-    //     value: this.state.nonbillableInternalCount,
-    //     color: "#FF715B",
-    //     members: this.state.nbiCadets
-    //   }, {
-    //     label: "Non-billable(Customer)",
-    //     value: this.state.nonbillableCustomerCount,
-    //     color: "#06D6A0",
-    //     members: this.state.nbcCadets
-    //   }, {
-    //     label: "Free",
-    //     value: this.state.FreeCount,
-    //     color: "#BCED09",
-    //     members: this.state.fCadets
-    //   }, {
-    //     label: "Support",
-    //     value: this.state.supportCount,
-    //     color: "#2F52E0",
-    //     members: this.state.sCadets
-    //   }
-    // ]
     // var datavalue = [];
     // if (this.state.value != null) {
     //   this.state.value.map(function(val, k) {
@@ -384,7 +290,7 @@ export default class WiproAdmin extends React.Component {
             <RaisedButton label="Add Graph" primary={true} onClick={th.addGraph} style={{width: '100%'}}/>
           </div>
         </div>
-        <div style={{border: '2px solid black', padding: '5px', boxStyle: 'border-box'}}>
+        <div>
         {
           th.state.graphs.map(function(graph) {
             return (
