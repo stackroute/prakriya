@@ -1563,4 +1563,21 @@ router.post('/createnewskill', auth.accessedBy(['COURSES']), function(req, res) 
   }
 });
 
+
+router.get('/billabilitystats', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
+  try{
+    dashboardNeo4jController.getBillabilityStats(function (stats) {
+      res.status(201).json(stats);
+    }, function (err) {
+      logger.error('Get BillabilityStats Error: ', err);
+      res.status(500).json({error: 'Cannot get billability stats from neo4j...!'});
+    });
+  } catch(err) {
+    logger.error('Get BillabilityStats Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 module.exports = router;

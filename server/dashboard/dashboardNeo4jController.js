@@ -1703,6 +1703,26 @@ let createNewSkill = function(skill, successCB, errorCB) {
   });
 };
 
+//Billability
+let getBillabilityStats = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+    WITH Collect(DISTINCT split(candidate.Billability, 'since')[0])
+    AS BillabilityLabels UNWIND(BillabilityLabels) AS BL
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+    WHERE candidate.Billability CONTAINS BL
+    WITH {label: BL, value: COLLECT(candidate)} AS obj
+    RETURN COLLECT(obj)
+    `;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0]);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 module.exports = {
       addCadet,
       updateCadet,
@@ -1754,5 +1774,6 @@ module.exports = {
       getEvaluationSkills,
       updateRating,
       getSkillSet,
-      createNewSkill
+      createNewSkill,
+      getBillabilityStats
   }
