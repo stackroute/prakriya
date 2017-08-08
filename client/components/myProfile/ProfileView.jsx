@@ -72,7 +72,7 @@ export default class ProfileView extends React.Component {
 			showAssetDialog: false,
 			projectName: '',
 			projectDesc: '',
-			projectSkills: '',
+			Skills: '',
 			disableSave: true,
 			disableSavePic: true,
 			defaultProfilePic: '../../assets/images/avt-default.jpg',
@@ -114,7 +114,7 @@ export default class ProfileView extends React.Component {
 			contact: this.props.cadet.Contact,
 			projectName: this.props.cadet.ProjectName,
 			projectDesc: this.props.cadet.ProjectDescription,
-			projectSkills: this.props.cadet.ProjectSkills,
+			Skills: this.props.cadet.Skills,
   		picPreview: this.state.defaultProfilePic,
 			Billability: Billability[0],
 			Date: date
@@ -352,6 +352,14 @@ export default class ProfileView extends React.Component {
 									</p>
 								</div>
 							}
+							{
+								<div>
+								<strong>Skills:</strong> <ul>{
+									this.state.Skills.map( function(skill) {
+										return <li>{skill}</li>
+									})}</ul>
+								</div>
+							}
 
 							{
 								this.state.cadet.ProjectName != undefined &&
@@ -363,10 +371,6 @@ export default class ProfileView extends React.Component {
 									<p style={styles.details}>
 										<strong>Project Name:</strong> {this.state.cadet.ProjectName}<br/>
 										<strong>Project Description:</strong> {this.state.cadet.ProjectDescription}<br/>
-										<strong>Skills:</strong> <ul>{
-											this.state.cadet.ProjectSkills.map(function(skill) {
-												return <li>{skill}</li>
-											})}</ul>
 									</p>
 								</div>
 							}

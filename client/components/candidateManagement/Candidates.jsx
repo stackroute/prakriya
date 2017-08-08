@@ -358,7 +358,9 @@ export default class Candidates extends React.Component {
 
 	render() {
 		let th = this;
-		return(
+		if(th.state.candidates.length > 0)
+		{
+			return(
 			<div>
 				{
 					th.state.filteredCandidates != undefined &&
@@ -537,6 +539,11 @@ export default class Candidates extends React.Component {
 					</div>
 				}
 			</div>
-		)
+		)}
+		else {
+			return (
+				<h3 style={{marginLeft: '40%'}}>NO CADETS TO DISPLAY</h3>
+			)
+		}
 	}
 }
