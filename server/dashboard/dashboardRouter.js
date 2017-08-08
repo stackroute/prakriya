@@ -1260,7 +1260,7 @@ router.post('/sendmail', auth.accessedBy(['BULK_UPLOAD']),function (req, res) {
 });
 
 // Get all waves
-router.get('/waves', auth.accessedBy(['CANDIDATES', 'WAVES']), function (req, res) {
+router.get('/waves', auth.accessedBy(['CANDIDATES', 'WAVES', 'COURSES']), function (req, res) {
   try{
     dashboardNeo4jController.getWaves(function (waves) {
       res.status(201).json(waves);
