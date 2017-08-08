@@ -17,19 +17,20 @@ import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import Paper from 'material-ui/Paper';
 import HorizontalTimeline from 'react-horizontal-timeline';
+import Toggle from 'material-ui/Toggle';
 
 const backgroundColors = [
 	'#F5DEBF',
 	'#DDDBF1',
 	'#CAF5B3',
-	'#C6D8D3'
+  '#efebe9'
 	]
 
   const styles = {
   	container: {
   		padding: 20,
   		borderRadius: 5,
-  		backgroundColor: '#efebe9'
+  		backgroundColor: '#C6D8D3'
   	}
   }
 
@@ -63,9 +64,15 @@ export default class Attendance extends React.Component {
       slidingMotionDamping: 25,
       stylesBackground: '#f8f8f8',
       stylesForeground: '#7b9d6f',
-      stylesOutline: '#dfdfdf',
+      stylesOutline: '',
       isTouchEnabled: true,
-      isKeyboardEnabled: true
+      isKeyboardEnabled: true,
+      onCalendarDiv: 'none',
+      onCalendarLabel: 'show details',
+			onSkillLabel: 'show details',
+			onSkillDiv: 'none',
+      onTimelineLabel: 'show details',
+			onTimelineDiv: 'none'
     }
     this.formatDate = this.formatDate.bind(this);
     this.format = this.format.bind(this);
@@ -77,6 +84,9 @@ export default class Attendance extends React.Component {
     this.formatProgress = this.formatProgress.bind(this);
     this.fetchAssessments = this.fetchAssessments.bind(this);
     this.fetchSessions = this.fetchSessions.bind(this);
+    this.toggleSkill = this.toggleSkill.bind(this);
+    this.toggleCalendar = this.toggleCalendar.bind(this);
+    this.toggleTimeline = this.toggleTimeline.bind(this);
   }
 
   componentWillMount() {
@@ -188,13 +198,60 @@ export default class Attendance extends React.Component {
       })
   }
 
+  toggleCalendar() {
+		let th = this;
+		if(th.state.onCalendarDiv === 'block') {
+			th.setState({
+				onCalendarLabel: 'show details',
+				onCalendarDiv: 'none'
+			})
+		}
+		else {
+			th.setState({
+				onCalendarLabel: 'hide details',
+				onCalendarDiv: 'block'
+			})
+		}
+	}
+
+    toggleSkill() {
+  		let th = this;
+  		if(th.state.onSkillDiv === 'block') {
+  			th.setState({
+  				onSkillLabel: 'show details',
+  				onSkillDiv: 'none'
+  			})
+  		}
+  		else {
+  			th.setState({
+  				onSkillLabel: 'hide details',
+  				onSkillDiv: 'block'
+  			})
+  		}
+  	}
+
+    toggleTimeline() {
+  		let th = this;
+  		if(th.state.onTimelineDiv === 'block') {
+  			th.setState({
+  				onTimelineLabel: 'show details',
+  				onTimelineDiv: 'none'
+  			})
+  		}
+  		else {
+  			th.setState({
+  				onTimelineLabel: 'hide details',
+  				onTimelineDiv: 'block'
+  			})
+  		}
+  	}
 
   render() {
     let th = this;
     let week = [];
     let dayName = [];
     let name = [];
-    console.log(this.state.Cadet)
+    let timelineSpan = 12
     if (th.state.startDate != '') {
       let now = Moment(th.state.endDate);
       let daysOfYear = [];
@@ -262,54 +319,78 @@ export default class Attendance extends React.Component {
       }
     }
     let date = new Date(this.state.endDate) >= new Date();
-    let colspan = 12
+    let colspan1 = 12;
+    let colspan2 = 12;
     if(date) {
-      colspan = 6
+      colspan1 = 7
+      colspan2 = 5
     }
-    console.log(VALUES);
+    if(th.state.onCalendarDiv === 'none' && th.state.onSkillDiv === 'none') {
+      colspan1 = 12;
+      colspan2 = 12;
+    }
     let assignment = 0;
     let session = 0;
     return (
       <div>
         <Grid>
           <Row>
-            {date && <Col md={colspan}>
-        <h3>Attendance:- </h3><p>( Click on today's date to mark attendance for today...<br/>&nbsp;&nbsp;For further updation contact SRAdmin )</p>
-        <Table fixedHeader={true} height='300px'>
-          <TableHeader colspan='12' displaySelectAll={false} adjustForCheckbox={false} style={{backgroundColor:'#EFEBE9'}}>
-            <TableRow>
-              {name}
-            </TableRow>
-          </TableHeader>
-          <TableBody displayRowCheckbox={false} showRowHover={true}>
-            {week}
-          </TableBody>
-        </Table>
-      </Col>}
-      <Col md={colspan}>
-        <br/><br/><br/><br/><br/><br/>
+            {date && <Col md={colspan1}>
+              <Paper style={styles.container}>
+                <div style={{float:'right'}}><Toggle
+        					onToggle={th.toggleCalendar}
+        					title={this.state.onCalendarLabel}
+        					style={{marginRight: '0px'}}
+        		    /></div>
+              <h3>Attendance:- </h3><div style={{display:this.state.onCalendarDiv}}><p>( Click on today's date to mark attendance for today...<br/>&nbsp;&nbsp;For further updation contact SRAdmin )</p>
+              <Table fixedHeader={true} height='300px'>
+                <TableHeader colspan='12' displaySelectAll={false} adjustForCheckbox={false} style={{backgroundColor:'#EFEBE9'}}>
+                  <TableRow>
+                    {name}
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false} showRowHover={true}>
+                  {week}
+                </TableBody>
+              </Table>
+              </div>
+            </Paper>
+            </Col>}
+      <Col md={colspan2}>
+        {colspan2 === 12 && <br/>}
         <Paper style={styles.container}>
           <p><b>Billability:</b>
           {
             this.state.Billability.split('since').length > 1 &&
-              <span> since {this.format(this.state.Billability.split('since')[1])}</span>
+              <span>{this.state.Billability.split('since')[0]} since {this.format(this.state.Billability.split('since')[1])}</span>
           }
           </p>
         <p><b>AssetID:</b> {this.state.AssetID}</p></Paper>
         <br/>
         <Paper style={styles.container}>
-        <h3>Skills Known:</h3>
-        <p>{this.state.Skills.map(function(skill, key) {
+          <div style={{float:'right'}}><Toggle
+            onToggle={th.toggleSkill}
+            title={this.state.onSkillsLabel}
+            style={{marginRight: '0px'}}
+          /></div><h3>Skills Known:</h3>
+        <div style={{display:this.state.onSkillDiv}}>{this.state.Skills.map(function(skill, key) {
           return <Avatar size='75' backgroundColor={backgroundColors[key%4]} color='black' style={{marginLeft:'20px'}}>
             <span style={{fontSize:'17px'}}>{skill}</span>
           </Avatar>
-        })}</p></Paper>
+        })}</div></Paper>
       </Col>
     </Row>
     <Row>
-      <Col md={12}>
+      <Col md={timelineSpan}>
         <br/>
         <Paper style={styles.container}>
+          <div style={{float:'right'}}><Toggle
+            onToggle={th.toggleTimeline}
+            title={this.state.onTimelineLabel}
+            style={{marginRight: '0px'}}
+          /></div>
+          <h3>Wave Details</h3>
+          <div style={{display:this.state.onTimelineDiv}}>
         <div style={{width: '100%', height: '100px', margin: '0 auto'}}>
           <HorizontalTimeline
           index = {this.state.value}
@@ -335,6 +416,7 @@ export default class Attendance extends React.Component {
           isOpenBeginning={th.state.isOpenBeginning} />
         </div>
       <div className='text-center'>
+        <h3>Week {this.state.value + 1}</h3>
         <b>Assignments</b>
         <ul>
           {
@@ -368,6 +450,7 @@ export default class Attendance extends React.Component {
           }
         </ul>
       </div>
+    </div>
     </Paper>
       </Col>
     </Row>

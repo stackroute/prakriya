@@ -124,7 +124,8 @@ export default class App extends React.Component {
             isOpenBeginning={th.state.isOpenBeginning} />
           </div>
         <div className='text-center'>
-          <b>Assignments</b>
+            <h3>Week {this.state.value + 1}</h3>
+            <b>Assignments</b>
           <ul>
             {
                 th.state.Assignments.map(function (assg) {
