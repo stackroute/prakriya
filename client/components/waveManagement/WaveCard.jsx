@@ -212,7 +212,7 @@ export default class WaveCard extends React.Component {
   }
 
   handleClose() {
-    this.setState({dialog: false, noCadets: false, addCadet: false})
+    this.setState({dialog: false, noCadets: false, addCadet: false,removecadets: false})
   }
 
   handleLocationChange(event) {
@@ -240,7 +240,9 @@ export default class WaveCard extends React.Component {
     this.getNewCadets();
   }
   removecadetwave() {
-    this.setState({removecadets: true})
+    this.setState({
+      removecadets: true
+    })
 
   }
 
@@ -408,11 +410,11 @@ export default class WaveCard extends React.Component {
 }
             </SelectField>
 
-            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleUpdateWave}/> {this.state.noCadets && <h3>No Cadets available</h3>
+            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleUpdateWave}/> {this.state.noCadets && <h3 style={{textAlign:'center'}}>No Cadets available</h3>
 }
           </div>
 }
-          {this.state.removecadets && <div>
+          {this.state.removecadets  && <div>
             <SelectField multiple={true} hintText="Select Cadets" floatingLabelText=' Remove Cadets' value={this.state.cadetsToRemove} onChange={this.handleRemoveCadetsChange} menuItemStyle={{
               borderTop: '1px solid teal',
               borderBottom: '1px solid teal',
@@ -425,7 +427,7 @@ export default class WaveCard extends React.Component {
               })
 }
             </SelectField>
-            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleremovecadets}/> {this.state.cadets.length === 0 && <h3>No Cadets available</h3>}
+            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleremovecadets}/> {this.state.cadets.length === 0 && <h3 style={{textAlign:'center'}} >No Cadets available</h3>}
           </div>
 }
 
