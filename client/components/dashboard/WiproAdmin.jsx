@@ -29,6 +29,7 @@ const styles = {
 }
 
 const file_types = ['ZCOP', 'ERD', 'Digi-Thon']
+const billingTags = ['Billable', 'Non-Billable (Internal)', 'Non-Billable (Customer)', 'Support', 'Free']
 
 export default class WiproAdmin extends React.Component {
   constructor(props) {
@@ -47,15 +48,15 @@ export default class WiproAdmin extends React.Component {
       gType: '',
       gTitle: '',
       graphs: [],
+      billingTags: [],
       billabilityStats: [],
-      billabilityStatsWithoutCandidates: []
+      billabilityStatsWithoutCandidates: [],
     }
 
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
     this.handleMerge = this.handleMerge.bind(this);
-    this.handleDownload = this.handleDownload.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleTagChange = this.handleTagChange.bind(this);
     this.addGraph = this.addGraph.bind(this);
     this.removeGraph = this.removeGraph.bind(this);
     this.isADuplicateGraph = this.isADuplicateGraph.bind(this);
@@ -94,8 +95,6 @@ export default class WiproAdmin extends React.Component {
     })
   }
 
-  handleDownload() {}
-
   getBillabilityStats() {
      let th = this;
      Request.get('/dashboard/billabilitystats')
@@ -129,9 +128,18 @@ export default class WiproAdmin extends React.Component {
      })
   }
 
-  handleChange(event, key, values) {
-    console.log(values)
-    this.setState({value: values, billabilityGData: key})
+  handleTagChange(e, k, v) {
+    let th = this;
+    let graphs = this.state.graphs;
+    graphs.some(function(graph) {
+      if(graph.title == 'billability') {
+        let newData = th.state.billabilityStatsWithoutCandidates.filter(function(datum) {
+          return (v.indexOf(datum.label) != -1)
+        })
+        graph.data = newData;
+      }
+    })
+    this.setState({billingTags: v, graphs: graphs})
   }
 
   addGraph() {
@@ -177,9 +185,9 @@ export default class WiproAdmin extends React.Component {
       return graph.title != title
     });
     this.setState({
-      graphs: filteredGraphs
+      graphs: filteredGraphs,
+      billingTags: []
     });
-    console.log('remove graph called');
   }
 
   isADuplicateGraph(title) {
@@ -195,25 +203,10 @@ export default class WiproAdmin extends React.Component {
     let propName = 'g' + prop[0].toUpperCase() + prop.slice(1);
     newState[propName] = value;
     this.setState(newState);
-    console.log('newState: ', newState)
-
   }
 
   render() {
     let th = this;
-
-    // var datavalue = [];
-    // if (this.state.value != null) {
-    //   this.state.value.map(function(val, k) {
-    //     for (var i = 0; i < data.length; i++) {
-    //       if (data[i].label === val) {
-    //         console.log(data[i].label)
-    //         datavalue.push(data[i])
-    //       }
-    //     }
-    //   })
-    // }
-    // console.log(datavalue, "datavalue")
 
     return (
       <div>
@@ -241,25 +234,6 @@ export default class WiproAdmin extends React.Component {
           <FileDrop type="REPORT" handleDrop={this.handleDrop}/>
         </div>
       </Paper>
-      {/*<Paper  style={styles.paperHidden}>
-        <Grid>
-          <Row>
-            <Col md={5}>
-              <SelectField value={this.state.value} onChange={this.handleChange} multiple={true} floatingLabelText="Select Billability">
-                {
-                  items.map(function(item, key) {
-                    return <MenuItem key={key} value={item} primaryText={item}/>
-                  })
-                }
-              </SelectField>
-
-              <NVD3Chart id="pieChart" type="pieChart" tooltip={{
-                enabled: true
-              }} datum={datavalue} x="label" y="value" width="550" height="600"/>
-            </Col>
-          </Row>
-        </Grid>
-      </Paper>*/}
       <Paper  style={styles.paper}>
         <div style={{border: '2px solid black'}}>
           <div style={{display: 'inline-block', border: '1px solid silver', width: 250}}>
@@ -306,9 +280,23 @@ export default class WiproAdmin extends React.Component {
                   {graph.title}
                 </h3>
                 <div style={{width: '100%', height:'95%'}}>
+                  {
+                      graph.title == 'billability' ?
+                      <SelectField
+                        value={th.state.billingTags}
+                        onChange={th.handleTagChange}
+                        multiple={true}
+                        floatingLabelText="Select Billability">
+                        {
+                          billingTags.map(function(tag, key) {
+                            return <MenuItem key={key} value={tag} primaryText={tag}/>
+                          })
+                        }
+                      </SelectField> : ''
+                  }
                   <NVD3Chart
                   id="pieChart" type="pieChart" tooltip={{enabled: true}}
-                  datum={graph.data} x="label" y="value" />
+                  datum={graph.data} x="label" y="value"/>
                 </div>
                 <RemoveIcon
                   style={{position: 'absolute', right: 10, top: 15, cursor: 'pointer'}}
