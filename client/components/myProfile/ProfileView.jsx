@@ -82,7 +82,7 @@ export default class ProfileView extends React.Component {
 			email: '',
 			contact: '',
 			Billability: '',
-			Billing: ['Billable', 'Non-billable(Internal-Project)', 'Non-billable(Customer-Project)', 'Support' , 'Free'],
+			Billing: ['Billable', 'Non-Billable (Internal)', 'Non-Billable (Customer)', 'Support' , 'Free'],
 			Date: '',
 			DateErrorText: ''
 		}
