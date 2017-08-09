@@ -13,12 +13,11 @@ import dialog from '../../styles/dialog.json';
 import CONFIG from '../../config/index';
 import Paper from 'material-ui/Paper';
 import Chip from 'material-ui/Chip';
-import SaveIcon from 'material-ui/svg-icons/content/save';
-import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
-import IconButton from 'material-ui/IconButton';
 import CourseColumns from './CourseColumns.jsx';
 import Request from 'superagent';
 import Snackbar from 'material-ui/Snackbar';
+import Popover, {PopoverAnimationVertical} from 'material-ui/Popover/Popover';
+import {Menu} from 'material-ui/Menu';
 
 const styles = {
   paper: {
@@ -52,10 +51,13 @@ export default class AddCourse extends React.Component {
       DurationErrorText: '',
       SkillsErrorText: '',
       Skills: [],
+      SkillsCredit: [],
       SkillName: '',
       snackbarOpen: false,
 			snackbarMessage: '',
-      snackbarAction: ''
+      snackbarAction: '',
+      popIndex: -1,
+      open: false
     }
 
     this.handleOpen = this.handleOpen.bind(this);
@@ -74,11 +76,13 @@ export default class AddCourse extends React.Component {
     this.hideSnackbar = this.hideSnackbar.bind(this);
     this.openSnackbar = this.openSnackbar.bind(this);
     this.snackbarAction = this.snackbarAction.bind(this);
+    this.changeCredit = this.changeCredit.bind(this);
+    this.handleRequestClose = this.handleRequestClose.bind(this);
   }
 
   componentWillMount() {
     if (this.props.openDialog) {
-      this.setState({showDialog: true, Name: this.props.course.Name, Mode: this.props.course.Mode, Duration: this.props.course.Duration.low, Skills: this.props.course.Skills});
+      this.setState({showDialog: true, Name: this.props.course.Name, Mode: this.props.course.Mode, Duration: this.props.course.Duration.low, Skills: this.props.course.Skills, SkillsCredit: this.props.course.SkillsCredit});
     }
   }
 
@@ -103,6 +107,7 @@ export default class AddCourse extends React.Component {
     let skill = this.state.SkillName;
     let skills = this.state.Skills;
     let skillSet = this.props.skills;
+    let skillsCredit = this.state.SkillsCredit;
     Request
     .post('/dashboard/createnewskill')
     .set({'Authorization': localStorage.getItem('token')})
@@ -113,11 +118,14 @@ export default class AddCourse extends React.Component {
       } else {
         skills.push(skill);
         skillSet.push(skill);
+        skillsCredit.push(3);
         th.setState({
           Skills: skills,
+          skillsCredit: skillsCredit,
           SkillSet: skillSet,
           SkillName: '',
-          SkillsErrorText: ''
+          SkillsErrorText: '',
+          anchorEl: ''
         });
         th.hideSnackbar();
         th.openSnackbar(skill + ' is added to the superset.', '');
@@ -148,6 +156,7 @@ export default class AddCourse extends React.Component {
       let skillSet = this.props.skills;
       let skills = this.state.Skills;
       let skill = this.state.SkillName;
+      let SkillsCredit = th.state.SkillsCredit;
       let duplicateFound = skills.some(function(s) {
         return s.toLowerCase() == skill.toLowerCase()
       });
@@ -161,7 +170,8 @@ export default class AddCourse extends React.Component {
         th.openSnackbar('New Skill! Wanna move it to the superset?', 'YES');
       } else {
         skills.push(skill);
-        th.setState({Skills: skills, SkillName: '', SkillsErrorText: ''});
+        SkillsCredit.push(3);
+        th.setState({Skills: skills, SkillName: '', SkillsCredit: SkillsCredit, SkillsErrorText: ''});
       }
     }
   }
@@ -196,8 +206,15 @@ export default class AddCourse extends React.Component {
   }
 
   handleSkillDelete(perm) {
-    let skill = this.state.Skills.filter(function(control) {
+    let key = -1;
+    let skill = this.state.Skills.filter(function(control, index) {
+      if(perm == control) {
+        key = index
+      }
       return perm != control
+    })
+    let SkillsCredit = this.state.SkillsCredit.filter(function(credit, index) {
+      return key != index
     })
     this.setState({Skills: skill})
   }
@@ -208,6 +225,7 @@ export default class AddCourse extends React.Component {
       Mode: '',
       Duration: '',
       Skills: [],
+      SkillsCredit: [],
       SkillName: '',
       NameErrorText: '',
       ModeErrorText: '',
@@ -218,12 +236,14 @@ export default class AddCourse extends React.Component {
 
   handleUpdate() {
     let th = this
+    console.log(this.state.SkillsCredit);
     let course = {}
     course.ID = this.props.course.ID;
     course.Name = this.state.Name;
     course.Mode = this.state.Mode;
     course.Duration = this.state.Duration;
 		course.Skills = this.state.Skills;
+    course.SkillsCredit = this.state.SkillsCredit;
     course.Removed = false;
     course.History = '';
     this.props.handleUpdate(course, 'edit');
@@ -236,6 +256,7 @@ export default class AddCourse extends React.Component {
     course.Name = this.state.Name;
     course.Mode = this.state.Mode;
     course.Skills = this.state.Skills;
+    course.SkillsCredit = this.state.SkillsCredit;
     course.Assignments = [];
     course.Schedule = [];
     course.Removed = false;
@@ -273,6 +294,33 @@ export default class AddCourse extends React.Component {
       courseColumns: false,
       showDialog: true
     });
+  }
+
+  handleRequestClose = () => {
+    this.setState({
+      open: false,
+      popIndex: -1,
+      anchorEl: ''
+    });
+  };
+
+  changeCredit(event, index) {
+    let th = this;
+    th.setState({
+      popIndex: index,
+      open: true,
+      anchorEl: event.currentTarget
+    })
+  }
+
+  changeNewCredit(event, index) {
+    let SkillsCredit = this.state.SkillsCredit;
+    SkillsCredit[index] = parseInt(event.target.outerText, 10);
+    console.log(SkillsCredit[index]);
+    this.setState({
+      SkillsCredit: SkillsCredit
+    })
+    this.handleRequestClose();
   }
 
   render() {
@@ -328,7 +376,7 @@ export default class AddCourse extends React.Component {
                 }} hintText="Mode" floatingLabelText='Mode *' floatingLabelStyle={app.mandatoryField} value={this.state.Mode} onChange={this.onChangeMode} errorText={this.state.ModeErrorText} menuItemStyle={select.menu} listStyle={select.list} selectedMenuItemStyle={select.selectedMenu} maxHeight={600}>
                   {
                     CONFIG.MODES.map(function(mode, key) {
-                      return (<MenuItem key={key} value={mode} primaryText={mode}/>)
+                      return ( <MenuItem key={key} value={mode} primaryText={mode}/>)
                     })
                   }
                 </SelectField>
@@ -360,13 +408,31 @@ export default class AddCourse extends React.Component {
                       this.state.Skills.map(function(skill, index) {
                         return (
                           <Chip onRequestDelete={() => th.handleSkillDelete(skill)} style={styles.chip} key={index}>
-                            <span>{skill}</span>
+                            <span onClick={(event) => th.changeCredit(event, index)}>{skill} ({th.state.SkillsCredit[index]})
+                              {
+                                th.state.popIndex === index && <Popover
+                                open={th.state.open}
+                                anchorEl={th.state.anchorEl}
+                                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                                targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                                onRequestClose={th.handleRequestClose}
+                                animation={PopoverAnimationVertical}
+                              >
+                                <Menu value = {th.state.SkillsCredit[index]} onClick = {(event) => th.changeNewCredit(event, index)}>
+                                  <MenuItem primaryText="1" value = {1} checked = {th.state.SkillsCredit[index] == 1}/>
+                                  <MenuItem primaryText="2" value = {2} checked = {th.state.SkillsCredit[index] == 2}/>
+                                  <MenuItem primaryText="3" value = {3} checked = {th.state.SkillsCredit[index] == 3}/>
+                                </Menu>
+                              </Popover>
+                              }
+                            </span>
                           </Chip>
                         )
                       })
                    }
                   </div>
                 </Paper>
+                <p>The default creadit for each skill is 3. Please click on the skill to change it.<br/> Basic - 1, Intermediate - 2 and Advanced - 3</p>
               </div>
             </div>
           </Dialog>

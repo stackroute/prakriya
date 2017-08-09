@@ -394,8 +394,13 @@ let addCourse = function(CourseObj, successCB, errorCB) {
   Mode:'${CourseObj.Mode}',Duration:${CourseObj.Duration},History:'${CourseObj.History}',
   Removed:${CourseObj.Removed},FeedbackFields: ${JSON.stringify(CourseObj.FeedbackFields)}}) WITH c AS course
   UNWIND ${JSON.stringify(CourseObj.Skills)} AS skill
-  MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
-  MERGE (n)<-[:${graphConsts.REL_INCLUDES} {credit: 1}]-(course);`;
+  WITH COLLECT(skill) as skills, course AS course
+  UNWIND ${JSON.stringify(CourseObj.SkillsCredit)} AS credit
+  WITH COLLECT(credit) as credits, course AS course,
+  RANGE (0, ${CourseObj.Skills.length - 1}) AS indices ,  skills AS skills
+  UNWIND indices AS index
+  MATCH (n:${graphConsts.NODE_SKILL}{Name: skills[index]})
+  MERGE (n)<-[:${graphConsts.REL_INCLUDES} {credit: credits[index]}]-(course);`;
   let session = driver.session();
   session.run(query).then(function(resultObj, err) {
     session.close();
@@ -410,13 +415,14 @@ let addCourse = function(CourseObj, successCB, errorCB) {
 
 let getCourses = function(successCB, errorCB) {
   let query = `MATCH (courses:${graphConsts.NODE_COURSE})
-  OPTIONAL MATCH (courses)-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
+  OPTIONAL MATCH (courses)-[skillRel:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
+  with COLLECT({skill:s.Name,skillCredit:skillRel.credit}) as s, courses as courses
   OPTIONAL MATCH (courses)-[:${graphConsts.REL_HAS}]->(a:${graphConsts.NODE_ASSIGNMENT})-[:${graphConsts.REL_INCLUDES}]->(aSkill:${graphConsts.NODE_SKILL})
   with collect(aSkill.Name) as assgSkill, a as a, courses as courses,s as s
   OPTIONAL MATCH (courses)-[:${graphConsts.REL_HAS}]->(se:${graphConsts.NODE_SESSION})
   optional match (se)-[:${graphConsts.REL_INCLUDES}]->(seSkill:${graphConsts.NODE_SKILL})
-  with collect(seSkill.Name) as sessSkill, assgSkill as assgSkill, a as a, courses as courses,s as s,se as se
-  return courses, collect(distinct s.Name) as skills,COLLECT(distinct {a: a, b: assgSkill}) as assg,COLLECT(distinct {a: se, b: sessSkill}) as session`;
+  with collect(seSkill.Name) as sessSkill, assgSkill as assgSkill, a as a, courses as courses,se as se, s as s
+  return courses, s as skills,COLLECT(distinct {a: a, b: assgSkill}) as assg,COLLECT(distinct {a: se, b: sessSkill}) as session`;
   let session = driver.session();
   session.run(query).then(function(resultObj, err) {
     session.close();
@@ -424,7 +430,17 @@ let getCourses = function(successCB, errorCB) {
     for (let i = 0; i < resultObj.records.length; i++) {
       let result = resultObj.records[i];
       courseArray.push(result._fields[0].properties);
-      courseArray[i].Skills = result._fields[1];
+      courseArray[i].Skills = result._fields[1].map(function(skill) {
+        return skill.skill
+      });
+      courseArray[i].SkillsCredit = result._fields[1].map(function(skill) {
+        if(skill.skillCredit !== null)
+        {
+          return skill.skillCredit.low
+        } else {
+            return 3
+          }
+      });
       if (result._fields[2][0].a === null) {
         courseArray[i].Assignments = [];
       } else {
@@ -463,9 +479,14 @@ let updateCourse = function(CourseObj, edit, successCB, errorCB) {
           c.History = '${CourseObj.History}',
           c.Removed = ${CourseObj.Removed}
           with c as course
-          UNWIND ${JSON.stringify(CourseObj.Skills)} as skill
-          MERGE (n:${graphConsts.NODE_SKILL}{Name:skill})
-          MERGE (n)<-[:${graphConsts.REL_INCLUDES}]-(course);`
+          UNWIND ${JSON.stringify(CourseObj.Skills)} AS skill
+          WITH COLLECT(skill) as skills, course AS course
+          UNWIND ${JSON.stringify(CourseObj.SkillsCredit)} AS credit
+          WITH COLLECT(credit) as credits, course AS course,
+          RANGE (0, ${CourseObj.Skills.length - 1}) AS indices ,  skills AS skills
+          UNWIND indices AS index
+          MATCH (n:${graphConsts.NODE_SKILL}{Name:skills[index]})
+          MERGE (n)<-[:${graphConsts.REL_INCLUDES}{credit: credits[index]}]-(course);`
     let session = driver.session();
     session.run(query).then(function(resultObj, err) {
       session.close();
@@ -1712,7 +1733,7 @@ let getBillabilityStats = function(successCB, errorCB) {
     AS BillabilityLabels UNWIND(BillabilityLabels) AS BL
     MATCH (candidate:${graphConsts.NODE_CANDIDATE})
     WHERE candidate.Billability CONTAINS BL
-    WITH {label: BL, value: COLLECT(candidate)} AS obj
+    WITH CASE WHEN LENGTH(BL) > 0 THEN {label: BL, value: COLLECT(candidate)} END AS obj
     RETURN COLLECT(obj)
     `;
   session.run(query).then(function(resultObj) {
