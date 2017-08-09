@@ -111,6 +111,7 @@ export default class Login extends React.Component {
 						<img src="./assets/images/login_head.png"/>
 					</CardMedia>
 					<CardText>
+					 <form className="commentForm" onSubmit={this.onCommentSubmit}>
 						<TextField
 						 	floatingLabelText="Username"
 						 	onChange={this.onChangeUsername}
@@ -151,6 +152,7 @@ export default class Login extends React.Component {
 								LOGIN
 							</RaisedButton>
 							<br /><br />
+							</form>
 						<div style={{color: 'red', fontWeight: 'bold', textAlign: 'center'}}>{this.state.errMsg}</div>
 					</CardText>
 				</Card>
