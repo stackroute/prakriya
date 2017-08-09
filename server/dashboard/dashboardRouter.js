@@ -1260,7 +1260,7 @@ router.post('/sendmail', auth.accessedBy(['BULK_UPLOAD']),function (req, res) {
 });
 
 // Get all waves
-router.get('/waves', auth.accessedBy(['CANDIDATES', 'WAVES']), function (req, res) {
+router.get('/waves', auth.accessedBy(['CANDIDATES', 'WAVES', 'COURSES']), function (req, res) {
   try{
     dashboardNeo4jController.getWaves(function (waves) {
       res.status(201).json(waves);
@@ -1557,6 +1557,23 @@ router.post('/createnewskill', auth.accessedBy(['COURSES']), function(req, res) 
     });
   } catch(err) {
     logger.debug('CreateNewSkill Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
+router.get('/billabilitystats', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
+  try{
+    dashboardNeo4jController.getBillabilityStats(function (stats) {
+      res.status(201).json(stats);
+    }, function (err) {
+      logger.error('Get BillabilityStats Error: ', err);
+      res.status(500).json({error: 'Cannot get billability stats from neo4j...!'});
+    });
+  } catch(err) {
+    logger.error('Get BillabilityStats Exception: ', err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });

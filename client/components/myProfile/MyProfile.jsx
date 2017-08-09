@@ -36,6 +36,8 @@ export default class MyProfile extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+					th.getProfilePic(res.body.data.EmailID);
+					th.getCadetProject(res.body.data.EmployeeID);
 					let wave = res.body.data.Wave;
 					let cadet = res.body.data;
 					cadet.Wave = cadet.Wave.WaveID;
@@ -43,15 +45,13 @@ export default class MyProfile extends React.Component {
 		    		cadet: cadet,
 						wave: wave
 		    	})
-					console.log(res.body.data)
-		    	th.getProfilePic(res.body.data.EmailID);
-					th.getCadetProject(res.body.data.EmployeeID);
 		    }
 		  })
 	}
 
 	getCadetProject(EmpID) {
 		let th = this;
+		console.log('called');
 		Request
 			.post('/dashboard/cadetproject')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -62,7 +62,7 @@ export default class MyProfile extends React.Component {
 		    else {
 					let cadet = th.state.cadet;
 					cadet.ProjectName = res.body.projectName;
-					cadet.ProjectSkills = res.body.projectSkills;
+					cadet.Skills = res.body.Skills;
 					cadet.ProjectDescription = res.body.projectDesc;
 		    	th.setState({
 		    		cadet: cadet

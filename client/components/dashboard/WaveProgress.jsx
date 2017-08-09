@@ -21,7 +21,20 @@ export default class App extends React.Component {
       value: 0,
       previous: 0,
       Assignments: [],
-      Schedule: []
+      Schedule: [],
+      minEventPadding: 20,
+      maxEventPadding: 120,
+      linePadding: 100,
+      labelWidth: 100,
+      fillingMotionStiffness: 150,
+      fillingMotionDamping: 25,
+      slidingMotionStiffness: 150,
+      slidingMotionDamping: 25,
+      stylesBackground: '#f8f8f8',
+      stylesForeground: '#7b9d6f',
+      stylesOutline: '#dfdfdf',
+      isTouchEnabled: true,
+      isKeyboardEnabled: true
     }
     this.handleClose = this.handleClose.bind(this);
     this.format = this.format.bind(this);
@@ -33,6 +46,9 @@ export default class App extends React.Component {
     let th = this;
     this.fetchAssessments();
     this.fetchSessions();
+    for (let d = Moment(th.props.wave.StartDate); d <= Moment(th.props.wave.EndDate); d.add('days', 7)) {
+      VALUES.push(th.format(d));
+    }
   }
 
   fetchAssessments() {
@@ -72,10 +88,6 @@ export default class App extends React.Component {
     ];
     let th = this;
 
-    for (let d = Moment(th.props.wave.StartDate); d <= Moment(th.props.wave.EndDate); d.add('days', 7)) {
-      VALUES.push(th.format(d))
-    }
-
     let title = 'Detais of ' + this.props.wave.WaveID + '-' +this.props.wave.CourseName;
     let assignment = 0;
     let session = 0;
@@ -96,11 +108,24 @@ export default class App extends React.Component {
               this.setState({value: index, previous: this.state.value});
             }}
             values={ VALUES }
-            isOpenEnding= 'false'
-            isOpenBeginning= 'true' />
+            isOpenEnding= 'true'
+            isOpenBeginning= 'true'
+            labelWidth={th.state.labelWidth}
+            linePadding={th.state.linePadding}
+            maxEventPadding={th.state.maxEventPadding}
+            minEventPadding={th.state.minEventPadding}
+            slidingMotion={{ stiffness: th.state.slidingMotionStiffness, damping: th.state.slidingMotionDamping }}
+            styles={{
+              background: th.state.stylesBackground,
+              foreground: th.state.stylesForeground,
+              outline: th.state.stylesOutline
+            }}
+            isOpenEnding={th.state.isOpenEnding}
+            isOpenBeginning={th.state.isOpenBeginning} />
           </div>
         <div className='text-center'>
-          <b>Assignments</b>
+            <h3>Week {this.state.value + 1}</h3>
+            <b>Assignments</b>
           <ul>
             {
                 th.state.Assignments.map(function (assg) {

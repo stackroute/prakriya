@@ -143,8 +143,14 @@ export default class Waves extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+					let courseArray = [];
+					res.body.map(function (course) {
+						if(!course.Removed) {
+							courseArray.push(course)
+						}
+					})
 		    	th.setState({
-		    		courses: res.body
+		    		courses: courseArray
 		    	})
 		    }
 		  })
@@ -352,6 +358,11 @@ export default class Waves extends React.Component {
 						courses={this.state.courses}
 						handleWaveAdd={this.addWave}
 					/>
+
+				}
+				{
+						this.state.courses.length === 0 &&
+						<h3 style={{marginLeft: '15%'}}>NO ACTIVE COURSE TO CREATE A WAVE! PLEASE CONTACT THE METOR TO CREATE NEW COURSE.</h3>
 				}
 
 				<Snackbar

@@ -16,21 +16,25 @@ import IconButton from 'material-ui/IconButton';
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import Paper from 'material-ui/Paper';
+import HorizontalTimeline from 'react-horizontal-timeline';
+import Toggle from 'material-ui/Toggle';
 
 const backgroundColors = [
 	'#F5DEBF',
 	'#DDDBF1',
 	'#CAF5B3',
-	'#C6D8D3'
+  '#efebe9'
 	]
 
   const styles = {
   	container: {
   		padding: 20,
   		borderRadius: 5,
-  		backgroundColor: '#efebe9'
+  		backgroundColor: '#C6D8D3'
   	}
   }
+
+const VALUES = []
 
 export default class Attendance extends React.Component {
   constructor(props) {
@@ -43,7 +47,32 @@ export default class Attendance extends React.Component {
       pointer: 'pointer',
       Billability: '',
       AssetID: '',
-      Skills: []
+      Skills: [],
+      Wave: '',
+      Course: '',
+      value: 0,
+      previous: 0,
+      Assignments: [],
+      Schedule: [],
+      minEventPadding: 20,
+      maxEventPadding: 120,
+      linePadding: 100,
+      labelWidth: 100,
+      fillingMotionStiffness: 150,
+      fillingMotionDamping: 25,
+      slidingMotionStiffness: 150,
+      slidingMotionDamping: 25,
+      stylesBackground: '#f8f8f8',
+      stylesForeground: '#7b9d6f',
+      stylesOutline: '',
+      isTouchEnabled: true,
+      isKeyboardEnabled: true,
+      onCalendarDiv: 'none',
+      onCalendarLabel: 'show details',
+			onSkillLabel: 'show details',
+			onSkillDiv: 'none',
+      onTimelineLabel: 'show details',
+			onTimelineDiv: 'none'
     }
     this.formatDate = this.formatDate.bind(this);
     this.format = this.format.bind(this);
@@ -52,6 +81,12 @@ export default class Attendance extends React.Component {
     this.handlePresent = this.handlePresent.bind(this);
     this.getUser = this.getUser.bind(this);
     this.knowSkills = this.knowSkills.bind(this);
+    this.formatProgress = this.formatProgress.bind(this);
+    this.fetchAssessments = this.fetchAssessments.bind(this);
+    this.fetchSessions = this.fetchSessions.bind(this);
+    this.toggleSkill = this.toggleSkill.bind(this);
+    this.toggleCalendar = this.toggleCalendar.bind(this);
+    this.toggleTimeline = this.toggleTimeline.bind(this);
   }
 
   componentWillMount() {
@@ -67,16 +102,44 @@ export default class Attendance extends React.Component {
         console.log(err);
       else {
         console.log(res.body);
+        for (let d = Moment(res.body.data.Wave.StartDate); d <= Moment(res.body.data.Wave.EndDate); d.add('days', 7)) {
+          VALUES.push(th.formatProgress(d));
+        }
         th.setState({
             CadetEmail: res.body.data.EmailID,
             Billability: res.body.data.Billability,
             AssetID: res.body.data.AssetID,
             startDate: res.body.data.Wave.StartDate,
-            endDate: res.body.data.Wave.EndDate
+            endDate: res.body.data.Wave.EndDate,
+            Wave: res.body.data.Wave.WaveID,
+            Course: res.body.data.Wave.CourseName
           })
+
+        th.fetchAssessments();
+        th.fetchSessions();
       }
     })
   }
+
+
+  fetchAssessments() {
+      let th = this
+      let wave = th.state.Wave;
+      let course = th.state.Course;
+      Request.get(`/dashboard/assessment?waveid=${wave}&course=${course}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+        th.setState({Assignments: res.body.data})
+      })
+  }
+
+  fetchSessions() {
+    let th = this
+    let wave = th.state.Wave;
+    let course = th.state.Course;
+    Request.get(`/dashboard/waveobject/${wave}/${course}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      th.setState({Schedule: res.body.waveObject.result, open: th.props.open})
+    })
+  }
+
 
   getUser() {
     let th = this;
@@ -118,6 +181,9 @@ export default class Attendance extends React.Component {
     return Moment(date).format("MMM Do YYYY");
   }
 
+  formatProgress(date) {
+    return Moment(date).format("YYYY-MM-DD");
+  }
 
   handlePresent(EmailID) {
       let th = this
@@ -132,13 +198,60 @@ export default class Attendance extends React.Component {
       })
   }
 
+  toggleCalendar() {
+		let th = this;
+		if(th.state.onCalendarDiv === 'block') {
+			th.setState({
+				onCalendarLabel: 'show details',
+				onCalendarDiv: 'none'
+			})
+		}
+		else {
+			th.setState({
+				onCalendarLabel: 'hide details',
+				onCalendarDiv: 'block'
+			})
+		}
+	}
+
+    toggleSkill() {
+  		let th = this;
+  		if(th.state.onSkillDiv === 'block') {
+  			th.setState({
+  				onSkillLabel: 'show details',
+  				onSkillDiv: 'none'
+  			})
+  		}
+  		else {
+  			th.setState({
+  				onSkillLabel: 'hide details',
+  				onSkillDiv: 'block'
+  			})
+  		}
+  	}
+
+    toggleTimeline() {
+  		let th = this;
+  		if(th.state.onTimelineDiv === 'block') {
+  			th.setState({
+  				onTimelineLabel: 'show details',
+  				onTimelineDiv: 'none'
+  			})
+  		}
+  		else {
+  			th.setState({
+  				onTimelineLabel: 'hide details',
+  				onTimelineDiv: 'block'
+  			})
+  		}
+  	}
 
   render() {
     let th = this;
     let week = [];
     let dayName = [];
     let name = [];
-    console.log(this.state.Cadet)
+    let timelineSpan = 12
     if (th.state.startDate != '') {
       let now = Moment(th.state.endDate);
       let daysOfYear = [];
@@ -206,40 +319,139 @@ export default class Attendance extends React.Component {
       }
     }
     let date = new Date(this.state.endDate) >= new Date();
-    let colspan = 12
+    let colspan1 = 12;
+    let colspan2 = 12;
     if(date) {
-      colspan = 6
+      colspan1 = 7
+      colspan2 = 5
     }
+    if(th.state.onCalendarDiv === 'none' && th.state.onSkillDiv === 'none') {
+      colspan1 = 12;
+      colspan2 = 12;
+    }
+    let assignment = 0;
+    let session = 0;
     return (
       <div>
         <Grid>
           <Row>
-            {date && <Col md={colspan}>
-        <h3>Attendance:- </h3><p>( Click on today's date to mark attendance for today...<br/>&nbsp;&nbsp;For further updation contact SRAdmin )</p>
-        <Table fixedHeader={true} height='300px'>
-          <TableHeader colspan='12' displaySelectAll={false} adjustForCheckbox={false} style={{backgroundColor:'#EFEBE9'}}>
-            <TableRow>
-              {name}
-            </TableRow>
-          </TableHeader>
-          <TableBody displayRowCheckbox={false} showRowHover={true}>
-            {week}
-          </TableBody>
-        </Table>
-      </Col>}
-      <Col md={colspan}>
-        <br/><br/><br/><br/><br/><br/>
+            {date && <Col md={colspan1}>
+              <Paper style={styles.container}>
+                <div style={{float:'right'}}><Toggle
+        					onToggle={th.toggleCalendar}
+        					title={this.state.onCalendarLabel}
+        					style={{marginRight: '0px'}}
+        		    /></div>
+              <h3>Attendance:- </h3><div style={{display:this.state.onCalendarDiv}}><p>( Click on today's date to mark attendance for today...<br/>&nbsp;&nbsp;For further updation contact SRAdmin )</p>
+              <Table fixedHeader={true} height='300px'>
+                <TableHeader colspan='12' displaySelectAll={false} adjustForCheckbox={false} style={{backgroundColor:'#EFEBE9'}}>
+                  <TableRow>
+                    {name}
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false} showRowHover={true}>
+                  {week}
+                </TableBody>
+              </Table>
+              </div>
+            </Paper>
+            </Col>}
+      <Col md={colspan2}>
+        {colspan2 === 12 && <br/>}
         <Paper style={styles.container}>
-          <p><b>Billability:</b> {this.state.Billability}</p>
+          <p><b>Billability:</b>
+          {
+            this.state.Billability.split('since').length > 1 &&
+              <span>{this.state.Billability.split('since')[0]} since {this.format(this.state.Billability.split('since')[1])}</span>
+          }
+          </p>
         <p><b>AssetID:</b> {this.state.AssetID}</p></Paper>
         <br/>
         <Paper style={styles.container}>
-        <h3>Skills Known:</h3>
-        <p>{this.state.Skills.map(function(skill, key) {
+          <div style={{float:'right'}}><Toggle
+            onToggle={th.toggleSkill}
+            title={this.state.onSkillsLabel}
+            style={{marginRight: '0px'}}
+          /></div><h3>Skills Known:</h3>
+        <div style={{display:this.state.onSkillDiv}}>{this.state.Skills.map(function(skill, key) {
           return <Avatar size='75' backgroundColor={backgroundColors[key%4]} color='black' style={{marginLeft:'20px'}}>
             <span style={{fontSize:'17px'}}>{skill}</span>
           </Avatar>
-        })}</p></Paper>
+        })}</div></Paper>
+      </Col>
+    </Row>
+    <Row>
+      <Col md={timelineSpan}>
+        <br/>
+        <Paper style={styles.container}>
+          <div style={{float:'right'}}><Toggle
+            onToggle={th.toggleTimeline}
+            title={this.state.onTimelineLabel}
+            style={{marginRight: '0px'}}
+          /></div>
+          <h3>Wave Details</h3>
+          <div style={{display:this.state.onTimelineDiv}}>
+        <div style={{width: '100%', height: '100px', margin: '0 auto'}}>
+          <HorizontalTimeline
+          index = {this.state.value}
+          indexClick={(index) => {
+            assignment = 0;
+            session = 0;
+            this.setState({value: index, previous: this.state.value});
+          }}
+          values={ VALUES }
+          isOpenEnding= 'true'
+          isOpenBeginning= 'true'
+          labelWidth={th.state.labelWidth}
+          linePadding={th.state.linePadding}
+          maxEventPadding={th.state.maxEventPadding}
+          minEventPadding={th.state.minEventPadding}
+          slidingMotion={{ stiffness: th.state.slidingMotionStiffness, damping: th.state.slidingMotionDamping }}
+          styles={{
+            background: th.state.stylesBackground,
+            foreground: th.state.stylesForeground,
+            outline: th.state.stylesOutline
+          }}
+          isOpenEnding={th.state.isOpenEnding}
+          isOpenBeginning={th.state.isOpenBeginning} />
+        </div>
+      <div className='text-center'>
+        <h3>Week {this.state.value + 1}</h3>
+        <b>Assignments</b>
+        <ul>
+          {
+              th.state.Assignments.map(function (assg) {
+                if(assg.Week.low === (th.state.value + 1)) {
+                  assignment = assignment + 1;
+                  return <li>{assg.Name}</li>
+                }
+              })
+            }
+            {
+                assignment === 0 && <li>No Assignments for the week</li>
+            }
+        </ul>
+        <b>Sessions</b>
+        <ul>
+          {
+            th.state.Schedule.map(function (sess) {
+              let week = (parseInt(sess.Day.low / 7));
+              if((th.state.value) <= week && week < (th.state.value + 1)) {
+                session = session + 1;
+                if(sess.Status) {
+                    return <li>{sess.Name} - {sess.Status}</li>
+                }
+                return <li>{sess.Name} - Yet to start</li>
+              }
+            })
+          }
+          {
+              session === 0 && <li>No Sessions scheduled for the week</li>
+          }
+        </ul>
+      </div>
+    </div>
+    </Paper>
       </Col>
     </Row>
   </Grid>

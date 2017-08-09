@@ -160,15 +160,18 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
 let getAllCadets = function(successCB, errorCB) {
   let session = driver.session();
   let query =
-    `match (c:${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE})
-    with c as candidate, w as wave
+    `match (c:${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE})-[:${graphConsts.REL_HAS}]->(course:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_INCLUDES}]->(skill:${graphConsts.NODE_SKILL})
+    with c as candidate, w as wave, skill as courseSkill
     optional match (candidate)-[w:worked_on]->(p:${graphConsts.NODE_PRODUCT})-[:has]->(v:${graphConsts.NODE_VERSION}{name:w.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
-    with p as product, candidate as candidate, wave as wave, v as version, s as skill
+    with p as product, candidate as candidate, wave as wave, v as version, COLLECT(s.Name) as skill,COLLECT(courseSkill.Name) as courseSkill
+    WITH skill + courseSkill AS skills,product as product, candidate as candidate, wave as wave, version as version
+    UNWIND skills AS skill
+    WITH COLLECT (DISTINCT skill) AS skillset, candidate as candidate, wave as wave, version as version
     return {
     		candidate:candidate,
     		product: version,
-        wave: wave,
-        skill: COLLECT(DISTINCT skill.Name)
+            wave: wave,
+            skill: skillset
     }`;
   session.run(query).then(function(resultObj) {
     session.close();
@@ -180,13 +183,12 @@ let getAllCadets = function(successCB, errorCB) {
       if(result._fields[0].product != null) {
         cadets[i].ProjectName = result._fields[0].product.properties.name;
         cadets[i].ProjectDescription = result._fields[0].product.properties.description;
-        cadets[i].ProjectSkills = result._fields[0].skill;
       }
       else {
         cadets[i].ProjectName = '';
         cadets[i].ProjectDescription = '';
-        cadets[i].ProjectSkills = '';
       }
+      cadets[i].Skills = result._fields[0].skill;
       cadets[i].Wave = result._fields[0].wave.properties.WaveID + ' (' + result._fields[0].wave.properties.CourseName + ')';
     }
     successCB(cadets);
@@ -212,7 +214,25 @@ let getAllCadets = function(successCB, errorCB) {
 // fetching candidate's Skill
 let getCadetSkills = function(email, successCB, errorCB) {
   let session = driver.session();
-  let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL}) return COLLECT(DISTINCT s.Name)`;
+  let query = `
+  MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${email}'})
+  WITH candidate AS candidate
+  OPTIONAL MATCH (candidate)
+  -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
+  WITH v.version AS versionname, candidate AS candidate
+  OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: versionname})
+  -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+  WITH COLLECT(skill.Name) as skills1, candidate AS candidate
+  MATCH (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
+  -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
+  WITH skills1 AS skills1, course AS course
+  MATCH (course) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+  WITH COLLECT(skill.Name) AS skills2, skills1
+  WITH skills1 + skills2 AS skills
+  UNWIND skills AS skill
+  WITH COLLECT (DISTINCT skill) AS skillset
+  RETURN skillset
+  `;
   session.run(query).then(function(resultObj) {
     session.close();
     console.log('done');
@@ -1500,12 +1520,19 @@ let allBillability = function(successCB, errorCB) {
   })
 }
 
-let getCadetProject = function (empID,successCB, errorCB) {
+let getCadetProject = function (empID, successCB, errorCB) {
    let session = driver.session();
-   let query = `match (c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${empID}'})-[r:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})
+   console.log(empID);
+   let query = `optional match (c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${empID}'})-[r:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})
                 with c as c,r as r,p as p
-                match (p)-[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:r.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
-               return {projectName:v.name,projectDesc:v.description,projectSkills:collect(s.Name)}`;
+                optional match (p)-[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:r.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
+                with c as c,v as v, s as projSkill
+                 optional match (c)-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE})-[:${graphConsts.REL_HAS}]-(course:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_INCLUDES}]->(skill:${graphConsts.NODE_SKILL})
+                 with c as c,v as v,COLLECT(skill.Name) as skill,COLLECT(projSkill.Name) as projSkill
+                 WITH skill + projSkill AS skills,c as c,v as v
+                 UNWIND skills AS skill
+                 WITH COLLECT (DISTINCT skill) AS skillset,c as c,v as v
+                return {projectName:v.name,projectDesc:v.description,Skills:skillset}`;
   session.run(query).then(function(resultObj) {
     session.close();
     successCB(resultObj.records[0]._fields[0]);
@@ -1676,6 +1703,26 @@ let createNewSkill = function(skill, successCB, errorCB) {
   });
 };
 
+//Billability
+let getBillabilityStats = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+    WITH Collect(DISTINCT split(candidate.Billability, 'since')[0])
+    AS BillabilityLabels UNWIND(BillabilityLabels) AS BL
+    MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+    WHERE candidate.Billability CONTAINS BL
+    WITH {label: BL, value: COLLECT(candidate)} AS obj
+    RETURN COLLECT(obj)
+    `;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0]);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 module.exports = {
       addCadet,
       updateCadet,
@@ -1727,5 +1774,6 @@ module.exports = {
       getEvaluationSkills,
       updateRating,
       getSkillSet,
-      createNewSkill
+      createNewSkill,
+      getBillabilityStats
   }

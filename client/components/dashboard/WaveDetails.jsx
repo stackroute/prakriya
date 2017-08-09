@@ -6,7 +6,8 @@ import Paper from 'material-ui/Paper';
 import IconButton from 'material-ui/IconButton';
 import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
 import KeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
-import WaveProgress from './waveProgress.jsx'
+import WaveProgress from './WaveProgress.jsx';
+import Toggle from 'material-ui/Toggle';
 
 const styles = {
 	container: {
@@ -33,12 +34,15 @@ export default class WaveDetails extends React.Component {
 			waves: [],
 			activeWaves: [],
 			showDetails: false,
-			waveDetail: ''
+			waveDetail: '',
+			onGoingLabel: 'hide details',
+			onGoingDiv: 'block'
 		},
 		this.getWaves = this.getWaves.bind(this);
 		this.showProgress = this.showProgress.bind(this);
 		this.formatDate = this.formatDate.bind(this);
 		this.WaveDetails = this.WaveDetails.bind(this);
+		this.toggleOnGoing = this.toggleOnGoing.bind(this);
 	}
 	componentWillMount() {
 		this.getWaves();
@@ -88,15 +92,38 @@ export default class WaveDetails extends React.Component {
 		})
 	}
 
+	toggleOnGoing() {
+		let th = this;
+		if(th.state.onGoingDiv === 'block') {
+			th.setState({
+				onGoingLabel: 'show details',
+				onGoingDiv: 'none'
+			})
+		}
+		else {
+			th.setState({
+				onGoingLabel: 'hide details',
+				onGoingDiv: 'block'
+			})
+		}
+	}
+
 	render() {
 		let th = this;
 		return(
 			<Paper style={styles.container}>
+				<div style={{float:'right'}}><Toggle
+					onToggle={th.toggleOnGoing}
+					title={this.state.onGoingLabel}
+					defaultToggled={true}
+					style={{marginRight: '0px'}}
+		    /></div>
 				{
 					this.state.activeWaves.length > 0 ?
 					<h3>On going waves</h3> :
 					<h3>No on going waves to show.</h3>
 				}
+				<div style={{display: th.state.onGoingDiv}}>
 				{
 					this.state.activeWaves.map(function(wave, key) {
 						let progressPercentile = th.showProgress(wave);
@@ -138,6 +165,7 @@ export default class WaveDetails extends React.Component {
 						)
 					})
 				}
+				</div>
 			</Paper>
 		)
 	}
