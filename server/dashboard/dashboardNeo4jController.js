@@ -956,7 +956,8 @@ let getProducts = function(successCB, errorCB) {
      ELSE
      COLLECT (DISTINCT {
        EmployeeID: candidate.EmployeeID,
-       EmployeeName: candidate.EmployeeName
+       EmployeeName: candidate.EmployeeName,
+       Email: candidate.EmailID
      })
    END AS candidates
    WITH COLLECT({
