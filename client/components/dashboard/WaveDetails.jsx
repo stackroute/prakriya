@@ -8,6 +8,12 @@ import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-dow
 import KeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
 import WaveProgress from './WaveProgress.jsx';
 import Toggle from 'material-ui/Toggle';
+import RaisedButton from 'material-ui/RaisedButton';
+import Dialog from 'material-ui/Dialog';
+import Cadets from './../waveManagement/Cadets.jsx';
+import {Grid, Row, Col} from 'react-flexbox-grid';
+import dialog from '../../styles/dialog.json';
+
 
 const styles = {
 	container: {
@@ -24,7 +30,15 @@ const styles = {
 	},
 	wave: {
 		marginBottom: 30
-	}
+	},
+  col: {
+    marginBottom: 20,
+    marginRight: -20,
+    width: 150
+  },
+  grid: {
+    width: '100%'
+  }
 }
 
 export default class WaveDetails extends React.Component {
@@ -36,13 +50,19 @@ export default class WaveDetails extends React.Component {
 			showDetails: false,
 			waveDetail: '',
 			onGoingLabel: 'hide details',
-			onGoingDiv: 'block'
+			onGoingDiv: 'block',
+			open: false,
+			acadets:[]
 		},
 		this.getWaves = this.getWaves.bind(this);
 		this.showProgress = this.showProgress.bind(this);
 		this.formatDate = this.formatDate.bind(this);
 		this.WaveDetails = this.WaveDetails.bind(this);
 		this.toggleOnGoing = this.toggleOnGoing.bind(this);
+		this.handleOpen = this.handleOpen.bind(this);
+		this.handleClose = this.handleClose.bind(this);
+		this.getCadetsOfActivewaves = this.getCadetsOfActivewaves.bind(this);
+
 	}
 	componentWillMount() {
 		this.getWaves();
@@ -57,6 +77,7 @@ export default class WaveDetails extends React.Component {
 					console.log(err)
 				else {
 					let activeWaves = []
+					console.log(res.body)
 					res.body.map(function(wave, key) {
 						let sdate = new Date(wave.StartDate);
 						let edate = new Date(wave.EndDate);
@@ -69,6 +90,33 @@ export default class WaveDetails extends React.Component {
 				}
 			})
 	}
+
+	getCadetsOfActivewaves(wave){
+		let th = this;
+	 let activewaveid = wave.split("(")[0].trim();
+	 let activeCourse = wave.split('(')[1].split(')')[0];
+	 console.log(activewaveid)
+	 console.log(activeCourse)
+        Request
+				.post('/dashboard/ActivewaveCadets')
+				.set({'Authorization': localStorage.getItem('token')})
+				.send({activewaveId: activewaveid,course:activeCourse})
+				.end(function(err, res){
+					if(err){
+						console.log(err);
+					}
+					else{
+						th.handleOpen();
+						console.log(res.body);
+						th.setState({
+							acadets: res.body
+						})
+
+					}
+				})
+				}
+
+
 	showProgress(waveObj) {
 		let sdate = new Date(waveObj.StartDate);
 		let edate = new Date(waveObj.EndDate);
@@ -108,8 +156,26 @@ export default class WaveDetails extends React.Component {
 		}
 	}
 
+handleOpen(){
+	this.setState({
+		open: true,
+		activecadets: true
+	})
+}
+handleClose(){
+	this.setState({
+		open: false
+	})
+}
 	render() {
+
 		let th = this;
+
+			console.log(th.state.acadets,"acadets")
+  let title = 'CADETS'
+	if (th.state.acadets.length !== 0) {
+		title = ('CADETS - (' + th.state.acadets.length + ')')
+	}
 		return(
 			<Paper style={styles.container}>
 				<div style={{float:'right'}}><Toggle
@@ -141,7 +207,39 @@ export default class WaveDetails extends React.Component {
 											<KeyboardArrowUp/>
 										}
 									</IconButton>
+
+									<RaisedButton label="cadets"
+									 primary={true} onClick={
+									 th.getCadetsOfActivewaves.bind(this, wave.WaveID + ' (' + wave.CourseName + ')')
+									 }
+										style={{marginLeft:'10px'}}
+										/>
+										{
+											th.state.activecadets &&
+
+
+<Dialog style={styles.dialog} title={title} open={th.state.open} autoScrollBodyContent={true} onRequestClose={th.handleClose} actionsContainerStyle={dialog.actionsContainer} bodyStyle={dialog.body} titleStyle={dialog.title}>
+
+
+									{th.state.acadets.length == 0 && <h3 style={{textAlign:'center'}} >No Cadets available</h3>}
+									<Grid style={styles.grid}>
+										<Row>
+											{th.state.acadets.map(function(cadet, index) {
+												return (
+													<Col xs={3} key={index} style={styles.col}>
+														<Cadets cadet={cadet}/>
+													</Col>
+												)
+											})
+				}
+										</Row>
+									</Grid>
+
+									</Dialog>
+										}
+
 								</div>
+
 								<LinearProgress
 									mode="determinate"
 									value={progressPercentile}
