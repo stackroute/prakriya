@@ -5,14 +5,14 @@ import Footer from './Footer.jsx';
 const styles = {
 	container: {
 		minHeight: '100%',
-		backgroundColor: 'fff'
+		backgroundColor: '#F0F8FF'
 	},
 	body: {
 		fontFamily: 'sans-serif',
 		height: '100%',
 		marginTop: 63,
 		paddingTop: 20,
-		backgroundColor: 'fff'
+		backgroundColor: '#F0F8FF'
 	}
 };
 

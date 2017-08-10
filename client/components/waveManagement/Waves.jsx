@@ -57,12 +57,10 @@ export default class Waves extends React.Component {
 		super(props);
 		this.state = {
 			tab: 'Ongoing',
-			currentPage: 1,
 			noCadets: false,
 			cadets: [],
 			courses: [],
 			waves : [],
-			displayWaves: [],
 			filteredWaves: [],
 			open: false,
 			message: ''
@@ -74,7 +72,6 @@ export default class Waves extends React.Component {
 		this.handleUpdate = this.handleUpdate.bind(this);
 		this.addWave = this.addWave.bind(this);
 		this.onTabChange = this.onTabChange.bind(this);
-		this.setPage = this.setPage.bind(this);
 		this.handleRequestClose = this.handleRequestClose.bind(this);
 	}
 
@@ -125,8 +122,7 @@ export default class Waves extends React.Component {
 					});
 		    	th.setState({
 		    		waves: res.body,
-						filteredWaves: filteredWaves,
-						displayWaves: filteredWaves.slice(0, 3)
+						filteredWaves: filteredWaves
 		    	})
 					th.onTabChange('Ongoing');
 		    }
@@ -237,9 +233,7 @@ export default class Waves extends React.Component {
 					filteredWaves.push(wave)
 			});
 			this.setState({
-				filteredWaves: filteredWaves,
-				displayWaves: filteredWaves.slice(0, 3),
-				pageNumber: 1
+				filteredWaves: filteredWaves
 			});
 		} else if(tab === 'Upcoming') {
 			this.state.waves.map(function(wave, key) {
@@ -247,9 +241,7 @@ export default class Waves extends React.Component {
 					filteredWaves.push(wave)
 			});
 			this.setState({
-				filteredWaves: filteredWaves,
-				displayWaves: filteredWaves.slice(0, 3),
-				pageNumber: 1
+				filteredWaves: filteredWaves
 			});
 		} else if(tab === 'Completed') {
 			this.state.waves.map(function(wave, key) {
@@ -257,9 +249,7 @@ export default class Waves extends React.Component {
 					filteredWaves.push(wave)
 			});
 			this.setState({
-				filteredWaves: filteredWaves,
-				displayWaves: filteredWaves.slice(0, 3),
-				pageNumber: 1
+				filteredWaves: filteredWaves
 			});
 		}
 		this.setState({
@@ -267,28 +257,17 @@ export default class Waves extends React.Component {
 		});
 	}
 
-	setPage(pageNumber) {
-		let th = this;
-		let start = (pageNumber - 1) * 3;
-		let end = start + 3;
-		let sliced = th.state.filteredWaves.slice(start, end);
-		th.setState({
-			displayWaves: sliced,
-			currentPage: pageNumber
-		});
-	}
-
-		handleRequestClose = () => {
-	    this.setState({
-	      open: false,
-				message: ''
-	    });
-	  };
+	handleRequestClose = () => {
+    this.setState({
+      open: false,
+			message: ''
+    });
+  };
 
 	render() {
 		let th = this;
 		let displayPage = (
-				this.state.displayWaves.length > 0 ?
+				this.state.filteredWaves.length > 0 ?
 				<Masonry
 					className={'my-class'}
 					elementType={'ul'}
@@ -296,7 +275,7 @@ export default class Waves extends React.Component {
 					style={styles.masonry}
 				>
 				{
-					th.state.displayWaves.map(function (wave, key) {
+					th.state.filteredWaves.map(function (wave, key) {
 						return (
 							<WaveCard
 								key={key}

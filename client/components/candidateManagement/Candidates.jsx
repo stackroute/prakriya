@@ -48,7 +48,6 @@ export default class Candidates extends React.Component {
 		super(props)
 
 		this.state = {
-			currentPage: 1,
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
@@ -57,7 +56,6 @@ export default class Candidates extends React.Component {
 			Billability: [],
 			filtersCount: 0,
 			filteredCandidates: [],
-			displayCandidates: [],
 			showCandidate: false,
 			displayCandidate: {},
 			imageURL: [],
@@ -88,7 +86,6 @@ export default class Candidates extends React.Component {
 		this.getFilteredCandidates = this.getFilteredCandidates.bind(this);
 		this.openSnackbar = this.openSnackbar.bind(this);
 		this.resetFilters = this.resetFilters.bind(this);
-		this.setPage = this.setPage.bind(this);
 		this.getRole = this.getRole.bind(this);
 	}
 
@@ -172,7 +169,6 @@ export default class Candidates extends React.Component {
 		    		candidates: cadets,
 						filteredCandidates: cadets
 		    	});
-					th.setPage(th.state.currentPage);
 		    }
 		  })
 	}
@@ -319,8 +315,6 @@ export default class Candidates extends React.Component {
 					th.setState({
 						filteredCandidates: res.body
 					});
-					// th.setPage(th.state.currentPage)
-					th.setPage(1)
 		    }
 			})
 	}
@@ -339,19 +333,7 @@ export default class Candidates extends React.Component {
 				Wave: '',
 				Billability: []
 			},
-			filteredCandidates: th.state.candidates,
-			displayCandidates: th.state.candidates.slice(0, 3)
-		});
-	}
-
-	setPage(pageNumber) {
-		let th = this;
-		let start = (pageNumber - 1) * 3;
-		let end = start + 3;
-		let sliced = th.state.filteredCandidates.slice(start, end);
-		th.setState({
-			displayCandidates: sliced,
-			currentPage: pageNumber
+			filteredCandidates: th.state.candidates
 		});
 	}
 
@@ -501,7 +483,6 @@ export default class Candidates extends React.Component {
 															handleCardClick={th.candidateView}
 															handleDelete={th.deleteCandidate}
 															key={key}
-															k={key + th.state.currentPage}
 															role={th.state.role}
 														/>
 												)
