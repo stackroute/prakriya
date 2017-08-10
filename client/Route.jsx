@@ -31,9 +31,9 @@ injectTapEventPlugin();
 const muiTheme = getMuiTheme(lightBaseTheme);
 muiTheme.baseTheme.palette.primary1Color = '#202D3E';
 muiTheme.appBar.color = '#202D3E';
-muiTheme.textField.floatingLabelColor = '#57e161';
-muiTheme.textField.hintColor = '#57e161';
-muiTheme.textField.textColor = '#57e161';
+muiTheme.textField.floatingLabelColor = '#000000';
+muiTheme.textField.hintColor = '#000000';
+muiTheme.textField.textColor = '#000000';
 
 var user;
 

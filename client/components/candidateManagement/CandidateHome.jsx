@@ -144,6 +144,9 @@ export default class CandidateHome extends React.Component {
         onClick={this.handleDelete}
       />,
     ];
+		let cadetSkill = []
+		let i = 0
+
 		return (
 			<div>
 				<Grid>
@@ -234,9 +237,25 @@ export default class CandidateHome extends React.Component {
 										{
 											<div>
 												<h4>Skills:</h4>
-												<ul>{this.props.candidate.Skills.map(function(skill) {
-													return <li>{skill}</li>
-												})}</ul>
+												{
+													cadetSkill[i] = []
+												}
+												{
+													this.props.candidate.Skills.map(function(skill, key) {
+														if(key % 3 === 0) {
+															i = i + 1
+															cadetSkill[i] = []
+														}
+														cadetSkill[i].push(<Col md={2}><li>{skill}</li></Col>)
+													})
+												}
+												<Grid>
+												{
+															cadetSkill.map(function(skills){
+																return <Row>{skills}</Row>
+															})
+												}
+											</Grid>
 											</div>
 										}
 

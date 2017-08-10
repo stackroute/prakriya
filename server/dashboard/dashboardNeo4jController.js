@@ -1203,8 +1203,8 @@ let getCadetsOfWave = function(waveID, course, successCB, errorCB) {
         logger.debug(res._fields[0])
         candidateName.push(res._fields[0].properties)
       })
-      successCB(candidateName);
       logger.debug(candidateName, "candidateName");
+      successCB(candidateName);
     } else {
       errorCB('Error');
     }
@@ -1556,7 +1556,23 @@ let getCadetProject = function (empID, successCB, errorCB) {
                 return {projectName:v.name,projectDesc:v.description,Skills:skillset}`;
   session.run(query).then(function(resultObj) {
     session.close();
-    successCB(resultObj.records[0]._fields[0]);
+    console.log(resultObj);
+    if(resultObj.records.length > 0) {
+      successCB(resultObj.records[0]._fields[0]);
+    }
+    else {
+        let query1 =  `match (c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${empID}'})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE})-[:${graphConsts.REL_HAS}]-(course:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_INCLUDES}]->(skill:${graphConsts.NODE_SKILL})
+                      return skill`;
+        session.run(query1).then(function(resultObj) {
+          session.close();
+          let result = {
+            projectName: '',
+            projectDesc: '',
+            Skills:resultObj.records[0]._fields[0]
+          }
+          successCB(result);
+    })
+    }
   }).catch(function(err) {
     errorCB(err);
   })

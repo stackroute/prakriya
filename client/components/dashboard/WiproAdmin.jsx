@@ -269,9 +269,9 @@ export default class WiproAdmin extends React.Component {
           th.state.graphs.map(function(graph) {
             return (
               <Paper style={{
-                width: '570',
-                height: '300',
-                backgroundColor: '#bbb',
+                width: '770',
+                height: '600',
+                backgroundColor: '#fff',
                 display: 'inline-block',
                 margin: '5px',
                 position: 'relative'
@@ -296,7 +296,7 @@ export default class WiproAdmin extends React.Component {
                   }
                   <NVD3Chart
                   id="pieChart" type="pieChart" tooltip={{enabled: true}}
-                  datum={graph.data} x="label" y="value"/>
+                  datum={graph.data} x="label" y="value" height={500} width={500}/>
                 </div>
                 <RemoveIcon
                   style={{position: 'absolute', right: 10, top: 15, cursor: 'pointer'}}
