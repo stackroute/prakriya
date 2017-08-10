@@ -3,7 +3,6 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
-import Pagination from 'material-ui-pagination';
 import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import CandidateCard from './CandidateCard.jsx';
@@ -495,7 +494,7 @@ export default class Candidates extends React.Component {
 								</Col>
 								<Col md={9}>
 									{
-										this.state.displayCandidates.map(function(candidate, key) {
+										this.state.filteredCandidates.map(function(candidate, key) {
 											return (
 														<CandidateCard
 															candidate={candidate}
@@ -511,21 +510,6 @@ export default class Candidates extends React.Component {
 								</Col>
 							</Row>
 						</Grid>
-						{
-							this.state.filteredCandidates.length > 3 ?
-							<div style={app.pager}>
-								<Pagination
-					          total={
-											this.state.filteredCandidates.length%3>0?
-											parseInt(this.state.filteredCandidates.length/3 + 1):
-											parseInt(this.state.filteredCandidates.length/3)
-										}
-					          current={this.state.currentPage}
-					          display={3}
-					          onChange={this.setPage}
-								/>
-							</div> : ''
-						}
 					</div>
 					:
 					<div>

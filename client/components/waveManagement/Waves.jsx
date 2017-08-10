@@ -4,7 +4,6 @@ import WaveCard from './WaveCard.jsx';
 import Masonry from 'react-masonry-component';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import {Grid, Row, Col} from 'react-flexbox-grid';
-import Pagination from 'material-ui-pagination';
 import AddWave from './AddWave.jsx';
 import app from '../../styles/app.json';
 import Snackbar from 'material-ui/Snackbar';
@@ -333,21 +332,6 @@ export default class Waves extends React.Component {
 						{displayPage}
 					</Tab>
 				</Tabs></Row></Grid>
-				{
-					this.state.filteredWaves.length > 3 ?
-					<div style={app.pager}>
-						<Pagination
-								total={
-									this.state.filteredWaves.length%3>0?
-									parseInt(this.state.filteredWaves.length/3 + 1):
-									parseInt(this.state.filteredWaves.length/3)
-								}
-								current={this.state.currentPage}
-								display={3}
-								onChange={this.setPage}
-						/>
-					</div> : ''
-				}
 				{
 					this.props.user.role == "sradmin" &&
 					this.state.courses.length > 0 &&

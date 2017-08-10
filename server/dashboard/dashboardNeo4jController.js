@@ -1556,13 +1556,13 @@ let getCadetProject = function (empID, successCB, errorCB) {
                 return {projectName:v.name,projectDesc:v.description,Skills:skillset}`;
   session.run(query).then(function(resultObj) {
     session.close();
-    console.log(resultObj);
-    if(resultObj.records.length > 0) {
+    if(resultObj.records[0] !== undefined) {
+      console.log(resultObj);
       successCB(resultObj.records[0]._fields[0]);
     }
     else {
         let query1 =  `match (c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${empID}'})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE})-[:${graphConsts.REL_HAS}]-(course:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_INCLUDES}]->(skill:${graphConsts.NODE_SKILL})
-                      return skill`;
+                      return collect(skill.Name)`;
         session.run(query1).then(function(resultObj) {
           session.close();
           let result = {
