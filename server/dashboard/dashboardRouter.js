@@ -253,6 +253,27 @@ router.post('/updatewavecadets', auth.accessedBy(['WAVES']), function (req, res)
   }
 });
 
+//getCadetsOfActivewaves
+router.post('/ActivewaveCadets', auth.accessedBy(['WAVES']), function (req, res) {
+  try {
+    console.log(req.body.activewaveId,"router")
+    console.log(req.body.course,"course")
+    dashboardNeo4jController.ActivewaveCadets(req.body.activewaveId,req.body.course , function (status) {
+      logger.info('Status: ', status);
+      res.status(201).json(status);
+    }, function (sessionerr) {
+      logger.error('err in get cadet in wave', sessionerr);
+      res.status(500).json({error: 'Cannot get cadet in wave...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
 
 /** **************************************************
 *******               Projects               ********
