@@ -1211,6 +1211,28 @@ let getCadetsOfWave = function(waveID, course, successCB, errorCB) {
     }
   });
 };
+//getCadetsOfActivewaves
+let ActivewaveCadets = function(activewaveId,course, successCB, errorCB){
+  let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
+                WHERE c.WaveID = '${activewaveId}' AND c.CourseName = '${course}'
+                RETURN {EmailID:n.EmailID, EmployeeName: n.EmployeeName,EmployeeID:n.EmployeeID}`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      let candidateName = []
+      resultObj.records.map(function(res) {
+        logger.debug(res._fields[0])
+        candidateName.push(res._fields[0])
+      })
+      successCB(candidateName);
+      logger.debug(candidateName, "candidateName");
+    } else {
+      errorCB('Error');
+    }
+  });
+};
+
 
 // Get all waves
 let getWaves = function(successCB, errorCB) {
@@ -1813,5 +1835,6 @@ module.exports = {
       updateRating,
       getSkillSet,
       createNewSkill,
-      getBillabilityStats
+      getBillabilityStats,
+      ActivewaveCadets
   }
