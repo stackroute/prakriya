@@ -11,8 +11,6 @@ export default class SRAdmin extends React.Component {
 
 	}
 
-
-
 	render() {
 
 		return (
