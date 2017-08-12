@@ -205,7 +205,6 @@ export default class AddRole extends React.Component {
           actions={dialogActions}
           modal={false}
           open={this.state.open}
-          onRequestClose={(e)=>{this.handleClose(e, 'CLOSE')}}
           autoScrollBodyContent={true}
 					actionsContainerStyle={dialog.actionsContainer}
         >

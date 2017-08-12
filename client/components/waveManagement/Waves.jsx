@@ -13,7 +13,7 @@ const styles = {
 		marginBottom: 20
 	},
 	tabs: {
-		border: '2px solid teal',
+		border: '2px solid #202D3E',
 		width: '1250px'
 	},
 	tab: {
@@ -26,7 +26,7 @@ const styles = {
 		bottom: '5px'
 	},
 	tabItemContainer: {
-		backgroundColor: 'teal'
+		backgroundColor: '#202D3E'
 	},
 	masonry: {
 		width: '1200px'
@@ -290,7 +290,7 @@ export default class Waves extends React.Component {
 					})
 				}
 			</Masonry> :
-			<h4 style={{textAlign: 'center', marginTop: '50px', color: 'teal'}}>NO WAVES TO DISPLAY</h4>
+			<h4 style={{textAlign: 'center', marginTop: '50px', color: '#202D3E'}}>NO WAVES TO DISPLAY</h4>
 		);
 		return (
 			<div>

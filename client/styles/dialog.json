@@ -1,26 +1,26 @@
 module.exports = {
   'body': {
-    /* 'backgroundColor': '#DDDBF1', */
-    'borderBottom': '10px solid teal',
-    'borderRight': '10px solid teal',
-    'borderLeft': '10px solid teal'
+    /* 'backgroundColor': '#202D3E', */
+    'borderBottom': '10px solid #C6D8D3',
+    'borderRight': '10px solid #C6D8D3',
+    'borderLeft': '10px solid #C6D8D3'
   },
   'title': {
     'fontWeight': 'bold',
-    'backgroundColor': 'teal',
-    'color': '#DDDBF1',
+    'backgroundColor': '#C6D8D3',
+    'color': '#202D3E',
     'textAlign': 'center'
   },
 	'actionsContainer': {
-		'backgroundColor': 'teal',
+		'backgroundColor': '#C6D8D3',
 		'borderTop': '0px',
 		'marginTop': '0px'
 	},
 	'actionButton': {
-		'backgroundColor': '#DDDBF1',
+		'backgroundColor': '#202D3E',
 		'width': '50%',
-		'color': 'teal',
-		'border': '1px solid teal',
+		'color': '#C6D8D3',
+		'border': '1px solid #C6D8D3',
 		'height': '100%'
 	},
   'box100' :{
@@ -52,7 +52,7 @@ module.exports = {
     'padding': '5px'
   },
   'confirmBox': {
-    'backgroundColor': '#DDDBF1',
-    'border': '10px solid teal'
+    'backgroundColor': '#202D3E',
+    'border': '10px solid #C6D8D3'
   }
 }

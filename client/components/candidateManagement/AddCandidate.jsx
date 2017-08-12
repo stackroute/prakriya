@@ -324,7 +324,6 @@ export default class AddCourse extends React.Component {
 						bodyStyle={dialog.body}
 						titleStyle={dialog.title}
 						actions={actions}
-	          onRequestClose={(e) => this.handleClose(e, 'CLOSE')}
 	        >
 					<div>
 						<div style={dialog.box50}>
