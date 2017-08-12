@@ -21,13 +21,13 @@ let deleteDanglingNodes = function(label) {
 // adding cadet
 let addCadet = function(cadetObj, successCB, errorCB) {
 
-  console.log(cadetObj);
+  logger.debug('addCadet: ', cadetObj);
 
   let cadet = {};
 
   cadet.EmployeeID = cadetObj.EmployeeID || '';
   cadet.EmployeeName = cadetObj.EmployeeName || '';
-  cadet.EmailID = cadetObj.EmailID || '';
+  cadet.EmailID = cadetObj.EmailID.toLowerCase() || '';
   cadet.AltEmail = cadetObj.AltEmail || '';
   cadet.Contact = cadetObj.Contact || '';
   cadet.DigiThonQualified = cadetObj.DigiThonQualified || '';
@@ -1021,8 +1021,8 @@ let addWave = function(waveObj, successCB, errorCB) {
     WITH wave AS wave, course AS course
     MERGE (wave)-[:${graphConsts.REL_HAS}]->(course)
     WITH wave AS wave
-    UNWIND ${JSON.stringify(userObj.Cadets)} AS empID
-    MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: empID})
+    UNWIND ${JSON.stringify(userObj.Cadets)} AS emailID
+    MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: emailID})
     MERGE (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (wave)
     RETURN candidate`;
   let count = 0;

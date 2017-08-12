@@ -229,7 +229,7 @@ export default class Waves extends React.Component {
 		if(tab === 'Ongoing') {
 			this.state.waves.map(function(wave, key) {
 				let today = Date.now();
-				if(new Date(wave.StartDate) <= today && new Date(wave.EndDate) >= today)
+				if(new Date(parseInt(wave.StartDate)) <= today && new Date(parseInt(wave.EndDate)) >= today)
 					filteredWaves.push(wave)
 			});
 			this.setState({
@@ -237,7 +237,7 @@ export default class Waves extends React.Component {
 			});
 		} else if(tab === 'Upcoming') {
 			this.state.waves.map(function(wave, key) {
-				if(new Date(wave.StartDate) > Date.now() || wave.StartDate === null)
+				if(new Date(parseInt(wave.StartDate)) > Date.now() || wave.StartDate === null)
 					filteredWaves.push(wave)
 			});
 			this.setState({
@@ -245,7 +245,7 @@ export default class Waves extends React.Component {
 			});
 		} else if(tab === 'Completed') {
 			this.state.waves.map(function(wave, key) {
-				if(new Date(wave.EndDate) < Date.now()  && wave.StartDate !== null)
+				if(new Date(parseInt(wave.EndDate)) < Date.now()  && wave.StartDate !== null)
 					filteredWaves.push(wave)
 			});
 			this.setState({
