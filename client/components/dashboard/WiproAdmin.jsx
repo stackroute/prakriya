@@ -264,8 +264,8 @@ export default class WiproAdmin extends React.Component {
       </Paper>
       <Paper  style={styles.paper}>
         <div>
-          <div style={{display: 'inline-block', border: '1px solid silver', width: 250}}>
-            {/*<SelectField
+          {/*<div style={{display: 'inline-block', width: 250}}>
+            <SelectField
               value={this.state.gType || 'pieChart'}
               onChange={(e, k, v)=>{th.handleGPropChange('type', v)}}
               floatingLabelText="Graph Type">
