@@ -1601,4 +1601,20 @@ router.get('/billabilitystats', auth.accessedBy(['BULK_UPLOAD']), function (req,
   }
 });
 
+router.get('/trainingstats', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
+  try{
+    dashboardNeo4jController.getTrainingStats(function (stats) {
+      res.status(201).json(stats);
+    }, function (err) {
+      logger.error('Get TrainingStats Error: ', err);
+      res.status(500).json({error: 'Cannot get training stats from neo4j...!'});
+    });
+  } catch(err) {
+    logger.error('Get TrainingStats Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 module.exports = router;

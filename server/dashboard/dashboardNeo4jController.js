@@ -1783,6 +1783,51 @@ let getBillabilityStats = function(successCB, errorCB) {
   })
 }
 
+//Billability
+let getTrainingStats = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `
+    OPTIONAL MATCH (chw:${graphConsts.NODE_WAVE} {Mode: 'Hybrid'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (cc1:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(chw.EndDate) < timestamp() WITH COLLECT(cc1) AS cc1
+    OPTIONAL MATCH (ciw:${graphConsts.NODE_WAVE} {Mode: 'Immersive'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (cc2:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(ciw.EndDate) < timestamp() WITH COLLECT(cc2) AS cc2, cc1 AS cc1
+    OPTIONAL MATCH (cow:${graphConsts.NODE_WAVE} {Mode: 'Online'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (cc3:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(cow.EndDate) < timestamp()
+    WITH [
+    {label: 'Hybrid', value: cc1},
+    {label: 'Immersive', value: cc2},
+    {label: 'Online', value: COLLECT(cc3)}
+    ] AS completed
+    OPTIONAL MATCH (ohw:${graphConsts.NODE_WAVE} {Mode: 'Hybrid'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (oc1:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(ohw.StartDate) < timestamp() AND toInteger(ohw.EndDate) > timestamp()
+    WITH COLLECT(oc1) AS oc1, completed AS completed
+    OPTIONAL MATCH (oiw:${graphConsts.NODE_WAVE} {Mode: 'Immersive'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (oc2:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(oiw.StartDate) < timestamp() AND toInteger(oiw.EndDate) > timestamp()
+    WITH COLLECT(oc2) AS oc2, oc1 AS oc1, completed AS completed
+    OPTIONAL MATCH (oow:${graphConsts.NODE_WAVE} {Mode: 'Online'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (oc3:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(oow.StartDate) < timestamp() AND toInteger(oow.EndDate) > timestamp()
+    WITH [
+    {label: 'Hybrid', value: oc1},
+    {label: 'Immersive', value: oc2},
+    {label: 'Online', value: COLLECT(oc3)}
+    ] AS ongoing, completed AS completed
+    RETURN {completed: completed, ongoing: ongoing}
+    `;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0]);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
+
 module.exports = {
       addCadet,
       updateCadet,
@@ -1836,5 +1881,6 @@ module.exports = {
       getSkillSet,
       createNewSkill,
       getBillabilityStats,
+      getTrainingStats,
       ActivewaveCadets
   }
