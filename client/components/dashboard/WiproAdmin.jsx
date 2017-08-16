@@ -8,16 +8,30 @@ import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import {CSVLink, CSVDownload} from 'react-csv';
 import FileDrop from './FileDrop.jsx';
 import NVD3Chart from 'react-nvd3';
+import Paper from 'material-ui/Paper';
+import RemoveIcon from 'material-ui/svg-icons/content/remove-circle-outline';
 
 const styles = {
   button: {
     float: 'right'
-  }
+  },
+  paperHidden: {
+    display: 'none',
+		padding: 20,
+		borderRadius: 5,
+		backgroundColor: '#C6D8D3'
+	},
+  paper: {
+		padding: 20,
+		borderRadius: 5,
+		backgroundColor: '#C6D8D3'
+	}
 }
 
 const file_types = ['ZCOP', 'ERD', 'Digi-Thon']
-
-const items = ['Billable', 'Non-billable(Internal)', 'Non-billable(Customer)', 'Support', 'Free']
+const graphCategories = ['Billability', 'Trainings Completed', 'Trainings In Progress']
+const graphTypes = ['pieChart', 'discreteBarChart']
+const billingTags = ['Billable', 'Non-Billable (Internal)', 'Non-Billable (Customer)', 'Support', 'Free']
 
 export default class WiproAdmin extends React.Component {
   constructor(props) {
@@ -31,35 +45,33 @@ export default class WiproAdmin extends React.Component {
       csvData: [],
       disableMerge: true,
       expandedSector: '',
-      billableCount: 0,
-      supportCount: 0,
-      nonbillableCount: 0,
-      FreeCount: 0,
-      bcadets: [],
-      nbiCadets: [],
-      nbcCadets: [],
-      fCadets: [],
-      sCadets: [],
       value: null,
-      billabilityGData: []
+      billabilityGData: [],
+      gType: '',
+      gTitle: '',
+      graphs: [],
+      billingTags: [],
+      billabilityStats: [],
+      billabilityStatsWithoutCandidates: [],
+      trainingStats: [],
+      trainingStatsWithoutCandidates: []
     }
+
     this.handleFileChange = this.handleFileChange.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
     this.handleMerge = this.handleMerge.bind(this);
-    this.handleDownload = this.handleDownload.bind(this);
-    this.getBillability = this.getBillability.bind(this);
-    this.getNonBillabilityInternal = this.getNonBillabilityInternal.bind(this);
-    this.getNonBillabilityCustomer = this.getNonBillabilityCustomer.bind(this);
-    this.getBillabilitySupport = this.getBillabilitySupport.bind(this);
-    this.getBillabilityFree = this.getBillabilityFree.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleTagChange = this.handleTagChange.bind(this);
+    this.addGraph = this.addGraph.bind(this);
+    this.removeGraph = this.removeGraph.bind(this);
+    this.isADuplicateGraph = this.isADuplicateGraph.bind(this);
+    this.handleGPropChange = this.handleGPropChange.bind(this);
+    this.getBillabilityStats = this.getBillabilityStats.bind(this);
+    this.getTrainingStats = this.getTrainingStats.bind(this);
   }
+
   componentWillMount() {
-    this.getBillability();
-    this.getNonBillabilityInternal();
-    this.getNonBillabilityCustomer();
-    this.getBillabilitySupport();
-    this.getBillabilityFree();
+    this.getBillabilityStats();
+    this.getTrainingStats();
   }
 
   handleFileChange(event, key, val) {
@@ -88,147 +100,242 @@ export default class WiproAdmin extends React.Component {
       }
     })
   }
-  handleDownload() {}
 
-  getBillability() {
+  getBillabilityStats() {
+     let th = this;
+     Request.get('/dashboard/billabilitystats')
+     .set({'Authorization': localStorage.getItem('token')})
+     .end(function(err, res) {
+       if (err)
+         console.log(err);
+       else {
+         let billabilityStats = res.body
+         let billabilityStatsWithoutCandidates = res.body
+         billabilityStatsWithoutCandidates.map(function(element) {
+           if(element.label == 'Billable') {
+             element.color = '#F9CB40'
+           } else if(element.label == 'Non-Billable (Internal)') {
+             element.color = '#FF715B'
+           } else if(element.label == 'Non-Billable (Customer)') {
+             element.color = '#06D6A0'
+           } else if(element.label == 'Free') {
+             element.color = '#BCED09'
+           } else if(element.label == 'Support') {
+             element.color = '#2F52E0'
+           }
+           element.value = element.value.length
+         })
+         console.log('Billing Stats: ', res.body)
+         let newState = {
+           billabilityStats: billabilityStats,
+           billabilityStatsWithoutCandidates: billabilityStatsWithoutCandidates
+         };
+         th.setState(newState);
+       }
+     })
+  }
+
+  getTrainingStats() {
+     let th = this;
+     let colors = {Hybrid: '#F9CB40', Immersive: '#FF715B', Online: '#06D6A0'}
+     Request.get('/dashboard/trainingstats')
+     .set({'Authorization': localStorage.getItem('token')})
+     .end(function(err, res) {
+       if (err)
+         console.log(err);
+       else {
+         let trainingStats = res.body
+         let trainingStatsWithoutCandidates = res.body
+         trainingStatsWithoutCandidates.completed.map(function(element) {
+           element.color = colors[element.label];
+           element.value = element.value.length;
+         });
+         trainingStatsWithoutCandidates.ongoing.map(function(element) {
+           element.color = colors[element.label];
+           element.value = element.value.length;
+         });
+         console.log('Training Stats: ', res.body)
+         let newState = {
+           trainingStats: trainingStats,
+           trainingStatsWithoutCandidates: trainingStatsWithoutCandidates
+         }
+         th.setState(newState)
+       }
+     })
+  }
+
+  handleTagChange(e, k, v) {
     let th = this;
-    Request.get('/dashboard/billable').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        th.setState({bcadets: res.body, billableCount: res.body.length})
+    let graphs = this.state.graphs;
+    graphs.some(function(graph) {
+      if(graph.title == 'Billability') {
+        let newData = th.state.billabilityStatsWithoutCandidates.filter(function(datum) {
+          return (v.indexOf(datum.label) != -1)
+        })
+        graph.data = newData;
       }
     })
+    this.setState({billingTags: v, graphs: graphs})
   }
-  getNonBillabilityInternal() {
+
+  addGraph() {
     let th = this;
-    Request.get('/dashboard/nonbillableInternal').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        th.setState({nonbillableInternalCount: res.body.length, nbCadets: res.body})
-      }
-    })
+    let graph = {};
+    let graphs = th.state.graphs;
+    console.log('gTitle: ', th.state.gTitle)
+    if(th.state.gTitle == 'Billability') {
+      graph.title = th.state.gTitle;
+      graph.data = th.state.billabilityStatsWithoutCandidates;
+        if(!th.isADuplicateGraph(th.state.gTitle)) graphs.push(graph);
+        th.setState({
+          graphs: graphs
+        });
+    } else if(th.state.gTitle == 'Trainings Completed') {
+      graph.title = th.state.gTitle;
+      graph.data = th.state.trainingStatsWithoutCandidates.completed;
+        if(!th.isADuplicateGraph(th.state.gTitle)) graphs.push(graph);
+        th.setState({
+          graphs: graphs
+        });
+    } else if(th.state.gTitle == 'Trainings In Progress') {
+      graph.title = th.state.gTitle;
+      graph.data = th.state.trainingStatsWithoutCandidates.ongoing;
+        if(!th.isADuplicateGraph(th.state.gTitle)) graphs.push(graph);
+        th.setState({
+          graphs: graphs
+        });
+    }
   }
-  getNonBillabilityCustomer() {
+
+  removeGraph(title) {
+    let graphs = this.state.graphs;
+    let filteredGraphs = graphs.filter(function (graph) {
+      return graph.title != title
+    });
+    this.setState({
+      graphs: filteredGraphs,
+      billingTags: []
+    });
+  }
+
+  isADuplicateGraph(title) {
+    let graphs = this.state.graphs;
+    return graphs.some(function(graph) {
+      return graph.title == title
+    });
+  }
+
+  handleGPropChange(prop, value) {
     let th = this;
-    Request.get('/dashboard/nonbillableCustomer').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        th.setState({nonbillableCustomerCount: res.body.length, nbcCadets: res.body})
-      }
-    })
+    let newState = {};
+    let propName = 'g' + prop[0].toUpperCase() + prop.slice(1);
+    newState[propName] = value;
+    this.setState(newState);
   }
-  getBillabilityFree() {
-    let th = this;
-    Request.get('/dashboard/free').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        th.setState({FreeCount: res.body.length, fCadets: res.body})
-      }
-    })
-  }
-  getBillabilitySupport() {
-    let th = this;
-    Request.get('/dashboard/support').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        th.setState({supportCount: res.body.length, sCadets: res.body})
-      }
-    })
-  }
-  handleChange(event, key, values) {
-    console.log(values)
-    this.setState({value: values, billabilityGData: key})
-  }
+
   render() {
     let th = this;
-    console.log(this.state.value, "values")
 
-    const data = [
-      {
-        label: 'Billable',
-        value: this.state.billableCount,
-        color: "#F9CB40",
-        members: this.state.bcadets
-      }, {
-        label: "Non-billable(Internal)",
-        value: this.state.nonbillableInternalCount,
-        color: "#FF715B",
-        members: this.state.nbiCadets
-      }, {
-        label: "Non-billable(Customer)",
-        value: this.state.nonbillableCustomerCount,
-        color: "#06D6A0",
-        members: this.state.nbcCadets
-      }, {
-        label: "Free",
-        value: this.state.FreeCount,
-        color: "#BCED09",
-        members: this.state.fCadets
-      }, {
-        label: "Support",
-        value: this.state.supportCount,
-        color: "#2F52E0",
-        members: this.state.sCadets
-      }
-    ]
-    var datavalue = [];
-    if (this.state.value != null) {
-      this.state.value.map(function(val, k) {
-        for (var i = 0; i < data.length; i++) {
-          if (data[i].label === val) {
-            console.log(data[i].label)
-            datavalue.push(data[i])
-          }
-        }
-      })
-    }
-    console.log(datavalue, "datavalue")
     return (
       <div>
-        <Grid>
-          <Row>
-            <Col md={5}>
-              <SelectField value={this.state.value} onChange={this.handleChange} multiple={true} floatingLabelText="Select Billability">
-                {
-                  items.map(function(item, key) {
-                    return <MenuItem key={key} value={item} primaryText={item}/>
-                  })
-                }
-              </SelectField>
-
-              <NVD3Chart id="pieChart" type="pieChart" tooltip={{
-                enabled: true
-              }} datum={datavalue} x="label" y="value" width="550" height="600"/>
-            </Col>
-
-            <Col md={3} mdOffset={1}>
-              <SelectField value={this.state.file} onChange={this.handleFileChange} floatingLabelText="Select File">
-                {
-                  file_types.map(function(file, key) {
-                    return <MenuItem key={key} value={file} primaryText={file}/>
-                  })
-                }
-              </SelectField>
-              <RaisedButton label="Merge" primary={true} onClick={this.handleMerge}/>
-              <br/>
-              <CSVLink data={this.state.csvData} filename="da_db.xlsx" style={styles.button}>
-                Download
-              </CSVLink>
-            </Col>
-            <Col md={3}>
-              <FileDrop type={this.state.file} handleDrop={this.handleDrop}/>
-              <br/>
-              <FileDrop type="REPORT" handleDrop={this.handleDrop}/>
-            </Col>
-          </Row>
-        </Grid>
+        <Paper  style={styles.paperHidden}>
+          <WaveDetails /><br/>
+        </Paper>
+        <Paper style={styles.paperHidden}>
+          <div>
+          <SelectField value={this.state.file} onChange={this.handleFileChange} floatingLabelText="Select File">
+            {
+              file_types.map(function(file, key) {
+                return <MenuItem key={key} value={file} primaryText={file}/>
+              })
+            }
+          </SelectField>
+          <RaisedButton label="Merge" primary={true} onClick={this.handleMerge}/>
+          <br/>
+          <CSVLink data={this.state.csvData} filename="da_db.xlsx" style={styles.button}>
+            Download
+          </CSVLink>
+        </div>
+        <div>
+          <FileDrop type={this.state.file} handleDrop={this.handleDrop}/>
+          <br/>
+          <FileDrop type="REPORT" handleDrop={this.handleDrop}/>
+        </div>
+      </Paper>
+      <Paper  style={styles.paper}>
+        <div>
+          {/*<div style={{display: 'inline-block', width: 250}}>
+            <SelectField
+              value={this.state.gType || 'pieChart'}
+              onChange={(e, k, v)=>{th.handleGPropChange('type', v)}}
+              floatingLabelText="Graph Type">
+              {
+                graphTypes.map(function(type, key) {
+                  return <MenuItem key={key} value={type} primaryText={type.toUpperCase()}/>
+                })
+              }
+            </SelectField>
+          </div>*/}
+          <div style={{display: 'inline-block', width: 250}}>
+            <SelectField
+              value={this.state.gTitle}
+              onChange={(e, k, v)=>{th.handleGPropChange('title', v)}}
+              floatingLabelText="Target Field">
+              {
+                graphCategories.map(function(title, key) {
+                  return <MenuItem key={key} value={title} primaryText={title.toUpperCase()}/>
+                })
+              }
+            </SelectField>
+          </div>
+          <div style={{display: 'inline-block', width: 250}}>
+            <RaisedButton label="Add Graph" primary={true} onClick={th.addGraph} style={{width: '100%'}}/>
+          </div>
+        </div>
+        <div>
+        {
+          th.state.graphs.map(function(graph) {
+            return (
+              <Paper style={{
+                width: '770',
+                height: '600',
+                backgroundColor: '#fff',
+                display: 'inline-block',
+                margin: '5px',
+                position: 'relative'
+              }}>
+                <h3 style={{height: '5%', textAlign: 'center', textTransform: 'uppercase'}}>
+                  {graph.title}
+                </h3>
+                <div style={{width: '100%', height:'95%'}}>
+                  {
+                      graph.title == 'Billability' ?
+                      <SelectField
+                        value={th.state.billingTags}
+                        onChange={th.handleTagChange}
+                        multiple={true}
+                        floatingLabelText="Select Billability">
+                        {
+                          billingTags.map(function(tag, key) {
+                            return <MenuItem key={key} value={tag} primaryText={tag}/>
+                          })
+                        }
+                      </SelectField> : ''
+                  }
+                  <NVD3Chart type="pieChart" tooltip={{enabled: true}}
+                  datum={graph.data} x="label" y="value" height={500} width={500}/>
+                </div>
+                <RemoveIcon
+                  style={{position: 'absolute', right: 10, top: 15, cursor: 'pointer'}}
+                  onTouchTap={()=>{th.removeGraph(graph.title)}}
+                />
+              </Paper>
+            )
+          })
+        }
+        </div>
+      </Paper>
       </div>
     )
   }
-
 }

@@ -212,9 +212,8 @@ export default class ProjectCard extends React.Component {
           background: bgColor
         }}>
 
-          <CardHeader title={title} subtitle={detail} avatar={< Avatar > {
-            this.props.project.product.charAt(0).toUpperCase()
-          } < /Avatar>}/>
+          <CardHeader title={title} subtitle={detail} avatar={< Avatar >
+            {this.props.project.product.charAt(0).toUpperCase()}< /Avatar>}/>
 
           <CardText style={styles.text}>
             <h3>Description:</h3>{this.props.project.version[this.state.selectedVersionIndex].description}

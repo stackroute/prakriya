@@ -34,7 +34,7 @@ export default class Dashboard extends React.Component {
 		this.state = {
 			user: {}
 		}
-		this.formatDate = this.formatDate.bind(this); 
+		this.formatDate = this.formatDate.bind(this);
 	}
 	componentWillMount() {
 		this.setState({
@@ -45,19 +45,18 @@ export default class Dashboard extends React.Component {
 		if(date) {
 			return Moment(date).fromNow();
 		}
-		else 
-			return 'First time login' 
+		else
+			return 'First time login'
 	}
 
 	render() {
 		return(
 			<div>
-				<h2 style={app.heading}>Dashboard</h2>
 				<Grid>
 					<Row>
 						<Col md={3} mdOffset={9} >
 					  	<Paper style={styles.lastLogin} zDepth={1} >
-					  		<strong>Last Login: </strong> 
+					  		<strong>Last Login: </strong>
 					  		{this.formatDate(this.props.user.lastLogin)}
 					  	</Paper>
 					  </Col>

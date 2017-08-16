@@ -22,6 +22,7 @@ export default class MyProfile extends React.Component {
 		this.getProfilePic = this.getProfilePic.bind(this);
 		this.getCadetProject = this.getCadetProject.bind(this);
 	}
+
 	componentWillMount() {
 		this.getCadet();
 	}
@@ -35,6 +36,8 @@ export default class MyProfile extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+					th.getProfilePic(res.body.data.EmailID);
+					th.getCadetProject(res.body.data.EmployeeID);
 					let wave = res.body.data.Wave;
 					let cadet = res.body.data;
 					cadet.Wave = cadet.Wave.WaveID;
@@ -42,15 +45,13 @@ export default class MyProfile extends React.Component {
 		    		cadet: cadet,
 						wave: wave
 		    	})
-					console.log(res.body.data)
-		    	th.getProfilePic(res.body.data.EmployeeID);
-					th.getCadetProject(res.body.data.EmployeeID);
 		    }
 		  })
 	}
 
 	getCadetProject(EmpID) {
 		let th = this;
+		console.log('called');
 		Request
 			.post('/dashboard/cadetproject')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -61,7 +62,7 @@ export default class MyProfile extends React.Component {
 		    else {
 					let cadet = th.state.cadet;
 					cadet.ProjectName = res.body.projectName;
-					cadet.ProjectSkills = res.body.projectSkills;
+					cadet.Skills = res.body.Skills;
 					cadet.ProjectDescription = res.body.projectDesc;
 		    	th.setState({
 		    		cadet: cadet
@@ -84,12 +85,17 @@ export default class MyProfile extends React.Component {
 		    }
 			});
 	}
+
 	saveProfilePic(picFile) {
 		let th = this;
+		let username = this.state.cadet.EmailID.split("@wipro.com")[0];
+		let user = {
+			username: username
+		};
 		Request
 			.post('/dashboard/saveimage')
 			.set({'Authorization': localStorage.getItem('token')})
-			.field('cadet', JSON.stringify(this.state.cadet))
+			.field('user', JSON.stringify(this.state.user))
 			.attach('file', picFile)
 			.end(function(err, res) {
 				if(err)
@@ -107,11 +113,14 @@ export default class MyProfile extends React.Component {
 		    }
 			})
 	}
-	getProfilePic(eid) {
+
+	getProfilePic(emailID) {
 		let th = this;
+		let username = emailID.split("@wipro.com")[0];
 		Request
-			.get(`/dashboard/getimage?eid=${eid}`)
+			.get(`/dashboard/getimage`)
 			.set({'Authorization': localStorage.getItem('token')})
+			.query({filename: username})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);

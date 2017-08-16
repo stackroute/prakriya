@@ -66,14 +66,15 @@ export default class CandidateHome extends React.Component {
 	}
 	componentWillMount() {
 		this.getWave(this.props.candidate.Wave)
-		this.getProfilePic(this.props.candidate.EmployeeID)
+		this.getProfilePic(this.props.candidate.EmailID)
 	}
-	getProfilePic(eid) {
+	getProfilePic(emailID) {
 		let th = this;
+		let username = emailID.split("@wipro.com")[0];
 		Request
-			.get(`/dashboard/getimage?eid=${eid}`)
+			.get(`/dashboard/getimage`)
 			.set({'Authorization': localStorage.getItem('token')})
-			.query({q: eid})
+			.query({filename: username})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
@@ -143,6 +144,9 @@ export default class CandidateHome extends React.Component {
         onClick={this.handleDelete}
       />,
     ];
+		let cadetSkill = []
+		let i = 0
+
 		return (
 			<div>
 				<Grid>
@@ -230,6 +234,30 @@ export default class CandidateHome extends React.Component {
 											Start Date: {this.formatDate(this.state.startDate)}<br/>
 											End Date: {this.formatDate(this.state.endDate)}
 										</p>
+										{
+											<div>
+												<h4>Skills:</h4>
+												{
+													cadetSkill[i] = []
+												}
+												{
+													this.props.candidate.Skills.map(function(skill, key) {
+														if(key % 3 === 0) {
+															i = i + 1
+															cadetSkill[i] = []
+														}
+														cadetSkill[i].push(<Col md={2}><li>{skill}</li></Col>)
+													})
+												}
+												<Grid>
+												{
+															cadetSkill.map(function(skills){
+																return <Row>{skills}</Row>
+															})
+												}
+											</Grid>
+											</div>
+										}
 
 										{
 											this.props.candidate.AcademyTrainingSkills != undefined &&
@@ -247,9 +275,6 @@ export default class CandidateHome extends React.Component {
 										<p style={styles.details}>
 											Project Name: {this.props.candidate.ProjectName}<br/>
 											Project Description: {this.props.candidate.ProjectDescription}<br/>
-											Project Skills: <ul>{this.props.candidate.ProjectSkills.map(function(skill) {
-												return <li>{skill}</li>
-											})}</ul>
 										</p></div>
 										}
 										{

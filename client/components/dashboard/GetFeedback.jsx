@@ -12,7 +12,8 @@ const styles = {
 	container: {
 		padding: 20,
 		borderRadius: 5,
-		backgroundColor: '#C6D8D3'
+		backgroundColor: '#C6D8D3',
+		width: '50%'
 	}
 }
 

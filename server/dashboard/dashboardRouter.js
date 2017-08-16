@@ -241,7 +241,7 @@ router.post('/updatewavecadets', auth.accessedBy(['WAVES']), function (req, res)
   try{
     dashboardNeo4jController.updateWaveCadets(req.body.cadets, req.body.waveID, req.body.course, function (status) {
       logger.debug('Update Cadet Status: ', status);
-      res.status(201);
+      res.status(201).json({success:'success'});
     }, function (err) {
       logger.error('Update Cadet Wave Error: ', err);
       res.status(500).json({error: 'Cannot update cadet wave...!'});
@@ -252,6 +252,27 @@ router.post('/updatewavecadets', auth.accessedBy(['WAVES']), function (req, res)
     });
   }
 });
+
+//getCadetsOfActivewaves
+router.post('/ActivewaveCadets', auth.accessedBy(['WAVES']), function (req, res) {
+  try {
+    console.log(req.body.activewaveId,"router")
+    console.log(req.body.course,"course")
+    dashboardNeo4jController.ActivewaveCadets(req.body.activewaveId,req.body.course , function (status) {
+      logger.info('Status: ', status);
+      res.status(201).json(status);
+    }, function (sessionerr) {
+      logger.error('err in get cadet in wave', sessionerr);
+      res.status(500).json({error: 'Cannot get cadet in wave...!'});
+    });
+  } catch(err) {
+    logger.error(err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 
 
 /** **************************************************
@@ -683,13 +704,11 @@ router.post('/saveimage', function (req, res) {
     fs.readFile(files.file.path, 'binary', (readFileError, data) => {
       try {
         let buffer = new Buffer(data, 'binary');
-        let user = fields.cadet ? JSON.parse(fields.cadet) :JSON.parse(fields.non_cadet);
-        // let cadet = JSON.parse(fields.cadet);
+        let user = JSON.parse(fields.user);
         let img = {};
         let dir = './public/profilePics/';
         img.data = buffer;
         img.contentType = files.file.type;
-        // cadet.ProfilePic = img;
         user.ProfilePic = img;
         if (!fs.existsSync('./public/')) {
           logger.debug('Public Directory not present');
@@ -699,7 +718,6 @@ router.post('/saveimage', function (req, res) {
           logger.debug('ProfilePics Directory not present');
           mkdirp(dir);
         }
-        // let imagePath = dir + cadet.EmployeeID + '.jpeg';
         let imagePath = dir + (user.EmployeeID || user.username) + '.jpeg';
         logger.debug('Image Path', imagePath);
         fs.writeFile(imagePath, data, 'binary', function (writeFileError) {
@@ -720,7 +738,7 @@ router.post('/saveimage', function (req, res) {
 
 router.get('/getimage', auth.canAccess(CONFIG.ALL), function (req, res) {
   try {
-    let filename = req.query.eid || req.query.filename;
+    let filename = req.query.filename;
     base64Img.base64('public/profilePics/' + filename + '.jpeg', function (err, data) {
       if(err) {
         res.status(500).json({error: 'No image is available...!'});
@@ -1076,7 +1094,7 @@ router.post('/restorecourse', auth.accessedBy(['COURSES']), function (req, res) 
 
 
 // Get all courses for specific wave
-router.get('/assessment', auth.accessedBy(['ASSG_TRACKER']), function (req, res) {
+router.get('/assessment', function (req, res) {
   try{
     console.log(req.query.waveid);
     dashboardNeo4jController.getAssessmentTrack(req.query.waveid, req.query.course, function (data) {
@@ -1189,7 +1207,7 @@ router.get('/waveids',
 );
 
 // Get a particular wave object based on wave id
-router.get('/waveobject/:waveID/:course', auth.accessedBy(['PROG_FLOW']), function (req, res) {
+router.get('/waveobject/:waveID/:course', function (req, res) {
   logger.info('API HIT ===> GET Wave Object');
   try{
     console.log(req.params.waveID,"req.params.WAVEID")
@@ -1263,7 +1281,7 @@ router.post('/sendmail', auth.accessedBy(['BULK_UPLOAD']),function (req, res) {
 });
 
 // Get all waves
-router.get('/waves', auth.accessedBy(['CANDIDATES', 'WAVES']), function (req, res) {
+router.get('/waves', auth.accessedBy(['CANDIDATES', 'WAVES', 'COURSES']), function (req, res) {
   try{
     dashboardNeo4jController.getWaves(function (waves) {
       res.status(201).json(waves);
@@ -1560,6 +1578,39 @@ router.post('/createnewskill', auth.accessedBy(['COURSES']), function(req, res) 
     });
   } catch(err) {
     logger.debug('CreateNewSkill Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+
+router.get('/billabilitystats', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
+  try{
+    dashboardNeo4jController.getBillabilityStats(function (stats) {
+      res.status(201).json(stats);
+    }, function (err) {
+      logger.error('Get BillabilityStats Error: ', err);
+      res.status(500).json({error: 'Cannot get billability stats from neo4j...!'});
+    });
+  } catch(err) {
+    logger.error('Get BillabilityStats Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+router.get('/trainingstats', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
+  try{
+    dashboardNeo4jController.getTrainingStats(function (stats) {
+      res.status(201).json(stats);
+    }, function (err) {
+      logger.error('Get TrainingStats Error: ', err);
+      res.status(500).json({error: 'Cannot get training stats from neo4j...!'});
+    });
+  } catch(err) {
+    logger.error('Get TrainingStats Exception: ', err);
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
     });

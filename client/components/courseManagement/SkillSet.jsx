@@ -34,7 +34,6 @@ export default class SkillSet extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      skills: [],
       skill: '',
       showDialog: false,
       disableAdd: true,
@@ -42,7 +41,6 @@ export default class SkillSet extends React.Component {
 			snackbarMessage: ''
     };
 
-    this.getSkillSet = this.getSkillSet.bind(this);
     this.addNewSkill = this.addNewSkill.bind(this);
     this.onOpen = this.onOpen.bind(this);
     this.onClose = this.onClose.bind(this);
@@ -52,38 +50,9 @@ export default class SkillSet extends React.Component {
     this.openSnackbar = this.openSnackbar.bind(this);
   }
 
-  componentWillMount() {
-    this.getSkillSet();
-  }
-
-  getSkillSet() {
-    let th = this;
-    Request
-    .get('/dashboard/skillset')
-    .set({'Authorization': localStorage.getItem('token')})
-    .end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        th.setState({skills: res.body});
-      }
-    });
-  }
-
-  addNewSkill(skill, skills) {
-    let th = this;
-    Request
-    .post('/dashboard/createnewskill')
-    .set({'Authorization': localStorage.getItem('token')})
-    .send({skill: skill})
-    .end(function(err, res) {
-      if (err)
-        console.log(err);
-      else {
-        skills.push(skill);
-        th.setState({skills: skills, skill: '', disableSave: true});
-      }
-    });
+  addNewSkill(skill) {
+    this.props.addNewSkill(skill);
+    this.setState({skill: '', disableSave: true});
   }
 
   onSkillChange(e) {
@@ -94,14 +63,14 @@ export default class SkillSet extends React.Component {
     let th = this;
     if (this.state.skill.trim().length != 0) {
       let skill = this.state.skill;
-      let skills = this.state.skills;
+      let skills = this.props.skills;
       let duplicateFound = skills.some(function(s) {
         return s.toLowerCase() == skill.toLowerCase()
       });
       if(duplicateFound) {
         th.openSnackbar('Duplicate Skill! Try adding a new skill.');
       } else {
-        th.addNewSkill(skill, skills);
+        th.addNewSkill(skill);
       }
     }
   }
@@ -152,7 +121,7 @@ export default class SkillSet extends React.Component {
                 <Paper style={styles.paper} zDepth={1}>
                   <div style={styles.wrapper}>
                     {
-                      this.state.skills.map(function(skill, index) {
+                      this.props.skills.map(function(skill, index) {
                         return (
                           <Chip style={styles.chip} key={index}>
                             <span>{skill}</span>

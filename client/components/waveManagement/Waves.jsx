@@ -4,7 +4,6 @@ import WaveCard from './WaveCard.jsx';
 import Masonry from 'react-masonry-component';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import {Grid, Row, Col} from 'react-flexbox-grid';
-import Pagination from 'material-ui-pagination';
 import AddWave from './AddWave.jsx';
 import app from '../../styles/app.json';
 import Snackbar from 'material-ui/Snackbar';
@@ -14,7 +13,7 @@ const styles = {
 		marginBottom: 20
 	},
 	tabs: {
-		border: '2px solid teal',
+		border: '2px solid #202D3E',
 		width: '1250px'
 	},
 	tab: {
@@ -27,7 +26,7 @@ const styles = {
 		bottom: '5px'
 	},
 	tabItemContainer: {
-		backgroundColor: 'teal'
+		backgroundColor: '#202D3E'
 	},
 	masonry: {
 		width: '1200px'
@@ -58,12 +57,10 @@ export default class Waves extends React.Component {
 		super(props);
 		this.state = {
 			tab: 'Ongoing',
-			currentPage: 1,
 			noCadets: false,
 			cadets: [],
 			courses: [],
 			waves : [],
-			displayWaves: [],
 			filteredWaves: [],
 			open: false,
 			message: ''
@@ -75,7 +72,6 @@ export default class Waves extends React.Component {
 		this.handleUpdate = this.handleUpdate.bind(this);
 		this.addWave = this.addWave.bind(this);
 		this.onTabChange = this.onTabChange.bind(this);
-		this.setPage = this.setPage.bind(this);
 		this.handleRequestClose = this.handleRequestClose.bind(this);
 	}
 
@@ -126,9 +122,9 @@ export default class Waves extends React.Component {
 					});
 		    	th.setState({
 		    		waves: res.body,
-						filteredWaves: filteredWaves,
-						displayWaves: filteredWaves.slice(0, 3)
+						filteredWaves: filteredWaves
 		    	})
+					th.onTabChange('Ongoing');
 		    }
 			})
 	}
@@ -142,8 +138,14 @@ export default class Waves extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+					let courseArray = [];
+					res.body.map(function (course) {
+						if(!course.Removed) {
+							courseArray.push(course)
+						}
+					})
 		    	th.setState({
-		    		courses: res.body
+		    		courses: courseArray
 		    	})
 		    }
 		  })
@@ -227,33 +229,27 @@ export default class Waves extends React.Component {
 		if(tab === 'Ongoing') {
 			this.state.waves.map(function(wave, key) {
 				let today = Date.now();
-				if(new Date(wave.StartDate) <= today && new Date(wave.EndDate) >= today)
+				if(new Date(parseInt(wave.StartDate)) <= today && new Date(parseInt(wave.EndDate)) >= today)
 					filteredWaves.push(wave)
 			});
 			this.setState({
-				filteredWaves: filteredWaves,
-				displayWaves: filteredWaves.slice(0, 3),
-				pageNumber: 1
+				filteredWaves: filteredWaves
 			});
 		} else if(tab === 'Upcoming') {
 			this.state.waves.map(function(wave, key) {
-				if(new Date(wave.StartDate) > Date.now() || wave.StartDate === null)
+				if(new Date(parseInt(wave.StartDate)) > Date.now() || wave.StartDate === null)
 					filteredWaves.push(wave)
 			});
 			this.setState({
-				filteredWaves: filteredWaves,
-				displayWaves: filteredWaves.slice(0, 3),
-				pageNumber: 1
+				filteredWaves: filteredWaves
 			});
 		} else if(tab === 'Completed') {
 			this.state.waves.map(function(wave, key) {
-				if(new Date(wave.EndDate) < Date.now()  && wave.StartDate !== null)
+				if(new Date(parseInt(wave.EndDate)) < Date.now()  && wave.StartDate !== null)
 					filteredWaves.push(wave)
 			});
 			this.setState({
-				filteredWaves: filteredWaves,
-				displayWaves: filteredWaves.slice(0, 3),
-				pageNumber: 1
+				filteredWaves: filteredWaves
 			});
 		}
 		this.setState({
@@ -261,28 +257,17 @@ export default class Waves extends React.Component {
 		});
 	}
 
-	setPage(pageNumber) {
-		let th = this;
-		let start = (pageNumber - 1) * 3;
-		let end = start + 3;
-		let sliced = th.state.filteredWaves.slice(start, end);
-		th.setState({
-			displayWaves: sliced,
-			currentPage: pageNumber
-		});
-	}
-
-		handleRequestClose = () => {
-	    this.setState({
-	      open: false,
-				message: ''
-	    });
-	  };
+	handleRequestClose = () => {
+    this.setState({
+      open: false,
+			message: ''
+    });
+  };
 
 	render() {
 		let th = this;
 		let displayPage = (
-				this.state.displayWaves.length > 0 ?
+				this.state.filteredWaves.length > 0 ?
 				<Masonry
 					className={'my-class'}
 					elementType={'ul'}
@@ -290,7 +275,7 @@ export default class Waves extends React.Component {
 					style={styles.masonry}
 				>
 				{
-					th.state.displayWaves.map(function (wave, key) {
+					th.state.filteredWaves.map(function (wave, key) {
 						return (
 							<WaveCard
 								key={key}
@@ -299,12 +284,13 @@ export default class Waves extends React.Component {
 								handleDelete={th.handleDelete}
 								bgColor={backgroundColors[key%4]}
 								bgIcon={backgroundIcons[key%4]}
+								getWaves={th.getWaves}
 							/>
 						)
 					})
 				}
 			</Masonry> :
-			<h4 style={{textAlign: 'center', marginTop: '50px', color: 'teal'}}>NO WAVES TO DISPLAY</h4>
+			<h4 style={{textAlign: 'center', marginTop: '50px', color: '#202D3E'}}>NO WAVES TO DISPLAY</h4>
 		);
 		return (
 			<div>
@@ -326,21 +312,6 @@ export default class Waves extends React.Component {
 					</Tab>
 				</Tabs></Row></Grid>
 				{
-					this.state.filteredWaves.length > 3 ?
-					<div style={app.pager}>
-						<Pagination
-								total={
-									this.state.filteredWaves.length%3>0?
-									parseInt(this.state.filteredWaves.length/3 + 1):
-									parseInt(this.state.filteredWaves.length/3)
-								}
-								current={this.state.currentPage}
-								display={3}
-								onChange={this.setPage}
-						/>
-					</div> : ''
-				}
-				{
 					this.props.user.role == "sradmin" &&
 					this.state.courses.length > 0 &&
 					(this.state.cadets.length > 0 ||
@@ -350,6 +321,11 @@ export default class Waves extends React.Component {
 						courses={this.state.courses}
 						handleWaveAdd={this.addWave}
 					/>
+
+				}
+				{
+						this.state.courses.length === 0 &&
+						<h3 style={{marginLeft: '15%'}}>NO ACTIVE COURSE TO CREATE A WAVE! PLEASE CONTACT THE METOR TO CREATE NEW COURSE.</h3>
 				}
 
 				<Snackbar

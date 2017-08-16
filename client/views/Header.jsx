@@ -29,8 +29,8 @@ const styles = {
   header: {
 		zIndex: 2,
 		fontFamily: 'sans-serif',
-		backgroundColor: 'rgb(0, 188, 212)',
-		color: '#fff',
+		backgroundColor: '#F0F8FF',
+		color: '#000000',
 		position: 'fixed',
 		left: 0,
 		top: 0,
@@ -38,7 +38,7 @@ const styles = {
     width: '100%',
 	},
   userMenu: {
-    backgroundColor: '#C6D8D3',
+    backgroundColor: '#F0F8FF',
     width: '100%',
     fontWeight: 'bold'
   },
@@ -117,8 +117,9 @@ export default class Header extends React.Component {
   getProfilePic(username) {
   	let th = this;
   	Request
-  		.get(`/dashboard/getimage?filename=${username}`)
+  		.get(`/dashboard/getimage`)
   		.set({'Authorization': localStorage.getItem('token')})
+      .query({filename: username})
   		.end(function(err, res) {
   			if(err)
   	    	console.log(err);
@@ -247,7 +248,7 @@ export default class Header extends React.Component {
 		      width={250}
 		      open={this.state.openDrawer}
 		      onRequestChange={(openDrawer) => this.setState({openDrawer})}
-          containerStyle={{backgroundColor: '#292A2C'}}
+          containerStyle={{backgroundColor: '#202D3E'}}
           >
           <Card>
              <CardMedia
@@ -259,7 +260,7 @@ export default class Header extends React.Component {
 					      />
               }
              >
-                 <img src={this.state.imageURL} style={{width: '100%', border: '2px solid black', height: 250}}/>
+                 <img src={this.state.imageURL} style={{width: '100%', border: '2px solid #202D3E', height: 250}}/>
              </CardMedia>
           </Card>
 		      {
@@ -269,7 +270,7 @@ export default class Header extends React.Component {
 		      			<Link to={th.state.routes[key]} key={key} style={{textDecoration: 'none'}} >
 					      	<MenuItem
                     primaryText={action}
-                    style={{color: 'white'}}
+                    style={{color: '#F0F8FF', fontWeight: 'bold'}}
                     onTouchTap={th.handleDrawerClose}
                    />
 				      	</Link>

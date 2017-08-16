@@ -35,6 +35,7 @@ let registerCandidates = function () {
 
 				async.each(cadetColln,
 					function (cadetObj, callback) {
+						console.log(cadetObj);
 						dashboardNeo4jController.addCadet(cadetObj, function(cadet) {
 							logger.debug('Added the cadet', cadet)
 				      importedCadets.push(cadet);

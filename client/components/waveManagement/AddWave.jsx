@@ -155,11 +155,11 @@ export default class AddWave extends React.Component {
 		wave.WaveID = this.state.Mode.substr(0, 1) + this.state.WaveNumber.split('-')[1];
 		wave.Mode = this.state.Mode;
 		wave.Course = this.state.Course;
-		wave.WaveNumber = this.state.WaveNumber
-		wave.Location = this.state.Location
-		wave.StartDate = this.state.StartDate
-		wave.EndDate = this.state.EndDate
-		wave.Cadets = this.state.selectedCadets
+		wave.WaveNumber = this.state.WaveNumber;
+		wave.Location = this.state.Location;
+		wave.StartDate = this.state.StartDate.getTime();
+		wave.EndDate = this.state.EndDate.getTime();
+		wave.Cadets = this.state.selectedCadets;
 		this.props.handleWaveAdd(wave)
 		this.resetFields()
 	}
@@ -346,10 +346,10 @@ export default class AddWave extends React.Component {
 						        insetChildren={true}
 						        checked={
 						        	th.state.selectedCadets &&
-						        	th.state.selectedCadets.includes(cadet.EmployeeID)
+						        	th.state.selectedCadets.includes(cadet.EmailID)
 						       	}
-						        value={cadet.EmployeeID}
-						        primaryText={`${cadet.EmployeeName} (${cadet.EmployeeID})`}
+						        value={cadet.EmailID}
+						        primaryText={`${cadet.EmployeeName} (${cadet.EmailID})`}
 						      />
 		        		)
 		        	})

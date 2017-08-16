@@ -7,7 +7,7 @@ const styles = {
 		height: 100,
 		width: 100,
 		borderRadius: 75,
-		border: '5px solid teal'
+		border: '5px solid #202D3E'
 	}
 }
 export default class CandidateCard extends React.Component {
@@ -20,15 +20,17 @@ export default class CandidateCard extends React.Component {
 	}
 
 	componentWillMount() {
-		this.getProfilePic(this.props.cadet.EmployeeID)
+		this.getProfilePic(this.props.cadet.Email)
 	}
 
-	getProfilePic(eid) {
+	getProfilePic(emailID) {
 		let th = this;
+		console.log(emailID);
+		let username = emailID.split("@wipro.com")[0];
 		Request
-			.get(`/dashboard/getimage?eid=${eid}`)
+			.get(`/dashboard/getimage`)
 			.set({'Authorization': localStorage.getItem('token')})
-			.query({q: eid})
+			.query({filename: username})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);

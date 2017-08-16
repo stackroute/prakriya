@@ -1,32 +1,22 @@
 module.exports = {
   'heading': {
     'textAlign': 'center',
-    'color': '#eee'
+    'color': '#202D3E'
   },
   'fab': {
 		'position':'fixed',
 		'bottom': '20px',
 		'right': '15px',
 		'zIndex': 1,
-    'border': '2px solid teal'
+    'border': '2px solid #202D3E'
 	},
   'fab2': {
 		'position':'fixed',
 		'bottom': '80px',
 		'right': '15px',
 		'zIndex': 1,
-    'border': '2px solid teal'
+    'border': '2px solid #202D3E'
 	},
-  'pager': {
-    'width': '200px',
-    'border': '1px solid silver',
-    'position':'fixed',
-    'bottom': '20px',
-    'right': 'calc(50% - 100px)',
-    'borderRadius': '10px',
-    'zIndex': 1,
-    'textAlign': 'center'
-  },
   'mandatoryField': {
     'color': '#990000'
   }

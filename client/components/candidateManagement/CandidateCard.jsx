@@ -45,16 +45,18 @@ export default class CandidateCard extends React.Component {
 		this.getProfilePic(this.props.candidate.EmployeeID);
 	}
 	componentWillReceiveProps(nextProps) {
-		this.getProfilePic(nextProps.candidate.EmployeeID);
+		this.getProfilePic(nextProps.candidate.EmailID);
 	}
-	getProfilePic(eid) {
+	getProfilePic(emailID) {
 		let th = this;
+		let username = emailID.split("@wipro.com")[0];
 		Request
-			.get(`/dashboard/getimage?eid=${eid}`)
+			.get(`/dashboard/getimage`)
 			.set({'Authorization': localStorage.getItem('token')})
+			.query({filename: username})
 			.end(function(err, res) {
 				if(err) {
-		    	console.log('Image not found for ', eid);
+		    	console.log('Image not found for ', username);
 					th.setState({
 						imageURL: '../../assets/images/avt-default.jpg'
 					})
@@ -106,7 +108,7 @@ export default class CandidateCard extends React.Component {
       />
     ]
 		return(
-			<div style={{width: '285px', display: 'inline-block', padding: '5px'}} key={this.props.k}>
+			<div style={{width: '285px', display: 'inline-block', padding: '5px'}} key={this.props.key}>
 				<Card style={{border: '2px solid silver'}}>
 			    <CardMedia
 			    	style={styles.cardClick}

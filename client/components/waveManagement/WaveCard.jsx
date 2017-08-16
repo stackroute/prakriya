@@ -127,7 +127,8 @@ export default class WaveCard extends React.Component {
     })
   }
 
-  formatDate(date) {
+  formatDate(timestamp) {
+    let date = new Date(parseInt(timestamp));
     let dateString = Moment(date).format("MMM Do YYYY");
     if (dateString == 'Invalid date')
       return '';
@@ -157,7 +158,7 @@ export default class WaveCard extends React.Component {
       if (err)
         console.log(err);
       else {
-        console.log('Successfully updated')
+        th.props.getWaves();
       }
     })
   }
@@ -184,15 +185,6 @@ export default class WaveCard extends React.Component {
   }
 
   closeUpdateDialog() {
-    // let cadet = [];
-    // if(this.state.addCadet)
-    // {
-    // 	cadet = this.props.wave.Cadets
-    // }
-    // else
-    // {
-    // 	cadet = this.state.wave.Cadets
-    // }
     this.setState({openDialog: false, addCadet: false})
   }
 
@@ -212,7 +204,7 @@ export default class WaveCard extends React.Component {
   }
 
   handleClose() {
-    this.setState({dialog: false, noCadets: false, addCadet: false})
+    this.setState({dialog: false, noCadets: false, addCadet: false,removecadets: false})
   }
 
   handleLocationChange(event) {
@@ -222,13 +214,13 @@ export default class WaveCard extends React.Component {
   }
   handleStartDateChange(event, date) {
     let wave = this.state.wave;
-    wave.StartDate = new Date(date);
-    wave.EndDate = new Date(date.setDate(date.getDate() + 84));
+    wave.StartDate = new Date(date).getTime();
+    wave.EndDate = new Date(date.setDate(date.getDate() + 84)).getTime();
     this.setState({wave: wave})
   }
   handleEndDateChange(event, date) {
     let wave = this.state.wave;
-    wave.EndDate = date;
+    wave.EndDate = date.getTime();
     this.setState({wave: wave})
   }
   handleCourseChange(event, key, val) {
@@ -240,7 +232,9 @@ export default class WaveCard extends React.Component {
     this.getNewCadets();
   }
   removecadetwave() {
-    this.setState({removecadets: true})
+    this.setState({
+      removecadets: true
+    })
 
   }
 
@@ -254,14 +248,15 @@ export default class WaveCard extends React.Component {
         console.log(err);
       else {
         th.handleClose();
+        th.props.getWaves();
       }
     })
   }
 
   render() {
-    let startdate = new Date(this.props.wave.StartDate);
+    let startdate = new Date(parseInt(this.props.wave.StartDate));
     startdate = startdate.getFullYear() + '/' + (startdate.getMonth() + 1) + '/' + startdate.getDate();
-    let enddate = new Date(this.props.wave.EndDate);
+    let enddate = new Date(parseInt(this.props.wave.EndDate));
     enddate = enddate.getFullYear() + '/' + (enddate.getMonth() + 1) + '/' + enddate.getDate();
     let th = this
     let title = 'CADETS'
@@ -407,11 +402,11 @@ export default class WaveCard extends React.Component {
 }
             </SelectField>
 
-            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleUpdateWave}/> {this.state.noCadets && <h3>No Cadets available</h3>
+            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleUpdateWave}/> {this.state.noCadets && <h3 style={{textAlign:'center'}}>No Cadets available</h3>
 }
           </div>
 }
-          {this.state.removecadets && <div>
+          {this.state.removecadets  && <div>
             <SelectField multiple={true} hintText="Select Cadets" floatingLabelText=' Remove Cadets' value={this.state.cadetsToRemove} onChange={this.handleRemoveCadetsChange} menuItemStyle={{
               borderTop: '1px solid teal',
               borderBottom: '1px solid teal',
@@ -424,7 +419,7 @@ export default class WaveCard extends React.Component {
               })
 }
             </SelectField>
-            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleremovecadets}/> {this.state.cadets.length === 0 && <h3>No Cadets available</h3>}
+            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleremovecadets}/> {this.state.cadets.length === 0 && <h3 style={{textAlign:'center'}} >No Cadets available</h3>}
           </div>
 }
 
