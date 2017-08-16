@@ -1767,11 +1767,9 @@ let createNewSkill = function(skill, successCB, errorCB) {
 let getBillabilityStats = function(successCB, errorCB) {
   let session = driver.session();
   let query = `
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-    WITH Collect(DISTINCT split(candidate.Billability, 'since')[0])
-    AS BillabilityLabels UNWIND(BillabilityLabels) AS BL
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-    WHERE candidate.Billability CONTAINS BL
+    UNWIND (['Billable', 'Non-Billable (Internal)', 'Non-Billable (Customer)', 'Support', 'Free'])AS BL
+    OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+    WHERE candidate.Billability=~(BL + '.*')
     WITH CASE WHEN LENGTH(BL) > 0 THEN {label: BL, value: COLLECT(candidate)} END AS obj
     RETURN COLLECT(obj)
     `;

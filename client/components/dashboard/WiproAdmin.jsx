@@ -109,8 +109,8 @@ export default class WiproAdmin extends React.Component {
        if (err)
          console.log(err);
        else {
-         let billabilityStats = res.body
-         let billabilityStatsWithoutCandidates = res.body
+         let billabilityStats = JSON.parse(JSON.stringify(res.body));
+         let billabilityStatsWithoutCandidates = JSON.parse(JSON.stringify(res.body));
          billabilityStatsWithoutCandidates.map(function(element) {
            if(element.label == 'Billable') {
              element.color = '#F9CB40'
@@ -144,8 +144,8 @@ export default class WiproAdmin extends React.Component {
        if (err)
          console.log(err);
        else {
-         let trainingStats = res.body
-         let trainingStatsWithoutCandidates = res.body
+         let trainingStats = JSON.parse(JSON.stringify(res.body));
+         let trainingStatsWithoutCandidates = JSON.parse(JSON.stringify(res.body));
          trainingStatsWithoutCandidates.completed.map(function(element) {
            element.color = colors[element.label];
            element.value = element.value.length;

@@ -295,7 +295,7 @@ export default class Waves extends React.Component {
 		return (
 			<div>
 				<h2 style={app.heading}>Wave Management</h2>
-				<Grid><Row style={{height: '410px'}}><Tabs
+				<Grid><Row><Tabs
 					onChange={th.onTabChange}
 					value={th.state.tab}
 					style={styles.tabs}

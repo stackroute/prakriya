@@ -148,6 +148,7 @@ let candidate_template = [[
   "EmployeeID",
   "EmployeeName",
   "EmailID",
+  "Billability",
   "DigiThonQualified",
   "Selected",
   "Remarks",
