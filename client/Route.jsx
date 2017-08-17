@@ -26,6 +26,7 @@ import EvaluationForms from './components/evaluationForms/index.jsx';
 import Attendance from './components/attendance/index.jsx';
 import Wave from './components/waveManagement/index.jsx';
 import CandidateProfile from './components/cadetProfile/index.jsx';
+import ProductProfile from './components/productProfile/index.jsx';
 
 injectTapEventPlugin();
 
@@ -95,6 +96,7 @@ ReactDOM.render(
 				<Route path="/attendance" component={Attendance} />
 				<Route path="/waves" component={() => <Wave user={user}/>} />
         <Route path="/candidate/:id" component={CandidateProfile} />
+        <Route path="/product/:versionname" component={ProductProfile} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

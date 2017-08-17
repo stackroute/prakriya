@@ -25,6 +25,7 @@ import IconMenu from 'material-ui/IconMenu';
 import MoreVertIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import dialog from '../../styles/dialog.json';
+import {Link} from 'react-router';
 
 const styles = {
   text: {
@@ -205,13 +206,17 @@ export default class ProjectCard extends React.Component {
     </IconMenu></span>)
     return (
       <div>
+      <Link
+        to={'/product/' + this.props.project.version[this.state.selectedVersionIndex].name}
+        target="_blank"
+        style={{textDecoration: 'none'}}
+      >
         <Card style={{
           width: '370px',
           marginRight: '20px',
           marginBottom: '20px',
           background: bgColor
         }}>
-
           <CardHeader title={title} subtitle={detail} avatar={< Avatar >
             {this.props.project.product.charAt(0).toUpperCase()}< /Avatar>}/>
 
@@ -231,6 +236,7 @@ export default class ProjectCard extends React.Component {
             <DeleteIcon/>
           </IconButton>
         </Card>
+        </Link>
         {this.state.dialog && th.openCadetsDialog()}
         <Dialog bodyStyle={dialog.body} title='TEAM MEMBERS' titleStyle={dialog.title} open={this.state.dialogOpen} autoScrollBodyContent={true} onRequestClose={this.handleClose}>
           <Grid style={styles.grid}>
