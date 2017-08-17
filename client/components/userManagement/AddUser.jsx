@@ -253,7 +253,6 @@ export default class AddUser extends React.Component {
           modal={false}
           open={this.state.open}
           autoScrollBodyContent={true}
-          onRequestClose={(e) => this.handleClose(e, 'CLOSE')}
           actions={actions}
           actionsContainerStyle={dialog.actionsContainer}
         >

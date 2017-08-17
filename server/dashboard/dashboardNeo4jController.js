@@ -21,13 +21,13 @@ let deleteDanglingNodes = function(label) {
 // adding cadet
 let addCadet = function(cadetObj, successCB, errorCB) {
 
-  console.log(cadetObj);
+  logger.debug('addCadet: ', cadetObj);
 
   let cadet = {};
 
   cadet.EmployeeID = cadetObj.EmployeeID || '';
   cadet.EmployeeName = cadetObj.EmployeeName || '';
-  cadet.EmailID = cadetObj.EmailID || '';
+  cadet.EmailID = cadetObj.EmailID.toLowerCase() || '';
   cadet.AltEmail = cadetObj.AltEmail || '';
   cadet.Contact = cadetObj.Contact || '';
   cadet.DigiThonQualified = cadetObj.DigiThonQualified || '';
@@ -1021,8 +1021,8 @@ let addWave = function(waveObj, successCB, errorCB) {
     WITH wave AS wave, course AS course
     MERGE (wave)-[:${graphConsts.REL_HAS}]->(course)
     WITH wave AS wave
-    UNWIND ${JSON.stringify(userObj.Cadets)} AS empID
-    MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmployeeID: empID})
+    UNWIND ${JSON.stringify(userObj.Cadets)} AS emailID
+    MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: emailID})
     MERGE (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (wave)
     RETURN candidate`;
   let count = 0;
@@ -1767,11 +1767,9 @@ let createNewSkill = function(skill, successCB, errorCB) {
 let getBillabilityStats = function(successCB, errorCB) {
   let session = driver.session();
   let query = `
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-    WITH Collect(DISTINCT split(candidate.Billability, 'since')[0])
-    AS BillabilityLabels UNWIND(BillabilityLabels) AS BL
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-    WHERE candidate.Billability CONTAINS BL
+    UNWIND (['Billable', 'Non-Billable (Internal)', 'Non-Billable (Customer)', 'Support', 'Free'])AS BL
+    OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+    WHERE candidate.Billability=~(BL + '.*')
     WITH CASE WHEN LENGTH(BL) > 0 THEN {label: BL, value: COLLECT(candidate)} END AS obj
     RETURN COLLECT(obj)
     `;
@@ -1782,6 +1780,51 @@ let getBillabilityStats = function(successCB, errorCB) {
     errorCB(err);
   })
 }
+
+//Billability
+let getTrainingStats = function(successCB, errorCB) {
+  let session = driver.session();
+  let query = `
+    OPTIONAL MATCH (chw:${graphConsts.NODE_WAVE} {Mode: 'Hybrid'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (cc1:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(chw.EndDate) < timestamp() WITH COLLECT(cc1) AS cc1
+    OPTIONAL MATCH (ciw:${graphConsts.NODE_WAVE} {Mode: 'Immersive'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (cc2:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(ciw.EndDate) < timestamp() WITH COLLECT(cc2) AS cc2, cc1 AS cc1
+    OPTIONAL MATCH (cow:${graphConsts.NODE_WAVE} {Mode: 'Online'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (cc3:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(cow.EndDate) < timestamp()
+    WITH [
+    {label: 'Hybrid', value: cc1},
+    {label: 'Immersive', value: cc2},
+    {label: 'Online', value: COLLECT(cc3)}
+    ] AS completed
+    OPTIONAL MATCH (ohw:${graphConsts.NODE_WAVE} {Mode: 'Hybrid'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (oc1:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(ohw.StartDate) < timestamp() AND toInteger(ohw.EndDate) > timestamp()
+    WITH COLLECT(oc1) AS oc1, completed AS completed
+    OPTIONAL MATCH (oiw:${graphConsts.NODE_WAVE} {Mode: 'Immersive'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (oc2:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(oiw.StartDate) < timestamp() AND toInteger(oiw.EndDate) > timestamp()
+    WITH COLLECT(oc2) AS oc2, oc1 AS oc1, completed AS completed
+    OPTIONAL MATCH (oow:${graphConsts.NODE_WAVE} {Mode: 'Online'})
+    <-[:${graphConsts.REL_BELONGS_TO}]- (oc3:${graphConsts.NODE_CANDIDATE})
+    WHERE toInteger(oow.StartDate) < timestamp() AND toInteger(oow.EndDate) > timestamp()
+    WITH [
+    {label: 'Hybrid', value: oc1},
+    {label: 'Immersive', value: oc2},
+    {label: 'Online', value: COLLECT(oc3)}
+    ] AS ongoing, completed AS completed
+    RETURN {completed: completed, ongoing: ongoing}
+    `;
+  session.run(query).then(function(resultObj) {
+    session.close();
+    successCB(resultObj.records[0]._fields[0]);
+  }).catch(function(err) {
+    errorCB(err);
+  })
+}
+
 
 module.exports = {
       addCadet,
@@ -1836,5 +1879,6 @@ module.exports = {
       getSkillSet,
       createNewSkill,
       getBillabilityStats,
+      getTrainingStats,
       ActivewaveCadets
   }

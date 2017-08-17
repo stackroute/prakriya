@@ -25,26 +25,26 @@ const styles = {
 	},
 	dialog: {
 		backgroundColor: '#DDDBF1',
-		borderBottom: '3px solid teal',
-		borderRight: '10px solid teal',
-		borderLeft: '10px solid teal'
+		borderBottom: '3px solid #C6D8D3',
+		borderRight: '10px solid #C6D8D3',
+		borderLeft: '10px solid #C6D8D3'
 	},
 	dialogTitle: {
 		fontWeight: 'bold',
-		backgroundColor: 'teal',
-		color: '#DDDBF1',
+		backgroundColor: '#C6D8D3',
+		color: '#202D3E',
 		textAlign: 'center'
 	},
 	actionsContainer: {
-		backgroundColor: 'teal',
+		backgroundColor: '#C6D8D3',
 		borderTop: '0px',
 		marginTop: '0px'
 	},
 	actionButton: {
-		backgroundColor: '#DDDBF1',
+		backgroundColor: '#202D3E',
 		width: '50%',
-		color: 'teal',
-		border: '1px solid teal',
+		color: '#C6D8D3',
+		border: '1px solid #C6D8D3',
 		height: '100%'
 	},
 	underlineDisabled: {

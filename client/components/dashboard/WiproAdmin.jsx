@@ -29,6 +29,8 @@ const styles = {
 }
 
 const file_types = ['ZCOP', 'ERD', 'Digi-Thon']
+const graphCategories = ['Billability', 'Trainings Completed', 'Trainings In Progress']
+const graphTypes = ['pieChart', 'discreteBarChart']
 const billingTags = ['Billable', 'Non-Billable (Internal)', 'Non-Billable (Customer)', 'Support', 'Free']
 
 export default class WiproAdmin extends React.Component {
@@ -51,6 +53,8 @@ export default class WiproAdmin extends React.Component {
       billingTags: [],
       billabilityStats: [],
       billabilityStatsWithoutCandidates: [],
+      trainingStats: [],
+      trainingStatsWithoutCandidates: []
     }
 
     this.handleFileChange = this.handleFileChange.bind(this);
@@ -62,10 +66,12 @@ export default class WiproAdmin extends React.Component {
     this.isADuplicateGraph = this.isADuplicateGraph.bind(this);
     this.handleGPropChange = this.handleGPropChange.bind(this);
     this.getBillabilityStats = this.getBillabilityStats.bind(this);
+    this.getTrainingStats = this.getTrainingStats.bind(this);
   }
 
   componentWillMount() {
     this.getBillabilityStats();
+    this.getTrainingStats();
   }
 
   handleFileChange(event, key, val) {
@@ -103,8 +109,8 @@ export default class WiproAdmin extends React.Component {
        if (err)
          console.log(err);
        else {
-         let billabilityStats = JSON.parse(JSON.stringify(res.body))
-         let billabilityStatsWithoutCandidates = res.body
+         let billabilityStats = JSON.parse(JSON.stringify(res.body));
+         let billabilityStatsWithoutCandidates = JSON.parse(JSON.stringify(res.body));
          billabilityStatsWithoutCandidates.map(function(element) {
            if(element.label == 'Billable') {
              element.color = '#F9CB40'
@@ -119,9 +125,39 @@ export default class WiproAdmin extends React.Component {
            }
            element.value = element.value.length
          })
+         console.log('Billing Stats: ', res.body)
          let newState = {
            billabilityStats: billabilityStats,
            billabilityStatsWithoutCandidates: billabilityStatsWithoutCandidates
+         };
+         th.setState(newState);
+       }
+     })
+  }
+
+  getTrainingStats() {
+     let th = this;
+     let colors = {Hybrid: '#F9CB40', Immersive: '#FF715B', Online: '#06D6A0'}
+     Request.get('/dashboard/trainingstats')
+     .set({'Authorization': localStorage.getItem('token')})
+     .end(function(err, res) {
+       if (err)
+         console.log(err);
+       else {
+         let trainingStats = JSON.parse(JSON.stringify(res.body));
+         let trainingStatsWithoutCandidates = JSON.parse(JSON.stringify(res.body));
+         trainingStatsWithoutCandidates.completed.map(function(element) {
+           element.color = colors[element.label];
+           element.value = element.value.length;
+         });
+         trainingStatsWithoutCandidates.ongoing.map(function(element) {
+           element.color = colors[element.label];
+           element.value = element.value.length;
+         });
+         console.log('Training Stats: ', res.body)
+         let newState = {
+           trainingStats: trainingStats,
+           trainingStatsWithoutCandidates: trainingStatsWithoutCandidates
          }
          th.setState(newState)
        }
@@ -132,7 +168,7 @@ export default class WiproAdmin extends React.Component {
     let th = this;
     let graphs = this.state.graphs;
     graphs.some(function(graph) {
-      if(graph.title == 'billability') {
+      if(graph.title == 'Billability') {
         let newData = th.state.billabilityStatsWithoutCandidates.filter(function(datum) {
           return (v.indexOf(datum.label) != -1)
         })
@@ -147,36 +183,28 @@ export default class WiproAdmin extends React.Component {
     let graph = {};
     let graphs = th.state.graphs;
     console.log('gTitle: ', th.state.gTitle)
-    if(th.state.gTitle == 'billability') {
+    if(th.state.gTitle == 'Billability') {
       graph.title = th.state.gTitle;
       graph.data = th.state.billabilityStatsWithoutCandidates;
         if(!th.isADuplicateGraph(th.state.gTitle)) graphs.push(graph);
         th.setState({
           graphs: graphs
         });
-    } else if(th.state.gTitle == 'training completed') {
+    } else if(th.state.gTitle == 'Trainings Completed') {
       graph.title = th.state.gTitle;
-      graph.data = [
-          {
-            label: 'Immersive',
-            value: 100,
-            color: "#F9CB40"
-          }, {
-            label: 'Hybrid',
-            value: 200,
-            color: "#FF715B"
-          }, {
-            label: 'Online',
-            value: 25,
-            color: "#06D6A0"
-          }
-        ];
+      graph.data = th.state.trainingStatsWithoutCandidates.completed;
+        if(!th.isADuplicateGraph(th.state.gTitle)) graphs.push(graph);
+        th.setState({
+          graphs: graphs
+        });
+    } else if(th.state.gTitle == 'Trainings In Progress') {
+      graph.title = th.state.gTitle;
+      graph.data = th.state.trainingStatsWithoutCandidates.ongoing;
         if(!th.isADuplicateGraph(th.state.gTitle)) graphs.push(graph);
         th.setState({
           graphs: graphs
         });
     }
-    console.log('graphs: ', th.state.graphs)
   }
 
   removeGraph(title) {
@@ -235,32 +263,32 @@ export default class WiproAdmin extends React.Component {
         </div>
       </Paper>
       <Paper  style={styles.paper}>
-        <div style={{border: '2px solid black'}}>
-          <div style={{display: 'inline-block', border: '1px solid silver', width: 250}}>
+        <div>
+          {/*<div style={{display: 'inline-block', width: 250}}>
             <SelectField
               value={this.state.gType || 'pieChart'}
               onChange={(e, k, v)=>{th.handleGPropChange('type', v)}}
               floatingLabelText="Graph Type">
               {
-                ['pieChart', 'barChart'].map(function(type, key) {
+                graphTypes.map(function(type, key) {
                   return <MenuItem key={key} value={type} primaryText={type.toUpperCase()}/>
                 })
               }
             </SelectField>
-          </div>
-          <div style={{display: 'inline-block', border: '1px solid silver', width: 250}}>
+          </div>*/}
+          <div style={{display: 'inline-block', width: 250}}>
             <SelectField
               value={this.state.gTitle}
               onChange={(e, k, v)=>{th.handleGPropChange('title', v)}}
               floatingLabelText="Target Field">
               {
-                ['billability', 'training completed', 'training in progress'].map(function(title, key) {
+                graphCategories.map(function(title, key) {
                   return <MenuItem key={key} value={title} primaryText={title.toUpperCase()}/>
                 })
               }
             </SelectField>
           </div>
-          <div style={{display: 'inline-block', border: '1px solid silver', width: 250}}>
+          <div style={{display: 'inline-block', width: 250}}>
             <RaisedButton label="Add Graph" primary={true} onClick={th.addGraph} style={{width: '100%'}}/>
           </div>
         </div>
@@ -281,7 +309,7 @@ export default class WiproAdmin extends React.Component {
                 </h3>
                 <div style={{width: '100%', height:'95%'}}>
                   {
-                      graph.title == 'billability' ?
+                      graph.title == 'Billability' ?
                       <SelectField
                         value={th.state.billingTags}
                         onChange={th.handleTagChange}
@@ -294,8 +322,7 @@ export default class WiproAdmin extends React.Component {
                         }
                       </SelectField> : ''
                   }
-                  <NVD3Chart
-                  id="pieChart" type="pieChart" tooltip={{enabled: true}}
+                  <NVD3Chart type="pieChart" tooltip={{enabled: true}}
                   datum={graph.data} x="label" y="value" height={500} width={500}/>
                 </div>
                 <RemoveIcon

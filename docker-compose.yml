@@ -72,5 +72,5 @@ services:
       - "1337:1337"
     volumes:
 #      - ./neo4jContainer/neo4j/plugins:/plugins
-      - ./neo4jContainer/neo4j/data:/data
+      - ../neo4jContainer/neo4j/data:/data
 #      - ./neo4jContainer/neo4j/import:/var/lib/neo4j/import

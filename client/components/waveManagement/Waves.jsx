@@ -13,7 +13,7 @@ const styles = {
 		marginBottom: 20
 	},
 	tabs: {
-		border: '2px solid teal',
+		border: '2px solid #202D3E',
 		width: '1250px'
 	},
 	tab: {
@@ -26,7 +26,7 @@ const styles = {
 		bottom: '5px'
 	},
 	tabItemContainer: {
-		backgroundColor: 'teal'
+		backgroundColor: '#202D3E'
 	},
 	masonry: {
 		width: '1200px'
@@ -229,7 +229,7 @@ export default class Waves extends React.Component {
 		if(tab === 'Ongoing') {
 			this.state.waves.map(function(wave, key) {
 				let today = Date.now();
-				if(new Date(wave.StartDate) <= today && new Date(wave.EndDate) >= today)
+				if(new Date(parseInt(wave.StartDate)) <= today && new Date(parseInt(wave.EndDate)) >= today)
 					filteredWaves.push(wave)
 			});
 			this.setState({
@@ -237,7 +237,7 @@ export default class Waves extends React.Component {
 			});
 		} else if(tab === 'Upcoming') {
 			this.state.waves.map(function(wave, key) {
-				if(new Date(wave.StartDate) > Date.now() || wave.StartDate === null)
+				if(new Date(parseInt(wave.StartDate)) > Date.now() || wave.StartDate === null)
 					filteredWaves.push(wave)
 			});
 			this.setState({
@@ -245,7 +245,7 @@ export default class Waves extends React.Component {
 			});
 		} else if(tab === 'Completed') {
 			this.state.waves.map(function(wave, key) {
-				if(new Date(wave.EndDate) < Date.now()  && wave.StartDate !== null)
+				if(new Date(parseInt(wave.EndDate)) < Date.now()  && wave.StartDate !== null)
 					filteredWaves.push(wave)
 			});
 			this.setState({
@@ -290,12 +290,12 @@ export default class Waves extends React.Component {
 					})
 				}
 			</Masonry> :
-			<h4 style={{textAlign: 'center', marginTop: '50px', color: 'teal'}}>NO WAVES TO DISPLAY</h4>
+			<h4 style={{textAlign: 'center', marginTop: '50px', color: '#202D3E'}}>NO WAVES TO DISPLAY</h4>
 		);
 		return (
 			<div>
 				<h2 style={app.heading}>Wave Management</h2>
-				<Grid><Row style={{height: '410px'}}><Tabs
+				<Grid><Row><Tabs
 					onChange={th.onTabChange}
 					value={th.state.tab}
 					style={styles.tabs}

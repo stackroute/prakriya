@@ -6,6 +6,7 @@ import DatePicker from 'material-ui/DatePicker';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
+import Snackbar from 'material-ui/Snackbar';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import app from '../../styles/app.json';
 import dialog from '../../styles/dialog.json';
@@ -17,6 +18,8 @@ export default class AddWave extends React.Component {
 		super(props);
 		this.state = {
 			open: false,
+			openSnackbar: false,
+			snackbarMsg: '',
 			cadets: [],
 			courses: [],
 			Mode: '',
@@ -44,6 +47,7 @@ export default class AddWave extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.validationSuccess = this.validationSuccess.bind(this)
 		this.resetFields = this.resetFields.bind(this)
+		this.handleSnackbarClose = this.handleSnackbarClose.bind(this)
 	}
 
 	componentWillMount() {
@@ -62,7 +66,7 @@ export default class AddWave extends React.Component {
 
 	handleOpen() {
 		this.setState({
-			open: true
+			open: true,
 		})
 	}
 
@@ -77,9 +81,21 @@ export default class AddWave extends React.Component {
 	}
 
 	handleModeChange(event, key, val) {
+		let check = true;
+		this.state.courses.map(function(course) {
+			if(val == course.Mode) {
+				check = false;
+			}
+		})
+		if(check) {
+			this.setState({
+				openSnackbar: true,
+				snackbarMsg: 'No courses available for this mode'
+			})
+		}
 		this.setState({
 			Mode: val,
-			disableCourse: false,
+			disableCourse: check,
 			ModeErrorText: ''
 		})
 	}
@@ -139,11 +155,11 @@ export default class AddWave extends React.Component {
 		wave.WaveID = this.state.Mode.substr(0, 1) + this.state.WaveNumber.split('-')[1];
 		wave.Mode = this.state.Mode;
 		wave.Course = this.state.Course;
-		wave.WaveNumber = this.state.WaveNumber
-		wave.Location = this.state.Location
-		wave.StartDate = this.state.StartDate
-		wave.EndDate = this.state.EndDate
-		wave.Cadets = this.state.selectedCadets
+		wave.WaveNumber = this.state.WaveNumber;
+		wave.Location = this.state.Location;
+		wave.StartDate = this.state.StartDate.getTime();
+		wave.EndDate = this.state.EndDate.getTime();
+		wave.Cadets = this.state.selectedCadets;
 		this.props.handleWaveAdd(wave)
 		this.resetFields()
 	}
@@ -189,6 +205,12 @@ export default class AddWave extends React.Component {
 			return true
 		}
 		return false
+	}
+
+	handleSnackbarClose() {
+		this.setState({
+			openSnackbar: false
+		})
 	}
 
 	render() {
@@ -324,10 +346,10 @@ export default class AddWave extends React.Component {
 						        insetChildren={true}
 						        checked={
 						        	th.state.selectedCadets &&
-						        	th.state.selectedCadets.includes(cadet.EmployeeID)
+						        	th.state.selectedCadets.includes(cadet.EmailID)
 						       	}
-						        value={cadet.EmployeeID}
-						        primaryText={`${cadet.EmployeeName} (${cadet.EmployeeID})`}
+						        value={cadet.EmailID}
+						        primaryText={`${cadet.EmployeeName} (${cadet.EmailID})`}
 						      />
 		        		)
 		        	})
@@ -338,6 +360,12 @@ export default class AddWave extends React.Component {
 				<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen} >
 		      <ContentAdd />
 		    </FloatingActionButton>
+		    <Snackbar
+          open={this.state.openSnackbar}
+          message={this.state.snackbarMsg}
+          autoHideDuration={4000}
+          onRequestClose={this.handleSnackbarClose}
+        />
 			</div>
 		)
 	}

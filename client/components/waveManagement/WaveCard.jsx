@@ -127,7 +127,8 @@ export default class WaveCard extends React.Component {
     })
   }
 
-  formatDate(date) {
+  formatDate(timestamp) {
+    let date = new Date(parseInt(timestamp));
     let dateString = Moment(date).format("MMM Do YYYY");
     if (dateString == 'Invalid date')
       return '';
@@ -184,15 +185,6 @@ export default class WaveCard extends React.Component {
   }
 
   closeUpdateDialog() {
-    // let cadet = [];
-    // if(this.state.addCadet)
-    // {
-    // 	cadet = this.props.wave.Cadets
-    // }
-    // else
-    // {
-    // 	cadet = this.state.wave.Cadets
-    // }
     this.setState({openDialog: false, addCadet: false})
   }
 
@@ -222,13 +214,13 @@ export default class WaveCard extends React.Component {
   }
   handleStartDateChange(event, date) {
     let wave = this.state.wave;
-    wave.StartDate = new Date(date);
-    wave.EndDate = new Date(date.setDate(date.getDate() + 84));
+    wave.StartDate = new Date(date).getTime();
+    wave.EndDate = new Date(date.setDate(date.getDate() + 84)).getTime();
     this.setState({wave: wave})
   }
   handleEndDateChange(event, date) {
     let wave = this.state.wave;
-    wave.EndDate = date;
+    wave.EndDate = date.getTime();
     this.setState({wave: wave})
   }
   handleCourseChange(event, key, val) {
@@ -262,9 +254,9 @@ export default class WaveCard extends React.Component {
   }
 
   render() {
-    let startdate = new Date(this.props.wave.StartDate);
+    let startdate = new Date(parseInt(this.props.wave.StartDate));
     startdate = startdate.getFullYear() + '/' + (startdate.getMonth() + 1) + '/' + startdate.getDate();
-    let enddate = new Date(this.props.wave.EndDate);
+    let enddate = new Date(parseInt(this.props.wave.EndDate));
     enddate = enddate.getFullYear() + '/' + (enddate.getMonth() + 1) + '/' + enddate.getDate();
     let th = this
     let title = 'CADETS'

@@ -9,6 +9,7 @@ import Request from 'superagent';
 import jsPDF from 'jspdf';
 import DownloadProfile from './DownloadProfile.jsx';
 import dialog from '../../styles/dialog.json';
+import {Link} from 'react-router';
 
 const styles = {
 	profilePic: {
@@ -108,7 +109,8 @@ export default class CandidateCard extends React.Component {
       />
     ]
 		return(
-			<div style={{width: '285px', display: 'inline-block', padding: '5px'}} key={this.props.key}>
+			<div style={{width: '285px', display: 'inline-block', padding: '5px', textDecoration: 'none'}} key={this.props.key}>
+				<Link to={'/candidate/' + this.props.candidate.EmployeeID} target="_blank">
 				<Card style={{border: '2px solid silver'}}>
 			    <CardMedia
 			    	style={styles.cardClick}
@@ -145,6 +147,7 @@ export default class CandidateCard extends React.Component {
 				    </IconButton>
 			    </CardActions>
 			  </Card>
+				</Link>
 			  <Dialog
           actions={deleteDialogActions}
 					actionsContainerStyle={dialog.actionsContainer}

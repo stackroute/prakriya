@@ -7,7 +7,7 @@ const styles = {
 		height: 100,
 		width: 100,
 		borderRadius: 75,
-		border: '5px solid teal'
+		border: '5px solid #202D3E'
 	}
 }
 export default class CandidateCard extends React.Component {
