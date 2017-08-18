@@ -96,7 +96,7 @@ ReactDOM.render(
 				<Route path="/attendance" component={Attendance} />
 				<Route path="/waves" component={() => <Wave user={user}/>} />
         <Route path="/candidate/:id" component={CandidateProfile} />
-        <Route path="/product/:versionname" component={ProductProfile} />
+        <Route path="/product/:name" component={ProductProfile} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

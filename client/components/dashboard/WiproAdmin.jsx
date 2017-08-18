@@ -238,10 +238,10 @@ export default class WiproAdmin extends React.Component {
 
     return (
       <div>
-        <Paper  style={styles.paperHidden}>
+        <Paper  style={styles.paper}>
           <WaveDetails /><br/>
         </Paper>
-        <Paper style={styles.paperHidden}>
+        <Paper style={styles.paper}>
           <div>
           <SelectField value={this.state.file} onChange={this.handleFileChange} floatingLabelText="Select File">
             {

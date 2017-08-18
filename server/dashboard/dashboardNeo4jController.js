@@ -987,6 +987,55 @@ let getProducts = function(successCB, errorCB) {
   });
 };
 
+let getProduct = function(productName, successCB, errorCB) {
+  let session = driver.session();
+  let query = `
+   MATCH (product:${graphConsts.NODE_PRODUCT} {name: '${productName}'})
+   -[:${graphConsts.REL_HAS}]-> (version:${graphConsts.NODE_VERSION})
+   WITH COLLECT(version) AS versions, product AS product
+   UNWIND versions AS version
+   MATCH (version:${graphConsts.NODE_VERSION} {name: version.name})
+   -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+   OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+   -[:${graphConsts.REL_WORKEDON} {version: version.name}]-> (product)
+   WITH COLLECT(DISTINCT skill.Name) AS skills, version AS version, product AS product,
+   CASE WHEN candidate IS NULL THEN
+     []
+     ELSE
+     COLLECT (DISTINCT {
+       EmployeeID: candidate.EmployeeID,
+       EmployeeName: candidate.EmployeeName,
+       Email: candidate.EmailID
+     })
+   END AS candidates
+   WITH COLLECT({
+     name: version.name,
+     description: version.description,
+     wave: version.wave,
+     members: candidates,
+     skills: skills,
+     addedBy: version.addedBy,
+     addedOn: version.addedOn,
+     updated: version.updated
+   }) AS versions, product AS product
+   RETURN {
+     product: product.name,
+     description: product.description,
+     version: versions
+   }`;
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+    if (err) {
+      errorCB('Error');
+    } else {
+      console.log(resultObj.records);
+      successCB(resultObj.records.length > 0 ? resultObj.records[0]._fields[0] : {});
+    }
+  }).catch(function(err) {
+    errorCB(err);
+  });
+};
+
 /**********************************************
 ************** Wave Management ****************
 **********************************************/
@@ -1880,5 +1929,6 @@ module.exports = {
       createNewSkill,
       getBillabilityStats,
       getTrainingStats,
-      ActivewaveCadets
+      ActivewaveCadets,
+      getProduct
   }

@@ -283,7 +283,7 @@ router.post('/ActivewaveCadets', auth.accessedBy(['WAVES']), function (req, res)
 router.get('/projects', auth.accessedBy(['PROJECTS']), function (req, res) {
     try{
       dashboardNeo4jController.getProducts(function (projects) {
-      res.status(201).json(projects);
+      res.status(200).json(projects);
     }, function (err) {
       logger.error('Get All Projects Error: ', err);
       res.status(500).json({error: 'Cannot get all projects from db...!'});
@@ -331,6 +331,22 @@ router.post('/updateproject', auth.accessedBy(['PROJECTS']), function (req, res)
         res.status(500).json({error: 'Cannot update the project...!'});
       }
     );
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
+// Get a single project with name
+router.get('/project/:name', auth.accessedBy(['PROJECTS']), function (req, res) {
+    try{
+      dashboardNeo4jController.getProduct(req.params.name, function (project) {
+      res.status(200).json({product: project});
+    }, function (err) {
+      logger.error('Get Project Error: ', err);
+      res.status(500).json({error: 'Cannot get project from the db...!'});
+    });
   } catch(err) {
     res.status(500).json({
       error: 'Internal error occurred, please report...!'
