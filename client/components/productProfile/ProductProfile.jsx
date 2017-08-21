@@ -98,7 +98,7 @@ export default class ProductProfile extends React.Component {
 				}
 				{
 					th.state.version != null &&
-					<div style={{width: '80%', margin: 'auto', border: '2px solid #202D3E'}}>
+					<div>
 						<div>
 							<h3 style={{textAlign: 'center'}}>
 								{th.props.routeParams.name.toUpperCase()}
@@ -110,7 +110,7 @@ export default class ProductProfile extends React.Component {
 						<div style={styles.container}>
 							<div>
 								<h4>Description</h4>
-								<p style={{textIndent: '70px'}}>{th.state.version.description}</p>
+								<p style={{textIndent: '70px', textAlign: 'justify'}}>{th.state.version.description}</p>
 							</div>
 							<div>
 								<h4>Skills</h4>
@@ -146,7 +146,7 @@ export default class ProductProfile extends React.Component {
 			                  j = j + 1
 			                  cadetList[j] = []
 			                }
-			                cadetList[j].push(<Col md={2}><Link to={'/candidate/' + member.EmployeeID} target="_blank" style = {{textDecoration: 'none', color: '#202D3E'}}>
+			                cadetList[j].push(<Col md={2}><Link to={'/candidate/' + member.EmployeeID} target="_blank" style = {{textDecoration: 'none', color: '#8F4A8B'}}>
 										   {key + 1}. {member.EmployeeName}</Link></Col>)
 										})
 									}
