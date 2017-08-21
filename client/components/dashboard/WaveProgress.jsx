@@ -11,7 +11,7 @@ import Moment from 'moment';
 import HorizontalTimeline from 'react-horizontal-timeline';
 import Request from 'superagent';
 
-const VALUES = []
+let VALUES = []
 
 export default class App extends React.Component {
   constructor(props) {
@@ -44,19 +44,28 @@ export default class App extends React.Component {
 
   componentWillMount() {
     let th = this;
-    this.fetchAssessments();
-    this.fetchSessions();
-    for (let d = Moment(th.props.wave.StartDate); d <= Moment(th.props.wave.EndDate); d.add('days', 7)) {
+    VALUES = [];
+    for (let d = Moment(new Date(parseInt(th.props.wave.StartDate))); d <= Moment(new Date(parseInt(th.props.wave.EndDate))); d.add('days', 7)) {
       VALUES.push(th.format(d));
     }
+    let value = 0;
+    VALUES.map(function (date, key) {
+      if(key !== VALUES.length - 1) {
+        if(new Date(date) <= new Date() && new Date(VALUES[key + 1]) > new Date()) {
+          value = key;
+        }
+      }
+    })
+    this.fetchAssessments(value);
+    this.fetchSessions();
   }
 
-  fetchAssessments() {
+  fetchAssessments(value) {
       let th = this
       let wave = th.props.wave.WaveID;
       let course = th.props.wave.CourseName
       Request.get(`/dashboard/assessment?waveid=${wave}&course=${course}`).set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
-        th.setState({Assignments: res.body.data})
+        th.setState({Assignments: res.body.data, value: value})
       })
   }
 
