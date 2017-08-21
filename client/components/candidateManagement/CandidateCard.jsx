@@ -20,9 +20,6 @@ const styles = {
 	actions: {
 		textAlign: 'right'
 	},
-	cardClick: {
-		cursor: 'pointer'
-	},
 	cardTitle: {
 		paddingBottom: 0
 	}
@@ -128,7 +125,6 @@ export default class CandidateCard extends React.Component {
 			<div style={{width: '285px', display: 'inline-block', padding: '5px', textDecoration: 'none'}} key={this.props.key}>
 				<Card style={{border: '2px solid silver'}}>
 			    <CardMedia
-			    	style={styles.cardClick}
 			      overlay={
 			      	<CardTitle
 			      		title={this.props.candidate.EmployeeName}
@@ -143,6 +139,7 @@ export default class CandidateCard extends React.Component {
 				    	title={this.props.candidate.EmployeeID}
 				    	subtitle={this.props.candidate.CareerBand}
 				    	style={styles.cardTitle}
+							subtitleStyle={{cursor: 'default', textDecoration: 'none'}}
 				    />
 			    </Link>
 			    <CardActions style={styles.actions}>
@@ -158,9 +155,10 @@ export default class CandidateCard extends React.Component {
 								zip = {false}
 				      />
 				    </IconButton>
-				    <IconButton 
-				    	tooltip="Select Candidate" 
+				    <IconButton
+				    	tooltip="Select Candidate"
 				    	onTouchTap={this.selectCandidate}
+							style={{marginRight: '55px'}}
 				   	>
 				    	<SelectIcon color={this.state.color} />
 				    </IconButton>
