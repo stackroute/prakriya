@@ -1046,7 +1046,7 @@ let getProductVersion = function(versionName, successCB, errorCB) {
     CASE WHEN candidate IS NULL THEN
      []
      ELSE
-     COLLECT ({
+     COLLECT (DISTINCT {
        EmployeeID: candidate.EmployeeID,
        EmployeeName: candidate.EmployeeName,
        Email: candidate.EmailID
