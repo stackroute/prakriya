@@ -38,7 +38,6 @@ export default class CandidateCard extends React.Component {
 		}
 		this.getProfilePic = this.getProfilePic.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
-		this.handleCardClick = this.handleCardClick.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 	}
@@ -77,9 +76,6 @@ export default class CandidateCard extends React.Component {
 		    }
 			})
 	}
-	handleCardClick() {
-		this.props.handleCardClick(this.props.candidate);
-	}
 	openDeleteDialog() {
 		this.setState({
 			showDeleteDialog: true
@@ -109,12 +105,11 @@ export default class CandidateCard extends React.Component {
       />
     ]
 		return(
-			<div style={{width: '285px', display: 'inline-block', padding: '5px', textDecoration: 'none'}} key={this.props.key}>
-				<Link to={'/candidate/' + this.props.candidate.EmployeeID} target="_blank">
+			<div style={{width: '285px', display: 'inline-block', padding: '5px'}} key={this.props.key}>
+				<Link to={'/candidate/' + this.props.candidate.EmployeeID} target="_blank" style = {{textDecoration: 'none'}}>
 				<Card style={{border: '2px solid silver'}}>
 			    <CardMedia
 			    	style={styles.cardClick}
-			    	onClick={this.handleCardClick}
 			      overlay={
 			      	<CardTitle
 			      		title={this.props.candidate.EmployeeName}
