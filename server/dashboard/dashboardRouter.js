@@ -1358,6 +1358,22 @@ router.get('/waves', auth.accessedBy(['CANDIDATES', 'WAVES', 'COURSES']), functi
     });
   }
 });
+//getWaveswithCourseDuration
+router.get('/wavesDuration', auth.accessedBy(['CANDIDATES', 'WAVES', 'COURSES']), function (req, res) {
+  try{
+    dashboardNeo4jController.getWaveswithDuration(function (waves) {
+      res.status(201).json(waves);
+    }, function (err) {
+      logger.error('Get All Waves Error: ', err);
+      res.status(500).json({error: 'Cannot get all waves from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get All Waves Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
 
 // Get all cadets of a particular wave
 router.post('/cadetsofwave', auth.accessedBy(['PROJECTS', 'WAVES']), function (req, res) {
