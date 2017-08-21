@@ -1491,6 +1491,18 @@ let getWaveOfCadet = function(EmailID, successCB, errorCB) {
   })
 }
 
+let getCadetAndWave = function(EmpID, successCB, errorCB) {
+  let query = `MATCH (w:${graphConsts.NODE_WAVE})<-[:${graphConsts.REL_BELONGS_TO}]-(c:${graphConsts.NODE_CANDIDATE}{EmployeeID:'${EmpID}'}) return c,w`
+  let session = driver.session();
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+    let candidates = resultObj.records[0]._fields[0].properties;
+    candidates.Wave = resultObj.records[0]._fields[1].properties;
+    successCB(candidates);
+  })
+}
+
+
 //evaluation
 let getCadetsAndWave = function(successCB, errorCB) {
   let session = driver.session();
@@ -1910,6 +1922,7 @@ module.exports = {
       mapAssessmentTrack,
       assessmentsandcandidates,
       getWaveOfCadet,
+      getCadetAndWave,
       getSessionForWave,
       getCadetsAndWave,
       getBillability,
