@@ -1046,7 +1046,7 @@ let getProductVersion = function(versionName, successCB, errorCB) {
     CASE WHEN candidate IS NULL THEN
      []
      ELSE
-     COLLECT ({
+     COLLECT (DISTINCT {
        EmployeeID: candidate.EmployeeID,
        EmployeeName: candidate.EmployeeName,
        Email: candidate.EmailID
@@ -1060,7 +1060,10 @@ let getProductVersion = function(versionName, successCB, errorCB) {
      skills: skills,
      addedBy: version.addedBy,
      addedOn: version.addedOn,
-     updated: version.updated
+     updated: version.updated,
+     gitURL: version.gitURL,
+     videoURL: version.videoURL,
+     presentationURL: version.presentationURL
     }
   `;
   session.run(query).then(function(resultObj, err) {

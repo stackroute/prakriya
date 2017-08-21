@@ -79,6 +79,8 @@ ReactDOM.render(
 		<Router history={hashHistory}>
 			<Route path="/" component={Welcome} onEnter={alreadyLoggedIn} />
 			<Route path="/login" component={Login} onEnter={alreadyLoggedIn} />
+      <Route path="/product/:name" component={ProductProfile} />
+      <Route path="/candidate/:id" component={CandidateProfile} />
 			<Route path="/app" component={(props)=><App user={user} children={props.children}/>} onEnter={requireAuth} >
 				<IndexRoute component={() => <Dashboard user={user} />} />
 				<Route path="/roles" component={Roles} />
@@ -95,8 +97,6 @@ ReactDOM.render(
 				<Route path="/evaluationforms" component={EvaluationForms} />
 				<Route path="/attendance" component={Attendance} />
 				<Route path="/waves" component={() => <Wave user={user}/>} />
-        <Route path="/candidate/:id" component={CandidateProfile} />
-        <Route path="/product/:name" component={ProductProfile} />
 			</Route>
 		</Router>
 	</MuiThemeProvider>,

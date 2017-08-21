@@ -126,9 +126,8 @@ export default class ChangePassword extends React.Component {
 					 <br /><br />
 					 <RaisedButton
 					 	label="Change Password"
-						primary={true}
 						onClick={this.changePassword}
-						style={{width: '100%'}} />
+						style={{width: '100%', backgroundColor: '#202D3E'}} />
 						<br /><br />
 					 <div style={{color: 'red', fontWeight: 'bold', textAlign: 'center'}}>{this.state.errMsg}</div>
 				 </CardText>

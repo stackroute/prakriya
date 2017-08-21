@@ -12,6 +12,10 @@ const styles = {
 	iconWrapper : {
 		float: 'right'
 	},
+	container: {
+		marginTop: 10,
+		marginBottom: 20
+	},
 	actionIcon: {
 		marginRight: 15,
 		cursor: 'pointer'
