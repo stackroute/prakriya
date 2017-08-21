@@ -41,7 +41,6 @@ export default class CandidateCard extends React.Component {
 		this.getProfilePic = this.getProfilePic.bind(this);
 		this.selectCandidate = this.selectCandidate.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
-		this.handleCardClick = this.handleCardClick.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
 	}
@@ -130,7 +129,6 @@ export default class CandidateCard extends React.Component {
 				<Card style={{border: '2px solid silver'}}>
 			    <CardMedia
 			    	style={styles.cardClick}
-			    	onClick={this.handleCardClick}
 			      overlay={
 			      	<CardTitle
 			      		title={this.props.candidate.EmployeeName}

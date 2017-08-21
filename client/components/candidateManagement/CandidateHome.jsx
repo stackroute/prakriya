@@ -3,13 +3,10 @@ import FlatButton from 'material-ui/FlatButton';
 import {Card, CardMedia} from 'material-ui/Card';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import Dialog from 'material-ui/Dialog';
-import DatePicker from 'material-ui/DatePicker';
 import {grey50} from 'material-ui/styles/colors';
 import Request from 'superagent';
 import Moment from 'moment';
-import PerformanceMatrix from './PerformanceMatrix.jsx';
 import DownloadProfile from './DownloadProfile.jsx';
 
 const styles = {

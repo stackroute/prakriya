@@ -207,7 +207,7 @@ export default class ProjectCard extends React.Component {
     return (
       <div>
       <Link
-        to={'/product/' + this.props.project.product}
+        to={'/product/' + this.state.versionName[th.state.selectedVersionIndex]}
         target="_blank"
         style={{textDecoration: 'none'}}
       >

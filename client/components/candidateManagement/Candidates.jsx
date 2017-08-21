@@ -485,7 +485,6 @@ export default class Candidates extends React.Component {
 										return (
 											<CandidateCard
 												candidate={candidate}
-												handleCardClick={th.candidateView}
 												handleDelete={th.deleteCandidate}
 												key={key}
 												role={th.state.role}
