@@ -1348,7 +1348,29 @@ let getWaves = function(successCB, errorCB) {
     }
   });
 };
-
+//get waves with course duration
+let getWaveswithDuration = function(successCB, errorCB) {
+  let query = `MATCH(w:${graphConsts.NODE_WAVE})-[:${graphConsts.REL_HAS}]->(c:${graphConsts.NODE_COURSE})
+  RETURN w,c`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      let waves = []
+      resultObj.records.map(function(res) {
+        logger.debug(res._fields[1].properties)
+        let waveObj = res._fields[0].properties;
+        waveObj.Course = res._fields[1].properties.ID;
+        waveObj.Duration = res._fields[1].properties.Duration.low;
+        waveObj.Cadets = res._fields[2];
+        waves.push(waveObj);
+      })
+      successCB(waves);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
 // Get course for a given waveID
 let getCourseForWave = function (waveID, course, successCB, errorCB) {
   let query = `
@@ -1979,6 +2001,7 @@ module.exports = {
       deleteSession,
       getCourseForWave,
       removeCadetFromWave,
+      getWaveswithDuration,
       getEvaluationSkills,
       updateRating,
       getSkillSet,
