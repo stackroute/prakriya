@@ -140,30 +140,33 @@ export default class Projects extends React.Component {
 			<div>
 				<h2 style={styles.heading}>Product Management</h2>
 				<ProjectDialog addProject={this.addProject} dialogTitle={'ADD PRODUCT'}/>
-				<Grid><Row md={10}>
+				{
+					this.state.projects.length > 0 ?
+					<Grid><Row md={10}>
 						<Masonry
 							className={'my-class'}
 							elementType={'ul'}
 							options={masonryOptions}
 							style={styles.masonry}
 						>
-								{
-									this.state.projects.length > 0 ?
-									th.state.projects.map(function (project, key) {
-											return (
-												<ProjectCard
-													key={key}
-													project={project}
-													handleUpdate={th.handleUpdate}
-													handleDelete={th.handleDelete}
-													handleAddVersion={th.addVersion}
-													bgColor={backgroundColors[key%4]}
-												/>
-											)
-									}):
-									<span>No projects to display</span>
-								}
-						</Masonry></Row></Grid>
+						{
+							th.state.projects.map(function (project, key) {
+								return (
+									<ProjectCard
+										key={key}
+										project={project}
+										handleUpdate={th.handleUpdate}
+										handleDelete={th.handleDelete}
+										handleAddVersion={th.addVersion}
+										bgColor={backgroundColors[key%4]}
+									/>
+								)
+							})
+						}
+						</Masonry>
+					</Row></Grid> :
+					<h4 style={{textAlign: 'center', width: '100%'}}>NO PROJECTS TO DISPLAY</h4>
+				}
 			</div>
 		)
 	}

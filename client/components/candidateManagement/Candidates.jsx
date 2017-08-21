@@ -17,10 +17,6 @@ import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 
 const styles = {
-	filterBody: {
-		border: '1px solid #555',
-		background: '#fff'
-	},
 	header: {
 		// backgroundColor: '#eeeeee',
 		// border: '2px solid silver',
@@ -33,7 +29,7 @@ const styles = {
 	},
 	name: {
 		textAlign: 'center',
-		color: 'teal'
+		color: '#202D3E'
 	},
 	filters: {
 		// border: '2px solid silver',
@@ -352,9 +348,9 @@ export default class Candidates extends React.Component {
 						<DownloadProfile
 							color={lightBlack}
 							candidate={
-								th.state.selectedCandidates.length > 0 ? 
+								th.state.selectedCandidates.length > 0 ?
 								th.state.selectedCandidates :
-								th.state.filteredCandidates 
+								th.state.filteredCandidates
 							}
 							imageURL={null}
 							role={this.state.role}
@@ -367,7 +363,7 @@ export default class Candidates extends React.Component {
 					<h1 style={app.heading}>Candidate Management</h1>
 					<Grid>
 						<Row>
-							<Col md={3} style={styles.filterBody}>
+							<Col md={3}>
 								<div style={styles.header}>
 									<h3 style={styles.name}>... FILTERS ...</h3>
 									<div>
@@ -389,7 +385,7 @@ export default class Candidates extends React.Component {
 												textAlign: 'center',
 												borderRadius: '5px',
 												color: 'blue',
-												textDecoration: 'underline'
+												fontWeight: 'bold'
 											}}
 											onTouchTap={th.resetFilters}
 										>
@@ -419,7 +415,7 @@ export default class Candidates extends React.Component {
 														style={{border: '2px solid grey'}}
 														onRequestDelete={()=>th.removeFilter(filter)}
 													>
-														<span style={{color: 'teal'}}>{filter}: {val}</span>
+														<span style={{color: '#202D3E'}}>{filter}: {val}</span>
 													</Chip>
 												)
 											}

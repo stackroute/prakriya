@@ -305,6 +305,7 @@ export default class Courses extends React.Component {
 				<Grid style={styles.grid}>
 					<Row>
 						{
+							this.state.courses.length > 0 ?
 							this.state.courses.map(function (course, key) {
 								if(!course.Removed)
 								{
@@ -325,7 +326,8 @@ export default class Courses extends React.Component {
 											</Col>
 											)
 								}
-							})
+							}) :
+							<h4 style={{textAlign: 'center', width: '100%'}}>NO COURSES TO DISPLAY</h4>
 						}
 					</Row>
 				</Grid>

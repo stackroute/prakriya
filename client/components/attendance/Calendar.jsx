@@ -144,9 +144,9 @@ export default class Attendance extends React.Component {
     let dayName = [];
     let name = [];
     if (th.state.waveObject != null) {
-      let now = Moment(th.state.waveObject.EndDate);
+      let now = Moment(new Date(parseInt(th.state.waveObject.EndDate, 10)));
       let daysOfYear = [];
-      let day = new Date(th.state.waveObject.StartDate).getDay();
+      let day = new Date(parseInt(th.state.waveObject.StartDate, 10)).getDay();
       dayName = [ <TableHeaderColumn><b style={{fontSize:'20px'}}  disabled='true'>Sunday</b></TableHeaderColumn>,
               <TableHeaderColumn><b style={{fontSize:'20px'}}>Monday</b></TableHeaderColumn>,
               <TableHeaderColumn><b style={{fontSize:'20px'}}>Tuesday</b></TableHeaderColumn>,
@@ -164,7 +164,7 @@ export default class Attendance extends React.Component {
           i++;
         }
       }
-      for (let d = Moment(th.state.waveObject.StartDate); d <= now; d.add('days',1)) {
+      for (let d = Moment(new Date(parseInt(th.state.waveObject.StartDate, 10))); d <= now; d.add('days',1)) {
         let color = 'white';
         if(th.state.Cadet[0] != undefined) {
         th.state.Cadet[0].DaysPresent.map(function(date){
