@@ -55,6 +55,7 @@ export default class Candidates extends React.Component {
 			Billability: [],
 			filtersCount: 0,
 			filteredCandidates: [],
+			selectedCandidates: [],
 			imageURL: [],
 			appliedFilters: {
 				EmployeeID: '',
@@ -79,6 +80,7 @@ export default class Candidates extends React.Component {
 		this.removeFilter = this.removeFilter.bind(this);
 		this.hideSnackbar = this.hideSnackbar.bind(this);
 		this.getFilteredCandidates = this.getFilteredCandidates.bind(this);
+		this.updateSelectedList = this.updateSelectedList.bind(this);
 		this.openSnackbar = this.openSnackbar.bind(this);
 		this.resetFilters = this.resetFilters.bind(this);
 		this.getRole = this.getRole.bind(this);
@@ -300,6 +302,26 @@ export default class Candidates extends React.Component {
 			})
 	}
 
+	updateSelectedList(status, cadet) {
+		let cadets = this.state.selectedCandidates;
+		if(status) {
+			cadets.push(cadet);
+		}
+		else {
+			let newCadets = []
+			cadets.map(function(cadetObj) {
+				if(cadetObj.EmailID != cadet.EmailID) {
+					newCadets.push(cadetObj);
+				}
+			})
+			cadets = newCadets;
+		}
+		console.log('Selected cadets', cadets)
+		this.setState({
+			selectedCandidates: cadets
+		})
+	}
+
 	resetFilters() {
 		let th = this;
 		console.log('here');
@@ -329,7 +351,11 @@ export default class Candidates extends React.Component {
 					<FloatingActionButton mini={true} style={app.fab2} onTouchTap={this.handleOpen} title="Download All Profiles">
 						<DownloadProfile
 							color={lightBlack}
-							candidate={th.state.filteredCandidates}
+							candidate={
+								th.state.selectedCandidates.length > 0 ? 
+								th.state.selectedCandidates :
+								th.state.filteredCandidates 
+							}
 							imageURL={null}
 							role={this.state.role}
 							zip = {true}
@@ -457,14 +483,15 @@ export default class Candidates extends React.Component {
 								{
 									this.state.filteredCandidates.map(function(candidate, key) {
 										return (
-													<CandidateCard
-														candidate={candidate}
-														handleCardClick={th.candidateView}
-														handleDelete={th.deleteCandidate}
-														key={key}
-														role={th.state.role}
-													/>
-											)
+											<CandidateCard
+												candidate={candidate}
+												handleCardClick={th.candidateView}
+												handleDelete={th.deleteCandidate}
+												key={key}
+												role={th.state.role}
+												updateSelected={th.updateSelectedList}
+											/>
+										)
 									})
 								}
 							</Col>
