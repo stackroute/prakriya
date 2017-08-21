@@ -7,6 +7,7 @@ import IconButton from 'material-ui/IconButton';
 import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
 import KeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
 import WaveProgress from './WaveProgress.jsx';
+import SRAdminGraph from './SRAdminGraph.jsx';
 import Toggle from 'material-ui/Toggle';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
@@ -266,6 +267,7 @@ handleClose(){
 										wave = {wave}
 									/>
 								}
+								
 							</div>
 						)
 					})
