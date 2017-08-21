@@ -34,7 +34,7 @@ const backgroundColors = [
   	}
   }
 
-const VALUES = []
+let VALUES = []
 
 export default class Attendance extends React.Component {
   constructor(props) {
@@ -97,22 +97,31 @@ export default class Attendance extends React.Component {
 
   getCadet() {
     let th = this;
+    let value = 0;
     Request.get('/dashboard/getwaveofcadet').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-        console.log(res.body);
-        for (let d = Moment(res.body.data.Wave.StartDate); d <= Moment(res.body.data.Wave.EndDate); d.add('days', 7)) {
+        VALUES = [];
+        for (let d = Moment(new Date(parseInt(res.body.data.Wave.StartDate, 10))); d <= Moment(new Date(parseInt(res.body.data.Wave.EndDate, 10))); d.add('days', 7)) {
           VALUES.push(th.formatProgress(d));
         }
+        VALUES.map(function (date, key) {
+          if(key !== VALUES.length - 1) {
+            if(new Date(date) <= new Date() && new Date(VALUES[key + 1]) > new Date()) {
+              value = key;
+            }
+          }
+        })
         th.setState({
             CadetEmail: res.body.data.EmailID,
             Billability: res.body.data.Billability,
             AssetID: res.body.data.AssetID,
-            startDate: res.body.data.Wave.StartDate,
-            endDate: res.body.data.Wave.EndDate,
+            startDate: new Date(parseInt(res.body.data.Wave.StartDate, 10)),
+            endDate: new Date(parseInt(res.body.data.Wave.EndDate, 10)),
             Wave: res.body.data.Wave.WaveID,
-            Course: res.body.data.Wave.CourseName
+            Course: res.body.data.Wave.CourseName,
+            value: value
           })
 
         th.fetchAssessments();
@@ -251,7 +260,8 @@ export default class Attendance extends React.Component {
     let week = [];
     let dayName = [];
     let name = [];
-    let timelineSpan = 12
+    let timelineSpan = 12;
+    console.log(VALUES)
     if (th.state.startDate != '') {
       let now = Moment(th.state.endDate);
       let daysOfYear = [];

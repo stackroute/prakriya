@@ -75,10 +75,11 @@ export default class WaveDetails extends React.Component {
 					let activeWaves = []
 					console.log(res.body)
 					res.body.map(function(wave, key) {
-						let sdate = new Date(wave.StartDate);
-						let edate = new Date(wave.EndDate);
+						let sdate = new Date(parseInt(wave.StartDate, 10));
+						let edate = new Date(parseInt(wave.EndDate, 10));
 						if(sdate < Date.now() && edate > Date.now())
 							activeWaves.push(wave);
+							console.log('yes');
 							toggleArray.push('none');
 					})
 					th.setState({
@@ -116,8 +117,8 @@ export default class WaveDetails extends React.Component {
 
 
 	showProgress(waveObj) {
-		let sdate = new Date(waveObj.StartDate);
-		let edate = new Date(waveObj.EndDate);
+		let sdate = new Date(parseInt(waveObj.StartDate, 10));
+		let edate = new Date(parseInt(waveObj.EndDate, 10));
 		let total = edate - sdate;
 		let prog = Date.now() - sdate;
 		return Math.round(prog*100/total);
@@ -254,9 +255,9 @@ handleClose(){
 										key={key}
 										style={{display: showWave, marginTop: '10px', marginBottom: '5px'}}
 									/>
-									<span style={{display: showWave}}>{th.formatDate(wave.StartDate)}</span>
+									<span style={{display: showWave}}>{th.formatDate(new Date(parseInt(wave.StartDate, 10)))}</span>
 									<span style={{float: 'right', display: showWave}}>
-										{th.formatDate(wave.EndDate)}
+										{th.formatDate(new Date(parseInt(wave.EndDate, 10)))}
 									</span>
 								{
 									th.state.waveDetail !== '' &&
@@ -267,7 +268,7 @@ handleClose(){
 										wave = {wave}
 									/>
 								}
-								
+
 							</div>
 						)
 					})
