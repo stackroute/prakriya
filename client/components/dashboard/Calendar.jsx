@@ -71,8 +71,8 @@ export default class Attendance extends React.Component {
       onCalendarLabel: 'show details',
 			onSkillLabel: 'show details',
 			onSkillDiv: 'none',
-      onTimelineLabel: 'show details',
-			onTimelineDiv: 'none'
+      onTimelineLabel: 'hide details',
+			onTimelineDiv: 'block'
     }
     this.formatDate = this.formatDate.bind(this);
     this.format = this.format.bind(this);
@@ -397,6 +397,7 @@ export default class Attendance extends React.Component {
           <div style={{float:'right'}}><Toggle
             onToggle={th.toggleTimeline}
             title={this.state.onTimelineLabel}
+            defaultToggled = {true}
             style={{marginRight: '0px'}}
           /></div>
           <h3>Wave Details</h3>
