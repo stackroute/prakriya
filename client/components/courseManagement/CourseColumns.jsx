@@ -152,7 +152,7 @@ export default class CourseColumns extends React.Component {
           </div>
           <FlatButton
             label="Add One More Field"
-            primary
+            labelStyle={{color: '#202D3E'}}
             disabled={this.state.addFeedbackFieldDisabled}
             onClick={this.addFeedbackField} />
         </Dialog>

@@ -13,6 +13,7 @@ import Dialog from 'material-ui/Dialog';
 import Request from 'superagent';
 import app from '../../styles/app.json';
 import dialog from '../../styles/dialog.json';
+import select from '../../styles/select.json';
 
 export default class AddUser extends React.Component {
 
@@ -317,9 +318,9 @@ export default class AddUser extends React.Component {
                 floatingLabelStyle={app.mandatoryField}
   			    		value={this.state.role}
                 style={{width: '50%', border: '2px solid white', boxSizing: 'border-box', padding: '5px'}}
-    						menuItemStyle={{borderTop: '1px solid teal', borderBottom: '1px solid teal', backgroundColor: '#DDDBF1'}}
-    						listStyle={{backgroundColor: 'teal', borderLeft: '5px solid teal', borderRight: '5px solid teal'}}
-    						selectedMenuItemStyle={{color: 'black', fontWeight: 'bold'}}
+    						menuItemStyle={select.menu}
+    						listStyle={select.list}
+    						selectedMenuItemStyle={select.selectedMenu}
     						maxHeight={600}
 				      >
 				        {
