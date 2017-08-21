@@ -10,7 +10,7 @@ import {Card, CardMedia} from 'material-ui/Card';
 const styles = {
 	container: {
 		height: '100%',
-		background: 'url("../assets/images/bg1.jpg")',
+		// background: 'url("../assets/images/bg1.jpg")',
 		color: '#bbb'
 	},
 	body: {
