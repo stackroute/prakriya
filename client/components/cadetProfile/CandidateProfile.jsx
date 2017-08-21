@@ -61,7 +61,6 @@ export default class CandidateProfile extends React.Component {
 	}
 
 	getCandidate(EmpID) {
-		console.log(EmpID);
 		let th = this;
     Request
 			.post(`/dashboard/getcadetandwave`)
@@ -71,15 +70,14 @@ export default class CandidateProfile extends React.Component {
       if (err)
         console.log(err);
       else {
-				console.log(res.body);
 				let cadet = res.body;
-				cadet.Wave = res.body.Wave.WaveID;
+				cadet.Mode = cadet.Wave.Mode;
+				cadet.startDate = cadet.Wave.StartDate;
+				cadet.endDate = cadet.Wave.EndDate;
+				cadet.Wave = cadet.Wave.WaveID;
+				console.log(cadet);
 				th.setState({
-						cadet: cadet,
-						Wave: res.body.Wave.WaveID,
-						mode: res.body.Wave.Mode,
-						startDate: res.body.Wave.StartDate,
-						endDate: res.body.Wave.EndDate
+						cadet: cadet
 					});
 				th.getProfilePic(res.	body.EmailID)
       }
@@ -179,9 +177,9 @@ export default class CandidateProfile extends React.Component {
 										<h4>Training Details</h4>
 										<p style={styles.details}>
 											Wave: {this.state.cadet.Wave}<br/>
-											Mode: {this.state.mode}<br/>
-											Start Date: {this.formatDate(this.state.startDate)}<br/>
-											End Date: {this.formatDate(this.state.endDate)}
+											Mode: {this.state.cadet.Mode}<br/>
+											Start Date: {this.formatDate(new Date(parseInt(this.state.cadet.startDate, 10)))}<br/>
+											End Date: {this.formatDate(new Date(parseInt(this.state.cadet.endDate, 10)))}
 										</p>
 										{
 											<div>
