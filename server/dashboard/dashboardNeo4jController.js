@@ -1084,35 +1084,37 @@ let getProductVersion = function(versionName, successCB, errorCB) {
 
 // Add a wave
 let addWave = function(waveObj, successCB, errorCB) {
-  let userObj = {};
-  userObj.WaveID = waveObj.WaveID || '',
-  userObj.WaveNumber = waveObj.WaveNumber || '',
-  userObj.Mode = waveObj.Mode || '',
-  userObj.Location = waveObj.Location || '',
-  userObj.StartDate = waveObj.StartDate || '',
-  userObj.EndDate = waveObj.EndDate || '',
-  userObj.Sessions = waveObj.Sessions || '',
-  userObj.Cadets = waveObj.Cadets || '',
-  userObj.Course = waveObj.Course || '';
+  let waveObject = {};
+  waveObject.WaveID = waveObj.WaveID || '',
+  waveObject.WaveNumber = waveObj.WaveNumber || '',
+  waveObject.Mode = waveObj.Mode || '',
+  waveObject.Location = waveObj.Location || '',
+  waveObject.StartDate = waveObj.StartDate || '',
+  waveObject.EndDate = waveObj.EndDate || '',
+  waveObject.Sessions = waveObj.Sessions || '',
+  waveObject.Cadets = waveObj.Cadets || '',
+  waveObject.Course = waveObj.Course || '';
+  waveObject.GoH = waveObj.GoH || '';
 
   let session = driver.session();
 
   let query = `CREATE  (wave:${graphConsts.NODE_WAVE}
     {
-      WaveID: '${userObj.WaveID}',
-      WaveNumber: '${userObj.WaveNumber}',
-      Mode: '${userObj.Mode}',
-      Location: '${userObj.Location}',
-      StartDate: '${userObj.StartDate}',
-      EndDate: '${userObj.EndDate}',
-      CourseName: '${userObj.Course.split("_")[0]}'
+      WaveID: '${waveObject.WaveID}',
+      WaveNumber: '${waveObject.WaveNumber}',
+      Mode: '${waveObject.Mode}',
+      Location: '${waveObject.Location}',
+      StartDate: '${waveObject.StartDate}',
+      EndDate: '${waveObject.EndDate}',
+      CourseName: '${waveObject.Course.split("_")[0]}',
+      GoH: '${waveObject.GoH}'
     })
     WITH wave AS wave
-    MATCH (course: ${graphConsts.NODE_COURSE}{ID: '${userObj.Course}'})
+    MATCH (course: ${graphConsts.NODE_COURSE}{ID: '${waveObject.Course}'})
     WITH wave AS wave, course AS course
     MERGE (wave)-[:${graphConsts.REL_HAS}]->(course)
     WITH wave AS wave
-    UNWIND ${JSON.stringify(userObj.Cadets)} AS emailID
+    UNWIND ${JSON.stringify(waveObject.Cadets)} AS emailID
     MERGE (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: emailID})
     MERGE (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (wave)
     RETURN candidate`;
@@ -1161,10 +1163,8 @@ let removeCadetFromWave = function(cadets, waveID, course, successCB, errorCB) {
   session.run(query).then(function(resultObj) {
     session.close();
     if (cadets.length > 0) {
-      console.log(resultObj, "resultObj 123");
       resultObj.records.map(function(record) {
-        console.log("efgnerjghi")
-       let cadetObj = record._fields[0].properties;
+        let cadetObj = record._fields[0].properties;
         let user = {};
         user.name = cadetObj.EmployeeName;
         user.email = cadetObj.EmailID;
@@ -1195,7 +1195,8 @@ let updateWave = function(waveObj, oldCourse, successCB, errorCB) {
       w.Location = '${waveObj.Location}',
       w.StartDate = '${waveObj.StartDate}',
       w.EndDate = '${waveObj.EndDate}',
-      w.CourseName = '${waveObj.Course.split("_")[0]}'
+      w.CourseName = '${waveObj.Course.split("_")[0]}',
+      w.GoH = '${waveObj.GoH}'
     WITH w AS w
     MATCH (d:${graphConsts.NODE_COURSE}{ID:'${waveObj.Course}'})
     WITH w AS w, d AS d
