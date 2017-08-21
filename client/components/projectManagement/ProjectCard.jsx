@@ -204,10 +204,13 @@ export default class ProjectCard extends React.Component {
       }
         <MenuItem value='Add new version' primaryText='Add New Version' onClick={th.newVersion}/>
     </IconMenu></span>)
+
+		let cadetSkill = []
+		let i = 0
     return (
       <div>
       <Link
-        to={'/product/' + this.props.project.product}
+        to={'/product/' + this.state.versionName[th.state.selectedVersionIndex]}
         target="_blank"
         style={{textDecoration: 'none'}}
       >
@@ -223,9 +226,25 @@ export default class ProjectCard extends React.Component {
           <CardText style={styles.text}>
             <h3>Description:</h3>{this.props.project.version[this.state.selectedVersionIndex].description}
             <h3>Tech Skills:</h3>
-            <ul>{this.props.project.version[this.state.selectedVersionIndex].skills.map(function(skill, index) {
-                return <li key={index}>{skill}</li>
-              })}</ul>
+            {
+              cadetSkill[i] = []
+            }
+            {
+              this.props.project.version[this.state.selectedVersionIndex].skills.map(function(skill, key) {
+                if(key % 2 === 0) {
+                  i = i + 1
+                  cadetSkill[i] = []
+                }
+                cadetSkill[i].push(<Col md={2}><li key={key}>{skill}</li></Col>)
+              })
+            }
+            <Grid style = {{marginLeft: '10px'}}>
+            {
+                  cadetSkill.map(function (skills) {
+                    return <Row>{skills}</Row>
+                  })
+            }
+          </Grid>
             <h3>Developed By:</h3>{this.props.project.version[this.state.selectedVersionIndex].wave}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>view members</span>
           </CardText>

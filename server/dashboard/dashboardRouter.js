@@ -354,6 +354,22 @@ router.get('/project/:name', auth.accessedBy(['PROJECTS']), function (req, res) 
   }
 });
 
+// Get a single product version with name
+router.get('/projectversion/:name', auth.accessedBy(['PROJECTS']), function (req, res) {
+    try{
+      dashboardNeo4jController.getProductVersion(req.params.name, function (version) {
+      res.status(200).json({version: version});
+    }, function (err) {
+      logger.error('Get Project Version Error: ', err);
+      res.status(500).json({error: 'Cannot get project version from the db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // add a new version
 router.post('/addversion', auth.accessedBy(['PROJECTS']), function (req, res) {
   try {
@@ -803,6 +819,36 @@ router.get('/getwaveofcadet',
       });
     } catch(err) {
       logger.error('Get Wave Specific Candidates Exception: ', err);
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      });
+    }
+  }
+);
+
+// get candidate from EmployeeID
+router.post('/getcadetandwave',
+  auth.accessedBy(['CANDIDATES', 'PROJECTS']),
+  function (req, res) {
+    try{
+      dashboardNeo4jController.getCadetAndWave(req.body.EmpID, function (cadets) {
+        dashboardNeo4jController.getCadetProject(req.body.EmpID, function (cadet,err) {
+          if(err)
+          {
+            res.status(500).json({error: 'Cannot fetch projects'})
+          }
+          cadets.ProjectName = cadet.projectName;
+					cadets.Skills = cadet.Skills;
+					cadets.ProjectDescription = cadet.projectDesc;
+          console.log(cadets);
+          res.status(201).json(cadets);
+        });
+      }, function (err) {
+        logger.error('Get Cadet Error: ', err);
+        res.status(500).json({error: 'Cannot get cadet from db...!'});
+      });
+    } catch(err) {
+      logger.error('Get Cadet Exception: ', err);
       res.status(500).json({
         error: 'Internal error occurred, please report...!'
       });

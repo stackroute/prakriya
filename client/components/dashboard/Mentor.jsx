@@ -12,7 +12,7 @@ export default class Mentor extends React.Component {
 			<div>
 				<Grid>
           <Row>
-            <Col md={5}>
+            <Col md={12}>
 							<WaveDetails />
 						</Col>
 					</Row>
