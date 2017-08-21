@@ -136,7 +136,11 @@ export default class CandidateCard extends React.Component {
 			    </CardMedia>
 				    <CardTitle
 				    	title={
-								<Link to={'/candidate/' + this.props.candidate.EmployeeID} target="_blank">
+								<Link 
+									to={'/candidate/' + this.props.candidate.EmployeeID} 
+									target="_blank"
+									style={{textDecoration: 'none', color: '#333'}}
+								>
 									{this.props.candidate.EmployeeID}
 								</Link>
 							}

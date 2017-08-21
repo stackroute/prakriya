@@ -385,7 +385,7 @@ export default class Candidates extends React.Component {
 												textAlign: 'center',
 												borderRadius: '5px',
 												color: 'blue',
-												textDecoration: 'underline'
+												fontWeight: 'bold'
 											}}
 											onTouchTap={th.resetFilters}
 										>

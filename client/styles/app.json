@@ -8,14 +8,12 @@ module.exports = {
 		'bottom': '20px',
 		'right': '15px',
 		'zIndex': 1,
-    'border': '2px solid #202D3E'
 	},
   'fab2': {
 		'position':'fixed',
 		'bottom': '80px',
 		'right': '15px',
 		'zIndex': 1,
-    'border': '2px solid #202D3E'
 	},
   'mandatoryField': {
     'color': '#990000'
