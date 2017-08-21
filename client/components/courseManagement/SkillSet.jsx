@@ -17,8 +17,9 @@ const styles = {
     margin: '5px',
     padding: '5px',
     width: 'auto',
-    height: '120px',
-    borderRadius: '2px'
+    height: '250px',
+    borderRadius: '2px',
+    overflowY: 'scroll'
   },
   wrapper: {
     display: 'flex',

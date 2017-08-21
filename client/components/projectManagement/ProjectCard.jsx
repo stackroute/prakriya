@@ -190,38 +190,51 @@ export default class ProjectCard extends React.Component {
     ]
     let bgColor = this.props.bgColor;
     let th = this
-    let title = (<span style={{marginTop:'-50px'}}>{this.state.versionName[th.state.selectedVersionIndex]}<IconMenu iconButtonElement={< IconButton > <MoreVertIcon/> < /IconButton>} anchorOrigin={{
-      horizontal: 'left',
-      vertical: 'top'
-    }} targetOrigin={{
-      horizontal: 'left',
-      vertical: 'top'
-    }} style={{marginLeft:'250px',marginTop:'-100px'}}>
-      {
-        th.state.versionName.map(function(val, key) {
-            return <MenuItem key={key} value={val} primaryText={val} onTouchTap={(e)=>th.onVersionChange(key, val)}/>
-        })
-      }
-        <MenuItem value='Add new version' primaryText='Add New Version' onClick={th.newVersion}/>
-    </IconMenu></span>)
+    let title = (
+      <span style={{marginTop:'-50px'}}>
+        <Link
+          to={'/product/' + this.state.versionName[th.state.selectedVersionIndex]}
+          target="_blank"
+        >
+          {this.state.versionName[th.state.selectedVersionIndex].toUpperCase()}
+        </Link>
+        <IconMenu iconButtonElement={< IconButton > <MoreVertIcon/> < /IconButton>}
+        anchorOrigin={{
+        horizontal: 'left',
+        vertical: 'top'
+      }} targetOrigin={{
+        horizontal: 'left',
+        vertical: 'top'
+      }} style={{marginLeft:'250px',marginTop:'-100px'}}>
+        {
+          th.state.versionName.map(function(val, key) {
+              return <MenuItem key={key} value={val} primaryText={val} onTouchTap={(e)=>th.onVersionChange(key, val)}/>
+          })
+        }
+          <MenuItem value='Add new version' primaryText='Add New Version' onClick={th.newVersion}/>
+      </IconMenu>
+    </span>)
 
 		let cadetSkill = []
 		let i = 0
     return (
       <div>
-      <Link
-        to={'/product/' + this.state.versionName[th.state.selectedVersionIndex]}
-        target="_blank"
-        style={{textDecoration: 'none'}}
-      >
+
         <Card style={{
           width: '370px',
           marginRight: '20px',
           marginBottom: '20px',
           background: bgColor
         }}>
-          <CardHeader title={title} subtitle={detail} avatar={< Avatar >
-            {this.props.project.product.charAt(0).toUpperCase()}< /Avatar>}/>
+          <CardHeader
+            title={title}
+            subtitle={detail}
+            avatar={
+              <Avatar>
+                {this.props.project.product.charAt(0).toUpperCase()}
+              </Avatar>
+            }
+            />
 
           <CardText style={styles.text}>
             <h3>Description:</h3>{this.props.project.version[this.state.selectedVersionIndex].description}
@@ -255,7 +268,6 @@ export default class ProjectCard extends React.Component {
             <DeleteIcon/>
           </IconButton>
         </Card>
-        </Link>
         {this.state.dialog && th.openCadetsDialog()}
         <Dialog bodyStyle={dialog.body} title='TEAM MEMBERS' titleStyle={dialog.title} open={this.state.dialogOpen} autoScrollBodyContent={true} onRequestClose={this.handleClose}>
           <Grid style={styles.grid}>
