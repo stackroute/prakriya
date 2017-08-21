@@ -22,6 +22,7 @@ const styles = {
 		backgroundColor: '#C6D8D3'
 	},
   paper: {
+    width: '100%',
 		padding: 20,
 		borderRadius: 5,
 		backgroundColor: '#C6D8D3'
@@ -238,103 +239,112 @@ export default class WiproAdmin extends React.Component {
 
     return (
       <div>
-        <Paper  style={styles.paper}>
-          <WaveDetails /><br/>
-        </Paper>
+        <Grid>
+          <Row>
+            <Col md={12}>
+              <WaveDetails />
+            </Col>
+          </Row>
+          <br/>
+          <Paper style={styles.paper}>
+            <Row>
+              <Col md={6}>
+                <SelectField value={this.state.file} onChange={this.handleFileChange} floatingLabelText="Select File">
+                  {
+                    file_types.map(function(file, key) {
+                      return <MenuItem key={key} value={file} primaryText={file}/>
+                    })
+                  }
+                </SelectField>
+                <br/>
+                <RaisedButton label="Merge" primary={true} onClick={this.handleMerge}/>
+                <br/>
+                <CSVLink data={this.state.csvData} filename="da_db.xlsx" style={styles.button}>
+                  Download
+                </CSVLink>
+              </Col>
+              <Col md={6}>
+                <FileDrop type={this.state.file} handleDrop={this.handleDrop}/>
+                <br/>
+                <FileDrop type="REPORT" handleDrop={this.handleDrop}/>
+              </Col>
+            </Row>
+          </Paper>
+        </Grid>
+        <br/>
         <Paper style={styles.paper}>
           <div>
-          <SelectField value={this.state.file} onChange={this.handleFileChange} floatingLabelText="Select File">
-            {
-              file_types.map(function(file, key) {
-                return <MenuItem key={key} value={file} primaryText={file}/>
-              })
-            }
-          </SelectField>
-          <RaisedButton label="Merge" primary={true} onClick={this.handleMerge}/>
-          <br/>
-          <CSVLink data={this.state.csvData} filename="da_db.xlsx" style={styles.button}>
-            Download
-          </CSVLink>
-        </div>
-        <div>
-          <FileDrop type={this.state.file} handleDrop={this.handleDrop}/>
-          <br/>
-          <FileDrop type="REPORT" handleDrop={this.handleDrop}/>
-        </div>
-      </Paper>
-      <Paper  style={styles.paper}>
-        <div>
-          {/*<div style={{display: 'inline-block', width: 250}}>
-            <SelectField
-              value={this.state.gType || 'pieChart'}
-              onChange={(e, k, v)=>{th.handleGPropChange('type', v)}}
-              floatingLabelText="Graph Type">
-              {
-                graphTypes.map(function(type, key) {
-                  return <MenuItem key={key} value={type} primaryText={type.toUpperCase()}/>
-                })
-              }
-            </SelectField>
-          </div>*/}
-          <div style={{display: 'inline-block', width: 250}}>
-            <SelectField
-              value={this.state.gTitle}
-              onChange={(e, k, v)=>{th.handleGPropChange('title', v)}}
-              floatingLabelText="Target Field">
-              {
-                graphCategories.map(function(title, key) {
-                  return <MenuItem key={key} value={title} primaryText={title.toUpperCase()}/>
-                })
-              }
-            </SelectField>
+            {/*<div style={{display: 'inline-block', width: 250}}>
+              <SelectField
+                value={this.state.gType || 'pieChart'}
+                onChange={(e, k, v)=>{th.handleGPropChange('type', v)}}
+                floatingLabelText="Graph Type">
+                {
+                  graphTypes.map(function(type, key) {
+                    return <MenuItem key={key} value={type} primaryText={type.toUpperCase()}/>
+                  })
+                }
+              </SelectField>
+            </div>*/}
+            <div style={{display: 'inline-block', width: 250}}>
+              <SelectField
+                value={this.state.gTitle}
+                onChange={(e, k, v)=>{th.handleGPropChange('title', v)}}
+                floatingLabelText="Target Field">
+                {
+                  graphCategories.map(function(title, key) {
+                    return <MenuItem key={key} value={title} primaryText={title.toUpperCase()}/>
+                  })
+                }
+              </SelectField>
+            </div>
+            <div style={{display: 'inline-block', width: 250}}>
+              <RaisedButton label="Add Graph" primary={true} onClick={th.addGraph} style={{width: '100%'}}/>
+            </div>
           </div>
-          <div style={{display: 'inline-block', width: 250}}>
-            <RaisedButton label="Add Graph" primary={true} onClick={th.addGraph} style={{width: '100%'}}/>
+          <div>
+          {
+            th.state.graphs.map(function(graph) {
+              return (
+                <Paper style={{
+                  width: '770',
+                  height: '600',
+                  backgroundColor: '#fff',
+                  display: 'inline-block',
+                  margin: '5px',
+                  position: 'relative'
+                }}>
+                  <h3 style={{height: '5%', textAlign: 'center', textTransform: 'uppercase'}}>
+                    {graph.title}
+                  </h3>
+                  <div style={{width: '100%', height:'95%'}}>
+                    {
+                        graph.title == 'Billability' ?
+                        <SelectField
+                          value={th.state.billingTags}
+                          onChange={th.handleTagChange}
+                          multiple={true}
+                          floatingLabelText="Select Billability">
+                          {
+                            billingTags.map(function(tag, key) {
+                              return <MenuItem key={key} value={tag} primaryText={tag}/>
+                            })
+                          }
+                        </SelectField> : ''
+                    }
+                    <NVD3Chart type="pieChart" tooltip={{enabled: true}}
+                    datum={graph.data} x="label" y="value" height={500} width={500}/>
+                  </div>
+                  <RemoveIcon
+                    style={{position: 'absolute', right: 10, top: 15, cursor: 'pointer'}}
+                    onTouchTap={()=>{th.removeGraph(graph.title)}}
+                  />
+                </Paper>
+              )
+            })
+          }
           </div>
-        </div>
-        <div>
-        {
-          th.state.graphs.map(function(graph) {
-            return (
-              <Paper style={{
-                width: '770',
-                height: '600',
-                backgroundColor: '#fff',
-                display: 'inline-block',
-                margin: '5px',
-                position: 'relative'
-              }}>
-                <h3 style={{height: '5%', textAlign: 'center', textTransform: 'uppercase'}}>
-                  {graph.title}
-                </h3>
-                <div style={{width: '100%', height:'95%'}}>
-                  {
-                      graph.title == 'Billability' ?
-                      <SelectField
-                        value={th.state.billingTags}
-                        onChange={th.handleTagChange}
-                        multiple={true}
-                        floatingLabelText="Select Billability">
-                        {
-                          billingTags.map(function(tag, key) {
-                            return <MenuItem key={key} value={tag} primaryText={tag}/>
-                          })
-                        }
-                      </SelectField> : ''
-                  }
-                  <NVD3Chart type="pieChart" tooltip={{enabled: true}}
-                  datum={graph.data} x="label" y="value" height={500} width={500}/>
-                </div>
-                <RemoveIcon
-                  style={{position: 'absolute', right: 10, top: 15, cursor: 'pointer'}}
-                  onTouchTap={()=>{th.removeGraph(graph.title)}}
-                />
-              </Paper>
-            )
-          })
-        }
-        </div>
-      </Paper>
+        </Paper>
       </div>
     )
   }
