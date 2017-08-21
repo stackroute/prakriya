@@ -3,8 +3,9 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
+import SelectIcon from 'material-ui/svg-icons/action/check-circle';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import {lightBlack} from 'material-ui/styles/colors';
+import {lightBlack, greenA700} from 'material-ui/styles/colors';
 import Request from 'superagent';
 import jsPDF from 'jspdf';
 import DownloadProfile from './DownloadProfile.jsx';
@@ -35,8 +36,10 @@ export default class CandidateCard extends React.Component {
 			showDeleteDialog: false,
 			showDownloadDialog: false,
 			imageURL: '../../assets/images/avt-default.jpg',
+			color: lightBlack
 		}
 		this.getProfilePic = this.getProfilePic.bind(this);
+		this.selectCandidate = this.selectCandidate.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
 		this.openDeleteDialog = this.openDeleteDialog.bind(this);
 		this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
@@ -49,7 +52,7 @@ export default class CandidateCard extends React.Component {
 	}
 	getProfilePic(emailID) {
 		let th = this;
-		let username = emailID.split("@wipro.com")[0];
+		let username = emailID.split("@")[0];
 		Request
 			.get(`/dashboard/getimage`)
 			.set({'Authorization': localStorage.getItem('token')})
@@ -75,6 +78,23 @@ export default class CandidateCard extends React.Component {
 		    	}
 		    }
 			})
+	}
+	selectCandidate() {
+		if(this.state.color == lightBlack) {
+			this.setState({
+				color: greenA700
+			})
+			this.props.updateSelected(true, this.props.candidate);
+		}
+		else {
+			this.setState({
+				color: lightBlack
+			})
+			this.props.updateSelected(false, this.props.candidate);
+		}
+	}
+	handleCardClick() {
+		this.props.handleCardClick(this.props.candidate);
 	}
 	openDeleteDialog() {
 		this.setState({
@@ -105,8 +125,7 @@ export default class CandidateCard extends React.Component {
       />
     ]
 		return(
-			<div style={{width: '285px', display: 'inline-block', padding: '5px'}} key={this.props.key}>
-				<Link to={'/candidate/' + this.props.candidate.EmployeeID} target="_blank" style = {{textDecoration: 'none'}}>
+			<div style={{width: '285px', display: 'inline-block', padding: '5px', textDecoration: 'none'}} key={this.props.key}>
 				<Card style={{border: '2px solid silver'}}>
 			    <CardMedia
 			    	style={styles.cardClick}
@@ -119,11 +138,13 @@ export default class CandidateCard extends React.Component {
 			    >
 			      <img style={styles.profilePic} src={this.state.imageURL} />
 			    </CardMedia>
-			    <CardTitle
-			    	title={this.props.candidate.EmployeeID}
-			    	subtitle={this.props.candidate.CareerBand}
-			    	style={styles.cardTitle}
-			    />
+			    <Link to={'/candidate/' + this.props.candidate.EmployeeID} target="_blank">
+				    <CardTitle
+				    	title={this.props.candidate.EmployeeID}
+				    	subtitle={this.props.candidate.CareerBand}
+				    	style={styles.cardTitle}
+				    />
+			    </Link>
 			    <CardActions style={styles.actions}>
 			    	<IconButton
 			    		tooltip="Download Profile"
@@ -137,12 +158,17 @@ export default class CandidateCard extends React.Component {
 								zip = {false}
 				      />
 				    </IconButton>
+				    <IconButton 
+				    	tooltip="Select Candidate" 
+				    	onTouchTap={this.selectCandidate}
+				   	>
+				    	<SelectIcon color={this.state.color} />
+				    </IconButton>
 				    <IconButton tooltip="Delete Candidate" onTouchTap={this.openDeleteDialog}>
 				      <DeleteIcon color={lightBlack} />
 				    </IconButton>
 			    </CardActions>
 			  </Card>
-				</Link>
 			  <Dialog
           actions={deleteDialogActions}
 					actionsContainerStyle={dialog.actionsContainer}
