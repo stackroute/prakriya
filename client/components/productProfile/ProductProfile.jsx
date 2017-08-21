@@ -22,6 +22,10 @@ const styles = {
 	hr: {
 		height: '1px',
 		backgroundColor: '#202D3E'
+	},
+	container: {
+		marginLeft: '10%',
+		marginRight: '10%'
 	}
 };
 
@@ -74,30 +78,32 @@ export default class ProductProfile extends React.Component {
 								{th.props.routeParams.name.toUpperCase()}
 							</h3>
 						</div>
-						<div>
-							<h4>Description</h4>
-							<p>{th.state.version.description}</p>
-						</div>
-						<div>
-							<h4>Skills</h4>
-							{
-								th.state.version.skills.map(function(skill) {
-									return (
-										<p>{skill}</p>
-									)
-								})
-							}
-						</div>
-						<div>
-							<h4>Contributors</h4>
+						<div style={styles.container}>
 							<div>
+								<h4>Description:</h4>
+								<p style={{textIndent: '70px'}}>{th.state.version.description}</p>
+							</div>
+							<div>
+								<h4>Skills:</h4>
 								{
-									th.state.version.members.map(function(member) {
+									th.state.version.skills.map(function(skill) {
 										return (
-											<p>{member.EmployeeName}</p>
+											<p>{skill}</p>
 										)
 									})
 								}
+							</div>
+							<div>
+								<h4>Contributors</h4>
+								<div>
+									{
+										th.state.version.members.map(function(member) {
+											return (
+												<p>{member.EmployeeName}</p>
+											)
+										})
+									}
+								</div>
 							</div>
 						</div>
 					</div>
