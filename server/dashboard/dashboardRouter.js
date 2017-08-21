@@ -354,6 +354,22 @@ router.get('/project/:name', auth.accessedBy(['PROJECTS']), function (req, res) 
   }
 });
 
+// Get a single product version with name
+router.get('/projectversion/:name', auth.accessedBy(['PROJECTS']), function (req, res) {
+    try{
+      dashboardNeo4jController.getProductVersion(req.params.name, function (version) {
+      res.status(200).json({version: version});
+    }, function (err) {
+      logger.error('Get Project Version Error: ', err);
+      res.status(500).json({error: 'Cannot get project version from the db...!'});
+    });
+  } catch(err) {
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // add a new version
 router.post('/addversion', auth.accessedBy(['PROJECTS']), function (req, res) {
   try {

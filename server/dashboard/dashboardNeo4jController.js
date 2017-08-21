@@ -1028,8 +1028,47 @@ let getProduct = function(productName, successCB, errorCB) {
     if (err) {
       errorCB('Error');
     } else {
-      console.log(resultObj.records);
       successCB(resultObj.records.length > 0 ? resultObj.records[0]._fields[0] : {});
+    }
+  }).catch(function(err) {
+    errorCB(err);
+  });
+};
+
+let getProductVersion = function(versionName, successCB, errorCB) {
+  let session = driver.session();
+  let query = `
+    OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: '${versionName}'})
+    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+    -[:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
+    WITH COLLECT(DISTINCT skill.Name) AS skills, version AS version,
+    CASE WHEN candidate IS NULL THEN
+     []
+     ELSE
+     COLLECT ({
+       EmployeeID: candidate.EmployeeID,
+       EmployeeName: candidate.EmployeeName,
+       Email: candidate.EmailID
+     })
+    END AS candidates
+    RETURN {
+     name: version.name,
+     description: version.description,
+     wave: version.wave,
+     members: candidates,
+     skills: skills,
+     addedBy: version.addedBy,
+     addedOn: version.addedOn,
+     updated: version.updated
+    }
+  `;
+  session.run(query).then(function(resultObj, err) {
+    session.close();
+    if (err) {
+      errorCB('Error');
+    } else {
+      successCB(resultObj.records[0]._fields[0]);
     }
   }).catch(function(err) {
     errorCB(err);
@@ -1943,5 +1982,6 @@ module.exports = {
       getBillabilityStats,
       getTrainingStats,
       ActivewaveCadets,
-      getProduct
+      getProduct,
+      getProductVersion
   }
