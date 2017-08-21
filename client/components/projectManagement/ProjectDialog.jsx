@@ -15,38 +15,9 @@ import AddIcon from 'material-ui/svg-icons/content/add-circle-outline'
 import IconButton from 'material-ui/IconButton'
 import {Grid, Row, Col} from 'react-flexbox-grid'
 import app from '../../styles/app.json';
+import dialog from '../../styles/dialog.json';
 
 const styles = {
-	addButton: {
-		position:'fixed',
-	  bottom: '60px',
-	  right: '15px',
-	  zIndex: 1
-	},
-	dialog: {
-		backgroundColor: '#DDDBF1',
-		borderBottom: '3px solid #C6D8D3',
-		borderRight: '10px solid #C6D8D3',
-		borderLeft: '10px solid #C6D8D3'
-	},
-	dialogTitle: {
-		fontWeight: 'bold',
-		backgroundColor: '#C6D8D3',
-		color: '#202D3E',
-		textAlign: 'center'
-	},
-	actionsContainer: {
-		backgroundColor: '#C6D8D3',
-		borderTop: '0px',
-		marginTop: '0px'
-	},
-	actionButton: {
-		backgroundColor: '#202D3E',
-		width: '50%',
-		color: '#C6D8D3',
-		border: '1px solid #C6D8D3',
-		height: '100%'
-	},
 	underlineDisabled: {
 		display: 'none'
 	},
@@ -339,10 +310,17 @@ export default class ProjectDialog extends React.Component {
 	}
 
 	handleDescChange(e) {
-		this.setState({
-			projectDesc: e.target.value,
-			projectDescErrorText: ''
-		})
+		if(e.target.value.indexOf('\'') != -1 || e.target.value.indexOf('\"') != -1 || e.target.value.indexOf('\`') != -1) {
+			this.setState({
+				projectDesc: e.target.value,
+				projectDescErrorText: 'Please do not include characters like \', \" and \` in the description.'
+			})
+		} else {
+			this.setState({
+				projectDesc: e.target.value,
+				projectDescErrorText: ''
+			})
+		}
 	}
 
 	handleAdd() {
@@ -388,8 +366,6 @@ export default class ProjectDialog extends React.Component {
 			version.wave = this.state.wave;
 			version.skills = this.state.skills;
 			version.updated = true;
-			// version.addedOn = new Date();
-			// version.addedBy = xyz;
 			this.setState({
 				projectName: '',
 				versionName: '',
@@ -488,12 +464,12 @@ export default class ProjectDialog extends React.Component {
       <FlatButton
         label='Cancel'
         onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />,
       <FlatButton
         label='Add'
         onTouchTap={(e)=>{this.handleClose(e, 'ADD')}}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />
     ]
 
@@ -501,12 +477,12 @@ export default class ProjectDialog extends React.Component {
       <FlatButton
         label='Cancel'
         onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />,
       <FlatButton
         label='Add'
         onTouchTap={(e)=>{this.handleClose(e, 'VERSION')}}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />
     ]
 
@@ -514,13 +490,13 @@ export default class ProjectDialog extends React.Component {
       <FlatButton
         label='Cancel'
         onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
-				style={styles.actionButton}
+				style={dialog.actionButton}
 
       />,
       <FlatButton
         label='Update'
 				onTouchTap={(e)=>{this.handleClose(e, 'EDIT')}}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />
     ]
 
@@ -535,11 +511,11 @@ export default class ProjectDialog extends React.Component {
 	      <ContentAdd />
 	    </FloatingActionButton>
 	    <Dialog
-	    	bodyStyle={styles.dialog}
+	    	bodyStyle={dialog.body}
         title={this.props.dialogTitle}
-				titleStyle={styles.dialogTitle}
+				titleStyle={dialog.title}
         actions={actions}
-				actionsContainerStyle={styles.actionsContainer}
+				actionsContainerStyle={dialog.actionsContainer}
         open={this.state.showDialog}
         autoScrollBodyContent={true}
       >

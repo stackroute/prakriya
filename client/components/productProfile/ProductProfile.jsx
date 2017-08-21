@@ -22,6 +22,7 @@ const styles = {
 		top: '-25px'
 	},
 	hr: {
+		marginTop: '1px',
 		height: '1px',
 		backgroundColor: '#202D3E'
 	},
@@ -82,16 +83,22 @@ export default class ProductProfile extends React.Component {
 			}
 		}
 		return (
-			<div style={{padding: '10px'}}>
+			<div>
 				{
 					th.state.version != null &&
 					<div>
-						<div>
+						<div style={{backgroundColor: '#202D3E'}}>
 							<br/>
 							<br/>
-							<div style={styles.hr}></div>
-							<div style={styles.logo}>{th.props.routeParams.name.toUpperCase().charAt(0)}</div>
+							<br/>
 						</div>
+						<div style={styles.hr}></div>
+						<div style={styles.logo}>{th.props.routeParams.name.toUpperCase().charAt(0)}</div>
+					</div>
+				}
+				{
+					th.state.version != null &&
+					<div style={{width: '80%', margin: 'auto', border: '2px solid #202D3E'}}>
 						<div>
 							<h3 style={{textAlign: 'center'}}>
 								{th.props.routeParams.name.toUpperCase()}
