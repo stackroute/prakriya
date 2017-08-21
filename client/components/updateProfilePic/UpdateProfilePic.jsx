@@ -82,10 +82,9 @@ export default class UpdateProfilePic extends React.Component {
 				 <CardText>
 					 <RaisedButton
 					 	label="Update Picture"
-						primary={true}
 						disabled={this.state.disableUpdatePicture}
 						onClick={this.updatePicture}
-						style={{width: '100%'}} />
+						style={{width: '100%', backgroundColor: '#202D3E'}} />
 				 </CardText>
 			</Card>
 		)

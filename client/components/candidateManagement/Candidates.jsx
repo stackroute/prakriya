@@ -29,7 +29,7 @@ const styles = {
 	},
 	name: {
 		textAlign: 'center',
-		color: 'teal'
+		color: '#202D3E'
 	},
 	filters: {
 		// border: '2px solid silver',
@@ -415,7 +415,7 @@ export default class Candidates extends React.Component {
 														style={{border: '2px solid grey'}}
 														onRequestDelete={()=>th.removeFilter(filter)}
 													>
-														<span style={{color: 'teal'}}>{filter}: {val}</span>
+														<span style={{color: '#202D3E'}}>{filter}: {val}</span>
 													</Chip>
 												)
 											}

@@ -134,14 +134,15 @@ export default class CandidateCard extends React.Component {
 			    >
 			      <img style={styles.profilePic} src={this.state.imageURL} />
 			    </CardMedia>
-			    <Link to={'/candidate/' + this.props.candidate.EmployeeID} target="_blank">
 				    <CardTitle
-				    	title={this.props.candidate.EmployeeID}
+				    	title={
+								<Link to={'/candidate/' + this.props.candidate.EmployeeID} target="_blank">
+									{this.props.candidate.EmployeeID}
+								</Link>
+							}
 				    	subtitle={this.props.candidate.CareerBand}
 				    	style={styles.cardTitle}
-							subtitleStyle={{cursor: 'default', textDecoration: 'none'}}
 				    />
-			    </Link>
 			    <CardActions style={styles.actions}>
 			    	<IconButton
 			    		tooltip="Download Profile"

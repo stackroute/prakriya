@@ -95,7 +95,7 @@ export default class MyProfile extends React.Component {
 		Request
 			.post('/dashboard/saveimage')
 			.set({'Authorization': localStorage.getItem('token')})
-			.field('user', JSON.stringify(this.state.user))
+			.field('user', JSON.stringify(user))
 			.attach('file', picFile)
 			.end(function(err, res) {
 				if(err)
