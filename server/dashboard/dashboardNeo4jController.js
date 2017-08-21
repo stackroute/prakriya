@@ -1060,7 +1060,10 @@ let getProductVersion = function(versionName, successCB, errorCB) {
      skills: skills,
      addedBy: version.addedBy,
      addedOn: version.addedOn,
-     updated: version.updated
+     updated: version.updated,
+     gitURL: version.gitURL,
+     videoURL: version.videoURL,
+     presentationURL: version.presentationURL
     }
   `;
   session.run(query).then(function(resultObj, err) {
