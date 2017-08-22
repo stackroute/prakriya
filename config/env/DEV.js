@@ -102,7 +102,8 @@ let basedata = {
       name: "wiproadmin",
       controls: [
         "CANDIDATES",
-        "BULK_UPLOAD"
+        "BULK_UPLOAD",
+        "PROJECTS"
       ]
     },
     {
