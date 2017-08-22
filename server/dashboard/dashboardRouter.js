@@ -355,20 +355,23 @@ router.get('/project/:name', auth.accessedBy(['PROJECTS']), function (req, res) 
 });
 
 // Get a single product version with name
-router.get('/projectversion/:name', auth.accessedBy(['PROJECTS']), function (req, res) {
+router.get('/projectversion/:name', 
+  auth.accessedBy(['MY_PROF', 'CANDIDATES', 'PROJECTS']), 
+  function (req, res) {
     try{
       dashboardNeo4jController.getProductVersion(req.params.name, function (version) {
-      res.status(200).json({version: version});
-    }, function (err) {
-      logger.error('Get Project Version Error: ', err);
-      res.status(500).json({error: 'Cannot get project version from the db...!'});
-    });
-  } catch(err) {
-    res.status(500).json({
-      error: 'Internal error occurred, please report...!'
-    });
+        res.status(200).json({version: version});
+      }, function (err) {
+        logger.error('Get Project Version Error: ', err);
+        res.status(500).json({error: 'Cannot get project version from the db...!'});
+      });
+    } catch(err) {
+      res.status(500).json({
+        error: 'Internal error occurred, please report...!'
+      });
+    }
   }
-});
+);
 
 // add a new version
 router.post('/addversion', auth.accessedBy(['PROJECTS']), function (req, res) {
@@ -828,7 +831,7 @@ router.get('/getwaveofcadet',
 
 // get candidate from EmployeeID
 router.post('/getcadetandwave',
-  auth.accessedBy(['CANDIDATES', 'PROJECTS']),
+  auth.accessedBy(['MY_PROF', 'CANDIDATES', 'PROJECTS']),
   function (req, res) {
     try{
       dashboardNeo4jController.getCadetAndWave(req.body.EmpID, function (cadets) {
@@ -1663,7 +1666,7 @@ router.get('/billabilitystats', auth.accessedBy(['BULK_UPLOAD']), function (req,
   }
 });
 
-router.get('/trainingstats', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
+router.get('/trainingstats', auth.accessedBy(['BULK_UPLOAD', 'WAVES']), function (req, res) {
   try{
     dashboardNeo4jController.getTrainingStats(function (stats) {
       res.status(201).json(stats);
