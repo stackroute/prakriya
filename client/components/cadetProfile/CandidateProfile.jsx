@@ -87,7 +87,6 @@ export default class CandidateProfile extends React.Component {
         console.log(err);
       else {
         th.setState({role: res.body});
-				console.log('role' + res.body)
       }
     })
 	}
@@ -155,9 +154,11 @@ export default class CandidateProfile extends React.Component {
 						<Col md={4}>
 							<img src={this.state.imageURL} style = {styles.profilePic}/>
 							<h2 style = {{width: '225px', textAlign: 'center'}}>{this.state.cadet.EmployeeName}</h2>
-							<h4 style = {{width: '225px', textAlign: 'center'}}>
+							<h4 style = {{width: '300px', textAlign: 'center'}}>
 								<MailIcon style = {{ position: 'relative', top: '5px'}}/> <span> &nbsp;&nbsp;
-								{this.state.cadet.EmailID}</span><br/><br/>
+								{this.state.cadet.EmailID}</span>
+							</h4>
+							<h4 style = {{width: '225px', textAlign: 'center'}}>
 								<CallIcon style = {{ position: 'relative', top: '5px'}}/> <span> &nbsp;&nbsp;
 								{this.state.cadet.Contact}</span>
 								<br/>

@@ -60,7 +60,8 @@ export default class ProjectCard extends React.Component {
       selectedVersionIndex: 0,
       project: {},
       newVersionDialog: false,
-      delete: ''
+      delete: '',
+      role: ''
     }
     this.formatDate = this.formatDate.bind(this);
     this.handleClose = this.handleClose.bind(this);
@@ -75,6 +76,7 @@ export default class ProjectCard extends React.Component {
     this.addVersion = this.addVersion.bind(this);
     this.newVersion = this.newVersion.bind(this);
     this.handleDeleteChange = this.handleDeleteChange.bind(this);
+    this.getRole = this.getRole.bind(this);
   }
 
   componentWillMount() {
@@ -86,7 +88,19 @@ export default class ProjectCard extends React.Component {
       project: this.props.project,
       versionName: versionNames
     })
+    this.getRole();
   }
+
+	getRole() {
+		let th = this
+    Request.get('/dashboard/userrole').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({role: res.body});
+      }
+    })
+	}
 
   componentWillReceiveProps(nextProps, nextState) {
     let versionNames = [];
@@ -217,6 +231,8 @@ export default class ProjectCard extends React.Component {
 
 		let cadetSkill = []
 		let i = 0
+
+    console.log(this.state.role+'role');
     return (
       <div>
 
@@ -261,12 +277,17 @@ export default class ProjectCard extends React.Component {
             <h3>Developed By:</h3>{this.props.project.version[this.state.selectedVersionIndex].wave}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onClick={this.handleOpen} style={styles.view}>view members</span>
           </CardText>
-          <IconButton tooltip="Edit project" onClick={this.handleEditProject}>
-            <EditIcon/>
-          </IconButton>
-          <IconButton tooltip="Delete project" onClick={this.openDeleteDialog}>
-            <DeleteIcon/>
-          </IconButton>
+          {
+            this.state.role === 'mentor' &&
+            <span>
+              <IconButton tooltip="Edit project" onClick={this.handleEditProject}>
+                <EditIcon/>
+              </IconButton>
+              <IconButton tooltip="Delete project" onClick={this.openDeleteDialog}>
+                <DeleteIcon/>
+              </IconButton>
+          </span>
+          }
         </Card>
         {this.state.dialog && th.openCadetsDialog()}
         <Dialog bodyStyle={dialog.body} title='TEAM MEMBERS' titleStyle={dialog.title} open={this.state.dialogOpen} autoScrollBodyContent={true} onRequestClose={this.handleClose}>
