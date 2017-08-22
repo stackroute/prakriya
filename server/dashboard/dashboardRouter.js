@@ -1665,7 +1665,24 @@ router.post('/createnewskill', auth.accessedBy(['COURSES']), function(req, res) 
   }
 });
 
+// Delete a skill if it's dangling
+router.post('/deleteskill', auth.accessedBy(['COURSES']), function(req, res) {
+  try {
+    dashboardNeo4jController.deleteSkill(req.body.skill, function (status) {
+      res.status(201).json(status);
+    }, function (err) {
+      logger.error('DeleteSkill Error: ', err);
+      res.status(500).json({error: 'Cannot delete the skill in neo4j...!'});
+    });
+  } catch(err) {
+    logger.debug('DeleteSkill Error', err)
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
 
+// Fetching the billability status
 router.get('/billabilitystats', auth.accessedBy(['BULK_UPLOAD']), function (req, res) {
   try{
     dashboardNeo4jController.getBillabilityStats(function (stats) {

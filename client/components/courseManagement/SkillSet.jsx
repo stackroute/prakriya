@@ -43,6 +43,7 @@ export default class SkillSet extends React.Component {
     };
 
     this.addNewSkill = this.addNewSkill.bind(this);
+    this.deleteSkill = this.deleteSkill.bind(this);
     this.onOpen = this.onOpen.bind(this);
     this.onClose = this.onClose.bind(this);
     this.onSkillChange = this.onSkillChange.bind(this);
@@ -54,6 +55,10 @@ export default class SkillSet extends React.Component {
   addNewSkill(skill) {
     this.props.addNewSkill(skill);
     this.setState({skill: '', disableSave: true});
+  }
+
+  deleteSkill(skill) {
+    this.props.deleteSkill(skill);
   }
 
   onSkillChange(e) {
@@ -124,7 +129,11 @@ export default class SkillSet extends React.Component {
                     {
                       this.props.skills.map(function(skill, index) {
                         return (
-                          <Chip style={styles.chip} key={index}>
+                          <Chip 
+                            style={styles.chip} 
+                            key={index} 
+                            onRequestDelete={(e) => th.deleteSkill(skill)}
+                          >
                             <span>{skill}</span>
                           </Chip>
                         )
