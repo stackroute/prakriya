@@ -1,6 +1,7 @@
 import React from 'react';
 import Avatar from 'material-ui/Avatar';
 import Request from 'superagent';
+import {Link} from 'react-router';
 
 const styles = {
 	profilePic: {
@@ -45,9 +46,18 @@ export default class CandidateCard extends React.Component {
 
 	render() {
 		return(
-			<span><br/><img style={styles.profilePic} src={this.state.imageURL} />
-				<h3>{this.props.cadet.EmployeeName}</h3></span>
+			<span><br/>
+			<Link
+				to={'/candidate/' + this.props.cadet.EmployeeID}
+				target="_blank"
+				style={{textDecoration: 'none', color: '#333'}}
+			>
+			<img style={styles.profilePic} src={this.state.imageURL} />
+				<h3>{this.props.cadet.EmployeeName}</h3>
+				</Link>
+				</span>
+
+
 			)
 	}
 }
-

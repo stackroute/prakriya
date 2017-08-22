@@ -31,9 +31,11 @@ export default class AddWave extends React.Component {
 			Location: '',
 			StartDate: null,
 			EndDate: null,
+			GoH: '',
 			selectedCadets: [],
 			disableCourse: true,
-			disableAll: true
+			disableAll: true,
+
 		}
 		this.handleOpen = this.handleOpen.bind(this)
 		this.handleClose = this.handleClose.bind(this)
@@ -48,6 +50,7 @@ export default class AddWave extends React.Component {
 		this.validationSuccess = this.validationSuccess.bind(this)
 		this.resetFields = this.resetFields.bind(this)
 		this.handleSnackbarClose = this.handleSnackbarClose.bind(this)
+		this.handleGoHChange = this.handleGoHChange.bind(this)
 	}
 
 	componentWillMount() {
@@ -143,6 +146,12 @@ export default class AddWave extends React.Component {
 		})
 	}
 
+	handleGoHChange(event) {
+		this.setState({
+			GoH: event.target.value
+		})
+	}
+
 	handleCadetsChange(event, key, val) {
 		this.setState({
 			selectedCadets: val
@@ -159,6 +168,7 @@ export default class AddWave extends React.Component {
 		wave.Location = this.state.Location;
 		wave.StartDate = this.state.StartDate.getTime();
 		wave.EndDate = this.state.EndDate.getTime();
+		wave.GoH = this.state.GoH;
 		wave.Cadets = this.state.selectedCadets;
 		this.props.handleWaveAdd(wave)
 		this.resetFields()
@@ -175,6 +185,7 @@ export default class AddWave extends React.Component {
 			Location: '',
 			StartDate: null,
 			EndDate: null,
+			GoH: '',
 			selectedCadets: [],
 		})
 	}
@@ -355,6 +366,16 @@ export default class AddWave extends React.Component {
 		        	})
 		        }
 		      </SelectField>
+				</div>
+				<div style={dialog.box100}>
+					<TextField
+						hintText="Guest of Honour"
+						floatingLabelText="Guest of Honour"
+						value={this.state.GoH}
+						onChange={this.handleGoHChange}
+						disabled={this.state.disableAll}
+						style={{width: '100%'}}
+					/>
 				</div>
         </Dialog>
 				<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen} >

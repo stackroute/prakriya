@@ -75,6 +75,7 @@ export default class CandidateProfile extends React.Component {
 
 	componentWillMount() {
 		this.getCandidate(this.props.routeParams.id);
+		
 	}
 
 	getCandidate(EmpID) {

@@ -16,6 +16,7 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 import dialog from '../../styles/dialog.json';
 
 
+
 const styles = {
 	container: {
 		padding: 20,
