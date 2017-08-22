@@ -254,7 +254,7 @@ router.post('/updatewavecadets', auth.accessedBy(['WAVES']), function (req, res)
 });
 
 //getCadetsOfActivewaves
-router.post('/ActivewaveCadets', auth.accessedBy(['WAVES']), function (req, res) {
+router.post('/ActivewaveCadets', auth.accessedBy(['CANDIDATES','PROJECTS','WAVES']), function (req, res) {
   try {
     console.log(req.body.activewaveId,"router")
     console.log(req.body.course,"course")
@@ -828,7 +828,7 @@ router.get('/getwaveofcadet',
 
 // get candidate from EmployeeID
 router.post('/getcadetandwave',
-  auth.accessedBy(['CANDIDATES', 'PROJECTS']),
+  auth.accessedBy(['CANDIDATES', 'PROJECTS', 'WAVES']),
   function (req, res) {
     try{
       dashboardNeo4jController.getCadetAndWave(req.body.EmpID, function (cadets) {
@@ -840,7 +840,7 @@ router.post('/getcadetandwave',
           cadets.ProjectName = cadet.projectName;
 					cadets.Skills = cadet.Skills;
 					cadets.ProjectDescription = cadet.projectDesc;
-          console.log(cadets);
+          //console.log(cadets);
           res.status(201).json(cadets);
         });
       }, function (err) {
