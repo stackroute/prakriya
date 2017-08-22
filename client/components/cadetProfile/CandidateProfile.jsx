@@ -66,16 +66,30 @@ export default class CandidateProfile extends React.Component {
 			startDate: '',
 			endDate: '',
 			mode: '',
-			Wave: ''
+			Wave: '',
+			role: ''
 		}
 		this.getCandidate = this.getCandidate.bind(this);
 		this.getProfilePic = this.getProfilePic.bind(this);
 		this.formatDate = this.formatDate.bind(this);
+		this.getRole = this.getRole.bind(this);
 	}
 
 	componentWillMount() {
 		this.getCandidate(this.props.routeParams.id);
-		
+		this.getRole();
+	}
+
+	getRole() {
+		let th = this
+    Request.get('/dashboard/userrole').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({role: res.body});
+				console.log('role' + res.body)
+      }
+    })
 	}
 
 	getCandidate(EmpID) {
@@ -165,6 +179,19 @@ export default class CandidateProfile extends React.Component {
 	 							<p style={styles.details}>
 									<b>Work Experience:</b> {this.state.cadet.WorkExperience}
 								</p>
+
+								{
+									this.state.role === 'wiproadmin' &&
+									<span>
+										<h3>Status</h3>
+			 							<p style={styles.details}>
+											<b>Billability:</b> {this.state.cadet.Billability}
+										</p>
+										<p style={styles.details}>
+											<b>Band:</b> {this.state.cadet.CareerBand}
+										</p>
+									</span>
+								}
 
 								<h3>Digi-Thon</h3>
 								<p style={styles.details}>
