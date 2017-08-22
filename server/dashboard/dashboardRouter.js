@@ -355,8 +355,8 @@ router.get('/project/:name', auth.accessedBy(['PROJECTS']), function (req, res) 
 });
 
 // Get a single product version with name
-router.get('/projectversion/:name', 
-  auth.accessedBy(['MY_PROF', 'CANDIDATES', 'PROJECTS']), 
+router.get('/projectversion/:name',
+  auth.accessedBy(['MY_PROF', 'CANDIDATES', 'PROJECTS']),
   function (req, res) {
     try{
       dashboardNeo4jController.getProductVersion(req.params.name, function (version) {
@@ -497,7 +497,7 @@ router.post('/cadetproject', auth.accessedBy(['MY_PROF']), function (req, res) {
 
 
 // Get user Role
-router.get('/userrole', auth.accessedBy(['ATTENDANCE', 'CANDIDATES']), function (req, res) {
+router.get('/userrole', auth.accessedBy(['ATTENDANCE', 'CANDIDATES', 'PROJECTS']), function (req, res) {
   try {
     dashboardMongoController.getUserRole(req.user.email, function (cadet) {
       res.status(201).json(cadet.role);

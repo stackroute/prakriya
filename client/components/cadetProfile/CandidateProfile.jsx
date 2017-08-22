@@ -66,16 +66,29 @@ export default class CandidateProfile extends React.Component {
 			startDate: '',
 			endDate: '',
 			mode: '',
-			Wave: ''
+			Wave: '',
+			role: ''
 		}
 		this.getCandidate = this.getCandidate.bind(this);
 		this.getProfilePic = this.getProfilePic.bind(this);
 		this.formatDate = this.formatDate.bind(this);
+		this.getRole = this.getRole.bind(this);
 	}
 
 	componentWillMount() {
 		this.getCandidate(this.props.routeParams.id);
-		
+		this.getRole();
+	}
+
+	getRole() {
+		let th = this
+    Request.get('/dashboard/userrole').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({role: res.body});
+      }
+    })
 	}
 
 	getCandidate(EmpID) {
@@ -141,9 +154,11 @@ export default class CandidateProfile extends React.Component {
 						<Col md={4}>
 							<img src={this.state.imageURL} style = {styles.profilePic}/>
 							<h2 style = {{width: '225px', textAlign: 'center'}}>{this.state.cadet.EmployeeName}</h2>
-							<h4 style = {{width: '225px', textAlign: 'center'}}>
+							<h4 style = {{width: '300px', textAlign: 'center'}}>
 								<MailIcon style = {{ position: 'relative', top: '5px'}}/> <span> &nbsp;&nbsp;
-								{this.state.cadet.EmailID}</span><br/><br/>
+								{this.state.cadet.EmailID}</span>
+							</h4>
+							<h4 style = {{width: '225px', textAlign: 'center'}}>
 								<CallIcon style = {{ position: 'relative', top: '5px'}}/> <span> &nbsp;&nbsp;
 								{this.state.cadet.Contact}</span>
 								<br/>
@@ -165,6 +180,19 @@ export default class CandidateProfile extends React.Component {
 	 							<p style={styles.details}>
 									<b>Work Experience:</b> {this.state.cadet.WorkExperience}
 								</p>
+
+								{
+									this.state.role === 'wiproadmin' &&
+									<span>
+										<h3>Status</h3>
+			 							<p style={styles.details}>
+											<b>Billability:</b> {this.state.cadet.Billability}
+										</p>
+										<p style={styles.details}>
+											<b>Band:</b> {this.state.cadet.CareerBand}
+										</p>
+									</span>
+								}
 
 								<h3>Digi-Thon</h3>
 								<p style={styles.details}>

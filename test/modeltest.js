@@ -36,7 +36,7 @@ describe('User', () => {
             });
         });
 
-});6
+});
 
     describe('User', () => {
         it("should delete a user by id", function(done){
