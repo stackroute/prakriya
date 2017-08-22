@@ -92,7 +92,7 @@ ReactDOM.render(
 				<Route path="/assessmenttracker" component={AssessmentTracker} />
 				<Route path="/programflow" component={ProgramFlow} />
 				<Route path="/myprofile" component={MyProfile} />
-				<Route path="/projects" component={Projects} />
+				<Route path="/projects" component={() => <Projects user={user}/>} />
 				<Route path="/feedback" component={Feedback} />
 				<Route path="/evaluationforms" component={EvaluationForms} />
 				<Route path="/attendance" component={Attendance} />
