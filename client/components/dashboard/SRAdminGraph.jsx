@@ -28,52 +28,52 @@ componentWillMount() {
 
   getWaves() {
 		 let th = this;
-		 Request.get('/dashboard/waves').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+		 Request.get('/dashboard/wavesDuration').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
 				 if (err)
 						 console.log(err)
 				 else {
 						 let activeWaves = []
-						 console.log(res.body)
+						 console.log(res.body,"getwaves")
 						 res.body.map(function(wave, key) {
-								 let sdate = new Date(wave.StartDate);
-								 let edate = new Date(wave.EndDate);
+               console.log(wave,"wave")
+								 let sdate = new Date(parseInt(wave.StartDate, 10));
+								 let edate = new Date(parseInt(wave.EndDate, 10));
+                 console.log(sdate ,"sadate")
 								 if (sdate < Date.now() && edate > Date.now())
 										 activeWaves.push(wave);
 								 }
 						 )
 						 th.setState({activeWaves: activeWaves, waves: res.body})
-						 console.log(th.state.activeWaves)
-						 console.log(th.state.waves)
+						 console.log(th.state.activeWaves,"activewavesState")
+						 console.log(th.state.waves,"wavesin state")
 				 }
 		 })
  }
- // showProgress(waveObj) {
- //   let sdate = new Date(waveObj.StartDate);
- //   let edate = new Date(waveObj.EndDate);
- //   let total = edate - sdate;
- //   let prog = Date.now() - sdate;
- //   return Math.round(prog*100/total);
- // }
-
 	render() {
 
     let sampledata = []
+    console.log(this.state.activeWaves,"this.state.activeWaves")
     this.state.activeWaves.map(function(activewave,i){
       console.log(activewave,"activewave")
            let myobj = {}
            myobj.waveid = activewave.CourseName + '(' + activewave.WaveID + ')';
-          let sdate = new Date(activewave.StartDate);
-       		let edate = new Date(activewave.EndDate);
+          let sdate = new Date(parseInt(activewave.StartDate, 10));
+       		let edate = new Date(parseInt(activewave.EndDate, 10));
        		let total = edate - sdate;
+          let total1 = total/1000;
+            total1=  Math.floor(total1 / 86400) + 1;
        		let prog = Date.now() - sdate;
        		    let progg = Math.round(prog*100/total);
            myobj.value = progg;
+           myobj.total = total1;
+           myobj.duration = activewave.Duration;
            sampledata.push(myobj);
 
 console.log(myobj.waveid,myobj.value)
     })
 
 console.log(sampledata,"myobj");
+
 let Titems = [];
 for(let i=0;i<sampledata.length;i++){
   Titems.push(sampledata[i].waveid)
@@ -99,11 +99,11 @@ console.log(Tdatavalue,"Tdatavalue")
   let myobj1 = {}
           Tdatavalue.map(function(val,i){
 
-             myobj.label= "completed";
+             myobj.label= "Days completed";
              myobj.value = val.value;
              myobj.color = "#008DD5";
-             myobj1.label = "Inprogess";
-             myobj1.value = 100-val.value;
+             myobj1.label = "Days yet to go";
+             myobj1.value = val.total-val.value;
              myobj1.color = "#EE4266";
              console.log(myobj,"maaobj")
              console.log(myobj1,"wdbwejhf")

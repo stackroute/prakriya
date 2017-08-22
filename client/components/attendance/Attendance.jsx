@@ -220,8 +220,8 @@ export default class Attendance extends React.Component {
         console.log(res.body);
         th.setState({
             CadetEmail: res.body.data.EmailID,
-            startDate: res.body.data.Wave.StartDate,
-            endDate: res.body.data.Wave.EndDate
+            startDate: new Date(parseInt(res.body.data.Wave.StartDate, 10)),
+            endDate: new Date(parseInt(res.body.data.Wave.EndDate, 10))
           })
       }
     })
@@ -501,7 +501,7 @@ export default class Attendance extends React.Component {
         let attendance = '';
         let mark = true;
         let today = this.formatDate(new Date());
-        if((new Date() > new Date(th.state.startDate)) && (new Date() < new Date(th.state.endDate)))
+        if((new Date() > th.state.startDate) && (new Date() < th.state.endDate))
         {
         let todayAttendance = false;
         this.state.cadet.DaysPresent.map(function(date) {

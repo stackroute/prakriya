@@ -17,6 +17,7 @@ import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 import RemoveIcon from 'material-ui/svg-icons/content/remove-circle-outline';
 import DateIcon from 'material-ui/svg-icons/action/date-range';
 import GroupIcon from 'material-ui/svg-icons/social/group';
+import GoHIcon from 'material-ui/svg-icons/social/school';
 import LocationIcon from 'material-ui/svg-icons/communication/location-on';
 import Dialog from 'material-ui/Dialog';
 import Cadets from './Cadets.jsx';
@@ -93,6 +94,7 @@ export default class WaveCard extends React.Component {
     this.removecadetwave = this.removecadetwave.bind(this);
     this.handleRemoveCadetsChange = this.handleRemoveCadetsChange.bind(this);
     this.handleremovecadets = this.handleremovecadets.bind(this);
+    this.handleGoHChange = this.handleGoHChange.bind(this);
   }
 
   handleEditWave() {
@@ -223,6 +225,11 @@ export default class WaveCard extends React.Component {
     wave.EndDate = date.getTime();
     this.setState({wave: wave})
   }
+  handleGoHChange(event) {
+    let wave = this.state.wave;
+    wave.GoH = event.target.value;
+    this.setState({wave: wave})
+	}
   handleCourseChange(event, key, val) {
     this.setState({selectedCourse: val})
   }
@@ -325,14 +332,14 @@ export default class WaveCard extends React.Component {
             </IconButton>
             <span style={{
               position: 'absolute',
-              top: '33%'
+              top: '28%'
             }}>{this.props.wave.Location}</span><br/>
             <IconButton tooltip="Date">
               <DateIcon/>
             </IconButton>
             <span style={{
               position: 'absolute',
-              top: '47%'
+              top: '42%'
             }}>{this.formatDate(this.props.wave.StartDate)}
               - {this.formatDate(this.props.wave.EndDate)}</span><br/>
             <IconButton tooltip="Course">
@@ -340,15 +347,24 @@ export default class WaveCard extends React.Component {
             </IconButton>
             <span style={{
               position: 'absolute',
-              top: '62%'
+              top: '55%'
             }}>{this.props.wave.Course}</span><br/>
+            <IconButton tooltip="Guest of Honour">
+              <GoHIcon/>
+            </IconButton>
+            <span style={{
+              position: 'absolute',
+              top: '67%'
+            }}>{this.props.wave.GoH}</span><br/>
             <IconButton tooltip="Members" onClick={this.handleOpen}>
               <GroupIcon/>
             </IconButton>
             {this.props.wave.Cadets != undefined && <b style={{
               position: 'absolute',
-              top: '77%'
+              top: '80%'
             }}>({this.props.wave.Cadets})</b>}
+
+
             <IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{
               float: 'right'
             }}>
@@ -455,6 +471,13 @@ export default class WaveCard extends React.Component {
               })
 }
             </SelectField>
+          </div>
+          <div style={dialog.box100}>
+            <TextField
+            floatingLabelText="Guest of Honour"
+            value={th.state.wave.GoH} fullWidth={true}
+            onChange={th.handleGoHChange}
+            />
           </div>
         </Dialog>
       </div>

@@ -39,6 +39,7 @@ export default class Projects extends React.Component {
 		this.addVersion = this.addVersion.bind(this)
 	}
 	componentWillMount() {
+		 console.log('USER == ', this.props.user)
 		 this.getProjects()
 	}
 
@@ -139,7 +140,10 @@ export default class Projects extends React.Component {
 				return(
 			<div>
 				<h2 style={styles.heading}>Product Management</h2>
-				<ProjectDialog addProject={this.addProject} dialogTitle={'ADD PRODUCT'}/>
+				{
+					th.props.user.role === 'mentor' &&
+					<ProjectDialog addProject={this.addProject} dialogTitle={'ADD PRODUCT'}/>
+				}
 				{
 					this.state.projects.length > 0 ?
 					<Grid><Row md={10}>

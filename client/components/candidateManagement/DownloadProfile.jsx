@@ -141,6 +141,14 @@ export default class DownloadProfile extends React.Component {
 	}
 
 	render() {
+		if(this.props.view !== undefined) {
+			return(
+					<h4 onClick = {this.downloadCandidateProfile} style = {{cursor: 'pointer'}}>
+						<DownloadIcon style={this.props.style} color={this.props.color}/>
+						&nbsp; DownloadProfile
+					</h4>
+			)
+		}
 			return(
 				<DownloadIcon style={this.props.style} color={this.props.color}
 					onClick={this.downloadCandidateProfile}/>

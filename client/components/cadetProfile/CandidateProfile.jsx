@@ -7,18 +7,18 @@ import {grey50} from 'material-ui/styles/colors';
 import Request from 'superagent';
 import Moment from 'moment';
 import DownloadProfile from '../candidateManagement/DownloadProfile.jsx';
+import IconButton from 'material-ui/IconButton';
+import MailIcon from 'material-ui/svg-icons/communication/email';
+import CallIcon from 'material-ui/svg-icons/communication/call';
+import {Link} from 'react-router';
 
 const styles = {
 	iconWrapper : {
 		float: 'right'
 	},
 	container: {
-		marginTop: 10,
-		marginBottom: 20
-	},
-	actionIcon: {
-		marginRight: 15,
-		cursor: 'pointer'
+		marginLeft: -10,
+		marginRight: -10
 	},
 	name: {
 		color: '#fff',
@@ -38,8 +38,21 @@ const styles = {
 	details: {
 		marginTop: -15,
 		marginLeft: 50,
-		fontSize: 13,
+		fontSize: 18,
 		lineHeight: 1.5
+	},
+	profilePic: {
+		height: 175,
+		width: 175,
+		border: '3px solid #202D3E',
+		borderRadius: 100,
+		marginLeft: '8%',
+		marginTop: '3%'
+	},
+	hr: {
+		marginTop: '1px',
+		height: '2px',
+		backgroundColor: '#202D3E'
 	}
 }
 
@@ -62,6 +75,7 @@ export default class CandidateProfile extends React.Component {
 
 	componentWillMount() {
 		this.getCandidate(this.props.routeParams.id);
+		
 	}
 
 	getCandidate(EmpID) {
@@ -111,83 +125,73 @@ export default class CandidateProfile extends React.Component {
 	}
 
 	render() {
-		let cadetSkill = []
-		let i = 0
+
+		let cadetSkill = [];
+		let i = 0;
 
 		return (
-			<div>
+			<div style = {{overflowX: 'hidden'}}>
+				<div style={{backgroundColor: '#202D3E'}}>
+					<br/>
+					<b style = {{color: '#FFFFFF', fontSize: '18px', marginLeft: '40%'}}>CADET PROFILE</b><br/><br/>
+				</div>
+				<div style={styles.hr}/>
 				<Grid>
-					<div style={styles.container}>
-						{
-							<Grid>
-								<Row>
-									<Col md={8} mdOffset={2} style={styles.name}>
-										<span>
-											<h3>
-												{this.state.cadet.EmployeeName}
-												<span style={styles.iconWrapper}>
-													<DownloadProfile
-														color={grey50}
-														style={styles.actionIcon}
-														candidate={this.state.cadet}
-														imageURL={this.state.imageURL}
-														zip={false}
-													/>
-												</span>
-											</h3>
-										</span>
-									</Col>
-								</Row>
-								<Row>
-									<Col md={2} mdOffset={2} style={styles.pic}>
-										<CardMedia>
-											<img src={this.state.imageURL}/>
-										</CardMedia>
-										<p style={styles.basicDetails}>
-											Employee Id: {this.state.cadet.EmployeeID}<br/>
-											Career Band: {this.state.cadet.CareerBand}<br/>
-											Email: {this.state.cadet.EmailID}<br/>
-											Wave: {this.state.cadet.Wave}
-										</p>
-									</Col>
-									<Col md={6} mdOffset={1}>
-										<h4>Personal Details</h4>
-										<p style={styles.details}>
-											EmailID: {this.state.cadet.EmailID} <br/>
-											Alternate EmailID: {this.state.cadet.AltEmail}<br/>
-											Contact Number: {this.state.cadet.Contact} </p>
-										<h4>Experience</h4>
-			 							<p style={styles.details}>
-											Work Experience: {this.state.cadet.WorkExperience}
-										</p>
+					<Row>
+						<Col md={4}>
+							<img src={this.state.imageURL} style = {styles.profilePic}/>
+							<h2 style = {{width: '225px', textAlign: 'center'}}>{this.state.cadet.EmployeeName}</h2>
+							<h4 style = {{width: '225px', textAlign: 'center'}}>
+								<MailIcon style = {{ position: 'relative', top: '5px'}}/> <span> &nbsp;&nbsp;
+								{this.state.cadet.EmailID}</span><br/><br/>
+								<CallIcon style = {{ position: 'relative', top: '5px'}}/> <span> &nbsp;&nbsp;
+								{this.state.cadet.Contact}</span>
+								<br/>
+							</h4>
+							<h3
+							style = {{width: '225px', textAlign: 'center'}}>
+							<DownloadProfile
+									color='black'
+									candidate={this.state.cadet}
+									imageURL={this.state.imageURL}
+									zip={false}
+									view = 'full'
+									style = {{ position: 'relative', top: '5px', cursor: 'pointer'}}
+								/></h3>
+							</Col>
+							<Col md = {8}>
+								<br/>
+								<h3>Experience</h3>
+	 							<p style={styles.details}>
+									<b>Work Experience:</b> {this.state.cadet.WorkExperience}
+								</p>
 
-										<h4>Digi-Thon</h4>
-										<p style={styles.details}>
-											Digi-Thon Phase: {this.state.cadet.DigiThonPhase}<br/>
-											Digi-Thon Score: {this.state.cadet.DigiThonScore}
-										</p>
-
-										{
+								<h3>Digi-Thon</h3>
+								<p style={styles.details}>
+									<b>Digi-Thon Phase:</b> {this.state.cadet.DigiThonPhase}<br/>
+									<b>Digi-Thon Score:</b> {this.state.cadet.DigiThonScore}
+								</p>
+								{
 											this.state.cadet.Remarks != undefined &&
 											this.state.cadet.Remarks != '' &&
 											<div>
-												<h4>Mentor Meet</h4>
+												<h3>Mentor Meet</h3>
 												<p style={styles.details}>
-													Selected: {this.state.cadet.Selected}<br/>
-													Remarks: {this.state.cadet.Remarks}
+													<b>Selected:</b> {this.state.cadet.Selected}<br/>
+													<b>Remarks:</b> {this.state.cadet.Remarks}
 											</p>
 											</div>
 										}
-										<h4>Training Details</h4>
+										<h3>Training Details</h3>
 										<p style={styles.details}>
-											Wave: {this.state.cadet.Wave}<br/>
-											Mode: {this.state.cadet.Mode}<br/>
-											Start Date: {this.formatDate(new Date(parseInt(this.state.cadet.startDate, 10)))}<br/>
-											End Date: {this.formatDate(new Date(parseInt(this.state.cadet.endDate, 10)))}
+											<b>Wave:</b> {this.state.cadet.Wave}<br/>
+											<b>Mode:</b> {this.state.cadet.Mode}<br/>
+											<b>Start Date:</b> {this.formatDate(new Date(parseInt(this.state.cadet.startDate, 10)))}<br/>
+											<b>End Date:</b> {this.formatDate(new Date(parseInt(this.state.cadet.endDate, 10)))}
 										</p>
 										{
 											<div>
-												<h4>Skills:</h4>
+												<h3>Skills</h3>
 												{
 													cadetSkill[i] = []
 												}
@@ -198,10 +202,10 @@ export default class CandidateProfile extends React.Component {
 															i = i + 1
 															cadetSkill[i] = []
 														}
-														cadetSkill[i].push(<Col md={2}><li>{skill}</li></Col>)
+														cadetSkill[i].push(<Col md={2}><li style = {{fontSize: '18px'}}>{skill}</li></Col>)
 													})
 												}
-												<Grid>
+												<Grid style = {{marginLeft : '5%'}}>
 												{
 															cadetSkill.map(function(skills){
 																return <Row>{skills}</Row>
@@ -215,32 +219,34 @@ export default class CandidateProfile extends React.Component {
 											this.state.cadet.AcademyTrainingSkills != undefined &&
 											this.state.cadet.AcademyTrainingSkills != '' &&
 											<div>
-												<h4>Academy Training Skills</h4>
+												<h3>Academy Training Skills</h3>
 												<p style={styles.details}>
-													Skills: {this.state.cadet.AcademyTrainingSkills}
+													<b>Skills:</b> {this.state.cadet.AcademyTrainingSkills}
 											</p>
 											</div>
 										}
 										{(this.state.cadet.ProjectName !== '' && this.state.cadet.ProjectName !== undefined) &&
 										<div>
-										<h4>Project Details</h4>
+										<h3>Project Details</h3>
 										<p style={styles.details}>
-											Project Name: {this.state.cadet.ProjectName}<br/>
-											Project Description: {this.state.cadet.ProjectDescription}<br/>
+											<b>Project Name: </b><Link
+							          to={'/product/' + this.state.cadet.ProjectName}
+							          target="_blank"
+												style = {{textDecoration: 'none'}}
+								        >{this.state.cadet.ProjectName}<br/>
+											</Link>
+											<b>Project Description:</b> {this.state.cadet.ProjectDescription}<br/>
 										</p></div>
 										}
-										<h4>Manager Details</h4>
+										<h3>Manager Details</h3>
 										<p style={styles.details}>
-											Primary Supervisor: {this.state.cadet.PrimarySupervisor}<br/>
-											Project Supervisor: {this.state.cadet.ProjectSupervisor}
+											<b>Primary Supervisor:</b> {this.state.cadet.PrimarySupervisor}<br/>
+											<b>Project Supervisor:</b> {this.state.cadet.ProjectSupervisor}
 										</p>
-									</Col>
-								</Row>
-							</Grid>
-						}
-					</div>
+							</Col>
+						</Row>
 				</Grid>
 			</div>
-		);
+		)
 	}
 }
