@@ -187,7 +187,8 @@ export default class WaveCard extends React.Component {
   }
 
   closeUpdateDialog() {
-    this.setState({openDialog: false, addCadet: false})
+    let wave = this.props.wave;
+    this.setState({openDialog: false, addCadet: false, wave: wave})
   }
 
   handleOpen() {
@@ -331,37 +332,41 @@ export default class WaveCard extends React.Component {
               <LocationIcon/>
             </IconButton>
             <span style={{
-              position: 'absolute',
-              top: '28%'
+              position: 'relative',
+              top: '-5px'
             }}>{this.props.wave.Location}</span><br/>
             <IconButton tooltip="Date">
               <DateIcon/>
             </IconButton>
             <span style={{
-              position: 'absolute',
-              top: '42%'
+              position: 'relative',
+              top: '-5px'
             }}>{this.formatDate(this.props.wave.StartDate)}
               - {this.formatDate(this.props.wave.EndDate)}</span><br/>
             <IconButton tooltip="Course">
               <CourseIcon/>
             </IconButton>
             <span style={{
-              position: 'absolute',
-              top: '55%'
+              position: 'relative',
+              top: '-5px'
             }}>{this.props.wave.Course}</span><br/>
-            <IconButton tooltip="Guest of Honour">
-              <GoHIcon/>
-            </IconButton>
-            <span style={{
-              position: 'absolute',
-              top: '67%'
-            }}>{this.props.wave.GoH}</span><br/>
+            {
+              ( this.props.wave.GoH !== '' && this.props.wave.GoH !== undefined ) && <div>
+                <IconButton tooltip="Guest of Honour">
+                  <GoHIcon/>
+                </IconButton>
+                <span style={{
+                  position: 'relative',
+                  top: '-5px'
+                }}>{this.props.wave.GoH}</span><br/>
+              </div>
+            }
             <IconButton tooltip="Members" onClick={this.handleOpen}>
               <GroupIcon/>
             </IconButton>
             {this.props.wave.Cadets != undefined && <b style={{
-              position: 'absolute',
-              top: '80%'
+              position: 'relative',
+              top: '-5px'
             }}>({this.props.wave.Cadets})</b>}
 
 
