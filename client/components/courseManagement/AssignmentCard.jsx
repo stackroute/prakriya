@@ -11,31 +11,7 @@ import DateIcon from 'material-ui/svg-icons/action/date-range';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
-
-const styles = {
-  heading: {
-    textAlign: 'center'
-  },
-  col: {
-    marginBottom: 20
-  },
-  deleteDialog: {
-    backgroundColor: '#DDDBF1',
-    border: '10px solid teal'
-  },
-  actionsContainer: {
-    backgroundColor: 'teal',
-    borderTop: '0px',
-    marginTop: '0px'
-  },
-  actionButton: {
-    backgroundColor: '#DDDBF1',
-    width: '50%',
-    color: 'teal',
-    border: '1px solid teal',
-    height: '100%'
-  }
-}
+import dialog from '../../styles/dialog.json';
 
 export default class AssignmentCard extends React.Component {
 	constructor(props) {
@@ -69,7 +45,7 @@ export default class AssignmentCard extends React.Component {
         this.closeDeleteDialog
       }
       style = {
-        styles.actionButton
+        dialog.actionButton
       } />, < FlatButton label = "Delete" onTouchTap = {
         this.closeDeleteDialog
       }
@@ -77,7 +53,7 @@ export default class AssignmentCard extends React.Component {
         this.handleDeleteAssignment
       }
       style = {
-        styles.actionButton
+        dialog.actionButton
       } />
     ]
 		return(
@@ -142,8 +118,8 @@ export default class AssignmentCard extends React.Component {
             <DeleteIcon/>
           </IconButton>
 				</Card>
-        <Dialog bodyStyle={styles.deleteDialog} actionsContainerStyle={styles.actionsContainer} actions={deleteDialogActions} modal={false} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
-          Are you sure you want to delete this Assignment?
+        <Dialog bodyStyle={dialog.confirmBox} actionsContainerStyle={dialog.actionsContainer} actions={deleteDialogActions} modal={false} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
+          Are you sure? You want to delete this assignment?
         </Dialog>
 			</div>
 		)

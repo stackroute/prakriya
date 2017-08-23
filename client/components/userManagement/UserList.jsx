@@ -70,7 +70,8 @@ export default class UserList extends React.Component {
       .query({filename: user.username})
   		.end(function(err, res) {
   			if(err) {
-					user.profilePic = '../../../assets/images/avt-default.jpg'
+				  	console.log('Profile pic not found.');
+						user.profilePic = '../../../assets/images/avt-default.jpg'
 				} else {
   	    	if(res.text) {
   		    	user.profilePic = res.text

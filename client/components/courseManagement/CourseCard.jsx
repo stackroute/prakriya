@@ -22,31 +22,7 @@ import AddCourse from './AddCourse.jsx';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import DateIcon from 'material-ui/svg-icons/action/date-range';
-
-const styles = {
-  heading: {
-    textAlign: 'center'
-  },
-  col: {
-    marginBottom: 20
-  },
-  deleteDialog: {
-    backgroundColor: '#DDDBF1',
-    border: '10px solid teal'
-  },
-  actionsContainer: {
-    backgroundColor: 'teal',
-    borderTop: '0px',
-    marginTop: '0px'
-  },
-  actionButton: {
-    backgroundColor: '#DDDBF1',
-    width: '50%',
-    color: 'teal',
-    border: '1px solid teal',
-    height: '100%'
-  }
-}
+import dialog from '../../styles/dialog.json';
 
 export default class CourseCard extends React.Component {
   constructor(props) {
@@ -152,7 +128,7 @@ export default class CourseCard extends React.Component {
         this.closeDeleteDialog
       }
       style = {
-        styles.actionButton
+        dialog.actionButton
       } />, < FlatButton label = "Delete" onTouchTap = {
         this.closeDeleteDialog
       }
@@ -160,7 +136,7 @@ export default class CourseCard extends React.Component {
         this.handleDeleteCourse
       }
       style = {
-        styles.actionButton
+        dialog.actionButton
       } />
     ]
     let th = this
@@ -240,12 +216,10 @@ export default class CourseCard extends React.Component {
           </IconButton>
           {this.state.openDialog && <AddCourse course={this.props.course} openDialog={this.state.openDialog} skills={th.props.skills} handleUpdate={this.handleUpdateCourse} handleClose={this.handleClose}/>
 }
-					{this.state.showDetailDialog && <CourseSubCard course={this.props.course} openDialog={this.state.showDetailDialog} handleUpdate={this.handleUpdateCourse} handleClose={this.closeDetailDialog} title="ADD"
-
-          />}
+					{this.state.showDetailDialog && <CourseSubCard skills={th.props.skills} course={this.props.course} openDialog={this.state.showDetailDialog} handleUpdate={this.handleUpdateCourse} handleClose={this.closeDetailDialog} title="ADD"/>}
         </Card>
-        <Dialog bodyStyle={styles.deleteDialog} actionsContainerStyle={styles.actionsContainer} actions={deleteDialogActions} modal={false} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
-          Are you sure you want to delete this course?
+        <Dialog bodyStyle={dialog.confirmBox} actionsContainerStyle={dialog.actionsContainer} actions={deleteDialogActions} modal={false} open={this.state.showDeleteDialog} onRequestClose={this.closeDeleteDialog}>
+          Are you sure? You want to delete this course?
         </Dialog>
       </div>
     )

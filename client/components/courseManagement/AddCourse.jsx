@@ -167,7 +167,6 @@ export default class AddCourse extends React.Component {
       if(duplicateFound) {
         th.openSnackbar('Duplicate Skill! Try adding a new skill.', '');
       } else if (!matchFound){
-        // th.openSnackbar('Please choose a value from the drop down.', '');
         th.openSnackbar('New Skill! Wanna move it to the superset?', 'YES');
       } else {
         skills.push(skill);

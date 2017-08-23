@@ -56,10 +56,10 @@ export default class DownloadProfile extends React.Component {
 			.query({filename: username})
 			.end(function(err, res) {
 				if(err) {
+					console.log('Profile pic not found.');
 					imageURL = '../../assets/images/avt-default.jpg';
 					th.downloadProfile(cadet, index);
-				}
-		    else {
+				} else {
 		    	if(res.text) {
 		    		imageURL = res.text;
 						th.downloadProfile(cadet, index);

@@ -122,9 +122,9 @@ export default class CandidateProfile extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.query({filename: username})
 			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
+				if(err) {
+    	    	console.log('Profile pic not found.');
+        } else {
 		    	if(res.text) {
 			    	th.setState({
 			    		imageURL: res.text

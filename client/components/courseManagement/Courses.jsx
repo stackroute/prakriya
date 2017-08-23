@@ -308,7 +308,6 @@ export default class Courses extends React.Component {
 		    if(err)
 		    	console.log(err);
 		    else {
-					console.log('coming here')
 		    	th.getCourses();
 		    }
 		  });
@@ -321,9 +320,9 @@ export default class Courses extends React.Component {
 				<div>
 				<h2 style={styles.heading}>Course Management</h2>
 				<AddCourse handleAdd={this.addCourse} skills={this.state.skills}/>
-				<SkillSet 
-					skills={this.state.skills} 
-					addNewSkill={this.addNewSkill} 
+				<SkillSet
+					skills={this.state.skills}
+					addNewSkill={this.addNewSkill}
 					deleteSkill={this.deleteSkill}
 				/>
 				<Grid style={styles.grid}>
