@@ -38,10 +38,10 @@ const masonryOptions = {
 }
 
 const backgroundColors = [
-	'#F5DEBF',
-	'#DDDBF1',
-	'#CAF5B3',
-	'#C6D8D3'
+	'#F5DEBF ',
+  '#DDDBF1 ',
+  '#CAF5B3 ',
+  '#C6D8D3 '
 ]
 
 const backgroundIcons = [
