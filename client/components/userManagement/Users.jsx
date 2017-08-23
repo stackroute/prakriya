@@ -43,7 +43,6 @@ export default class Users extends React.Component {
 		}
 		this.getRoles = this.getRoles.bind(this);
 		this.getUsers = this.getUsers.bind(this);
-		this.getProfilePic = this.getProfilePic.bind(this);
 		this.addUser = this.addUser.bind(this);
 		this.deleteUser = this.deleteUser.bind(this);
 		this.updateUser = this.updateUser.bind(this);
@@ -88,9 +87,6 @@ export default class Users extends React.Component {
 		    if(err) {
 					console.log(err)
 				} else {
-					res.body.map(function(user) {
-						th.getProfilePic(user)
-					})
 					console.log('res.body: ', res.body)
 					th.setState({
 						users: res.body
@@ -99,24 +95,6 @@ export default class Users extends React.Component {
 				}
 		  })
 	}
-
-	getProfilePic(user, i, arr) {
-  	Request
-  		.get(`/dashboard/getimage`)
-  		.set({'Authorization': localStorage.getItem('token')})
-      .query({filename: user.username})
-  		.end(function(err, res) {
-  			if(err) {
-					user.profilePic = '../../../assets/images/avt-default.jpg'
-				} else {
-  	    	if(res.text) {
-  		    	user.profilePic = res.text
-  	    	} else {
-						user.profilePic = '../../../assets/images/avt-default.jpg'
-					}
-  	    }
-  		})
-  }
 
 	addUser(user) {
 		let th = this
@@ -264,7 +242,14 @@ export default class Users extends React.Component {
 							this.state.users.map(function (user, index) {
 								return(
 									<Col style={styles.card} md={3} key={index}>
-										<UserList  currUser={user} lockUser={th.lockUser} unlockUser={th.unlockUser} roles={th.state.roles} deleteUser={th.deleteUser} updateUser={th.updateUser} />
+										<UserList  
+											currUser={user} 
+											lockUser={th.lockUser} 
+											unlockUser={th.unlockUser} 
+											roles={th.state.roles} 
+											deleteUser={th.deleteUser} 
+											updateUser={th.updateUser} 
+										/>
 									</Col>
 								)
 							})

@@ -196,7 +196,7 @@ export default class CourseCard extends React.Component {
           <IconButton tooltip="Skills">
 						<SkillsIcon/>
 					</IconButton>
-          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{th.setState({showSkills:!th.state.showSkills})}}>
+          <span style={{textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={()=>{th.setState({showSkills:!th.state.showSkills})}}>
             {this.props.course.Skills.length}&nbsp;skill(s)
           </span><br/>
           {
@@ -207,14 +207,14 @@ export default class CourseCard extends React.Component {
           <IconButton tooltip="Schedule">
             <ScheduleIcon/>
           </IconButton>
-          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={th.session}>
+          <span style={{textDecoration: 'underline', cursor: 'pointer', verticalAlign: 'super'}} onTouchTap={th.session}>
             {this.props.course.Schedule.length}&nbsp;session(s)
           </span><br/>
 
           <IconButton tooltip="Assignments">
 						<AssignmentIcon/>
 					</IconButton>
-          <span style={{color: '#0000aa', textDecoration: 'underline', cursor: 'pointer',  verticalAlign: 'super'}} onTouchTap={th.assignment}>
+          <span style={{textDecoration: 'underline', cursor: 'pointer',  verticalAlign: 'super'}} onTouchTap={th.assignment}>
             {this.props.course.Assignments.length}&nbsp;assignment(s)
           </span><br/>
 

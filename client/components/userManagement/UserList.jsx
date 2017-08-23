@@ -37,10 +37,12 @@ export default class UserList extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			user: {},
 			lockConfirm: false,
 			deleteConfirm: false,
 			openDialog: false
 		}
+		this.getProfilePic = this.getProfilePic.bind(this);
 		this.handleOpen = this.handleOpen.bind(this);
 	  this.handleClose = this.handleClose.bind(this);
 		this.handleOpenLock = this.handleOpenLock.bind(this);
@@ -53,8 +55,37 @@ export default class UserList extends React.Component {
 		this.handleEditClose = this.handleEditClose.bind(this);
 	}
 
+	componentWillMount() {
+		this.setState({
+			user: this.props.currUser
+		})
+		this.getProfilePic(this.props.currUser)
+	}
+
+	getProfilePic(user) {
+		let th = this;
+  	Request
+  		.get(`/dashboard/getimage`)
+  		.set({'Authorization': localStorage.getItem('token')})
+      .query({filename: user.username})
+  		.end(function(err, res) {
+  			if(err) {
+					user.profilePic = '../../../assets/images/avt-default.jpg'
+				} else {
+  	    	if(res.text) {
+  		    	user.profilePic = res.text
+  	    	} else {
+						user.profilePic = '../../../assets/images/avt-default.jpg'
+					}
+  	    }
+  	    th.setState({
+  	    	user: user
+  	    })
+  		})
+  }
+
 	disabledUser = () => {
-		if(this.props.currUser.actions.indexOf('login') > -1)
+		if(this.state.user.actions.indexOf('login') > -1)
 			return false
 		else
 			return true
@@ -78,15 +109,15 @@ export default class UserList extends React.Component {
 
   handleAccountSuspension() {
   	this.handleCloseLock();
-  	if(this.props.currUser.actions.indexOf('login') > -1)
-			this.props.lockUser(this.props.currUser)
+  	if(this.state.user.actions.indexOf('login') > -1)
+			this.props.lockUser(this.state.user)
 		else
-			this.props.unlockUser(this.props.currUser)
+			this.props.unlockUser(this.state.user)
 	}
 
 	handleRemoveUser() {
 		this.handleClose();
-		this.props.deleteUser(this.props.currUser);
+		this.props.deleteUser(this.state.user);
 	}
 
 	handleEditUser() {
@@ -134,19 +165,18 @@ export default class UserList extends React.Component {
 		const accountTooltip = this.disabledUser() ? 'Unlock Account' : 'Lock Account' ;
 		const disabled = this.disabledUser()
 		let type = typeof color;
-		let th = this;
 		return (
 			<div>
 					<Card>
-						<CardMedia overlay={<CardTitle title={this.props.currUser.username} subtitle={this.props.currUser.role.toUpperCase()} />}>
-				      <img src={th.props.currUser.profilePic || '../../../assets/images/avt-default.jpg'} style={{height: 250}}/>
+						<CardMedia overlay={<CardTitle title={this.state.user.username} subtitle={this.state.user.role.toUpperCase()} />}>
+				      <img src={this.state.user.profilePic || '../../../assets/images/avt-default.jpg'} style={{height: 250}}/>
 				    </CardMedia>
-				    <CardTitle title={this.props.currUser.name} subtitle={this.props.currUser.email} />
+				    <CardTitle title={this.state.user.name} subtitle={this.state.user.email} />
 						<CardActions style={styles.cardActions}>
 							<IconButton tooltip={accountTooltip} onTouchTap={this.handleOpenLock} >
 					      <LockIcon color={color} />
 					    </IconButton>
-					    {(this.props.currUser.actions.indexOf('login') > -1)?(<Dialog
+					    {(this.state.user.actions.indexOf('login') > -1)?(<Dialog
 										bodyStyle={styles.dialog}
 					          actions={lockActions}
 										actionsContainerStyle={styles.actionsContainer}
@@ -188,7 +218,7 @@ export default class UserList extends React.Component {
 						{
 							this.state.openDialog &&
 							<AddUser
-								user={this.props.currUser}
+								user={this.state.user}
 								roles={this.props.roles}
 								openDialog={this.state.openDialog}
 								handleUpdate={this.handleUpdateUser}

@@ -26,18 +26,18 @@ const styles = {
 }
 
 const backgroundColors = [
-	'#F5DEBF',
-	'#DDDBF1',
-	'#CAF5B3',
-	'#C6D8D3'
-	]
+	'#F5DEBF ',
+  '#DDDBF1 ',
+  '#CAF5B3 ',
+  '#C6D8D3 '
+]
 
 const backgroundIcons = [
 	'#847662',
 	'#666682',
 	'#4e5f46',
 	'#535f5b'
-	]
+]
 
 export default class Courses extends React.Component {
 	constructor(props) {
@@ -55,6 +55,7 @@ export default class Courses extends React.Component {
 
 		this.getSkillSet = this.getSkillSet.bind(this);
 		this.addNewSkill = this.addNewSkill.bind(this);
+		this.deleteSkill = this.deleteSkill.bind(this);
 		this.getCourses = this.getCourses.bind(this);
 		this.updateCourse = this.updateCourse.bind(this);
 		this.deleteCourse = this.deleteCourse.bind(this);
@@ -123,6 +124,25 @@ export default class Courses extends React.Component {
       else {
         skills.push(skill);
         th.setState({skills: skills});
+      }
+    });
+  }
+
+  deleteSkill(skill) {
+  	let th = this;
+    Request
+    .post('/dashboard/deleteskill')
+    .set({'Authorization': localStorage.getItem('token')})
+    .send({skill: skill})
+    .end(function(err, res) {
+    	if(res.body == 'SUCCESS') {
+      	th.getSkillSet();
+      }
+      else {
+      	th.setState({
+      		message: 'Cannot delete this skill',
+      		open: true
+      	})
       }
     });
   }
@@ -301,7 +321,11 @@ export default class Courses extends React.Component {
 				<div>
 				<h2 style={styles.heading}>Course Management</h2>
 				<AddCourse handleAdd={this.addCourse} skills={this.state.skills}/>
-				<SkillSet skills={this.state.skills} addNewSkill={this.addNewSkill}/>
+				<SkillSet 
+					skills={this.state.skills} 
+					addNewSkill={this.addNewSkill} 
+					deleteSkill={this.deleteSkill}
+				/>
 				<Grid style={styles.grid}>
 					<Row>
 						{

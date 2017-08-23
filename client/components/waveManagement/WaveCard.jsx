@@ -332,14 +332,14 @@ export default class WaveCard extends React.Component {
             </IconButton>
             <span style={{
               position: 'absolute',
-              top: '33%'
+              top: '28%'
             }}>{this.props.wave.Location}</span><br/>
             <IconButton tooltip="Date">
               <DateIcon/>
             </IconButton>
             <span style={{
               position: 'absolute',
-              top: '47%'
+              top: '42%'
             }}>{this.formatDate(this.props.wave.StartDate)}
               - {this.formatDate(this.props.wave.EndDate)}</span><br/>
             <IconButton tooltip="Course">
@@ -347,22 +347,24 @@ export default class WaveCard extends React.Component {
             </IconButton>
             <span style={{
               position: 'absolute',
-              top: '62%'
+              top: '55%'
             }}>{this.props.wave.Course}</span><br/>
+            <IconButton tooltip="Guest of Honour">
+              <GoHIcon/>
+            </IconButton>
+            <span style={{
+              position: 'absolute',
+              top: '67%'
+            }}>{this.props.wave.GoH}</span><br/>
             <IconButton tooltip="Members" onClick={this.handleOpen}>
               <GroupIcon/>
             </IconButton>
             {this.props.wave.Cadets != undefined && <b style={{
               position: 'absolute',
-              top: '77%'
+              top: '80%'
             }}>({this.props.wave.Cadets})</b>}
-            {/*<IconButton tooltip="Guest of Honour">
-              <GoHIcon/>
-            </IconButton>
-            <span style={{
-              position: 'absolute',
-              top: '92%'
-            }}>{this.props.wave.GoH}</span>*/}
+
+
             <IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{
               float: 'right'
             }}>

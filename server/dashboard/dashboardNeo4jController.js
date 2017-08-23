@@ -1889,6 +1889,24 @@ let createNewSkill = function(skill, successCB, errorCB) {
   });
 };
 
+// Delete a skill
+let deleteSkill = function(skill, successCB, errorCB) {
+  let query = 
+    `MATCH (skill:${graphConsts.NODE_SKILL} {Name: '${skill}'})
+    DELETE skill`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      successCB('SUCCESS');
+    } else {
+      errorCB('deleteSkill: Error');
+    }
+  }).catch(function(err) {
+    errorCB(err)
+  });
+};
+
 //Billability
 let getBillabilityStats = function(successCB, errorCB) {
   let session = driver.session();
@@ -2006,6 +2024,7 @@ module.exports = {
       updateRating,
       getSkillSet,
       createNewSkill,
+      deleteSkill,
       getBillabilityStats,
       getTrainingStats,
       ActivewaveCadets,

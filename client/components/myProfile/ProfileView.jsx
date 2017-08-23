@@ -18,10 +18,12 @@ import Dropzone from 'react-dropzone';
 import Moment from 'moment';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import DatePicker from 'material-ui/DatePicker';
+import {Link} from 'react-router';
 
 const styles = {
 	container: {
-		marginBottom: 20
+		marginBottom: 20,
+		overflowX: 'hidden'
 	},
 	heading: {
 		textAlign: 'center'
@@ -35,7 +37,7 @@ const styles = {
 	name: {
 		color: '#fff',
 		background: '#555',
-		textAlign: 'center',
+		textAlign: 'center'
 	},
 	pic: {
 		height: 200,
@@ -220,6 +222,10 @@ export default class ProfileView extends React.Component {
 
 	render() {
 		let th = this;
+
+		let cadetSkill = [];
+		let i = 0;
+
     const assetDialogActions = [
       <FlatButton
         label="Cancel"
@@ -354,10 +360,27 @@ export default class ProfileView extends React.Component {
 							}
 							{
 								<div>
-								<strong>Skills:</strong> <ul>{
-									this.state.Skills.map( function(skill) {
-										return <li>{skill}</li>
-									})}</ul>
+								<strong>Skills:</strong>
+								{
+									cadetSkill[i] = []
+								}
+								{
+									this.state.Skills !== undefined &&
+									this.state.Skills.map(function(skill, key) {
+										if(key % 3 === 0) {
+											i = i + 1
+											cadetSkill[i] = []
+										}
+										cadetSkill[i].push(<Col md={2}><li style = {{fontSize: '13px'}}>{skill}</li></Col>)
+									})
+								}
+								<Grid style = {{marginLeft : '5%'}}>
+								{
+											cadetSkill.map(function(skills){
+												return <Row>{skills}</Row>
+											})
+								}
+							</Grid>
 								</div>
 							}
 
@@ -369,7 +392,14 @@ export default class ProfileView extends React.Component {
 										Project Details
 									</h4>
 									<p style={styles.details}>
-										<strong>Project Name:</strong> {this.state.cadet.ProjectName}<br/>
+										<strong>Project Name:</strong>
+										<Link
+											to={'/product/' + this.state.cadet.ProjectName}
+											target="_blank"
+											style = {{textDecoration: 'none'}}
+											>
+												{this.state.cadet.ProjectName}
+											</Link><br/>
 										<strong>Project Description:</strong> {this.state.cadet.ProjectDescription}<br/>
 									</p>
 								</div>
