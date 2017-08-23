@@ -51,8 +51,8 @@ export default class ProjectDialog extends React.Component {
 			projectDesc: '',
 			candidateSet:[],
 			wave: '',
-			openSnackBar: false,
-			snackBarMsg: '',
+			snackbarOpen: false,
+			snackbarMessage: '',
 			sessionOn: {},
 			candidates: [],
 			skillName: '',
@@ -93,7 +93,8 @@ export default class ProjectDialog extends React.Component {
 		this.onPresentationURLChange = this.onPresentationURLChange.bind(this);
 		this.validationSuccess = this.validationSuccess.bind(this);
 		this.resetFields = this.resetFields.bind(this);
-
+		this.openSnackbar = this.openSnackbar.bind(this);
+		this.hideSnackbar = this.hideSnackbar.bind(this);
 	}
 
 	componentWillMount() {
@@ -277,6 +278,20 @@ export default class ProjectDialog extends React.Component {
 		})
 	}
 
+	openSnackbar(message) {
+		this.setState({
+			snackbarMessage: message,
+			snackbarOpen: true
+		});
+	}
+
+	hideSnackbar() {
+		this.setState({
+			snackbarMessage: '',
+			snackbarOpen: false
+		});
+	}
+
 	onDialogClose(e, action) {
 		if(action == 'CLOSE DIALOG') {
 			if(this.props.dialogTitle == 'ADD PRODUCT') {
@@ -423,15 +438,9 @@ export default class ProjectDialog extends React.Component {
 				return s.toLowerCase() == skill.toLowerCase();
 			});
 			if(duplicateFound) {
-				this.setState({
-					snackBarMsg: "Duplicate Skill! Cannot be added.",
-					openSnackBar: true
-				})
+				this.openSnackbar('Duplicate Skill! Cannot be added.');
 			} else if (!matchFound){
-				this.setState({
-					snackBarMsg: "Skill not found! Please select one from the drop down.",
-					openSnackBar: true
-				})
+				this.openSnackbar('Skill not found! Please select one from the drop down.');
 			} else {
 				skills.push(skill);
 				th.setState({
@@ -646,7 +655,7 @@ export default class ProjectDialog extends React.Component {
 						<p>
 							Contributors
 							{
-								th.state.candidateIDs.length > 0 ? ` - (${th.state.candidateIDs.length})` : ''
+								th.state.candidates.length > 0 ? ` - (${th.state.candidates.length})` : ''
 							}
 						</p>
 	          {
@@ -760,6 +769,12 @@ export default class ProjectDialog extends React.Component {
 						</div>
 					</div>
       </Dialog>
+			<Snackbar
+				open={this.state.snackbarOpen}
+				message={this.state.snackbarMessage}
+				autoHideDuration={4000}
+				onRequestClose={this.hideSnackbar}
+			/>
 		</div>)
 	}
 }

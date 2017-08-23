@@ -169,7 +169,7 @@ export default class Projects extends React.Component {
 						}
 						</Masonry>
 					</Row></Grid> :
-					<h4 style={{textAlign: 'center', width: '100%'}}>NO PROJECTS TO DISPLAY</h4>
+					<h4 style={{textAlign: 'center', width: '100%'}}>NO PRODUCTS TO DISPLAY</h4>
 				}
 			</div>
 		)

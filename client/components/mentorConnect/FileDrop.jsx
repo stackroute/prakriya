@@ -2,30 +2,24 @@ import React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dropzone from 'react-dropzone';
 import UploadIcon from 'material-ui/svg-icons/file/file-upload';
-import {Grid, Row, Col} from 'react-flexbox-grid';
+import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import {CSVLink, CSVDownload} from 'react-csv';
 import Request from 'superagent';
 
 const styles = {
-	container: {
-		marginTop: 10,
-		marginBottom: 20
+	paper: {
+		padding: '10px',
+		backgroundColor: '#C6D8D3'
 	},
 	dropzone: {
 		background: '#eee',
 		height: '100px',
 		borderStyle: 'dashed',
 		paddingTop: '40px',
-		boxSizing: 'border-box'
-	},
-	downloadIcon: {
-		float: 'right'
-	},
-	uploadBtn: {
-		marginTop: 20, 
-		float: 'left'
+		boxSizing: 'border-box',
+		textAlign: 'center'
 	}
 }
 
@@ -44,7 +38,7 @@ export default class FileDrop extends React.Component {
 	}
 
 	componentWillMount() {
-		this.getTemplate();	
+		this.getTemplate();
 	}
 
 	getTemplate() {
@@ -73,49 +67,46 @@ export default class FileDrop extends React.Component {
 			showSelFile: true,
 			selectedFile: acceptedFiles[0]
 		})
-		console.log('Accepted files: ', acceptedFiles);
-    console.log('Rejected files: ', rejectedFiles);
 	}
 
 	render() {
 		return(
-			<div style={styles.container}>
-				<Row>
-					<Col md={6} mdOffset={9}>
-						<CSVLink 
+			<div>
+				<Paper style={styles.paper}>
+					<div>
+						<Dropzone style={styles.dropzone} onDrop={this.handleDrop}>
+							<div>Drop or Click to upload csv files in required format</div>
+						</Dropzone>
+					</div>
+				</Paper>
+				<Paper style={styles.paper}>
+					<div style={{textAlign: 'left', padding: '3px'}}>
+						<RaisedButton
+							label="Upload"
+							primary={true}
+							icon={<UploadIcon />}
+							onClick={this.handleUpdateRemarks}
+							disabled={!this.state.showSelFile}
+						/>
+						{
+							this.state.showSelFile ?
+							<span> {this.state.selectedFile.name}</span> :
+							<span> No File Selected.</span>
+						}
+					</div>
+					<div style={{textAlign: 'right', padding: '3px'}}>
+						<CSVLink
 							data={this.state.template}
-							filename={"remarks_template.csv"} 
+							filename={"remarks_template.csv"}
 						>
 							<FlatButton
 					      label="Template"
 					      secondary={true}
 					      icon={<DownloadIcon />}
-					      style={styles.downloadIcon}
 					    />
 					  </CSVLink>
-					</Col>
-				</Row>
-    		<Row>
-    			<Col md={12} mdOffset={3}>
-						<Dropzone style={styles.dropzone} onDrop={this.handleDrop}>
-		          <div>Drop or Click to upload csv files in required format</div>
-		        </Dropzone>
-				    <RaisedButton
-				      label="Upload"
-				      primary={true}
-				      icon={<UploadIcon />}
-				      onClick={this.handleUpdateRemarks}
-				      disabled={!this.state.showSelFile}
-				      style={styles.uploadBtn}
-				    />
-				    {
-				    	this.state.showSelFile &&
-				    	<span>
-				    		{this.state.selectedFile.name}
-				    	</span>
-				    }
-	    		</Col>
-    		</Row>
+					</div>
+				</Paper>
 			</div>
 		)
 	}
