@@ -197,19 +197,22 @@ export default class AssessmentTracker extends React.Component {
             <Col md={6}>
               <Paper style={{
                 boxSizing: 'border-box',
-                padding: '5px'
+                padding: '5px',
+                backgroundColor: '#C6D8D3'
               }}>
                 <SelectField onChange={th.onWaveChange} floatingLabelText="Select Wave" value={th.state.wave}>
-                  {th.state.waves.map(function(val, key) {
-                    return <MenuItem key={key} value={val + ' (' + th.state.Course[key] + ')'} primaryText={val + ' (' + th.state.Course[key] + ')'}/>
-                  })
-}
+                  {
+                    th.state.waves.map(function(val, key) {
+                      return <MenuItem key={key} value={val + ' (' + th.state.Course[key] + ')'} primaryText={val + ' (' + th.state.Course[key] + ')'}/>
+                    })
+                  }
                 </SelectField>
                 <SelectField onChange={th.onAssessmentChange} floatingLabelText="Select Assessment" value={th.state.assessment}>
-                  {th.state.select && th.state.Assignments.map(function(val, key) {
-                    return <MenuItem key={key} value={val.Name} primaryText={val.Name}/>
-                  })
-}
+                  {
+                    th.state.select && th.state.Assignments.map(function(val, key) {
+                      return <MenuItem key={key} value={val.Name} primaryText={val.Name}/>
+                    })
+                  }
                 </SelectField>
               </Paper>
             </Col>

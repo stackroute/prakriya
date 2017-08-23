@@ -34,7 +34,12 @@ const muiTheme = getMuiTheme(lightBaseTheme);
 muiTheme.baseTheme.palette.primary1Color = '#202D3E';
 muiTheme.appBar.color = '#202D3E';
 muiTheme.floatingActionButton.color = '#202D3E';
-muiTheme.inkBar.backgroundColor = '#202D3E';
+muiTheme.textField.focusColor = '#202D3E';
+muiTheme.flatButton.primaryTextColor = '#202D3E';
+muiTheme.slider.selectionColor = '#202D3E';
+muiTheme.slider.rippleColor = '#202D3E';
+muiTheme.datePicker.selectColor = '#202D3E';
+
 console.log('muiTheme', muiTheme);
 
 var user;
