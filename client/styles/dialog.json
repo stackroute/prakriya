@@ -52,7 +52,7 @@ module.exports = {
     'padding': '5px'
   },
   'confirmBox': {
-    'backgroundColor': '#202D3E',
+    /*'backgroundColor': '#202D3E',*/
     'border': '10px solid #C6D8D3'
   }
 }
