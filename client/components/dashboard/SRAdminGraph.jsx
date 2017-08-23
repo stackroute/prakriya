@@ -3,8 +3,10 @@ import NVD3Chart from 'react-nvd3';
 import Request from 'superagent';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import Paper from 'material-ui/Paper';
+import WaveProgress from './WaveProgress.jsx';
 import Toggle from 'material-ui/Toggle';
+import Paper from 'material-ui/Paper';
+
 
 const styles = {
   container: {
@@ -16,7 +18,7 @@ const styles = {
   }
 }
 
-//const Titems = ['Completed', 'InProgress']
+
 export default class SRAdminGraph extends React.Component {
   constructor(props) {
     super(props);

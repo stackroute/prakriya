@@ -39,7 +39,6 @@ export default class Projects extends React.Component {
 		this.addVersion = this.addVersion.bind(this)
 	}
 	componentWillMount() {
-		 console.log('USER == ', this.props.user)
 		 this.getProjects()
 	}
 

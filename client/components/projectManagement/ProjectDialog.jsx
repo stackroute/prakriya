@@ -1,19 +1,20 @@
 import React from 'react';
-import Request from 'superagent'
-import FloatingActionButton from 'material-ui/FloatingActionButton'
-import ContentAdd from 'material-ui/svg-icons/content/add'
-import Dialog from 'material-ui/Dialog'
-import TextField from 'material-ui/TextField'
-import FlatButton from 'material-ui/FlatButton'
-import SelectField from 'material-ui/SelectField'
-import MenuItem from 'material-ui/MenuItem'
-import AutoComplete from 'material-ui/AutoComplete'
-import Paper from 'material-ui/Paper'
-import Chip from 'material-ui/Chip'
-import Snackbar from 'material-ui/Snackbar'
-import AddIcon from 'material-ui/svg-icons/content/add-circle-outline'
-import IconButton from 'material-ui/IconButton'
-import {Grid, Row, Col} from 'react-flexbox-grid'
+import Request from 'superagent';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import AutoComplete from 'material-ui/AutoComplete';
+import Paper from 'material-ui/Paper';
+import Chip from 'material-ui/Chip';
+import Snackbar from 'material-ui/Snackbar';
+import Checkbox from 'material-ui/Checkbox';
+import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
+import IconButton from 'material-ui/IconButton';
+import {Grid, Row, Col} from 'react-flexbox-grid';
 import app from '../../styles/app.json';
 import dialog from '../../styles/dialog.json';
 
@@ -48,66 +49,89 @@ export default class ProjectDialog extends React.Component {
 			projectName: '',
 			versionName: '',
 			projectDesc: '',
-			candidates:[],
+			candidateSet:[],
 			wave: '',
-			searchPerm: '',
 			openSnackBar: false,
 			snackBarMsg: '',
 			sessionOn: {},
-			candidateList: [],
+			candidates: [],
 			skillName: '',
 			skills: [],
+			skillSet: [],
 			projectNameErrorText: '',
 			projectDescErrorText: '',
 			waveErrorText: '',
 			skillsErrorText: '',
-			candidatesName: [] ,
-			candidateIDList: [] ,
-			candidateDelList: [],
+			candidateNames: [] ,
+			candidateIDs: [] ,
+			candidateEmailID: [],
 			project: {},
-			Course: []
+			Course: [],
+			gitURL: '',
+			gitBranch: '',
+			videoURL: '',
+			presentationURL: ''
 		}
+		this.getSkillSet = this.getSkillSet.bind(this);
 		this.getWaveIDs = this.getWaveIDs.bind(this)
-		this.handleOpen = this.handleOpen.bind(this);
-		this.handleClose = this.handleClose.bind(this);
-		this.handleNameChange = this.handleNameChange.bind(this);
-		this.handleVersionChange = this.handleVersionChange.bind(this);
-		this.handleDescChange = this.handleDescChange.bind(this);
-		this.handleAdd = this.handleAdd.bind(this);
-		this.handleControlDelete = this.handleControlDelete.bind(this);
-		this.handleUpdateInputPerm = this.handleUpdateInputPerm.bind(this);
-		this.handleAddNewPerm = this.handleAddNewPerm.bind(this);
+		this.onDialogOpen = this.onDialogOpen.bind(this);
+		this.onDialogClose = this.onDialogClose.bind(this);
+		this.onNameChange = this.onNameChange.bind(this);
+		this.onVersionChange = this.onVersionChange.bind(this);
+		this.onDescChange = this.onDescChange.bind(this);
+		this.onProductAddition = this.onProductAddition.bind(this);
+		this.onToggleCandidate = this.onToggleCandidate.bind(this);
 		this.onWaveChange = this.onWaveChange.bind(this);
-		this.onChangeAddSkill = this.onChangeAddSkill.bind(this);
-		this.onChangeSkill = this.onChangeSkill.bind(this);
-		this.handleSkillDelete = this.handleSkillDelete.bind(this);
-		this.handleUpdate = this.handleUpdate.bind(this);
+		this.onSkillAddition = this.onSkillAddition.bind(this);
+		this.onSkillChange = this.onSkillChange.bind(this);
+		this.onSkillDeletion = this.onSkillDeletion.bind(this);
+		this.onVersionUpdation = this.onVersionUpdation.bind(this);
+		this.onVersionAddition = this.onVersionAddition.bind(this);
+		this.onGitBranchChange = this.onGitBranchChange.bind(this);
+		this.onGitURLChange = this.onGitURLChange.bind(this);
+		this.onVideoURLChange = this.onVideoURLChange.bind(this);
+		this.onPresentationURLChange = this.onPresentationURLChange.bind(this);
 		this.validationSuccess = this.validationSuccess.bind(this);
-		this.handleAddVersion = this.handleAddVersion.bind(this);
+		this.resetFields = this.resetFields.bind(this);
+
 	}
 
 	componentWillMount() {
 		if(localStorage.getItem('token')) {
-			this.getWaveIDs()
+			this.getWaveIDs();
+			this.getSkillSet();
 		}
-		if(this.props.dialogTitle == 'EDIT PRODUCT') {
+		if(this.props.dialogTitle == 'EDIT VERSION') {
 			let th = this;
-			let candidateList = [];
-			let candidateIDList = [];
+			let candidates = [];
+			let candidateIDs = [];
 			this.props.project.version[th.props.version].members.map(function(member) {
-				candidateList.push(member.EmployeeName)
-				candidateIDList.push(member.EmployeeID)
+				candidates.push(member.EmployeeName)
+				candidateIDs.push(member.EmployeeID)
 			})
+			let git = this.props.project.version[th.props.version].gitURL.split('/tree/');
+			let gitBranch = '';
+			let gitURL = '';
+			if(git.length > 0) {
+				gitURL = git[0];
+				gitBranch = git[1];
+			}
+			let videoURL = this.props.project.version[th.props.version].videoURL;
+			let presentationURL = this.props.project.version[th.props.version].presentationURL;
 			this.setState({
 				project: th.props.project,
 				projectName: this.props.project.product,
 				versionName: this.props.project.version[th.props.version].name,
 				projectDesc: this.props.project.version[th.props.version].description,
-				candidateList:candidateList,
-				candidateIDList:candidateIDList,
+				candidates: candidates,
+				candidateIDs: candidateIDs,
 				wave: this.props.project.version[th.props.version].wave,
 				skills: this.props.project.version[th.props.version].skills,
-				showDialog: this.props.openDialog
+				showDialog: this.props.openDialog,
+				gitURL: gitURL,
+				gitBranch: gitBranch,
+				videoURL: videoURL,
+				presentationURL: presentationURL
 			})
 			this.getCandidates(this.props.project.version[th.props.version].wave);
 		}
@@ -118,6 +142,20 @@ export default class ProjectDialog extends React.Component {
 			})
 		}
 	}
+
+	getSkillSet() {
+    let th = this;
+    Request
+    .get('/dashboard/skillset')
+    .set({'Authorization': localStorage.getItem('token')})
+    .end(function(err, res) {
+      if (err) {
+				console.log('Error in fetching skillset. ');
+			} else {
+        th.setState({skillSet: res.body});
+      }
+    });
+  }
 
 	getWaveIDs() {
 		let th = this
@@ -143,17 +181,19 @@ export default class ProjectDialog extends React.Component {
 		th.setState({
 			wave: e.target.outerText,
 			waveErrorText: '',
-			candidateList: [],
-			candidateIDList: []
+			candidates: [],
+			candidateIDs: []
 		})
 		th.getCandidates(e.target.outerText)
 	}
 
 	getCandidates(waveID) {
-			let th = this
-			let candidateList = []
-			let candidateName = []
-			let candidateID = []
+			let th = this;
+			let candidateSet = [];
+			let candidateNames = [];
+			let candidateIDs = [];
+			let candidateEmailID = [];
+			let candidates = [];
 			let wave = waveID.split('(')[0].trim();
 	    let course = waveID.split('(')[1].split(')')[0];
 	    Request
@@ -162,98 +202,86 @@ export default class ProjectDialog extends React.Component {
 				.send({waveid: wave, course: course})
 				.end(function(err, res){
 					res.body.map(function(candidate,index) {
-						candidateList.push(candidate)
-						candidateName.push(candidate.EmployeeName)
-						candidateID.push(candidate.EmployeeID)
-					})
+						let flag = false;
+						candidateSet.push(candidate)
+						if(th.props.dialogTitle == 'EDIT VERSION') {
+							th.props.project.version[th.props.version].members.filter(function (cadet) {
+								if(candidate.EmployeeName === cadet.EmployeeName) {
+									candidateNames.push({value: candidate.EmployeeName, checked: true})
+									candidates.push(cadet);
+									flag = true;
+								}
+							});
+							if(!flag) {
+								candidateNames.push({value: candidate.EmployeeName, checked: false})
+							}
+						}
+						else {
+							candidateNames.push({value: candidate.EmployeeName, checked: false});
+						}
+						candidateIDs.push(candidate.EmployeeID)
+						candidateEmailID.push(candidate.EmailID)
+					});
 					th.setState({
-						candidates: candidateList,
-						candidatesName: candidateName
-					})
+						candidateSet: candidateSet,
+						candidateNames: candidateNames,
+						candidateIDs: candidateIDs,
+						candidates: candidates,
+						candidateEmailID: candidateEmailID
+					});
 				})
 	}
 
-	handleControlDelete(perm) {
-		console.log(perm,"cntrlDelete")
-		let index = this.state.candidateList.indexOf(perm);
-		let candidatesID = this.state.candidateIDList.filter(function(id,key){
-			return index!=key
-		})
-		let candidatesLists = this.state.candidateList.filter(function(control) {
-			return perm != control
-		})
-		let candidateDelPerm = this.state.candidateDelList;
-		candidateDelPerm.push(this.state.candidateIDList[index]);
-		this.setState({
-			candidateList: candidatesLists,
-			candidateIDList: candidatesID,
-			candidateDelList: candidateDelPerm
-		})
-	}
-
-	handleUpdateInputPerm(searchPerm) {
-		this.setState({
-			searchPerm: searchPerm
-		})
-	}
-
-	handleAddNewPerm() {
-		let perms = [];
+	onToggleCandidate(event, isChecked) {
+		event.persist();
 		let th = this;
-		if(this.state.candidatesName.indexOf(this.state.searchPerm)> -1
-			 && this.state.candidateList.indexOf(this.state.searchPerm) === -1) {
-				perms = this.state.candidateList;
-				let index = this.state.candidatesName.indexOf(this.state.searchPerm);
-				let candidateID = this.state.candidateIDList;
-				candidateID.push(this.state.candidates[index].EmployeeID);
-				perms.push(this.state.searchPerm);
-				let candidateDelList = this.state.candidateDelList.filter(function(control) {
-					return th.state.candidates[index].EmployeeID != control
-				})
-				this.setState({
-					candidateList: perms,
-					searchPerm: '',
-					candidateIDList: candidateID,
-					candidateDelList: candidateDelList
-				})
-		} else {
-			if(this.state.candidateList.indexOf(this.state.searchPerm) >= 0) {
-				this.setState({
-					snackBarMsg: "Candidate already added",
-					openSnackBar: true
-				})
-			} else {
-				this.setState({
-					snackBarMsg: "Candidate not available",
-					openSnackBar: true
-				})
+		let index = -1;
+		let value = event.target.value;
+		let candidateNames = th.state.candidateNames;
+		let candidates = this.state.candidates;
+		candidateNames.some(function(name, indx) {
+			if(name.value == value) {
+				index = indx;
+				name.checked = isChecked;
 			}
+			return name.value == value;
+		});
+		if(isChecked) {
+			candidates.push(
+				{
+					EmployeeID: th.state.candidateIDs[index],
+					EmployeeName: value,
+					Email: th.state.candidateEmailID[index]
+				}
+			);
+			console.log(candidates)
+			this.setState({
+				candidateNames: candidateNames,
+				candidates: candidates
+			});
+		} else {
+			let id = th.state.candidateIDs[index];
+			candidates = candidates.filter(function(candidate) {
+				return candidate.EmployeeID != id;
+			});
+			this.setState({
+				candidateNames: candidateNames,
+				candidates: candidates
+			});
 		}
 	}
 
-	handleOpen() {
+	onDialogOpen() {
 		this.setState({
 			showDialog: true
 		})
 	}
 
-	handleClose(e, action) {
-		if(action == 'CLOSE') {
+	onDialogClose(e, action) {
+		if(action == 'CLOSE DIALOG') {
 			if(this.props.dialogTitle == 'ADD PRODUCT') {
-				this.setState({
-					showDialog: false,
-					projectName: '',
-					versionName: '',
-					projectDesc: '',
-					wave: '',
-					projectNameErrorText: '',
-					projectDescErrorText: '',
-					waveErrorText: '',
-					skillsErrorText: '',
-					skills: [],
-					candidateList: []
-				})
-			} else if(this.props.dialogTitle == 'EDIT PRODUCT') {
+				this.resetFields()
+			} else if(this.props.dialogTitle == 'EDIT VERSION') {
 				this.setState({
 					showDialog: false,
 					projectNameErrorText: '',
@@ -278,16 +306,14 @@ export default class ProjectDialog extends React.Component {
 				this.props.handleClose();
 			}
 		} else if(this.validationSuccess()) {
-			if(action == 'ADD') {
-				console.log("inside validationsucceshandle")
-				this.handleAdd()
-			} else if(action == 'EDIT') {
+			if(action == 'ADD PRODUCT') {
+				this.onProductAddition()
+			} else if(action == 'EDIT VERSION') {
 				this.props.handleClose()
-				this.handleUpdate()
-			} else if(action == 'VERSION') {
-				console.log('here')
+				this.onVersionUpdation()
+			} else if(action == 'ADD VERSION') {
 				this.props.handleClose()
-				this.handleAddVersion()
+				this.onVersionAddition()
 			}
 			this.setState({
 				showDialog: false
@@ -295,45 +321,58 @@ export default class ProjectDialog extends React.Component {
 		}
 	}
 
-	handleNameChange(e) {
+	onGitBranchChange(e) {
+		this.setState({
+			gitBranch: e.target.value
+		});
+	}
+
+	onGitURLChange(e) {
+		this.setState({
+			gitURL: e.target.value
+		});
+	}
+
+	onVideoURLChange(e) {
+		this.setState({
+			videoURL: e.target.value
+		});
+	}
+
+	onPresentationURLChange(e) {
+		this.setState({
+			presentationURL: e.target.value
+		});
+	}
+
+	onNameChange(e) {
 		this.setState({
 			projectName: e.target.value,
 			projectNameErrorText: ''
-		})
+		});
 	}
-	handleVersionChange(e) {
+
+	onVersionChange(e) {
 		this.setState({
 			versionName: e.target.value,
 			projectVersionErrorText: ''
-		})
-
+		});
 	}
 
-	handleDescChange(e) {
-		if(e.target.value.indexOf('\'') != -1 || e.target.value.indexOf('\"') != -1 || e.target.value.indexOf('\`') != -1) {
-			this.setState({
-				projectDesc: e.target.value,
-				projectDescErrorText: 'Please do not include characters like \', \" and \` in the description.'
-			})
-		} else {
-			this.setState({
-				projectDesc: e.target.value,
-				projectDescErrorText: ''
-			})
-		}
+	onDescChange(e) {
+		this.setState({
+			projectDesc: e.target.value,
+			projectDescErrorText: ''
+		});
 	}
 
-	handleAdd() {
-		 console.log(this.state.candidateList,"candidateList")
-
-			let project = {}
-			project.version = []
-			project.version.push({})
-		  project.version[0].members =[]
-			let th = this
-			this.state.candidateList.map(function(name, index){
-				project.version[0].members.push({EmployeeID:th.state.candidateIDList[index], EmployeeName:name})
-			})
+	onProductAddition() {
+			console.log('Product Addition: ', this.state.candidates)
+			let th = this;
+			let project = {};
+			project.version = [];
+			project.version.push({});
+		  project.version[0].members = this.state.candidates;
 			project.product = this.state.projectName;
 			project.version[0].name = this.state.versionName;
 			project.version[0].description = this.state.projectDesc;
@@ -341,91 +380,115 @@ export default class ProjectDialog extends React.Component {
 			project.version[0].skills = this.state.skills;
 			project.version[0].updated = false;
 			project.version[0].addedOn = new Date();
-			// project.version[0].addedBy = xyz;
-			this.setState({
-				projectName: '',
-				versionName: '',
-				projectDesc: '',
-				candidates:[],
-				wave: '',
-				skills: []
-			})
+			project.version[0].gitURL =
+				this.state.gitURL.trim().length > 0 && this.state.gitBranch.trim().length > 0 ?
+				this.state.gitURL + '/tree/' + this.state.gitBranch :
+				'';
+			project.version[0].videoURL = this.state.videoURL;
+			project.version[0].presentationURL = this.state.presentationURL;
+			this.resetFields();
 			this.props.addProject(project);
 	}
 
-	handleAddVersion() {
+	onVersionAddition() {
 			let th = this;
 			let product = th.state.projectName;
-			let version = {}
-		  version.members =[]
-			this.state.candidateList.map(function(name, index){
-				version.members.push({EmployeeID:th.state.candidateIDList[index],EmployeeName:name})
-			})
+			let version = {};
+		  version.members = this.state.candidates;
 			version.name= this.state.versionName;
 			version.description = this.state.projectDesc;
 			version.wave = this.state.wave;
 			version.skills = this.state.skills;
 			version.updated = true;
-			this.setState({
-				projectName: '',
-				versionName: '',
-				projectDesc: '',
-				candidates:[],
-				wave: '',
-				skills: []
-			})
+			version.gitURL =
+				this.state.gitURL.trim().length > 0 && this.state.gitBranch.trim().length > 0 ?
+				this.state.gitURL + '/tree/' + this.state.gitBranch :
+				'';
+			version.videoURL = this.state.videoURL;
+			version.presentationURL = this.state.presentationURL;
+			this.resetFields();
 			this.props.handleAddVersion({product: product, version: version});
 		}
 
-	onChangeAddSkill() {
+	onSkillAddition() {
+		let th = this;
 		if(this.state.skillName.trim().length != 0) {
-			let skills = this.state.skills
-			skills.push(this.state.skillName)
-			this.setState({
-				skills: skills,
-				skillName: ''
-			})
+			let skillSet = this.state.skillSet;
+			let skills = this.state.skills;
+			let skill = this.state.skillName;
+			let duplicateFound = skills.some(function(s) {
+				return s.toLowerCase() == skill.toLowerCase();
+			});
+			let matchFound = skillSet.some(function(s) {
+				return s.toLowerCase() == skill.toLowerCase();
+			});
+			if(duplicateFound) {
+				this.setState({
+					snackBarMsg: "Duplicate Skill! Cannot be added.",
+					openSnackBar: true
+				})
+			} else if (!matchFound){
+				this.setState({
+					snackBarMsg: "Skill not found! Please select one from the drop down.",
+					openSnackBar: true
+				})
+			} else {
+				skills.push(skill);
+				th.setState({
+					skills: skills,
+					skillName: '',
+					skillsErrorText: ''
+				});
+			}
 		} else {
-			this.setState({
+			th.setState({
 				skillName: ''
-			})
+			});
 		}
 	}
 
-	onChangeSkill(e) {
+	onSkillChange(value) {
 		this.setState({
-			skillName: e.target.value,
+			skillName: value,
 			skillsErrorText: ''
 		})
 	}
 
-	handleSkillDelete(perm) {
-		let skill = this.state.skills.filter(function(control) {
-			return perm != control
-		})
+	onSkillDeletion(skill) {
+		let skills = this.state.skills.filter(function(s) {
+			return skill != control;
+		});
 		this.setState({
-			skills: skill
-		})
+			skills: skills
+		});
 	}
 
-	handleUpdate() {
+	onVersionUpdation() {
 		let th = this;
 		let version = this.state.project.version[th.props.version];
-		version.members = [];
-		this.state.candidateList.map(function(name, index){
-			version.members.push({EmployeeName: name, EmployeeID: th.state.candidateIDList[index]})
-		})
+		version.members = this.state.candidates;
+		console.log(version.members);
 		version.name = this.state.versionName;
 		version.description = this.state.projectDesc;
 		version.wave = this.state.wave;
 		version.skills = this.state.skills;
 		version.addedOn = new Date();
+		version.gitURL =
+			this.state.gitURL.trim().length > 0 && this.state.gitBranch.trim().length > 0 ?
+			this.state.gitURL + '/tree/' + this.state.gitBranch :
+			'';
+		version.videoURL = this.state.videoURL;
+		version.presentationURL = this.state.presentationURL;
 		this.setState({
 			projectName: '',
 			projectDesc: '',
-			candidates:[],
+			candidateSet:[],
 			wave: '',
-			skills: []
+			skills: [],
+			gitURL: '',
+			gitBranch: '',
+			videoURL: '',
+			presentationURL: ''
 		})
 		this.props.handleUpdate(version);
 		this.props.handleClose();
@@ -458,17 +521,40 @@ export default class ProjectDialog extends React.Component {
 		return false
 	}
 
+	resetFields() {
+		this.setState({
+			showDialog: false,
+			projectName: '',
+			versionName: '',
+			projectDesc: '',
+			candidateSet: [],
+			candidateNames: [],
+			candidateIDs: [],
+			candidateEmailID: [],
+			wave: '',
+			skills: [],
+			gitURL: '',
+			gitBranch: '',
+			videoURL: '',
+			presentationURL: '',
+			projectNameErrorText: '',
+			projectDescErrorText: '',
+			waveErrorText: '',
+			skillsErrorText: ''
+		});
+	}
+
 	render() {
 		let th = this
 		const	AddActions = [
       <FlatButton
         label='Cancel'
-        onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
+        onTouchTap={(e)=>{this.onDialogClose(e, 'CLOSE DIALOG')}}
 				style={dialog.actionButton}
       />,
       <FlatButton
         label='Add'
-        onTouchTap={(e)=>{this.handleClose(e, 'ADD')}}
+        onTouchTap={(e)=>{this.onDialogClose(e, 'ADD PRODUCT')}}
 				style={dialog.actionButton}
       />
     ]
@@ -476,12 +562,12 @@ export default class ProjectDialog extends React.Component {
 		const	VersionActions = [
       <FlatButton
         label='Cancel'
-        onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
+        onTouchTap={(e)=>{this.onDialogClose(e, 'CLOSE DIALOG')}}
 				style={dialog.actionButton}
       />,
       <FlatButton
         label='Add'
-        onTouchTap={(e)=>{this.handleClose(e, 'VERSION')}}
+        onTouchTap={(e)=>{this.onDialogClose(e, 'ADD VERSION')}}
 				style={dialog.actionButton}
       />
     ]
@@ -489,25 +575,24 @@ export default class ProjectDialog extends React.Component {
     const	EditActions = [
       <FlatButton
         label='Cancel'
-        onTouchTap={(e)=>{this.handleClose(e, 'CLOSE')}}
+        onTouchTap={(e)=>{this.onDialogClose(e, 'CLOSE DIALOG')}}
 				style={dialog.actionButton}
 
       />,
       <FlatButton
         label='Update'
-				onTouchTap={(e)=>{this.handleClose(e, 'EDIT')}}
+				onTouchTap={(e)=>{this.onDialogClose(e, 'EDIT VERSION')}}
 				style={dialog.actionButton}
       />
     ]
 
-		let actions = []
-		if(this.props.dialogTitle == 'ADD PRODUCT') actions = AddActions
-		else if(this.props.dialogTitle == 'ADD VERSION') actions = VersionActions
-		else actions = EditActions
-
+		let actions = [];
+		if(this.props.dialogTitle == 'ADD PRODUCT') actions = AddActions;
+		else if(this.props.dialogTitle == 'ADD VERSION') actions = VersionActions;
+		else actions = EditActions;
 		return(
 		<div>
-			<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.handleOpen}>
+			<FloatingActionButton mini={true} style={app.fab} onTouchTap={this.onDialogOpen}>
 	      <ContentAdd />
 	    </FloatingActionButton>
 	    <Dialog
@@ -524,7 +609,7 @@ export default class ProjectDialog extends React.Component {
 			      floatingLabelText='Name *'
 						floatingLabelStyle={app.mandatoryField}
 						value={this.state.projectName}
-			      onChange={this.handleNameChange}
+			      onChange={this.onNameChange}
 						errorText={this.state.projectNameErrorText}
 						disabled={this.props.openDialog}
 						underlineDisabledStyle={styles.underlineDisabled}
@@ -535,7 +620,7 @@ export default class ProjectDialog extends React.Component {
 					floatingLabelText='Version *'
 					floatingLabelStyle={app.mandatoryField}
 					value={this.state.versionName}
-					onChange={this.handleVersionChange}
+					onChange={this.onVersionChange}
 					errorText={this.state.projectVersionErrorText}
 					disabled={this.props.showAddVersion}
 					underlineDisabledStyle={styles.underlineDisabled}
@@ -556,56 +641,55 @@ export default class ProjectDialog extends React.Component {
 							}
 					</SelectField>
 				</div>
-				<div style={{marginTop: '-25px'}}>
-					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box'}}>
-					<AutoComplete
-					      floatingLabelText='Select Candidates...'
-					      filter={AutoComplete.fuzzyFilter}
-					      searchText={this.state.searchPerm}
-			          onUpdateInput={this.handleUpdateInputPerm}
-			          onNewRequest={this.handleAddNewPerm}
-					      dataSource={this.state.candidatesName}
-					      maxSearchResults={5}
-								style={{padding: '5px'}}
-					    />
-		    	<Paper style={styles.paper} zDepth={1} >
-						<div style={styles.wrapper}>
+				<div>
+					<div style={dialog.box100}>
+						<p>
+							Contributors
 							{
-								th.state.candidateList.map(function (candidate, index) {
-									return(
-										<Chip
-											onRequestDelete={() => th.handleControlDelete(candidate)}
-						          style={styles.chip}
-						          key={index}
-						        >
-						          <span style={styles.chipName}>{candidate}</span>
-						        </Chip>
-					        )
-								})
+								th.state.candidateIDs.length > 0 ? ` - (${th.state.candidateIDs.length})` : ''
 							}
-						</div>
-					</Paper>
+						</p>
+	          {
+							th.state.candidateNames.length > 0 ?
+	          	th.state.candidateNames.map(function(name, index) {
+	          		return(
+		          		<Checkbox
+										label={name.value}
+										value={name.value}
+										onCheck={th.onToggleCandidate}
+										checked={name.checked}
+										key={index}
+										style={{width: '50%', display: 'inline-block'}}
+										iconStyle={{fill: '#202D3E'}}
+									/>
+								)
+	          	}) :
+								th.state.wave == '' ?
+								<p>Please select a wave to see the list of available candets.</p> :
+								<p>Sorry! No cadets available.</p>
+						}
 					</div>
-					<div style={{border: '2px solid white', width: '50%', display: 'inline-block', boxSizing: 'border-box'}}>
-					<TextField
-			    		hintText="Skills"
-			    		floatingLabelText="Skills *"
+				</div>
+				<div>
+					<div style={dialog.box100}>
+						<AutoComplete
+							floatingLabelText="Add Skills *"
 							floatingLabelStyle={app.mandatoryField}
-			    		value={this.state.skillName}
-							errorText={this.state.skillsErrorText}
-			    		onChange={this.onChangeSkill}
-							style={{padding: '5px'}}
-			    	/>
-			    	<IconButton tooltip="Add Skill" onClick={this.onChangeAddSkill}>
-				      <AddIcon/>
-				    </IconButton>
+							filter={AutoComplete.fuzzyFilter}
+							searchText={th.state.skillName}
+							onUpdateInput={th.onSkillChange}
+							onNewRequest={th.onSkillAddition}
+							dataSource={th.state.skillSet}
+							errorText={th.state.skillsErrorText}
+							maxSearchResults={5}
+						/>
 						<Paper style={styles.paper} zDepth={1} >
 							<div style={styles.wrapper}>
 								{
 									this.state.skills.map(function (skill, index) {
 										return(
 											<Chip
-												onRequestDelete={() => th.handleSkillDelete(skill)}
+												onRequestDelete={() => th.onSkillDeletion(skill)}
 							          style={styles.chip}
 							          key={index}
 							        >
@@ -619,18 +703,61 @@ export default class ProjectDialog extends React.Component {
 						</div>
 					</div>
 					<div>
-		      	<TextField
-				      floatingLabelText='Description *'
-							floatingLabelStyle={app.mandatoryField}
-				      value={this.state.projectDesc}
-				      onChange={this.handleDescChange}
-							errorText={this.state.projectDescErrorText}
-				      multiLine={true}
-				      rows={3}
-				      rowsMax={3}
-				      fullWidth={true}
-							style={{border: '2px solid white', padding: '5px', textAlign: 'justify', boxSizing: 'border-box'}}
-				    />
+						<div style={dialog.box100}>
+			      	<TextField
+					      floatingLabelText='Description *'
+								floatingLabelStyle={app.mandatoryField}
+					      value={th.state.projectDesc}
+					      onChange={th.onDescChange}
+								errorText={th.state.projectDescErrorText}
+					      multiLine={true}
+					      rows={3}
+					      rowsMax={3}
+					      fullWidth={true}
+					    />
+						</div>
+					</div>
+					<div>
+						<div style={dialog.box50}>
+			      	<TextField
+					      floatingLabelText='Git URL'
+					      value={th.state.gitURL}
+					      onChange={th.onGitURLChange}
+					      multiLine={true}
+					      fullWidth={true}
+					    />
+						</div>
+						<div style={dialog.box50}>
+			      	<TextField
+					      floatingLabelText='Git Branch'
+					      value={th.state.gitBranch}
+					      onChange={th.onGitBranchChange}
+					      multiLine={true}
+					      fullWidth={true}
+					    />
+						</div>
+					</div>
+					<div>
+						<div style={dialog.box100}>
+			      	<TextField
+					      floatingLabelText='Video URL'
+					      value={th.state.videoURL}
+					      onChange={th.onVideoURLChange}
+					      multiLine={true}
+					      fullWidth={true}
+					    />
+						</div>
+					</div>
+					<div>
+						<div style={dialog.box100}>
+			      	<TextField
+					      floatingLabelText='Presentation URL'
+					      value={th.state.presentationURL}
+					      onChange={th.onPresentationURLChange}
+					      multiLine={true}
+					      fullWidth={true}
+					    />
+						</div>
 					</div>
       </Dialog>
 		</div>)
