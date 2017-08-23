@@ -5,8 +5,9 @@ import Request from 'superagent';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import WaveProgress from './WaveProgress.jsx';
+import Toggle from 'material-ui/Toggle';
 
-//const Titems = ['Completed', 'InProgress']
+
 export default class SRAdminGraph extends React.Component {
 	constructor(props) {
 		super(props);
@@ -63,7 +64,8 @@ componentWillMount() {
           let total1 = total/1000;
             total1=  Math.floor(total1 / 86400) + 1;
        		let prog = Date.now() - sdate;
-       		    let progg = Math.round(prog*100/total);
+       		    let progg = prog/1000;
+							     progg = Math.floor(progg/ 86400) +1;
            myobj.value = progg;
            myobj.total = total1;
            myobj.duration = activewave.Duration;

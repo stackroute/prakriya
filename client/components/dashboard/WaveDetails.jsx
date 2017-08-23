@@ -17,11 +17,13 @@ import dialog from '../../styles/dialog.json';
 
 
 
+
 const styles = {
 	container: {
 		padding: 20,
 		borderRadius: 5,
 		backgroundColor: '#C6D8D3',
+		width: '50%'
 	},
 	wave: {
 		marginBottom: 30
