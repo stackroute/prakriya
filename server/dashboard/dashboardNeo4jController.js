@@ -684,6 +684,9 @@ let addProduct = function(productObj, successCB, errorCB) {
   version.addedBy = productObj.version[0].addedBy;
   version.addedOn = productObj.version[0].addedOn;
   version.updated = productObj.version[0].updated;
+  version.gitURL = productObj.version[0].gitURL;
+  version.videoURL = productObj.version[0].videoURL;
+  version.presentationURL = productObj.version[0].presentationURL;
 
   let session = driver.session();
 
@@ -701,7 +704,10 @@ let addProduct = function(productObj, successCB, errorCB) {
         wave: '${version.wave}',
         addedOn: '${version.addedOn}',
         addedBy: '${version.addedBy}',
-        updated: '${version.updated}'
+        updated: '${version.updated}',
+        gitURL: '${version.gitURL}',
+        videoURL: '${version.videoURL}',
+        presentationURL: '${version.presentationURL}'
        }
      )
      WITH version AS version, product AS product
@@ -746,6 +752,9 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   version.addedBy = versionObj.addedBy;
   version.addedOn = versionObj.addedOn;
   version.updated = versionObj.updated;
+  version.gitURL = productObj.version[0].gitURL;
+  version.videoURL = productObj.version[0].videoURL;
+  version.presentationURL = productObj.version[0].presentationURL;
 
   let session = driver.session();
 
@@ -758,7 +767,10 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
            wave: '${version.wave}',
            addedOn: '${version.addedOn}',
            addedBy: '${version.addedBy}',
-           updated: '${version.updated}'
+           updated: '${version.updated}',
+           gitURL: '${version.gitURL}',
+           videoURL: '${version.videoURL}',
+           presentationURL: '${version.presentationURL}'
          }
        )
        WITH version AS version
@@ -819,7 +831,10 @@ let updateVersion = function(version, successCB, errorCB) {
           SET version.description='${version.description}',
           version.addedOn='${String(version.addedOn)}',
           version.addedBy='${version.addedBy}',
-          version.updated=${version.updated}
+          version.updated=${version.updated},
+          version.gitURL='${version.gitURL}',
+          version.videoURL='${version.videoURL}',
+          version.presentationURL='${version.presentationURL}'
           WITH version AS version
           MATCH (product:${graphConsts.NODE_PRODUCT})
           -[:${graphConsts.REL_HAS}]-> (:${graphConsts.NODE_VERSION} {name: version.name})
@@ -968,7 +983,10 @@ let getProducts = function(successCB, errorCB) {
      skills: skills,
      addedBy: version.addedBy,
      addedOn: version.addedOn,
-     updated: version.updated
+     updated: version.updated,
+     gitURL: version.gitURL,
+     videoURL: version.videoURL,
+     presentationURL: version.presentationURL
    }) AS versions, product AS product
    RETURN {
      product: product.name,
@@ -1016,7 +1034,10 @@ let getProduct = function(productName, successCB, errorCB) {
      skills: skills,
      addedBy: version.addedBy,
      addedOn: version.addedOn,
-     updated: version.updated
+     updated: version.updated,
+     gitURL: version.gitURL,
+     videoURL: version.videoURL,
+     presentationURL: version.presentationURL
    }) AS versions, product AS product
    RETURN {
      product: product.name,
@@ -1891,7 +1912,7 @@ let createNewSkill = function(skill, successCB, errorCB) {
 
 // Delete a skill
 let deleteSkill = function(skill, successCB, errorCB) {
-  let query = 
+  let query =
     `MATCH (skill:${graphConsts.NODE_SKILL} {Name: '${skill}'})
     DELETE skill`;
   let session = driver.session();

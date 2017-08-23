@@ -156,6 +156,9 @@ export default class ProjectCard extends React.Component {
     }
     else {
         this.props.handleDelete(this.state.project.version[this.state.selectedVersionIndex],'version');
+        this.setState({
+          selectedVersionIndex: 0
+        })
         this.closeDeleteDialog();
     }
 
@@ -212,22 +215,7 @@ export default class ProjectCard extends React.Component {
         >
           {this.state.versionName[th.state.selectedVersionIndex].toUpperCase()}
         </Link>
-        <IconMenu iconButtonElement={< IconButton > <MoreVertIcon/> < /IconButton>}
-        anchorOrigin={{
-        horizontal: 'left',
-        vertical: 'top'
-      }} targetOrigin={{
-        horizontal: 'left',
-        vertical: 'top'
-      }} style={{marginLeft:'250px',marginTop:'-100px'}}>
-        {
-          th.state.versionName.map(function(val, key) {
-              return <MenuItem key={key} value={val} primaryText={val} onTouchTap={(e)=>th.onVersionChange(key, val)}/>
-          })
-        }
-          <MenuItem value='Add new version' primaryText='Add New Version' onClick={th.newVersion}/>
-      </IconMenu>
-    </span>)
+        </span>)
 
 		let cadetSkill = []
 		let i = 0
@@ -242,6 +230,21 @@ export default class ProjectCard extends React.Component {
           marginBottom: '20px',
           background: bgColor
         }}>
+        <IconMenu iconButtonElement={< IconButton > <MoreVertIcon/> < /IconButton>}
+        anchorOrigin={{
+          horizontal: 'left',
+          vertical: 'top'
+        }} targetOrigin={{
+          horizontal: 'left',
+          vertical: 'top'
+          }} style={{float:'right'}}>
+        {
+          th.state.versionName.map(function(val, key) {
+            return <MenuItem key={key} value={val} primaryText={val} onTouchTap={(e)=>th.onVersionChange(key, val)}/>
+          })
+        }
+        <MenuItem value='Add new version' primaryText='Add New Version' onClick={th.newVersion}/>
+      </IconMenu>
           <CardHeader
             title={title}
             subtitle={detail}
@@ -251,7 +254,6 @@ export default class ProjectCard extends React.Component {
               </Avatar>
             }
             />
-
           <CardText style={styles.text}>
             <h3>Description:</h3>{this.props.project.version[this.state.selectedVersionIndex].description}
             <h3>Tech Skills:</h3>
@@ -303,7 +305,7 @@ export default class ProjectCard extends React.Component {
           </Grid>
         </Dialog>
 
-        {this.state.openDialog && <ProjectDialog project={this.props.project} version={th.state.selectedVersionIndex} showAddVersion={true} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT PRODUCT'}/>
+        {this.state.openDialog && <ProjectDialog project={this.props.project} version={th.state.selectedVersionIndex} showAddVersion={true} openDialog={this.state.openDialog} handleUpdate={this.handleUpdateProject} handleClose={this.handleClose} dialogTitle={'EDIT VERSION'}/>
 }
         {this.state.newVersionDialog && <ProjectDialog project={this.props.project} version={th.state.selectedVersionIndex} showAddVersion={false} openDialog={this.state.newVersionDialog} handleAddVersion={this.addVersion} handleClose={this.handleClose} dialogTitle={'ADD VERSION'}/>
 }

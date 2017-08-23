@@ -64,6 +64,7 @@ export default class ProjectDialog extends React.Component {
 			skillsErrorText: '',
 			candidateNames: [] ,
 			candidateIDs: [] ,
+			candidateEmailID: [],
 			project: {},
 			Course: [],
 			gitURL: '',
@@ -108,6 +109,15 @@ export default class ProjectDialog extends React.Component {
 				candidates.push(member.EmployeeName)
 				candidateIDs.push(member.EmployeeID)
 			})
+			let git = this.props.project.version[th.props.version].gitURL.split('/tree/');
+			let gitBranch = '';
+			let gitURL = '';
+			if(git.length > 0) {
+				gitURL = git[0];
+				gitBranch = git[1];
+			}
+			let videoURL = this.props.project.version[th.props.version].videoURL;
+			let presentationURL = this.props.project.version[th.props.version].presentationURL;
 			this.setState({
 				project: th.props.project,
 				projectName: this.props.project.product,
@@ -117,7 +127,11 @@ export default class ProjectDialog extends React.Component {
 				candidateIDs: candidateIDs,
 				wave: this.props.project.version[th.props.version].wave,
 				skills: this.props.project.version[th.props.version].skills,
-				showDialog: this.props.openDialog
+				showDialog: this.props.openDialog,
+				gitURL: gitURL,
+				gitBranch: gitBranch,
+				videoURL: videoURL,
+				presentationURL: presentationURL
 			})
 			this.getCandidates(this.props.project.version[th.props.version].wave);
 		}
@@ -178,6 +192,8 @@ export default class ProjectDialog extends React.Component {
 			let candidateSet = [];
 			let candidateNames = [];
 			let candidateIDs = [];
+			let candidateEmailID = [];
+			let candidates = [];
 			let wave = waveID.split('(')[0].trim();
 	    let course = waveID.split('(')[1].split(')')[0];
 	    Request
@@ -186,14 +202,32 @@ export default class ProjectDialog extends React.Component {
 				.send({waveid: wave, course: course})
 				.end(function(err, res){
 					res.body.map(function(candidate,index) {
+						let flag = false;
 						candidateSet.push(candidate)
-						candidateNames.push({value: candidate.EmployeeName, checked: false})
+						if(th.props.dialogTitle == 'EDIT VERSION') {
+							th.props.project.version[th.props.version].members.filter(function (cadet) {
+								if(candidate.EmployeeName === cadet.EmployeeName) {
+									candidateNames.push({value: candidate.EmployeeName, checked: true})
+									candidates.push(cadet);
+									flag = true;
+								}
+							});
+							if(!flag) {
+								candidateNames.push({value: candidate.EmployeeName, checked: false})
+							}
+						}
+						else {
+							candidateNames.push({value: candidate.EmployeeName, checked: false});
+						}
 						candidateIDs.push(candidate.EmployeeID)
+						candidateEmailID.push(candidate.EmailID)
 					});
 					th.setState({
 						candidateSet: candidateSet,
 						candidateNames: candidateNames,
-						candidateIDs: candidateIDs
+						candidateIDs: candidateIDs,
+						candidates: candidates,
+						candidateEmailID: candidateEmailID
 					});
 				})
 	}
@@ -216,9 +250,11 @@ export default class ProjectDialog extends React.Component {
 			candidates.push(
 				{
 					EmployeeID: th.state.candidateIDs[index],
-					EmployeeName: value
+					EmployeeName: value,
+					Email: th.state.candidateEmailID[index]
 				}
 			);
+			console.log(candidates)
 			this.setState({
 				candidateNames: candidateNames,
 				candidates: candidates
@@ -254,7 +290,7 @@ export default class ProjectDialog extends React.Component {
 					waveErrorText: '',
 					skillsErrorText: ''
 				})
-				this.props.onDialogClose()
+				this.props.handleClose()
 			} else if(this.props.dialogTitle == 'ADD VERSION') {
 				this.setState({
 					showDialog: false,
@@ -267,16 +303,16 @@ export default class ProjectDialog extends React.Component {
 					waveErrorText: '',
 					skillsErrorText: ''
 				})
-				this.props.onDialogClose();
+				this.props.handleClose();
 			}
 		} else if(this.validationSuccess()) {
 			if(action == 'ADD PRODUCT') {
 				this.onProductAddition()
 			} else if(action == 'EDIT VERSION') {
-				this.props.onDialogClose()
+				this.props.handleClose()
 				this.onVersionUpdation()
 			} else if(action == 'ADD VERSION') {
-				this.props.onDialogClose()
+				this.props.handleClose()
 				this.onVersionAddition()
 			}
 			this.setState({
@@ -371,7 +407,7 @@ export default class ProjectDialog extends React.Component {
 			version.videoURL = this.state.videoURL;
 			version.presentationURL = this.state.presentationURL;
 			this.resetFields();
-			this.props.onVersionAddition({product: product, version: version});
+			this.props.handleAddVersion({product: product, version: version});
 		}
 
 	onSkillAddition() {
@@ -430,24 +466,32 @@ export default class ProjectDialog extends React.Component {
 	onVersionUpdation() {
 		let th = this;
 		let version = this.state.project.version[th.props.version];
-		version.members = [];
-		this.state.candidates.map(function(name, index){
-			version.members.push({EmployeeName: name, EmployeeID: th.state.candidateIDs[index]})
-		})
+		version.members = this.state.candidates;
+		console.log(version.members);
 		version.name = this.state.versionName;
 		version.description = this.state.projectDesc;
 		version.wave = this.state.wave;
 		version.skills = this.state.skills;
 		version.addedOn = new Date();
+		version.gitURL =
+			this.state.gitURL.trim().length > 0 && this.state.gitBranch.trim().length > 0 ?
+			this.state.gitURL + '/tree/' + this.state.gitBranch :
+			'';
+		version.videoURL = this.state.videoURL;
+		version.presentationURL = this.state.presentationURL;
 		this.setState({
 			projectName: '',
 			projectDesc: '',
 			candidateSet:[],
 			wave: '',
-			skills: []
+			skills: [],
+			gitURL: '',
+			gitBranch: '',
+			videoURL: '',
+			presentationURL: ''
 		})
-		this.props.onVersionUpdation(version);
-		this.props.onDialogClose();
+		this.props.handleUpdate(version);
+		this.props.handleClose();
 	}
 
 	validationSuccess() {
@@ -486,6 +530,7 @@ export default class ProjectDialog extends React.Component {
 			candidateSet: [],
 			candidateNames: [],
 			candidateIDs: [],
+			candidateEmailID: [],
 			wave: '',
 			skills: [],
 			gitURL: '',
