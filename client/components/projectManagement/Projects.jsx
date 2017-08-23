@@ -75,6 +75,7 @@ export default class Projects extends React.Component {
 		    	console.log(err);
 		    else {
 		    	let projects = th.state.projects;
+					project.version[0].addedBy = th.props.user.role;
 		    	projects.push(project);
 		    	th.setState({
 		    		projects: projects
