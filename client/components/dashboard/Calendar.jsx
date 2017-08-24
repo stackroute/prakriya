@@ -156,7 +156,6 @@ export default class Attendance extends React.Component {
       if (err)
         console.log(err);
       else {
-        console.log(res.body);
         th.setState({
             Cadet: res.body
           })
@@ -170,7 +169,6 @@ export default class Attendance extends React.Component {
       if (err)
         console.log(err);
       else {
-        console.log(res.body);
         th.setState({
             Skills: res.body
           })
@@ -261,7 +259,6 @@ export default class Attendance extends React.Component {
     let dayName = [];
     let name = [];
     let timelineSpan = 12;
-    console.log(VALUES)
     if (th.state.startDate != '') {
       let now = Moment(th.state.endDate);
       let daysOfYear = [];

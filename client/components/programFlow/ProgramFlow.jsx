@@ -22,9 +22,8 @@ import {
   TableHeader,
   TableHeaderColumn,
   TableRow,
-  TableRowColumn,
+  TableRowColumn
 } from 'material-ui/Table';
-
 
 const styles = {
   tableHeading: {
@@ -35,27 +34,17 @@ const styles = {
     textAlign: 'center'
   },
   masonry: {
-		width: '1200px'
-	}
+    width: '1200px'
+  }
 }
 
 const masonryOptions = {
-    transitionDuration: 0
+  transitionDuration: 0
 }
 
-const backgroundColors = [
-	'#F5DEBF',
-	'#DDDBF1',
-	'#CAF5B3',
-	'#C6D8D3'
-	]
+const backgroundColors = ['#F5DEBF', '#DDDBF1', '#CAF5B3', '#C6D8D3']
 
-const backgroundIcons = [
-	'#847662',
-	'#666682',
-	'#4e5f46',
-	'#535f5b'
-	]
+const backgroundIcons = ['#847662', '#666682', '#4e5f46', '#535f5b']
 
 export default class Wave extends React.Component {
   constructor(props) {
@@ -85,14 +74,11 @@ export default class Wave extends React.Component {
     Request.get('/dashboard/waveids').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
       let wave = [];
       let course = [];
-      res.body.waveids.map(function (waveDetails) {
+      res.body.waveids.map(function(waveDetails) {
         wave.push(waveDetails.waveID);
         course.push(waveDetails.course);
       })
-      th.setState({
-        waves: wave,
-        Course: course
-      })
+      th.setState({waves: wave, Course: course})
     })
   }
 
@@ -142,28 +128,25 @@ export default class Wave extends React.Component {
       <div>
         <h1 style={app.heading}>Program Flow</h1>
 
-
-              <SelectField onChange={th.onWaveChange} floatingLabelText="Select Wave" value={th.state.waveString}>
-                {th.state.waves.map(function(val, key) {
-                  return <MenuItem key={key} value={val + ' (' + th.state.Course[key] + ')'} primaryText={val + ' (' + th.state.Course[key] + ')'}/>
-                })
-        }
-              </SelectField>
-              <Masonry
-      					className={'my-class'}
-      					elementType={'ul'}
-      					options={masonryOptions}
-      					style={styles.masonry}
-      				>
-      				{th.state.setState === false  && (th.state.waveObj).length !== 0  && th.state.waveObj.result.map(function(session, i) {
-            return (<Schedule wave={session} key={i} handleWaveUpdate={th.waveUpdate} handleDelete={th.handleDelete}
-              bgColor={backgroundColors[i%4]}
-              bgIcon={backgroundIcons[i%4]}
-            />)
-          })
-          }
+        {this.state.waves.length > 0 && <div>
+          <SelectField onChange={th.onWaveChange} floatingLabelText="Select Wave" value={th.state.waveString}>
+            {th.state.waves.map(function(val, key) {
+              return <MenuItem key={key} value={val + ' (' + th.state.Course[key] + ')'} primaryText={val + ' (' + th.state.Course[key] + ')'}/>
+            })
+}
+          </SelectField>
+          {th.state.waveObj.result !== undefined && th.state.waveObj.result.length > 0 && <Masonry className={'my-class'} elementType={'ul'} options={masonryOptions} style={styles.masonry}>
+            {th.state.setState === false && (th.state.waveObj).length !== 0 && th.state.waveObj.result.map(function(session, i) {
+              return (<Schedule wave={session} key={i} handleWaveUpdate={th.waveUpdate} handleDelete={th.handleDelete} bgColor={backgroundColors[i % 4]} bgIcon={backgroundIcons[i % 4]}/>)
+            })
+}
           </Masonry>
-</div>
+}
+{
+  (th.state.waveObj.result === undefined || th.state.waveObj.result.length === 0) && <h3 style= {{textAlign:'center'}}> NO SESSIONS SCHEDULED FOR THIS WAVE </h3>
+}
+        </div>}
+      </div>
 
     )
 
