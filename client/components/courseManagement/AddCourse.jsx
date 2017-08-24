@@ -2,15 +2,12 @@ import React from 'react';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Dialog from 'material-ui/Dialog';
-import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import AutoComplete from 'material-ui/AutoComplete';
 import app from '../../styles/app.json';
-import select from '../../styles/select.json';
 import dialog from '../../styles/dialog.json';
-import CONFIG from '../../config/index';
 import Paper from 'material-ui/Paper';
 import Chip from 'material-ui/Chip';
 import CourseColumns from './CourseColumns.jsx';
@@ -18,6 +15,7 @@ import Request from 'superagent';
 import Snackbar from 'material-ui/Snackbar';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover/Popover';
 import {Menu} from 'material-ui/Menu';
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 
 const styles = {
   paper: {
@@ -45,7 +43,7 @@ export default class AddCourse extends React.Component {
       courseColumns: false,
       showDialog: false,
       Name: '',
-      Mode: '',
+      Mode: 'Immersive',
       Duration: '',
       NameErrorText: '',
       ModeErrorText: '',
@@ -138,8 +136,7 @@ export default class AddCourse extends React.Component {
     this.setState({Name: e.target.value, NameErrorText: ''});
   }
 
-  onChangeMode(e, key, value) {
-    console.log('mode e: ', value)
+  onChangeMode(e, value) {
     this.setState({Mode: value, ModeErrorText: ''});
   }
 
@@ -187,7 +184,6 @@ export default class AddCourse extends React.Component {
           showDialog: false,
           courseColumns: true
         });
-        // this.resetFields()
       }
     } else if (action == 'EDIT') {
       if (this.validationSuccess()) {
@@ -236,7 +232,6 @@ export default class AddCourse extends React.Component {
 
   handleUpdate() {
     let th = this
-    console.log(this.state.SkillsCredit);
     let course = {}
     course.ID = this.props.course.ID;
     course.Name = this.state.Name;
@@ -262,7 +257,6 @@ export default class AddCourse extends React.Component {
     course.Removed = false;
     course.Duration = this.state.Duration;
     course.History = '';
-    console.log('CourseColumns: ', courseColumns);
     course.FeedbackFields = courseColumns.FeedbackFields;
     course.EvaluationFields = courseColumns.EvaluationFields;
     this.props.handleAdd(course);
@@ -316,7 +310,6 @@ export default class AddCourse extends React.Component {
   changeNewCredit(event, index) {
     let SkillsCredit = this.state.SkillsCredit;
     SkillsCredit[index] = parseInt(event.target.outerText, 10);
-    console.log(SkillsCredit[index]);
     this.setState({
       SkillsCredit: SkillsCredit
     })
@@ -370,16 +363,27 @@ export default class AddCourse extends React.Component {
               </div>
             </div>
             <div>
-              <div style={dialog.box100}>
-                <SelectField style={{
-                  width: '100%'
-                }} hintText="Mode" floatingLabelText='Mode *' floatingLabelStyle={app.mandatoryField} value={this.state.Mode} onChange={this.onChangeMode} errorText={this.state.ModeErrorText} menuItemStyle={select.menu} listStyle={select.list} selectedMenuItemStyle={select.selectedMenu} maxHeight={600}>
-                  {
-                    CONFIG.MODES.map(function(mode, key) {
-                      return ( <MenuItem key={key} value={mode} primaryText={mode}/>)
-                    })
-                  }
-                </SelectField>
+              <div  style={dialog.box100}>
+                <p>Mode</p>
+                <RadioButtonGroup name='Mode'
+                  defaultSelected={this.state.Mode} valueSelected={this.state.Mode}
+                  onChange={this.onChangeMode}>
+                    <RadioButton
+                      value='Immersive'
+                      label='Immersive'
+                      style={{display: 'inline-block', width: '150px'}}
+                    />
+                    <RadioButton
+                      value='Online'
+                      label='Online'
+                      style={{display: 'inline-block', width: '150px'}}
+                    />
+                    <RadioButton
+                      value='Hybrid'
+                      label='Hybrid'
+                      style={{display: 'inline-block', width: '150px'}}
+                    />
+                </RadioButtonGroup>
               </div>
             </div>
             <div>
@@ -410,14 +414,15 @@ export default class AddCourse extends React.Component {
                           <Chip onRequestDelete={() => th.handleSkillDelete(skill)} style={styles.chip} key={index}>
                             <span onClick={(event) => th.changeCredit(event, index)}>{skill} ({th.state.SkillsCredit[index]})
                               {
-                                th.state.popIndex === index && <Popover
-                                open={th.state.open}
-                                anchorEl={th.state.anchorEl}
-                                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                                targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                                onRequestClose={th.handleRequestClose}
-                                animation={PopoverAnimationVertical}
-                              >
+                                th.state.popIndex === index &&
+                                <Popover
+                                  open={th.state.open}
+                                  anchorEl={th.state.anchorEl}
+                                  anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                                  targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                                  onRequestClose={th.handleRequestClose}
+                                  animation={PopoverAnimationVertical}
+                                >
                                 <Menu value = {th.state.SkillsCredit[index]} onClick = {(event) => th.changeNewCredit(event, index)}>
                                   <MenuItem primaryText="1" value = {1} checked = {th.state.SkillsCredit[index] == 1}/>
                                   <MenuItem primaryText="2" value = {2} checked = {th.state.SkillsCredit[index] == 2}/>

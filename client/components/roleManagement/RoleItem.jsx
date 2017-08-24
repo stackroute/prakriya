@@ -17,7 +17,7 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import AutoComplete from 'material-ui/AutoComplete';
 import Snackbar from 'material-ui/Snackbar';
-import {cyan500, white} from 'material-ui/styles/colors';
+import dialog from '../../styles/dialog.json';
 
 const styles = {
 	avatar: {
@@ -54,29 +54,7 @@ const styles = {
   },
   cardText: {
   	paddingTop: 0
-  },
-	dialog: {
-		backgroundColor: '#DDDBF1',
-		border: '10px solid teal'
-	},
-	dialogTitle: {
-		fontWeight: 'bold',
-		backgroundColor: 'teal',
-		color: '#DDDBF1',
-		textAlign: 'center'
-	},
-	actionsContainer: {
-		backgroundColor: 'teal',
-		borderTop: '0px',
-		marginTop: '0px'
-	},
-	actionButton: {
-		backgroundColor: '#DDDBF1',
-		width: '50%',
-		color: 'teal',
-		border: '1px solid teal',
-		height: '100%'
-	}
+  }
 }
 
 export default class RoleItem extends React.Component {
@@ -204,15 +182,15 @@ export default class RoleItem extends React.Component {
 		let role = this.props.roleperm.name.charAt(0).toUpperCase() + this.props.roleperm.name.slice(1)
 		const deleteDialogActions = [
       <FlatButton
-        label='Cancel'
+        label='Not sure. May be later'
         onTouchTap={this.closeDeleteDialog}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />,
       <FlatButton
         label='Delete'
         onTouchTap={this.closeDeleteDialog}
         onClick={this.handleDeleteRole}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />,
     ];
 		return (
@@ -274,14 +252,14 @@ export default class RoleItem extends React.Component {
           onRequestClose={this.handleSnackBarClose}
         />
 			  <Dialog
-					bodyStyle={styles.dialog}
-					actionsContainerStyle={styles.actionsContainer}
+					bodyStyle={dialog.confirmBox}
+					actionsContainerStyle={dialog.actionsContainer}
           actions={deleteDialogActions}
           modal={false}
           open={this.state.showDeleteDialog}
           onRequestClose={this.closeDeleteDialog}
         >
-        	Are you sure you want to delete this role?
+        	Are you sure? You want to delete this role?
         </Dialog>
 			</div>
 		);
