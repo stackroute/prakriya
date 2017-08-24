@@ -39,6 +39,8 @@ muiTheme.flatButton.primaryTextColor = '#202D3E';
 muiTheme.slider.selectionColor = '#202D3E';
 muiTheme.slider.rippleColor = '#202D3E';
 muiTheme.datePicker.selectColor = '#202D3E';
+muiTheme.radioButton.checkedColor = '#202D3E';
+muiTheme.toggle.thumbOnColor = '#202D3E';
 
 console.log('muiTheme', muiTheme);
 

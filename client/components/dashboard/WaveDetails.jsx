@@ -67,17 +67,15 @@ export default class WaveDetails extends React.Component {
 			.get('/dashboard/waves')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res){
-				if(err)
+				if(err){
 					console.log(err)
-				else {
+				} else {
 					let activeWaves = []
-					console.log(res.body)
 					res.body.map(function(wave, key) {
 						let sdate = new Date(parseInt(wave.StartDate, 10));
 						let edate = new Date(parseInt(wave.EndDate, 10));
 						if(sdate < Date.now() && edate > Date.now())
 							activeWaves.push(wave);
-							console.log('yes');
 							toggleArray.push('none');
 					})
 					th.setState({
@@ -90,28 +88,23 @@ export default class WaveDetails extends React.Component {
 
 	getCadetsOfActivewaves(wave){
 		let th = this;
-	 let activewaveid = wave.split("(")[0].trim();
-	 let activeCourse = wave.split('(')[1].split(')')[0];
-	 console.log(activewaveid)
-	 console.log(activeCourse)
-        Request
-				.post('/dashboard/ActivewaveCadets')
-				.set({'Authorization': localStorage.getItem('token')})
-				.send({activewaveId: activewaveid,course:activeCourse})
-				.end(function(err, res){
-					if(err){
-						console.log(err);
-					}
-					else{
-						th.handleOpen();
-						console.log(res.body);
-						th.setState({
-							acadets: res.body
-						})
-
-					}
-				})
+	  let activewaveid = wave.split("(")[0].trim();
+	  let activeCourse = wave.split('(')[1].split(')')[0];
+  	Request
+			.post('/dashboard/ActivewaveCadets')
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({activewaveId: activewaveid,course:activeCourse})
+			.end(function(err, res){
+				if(err){
+					console.log(err);
+				} else{
+					th.handleOpen();
+					th.setState({
+						acadets: res.body
+					})
 				}
+			})
+		}
 
 
 	showProgress(waveObj) {
@@ -165,14 +158,9 @@ handleClose(){
 	})
 }
 	render() {
-
 		let th = this;
-
-			console.log(th.state.acadets,"acadets")
-  let title = 'CADETS'
-	if (th.state.acadets.length !== 0) {
-		title = ('CADETS - (' + th.state.acadets.length + ')')
-	}
+	  let title = 'CADETS'
+		if (th.state.acadets.length !== 0) {title = ('CADETS - (' + th.state.acadets.length + ')')}
 		return(
 			<Paper style={styles.container}>
 				{
@@ -223,11 +211,7 @@ handleClose(){
 										/>
 										{
 											th.state.activecadets &&
-
-
 											<Dialog style={styles.dialog} title={title} open={th.state.open} autoScrollBodyContent={true} onRequestClose={th.handleClose} actionsContainerStyle={dialog.actionsContainer} bodyStyle={dialog.body} titleStyle={dialog.title}>
-
-
 									{th.state.acadets.length == 0 && <h3 style={{textAlign:'center'}} >No Cadets available</h3>}
 									<Grid style={styles.grid}>
 										<Row>

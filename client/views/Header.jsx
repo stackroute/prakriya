@@ -145,7 +145,6 @@ export default class Header extends React.Component {
       .get(`/dashboard/notifications?username=${username}`)
       .set({'Authorization': localStorage.getItem('token')})
       .end(function(err, res){
-        console.log('Notifications recieved from server: ', res.body.notifications)
         th.setState({
           notifications: res.body.notifications
         })
