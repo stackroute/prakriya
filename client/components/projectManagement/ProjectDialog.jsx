@@ -674,7 +674,7 @@ export default class ProjectDialog extends React.Component {
 								)
 	          	}) :
 								th.state.wave == '' ?
-								<p>Please select a wave to see the list of available candets.</p> :
+								<p>Please select a wave to see the list of available cadets.</p> :
 								<p>Sorry! No cadets available.</p>
 						}
 					</div>
