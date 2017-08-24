@@ -10,26 +10,11 @@ import LockIcon from 'material-ui/svg-icons/action/lock';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import AddUser from './AddUser.jsx';
+import dialog from '../../styles/dialog.json';
 
 const styles = {
 	cardActions: {
 		textAlign: 'right'
-	},
-	dialog: {
-		backgroundColor: '#DDDBF1',
-		border: '10px solid teal'
-	},
-	actionsContainer: {
-		backgroundColor: 'teal',
-		borderTop: '0px',
-		marginTop: '0px'
-	},
-	actionButton: {
-		backgroundColor: '#DDDBF1',
-		width: '50%',
-		color: 'teal',
-		border: '1px solid teal',
-		height: '100%'
 	}
 }
 
@@ -142,24 +127,24 @@ export default class UserList extends React.Component {
 	      <FlatButton
 	        label="Not sure.  Maybe later."
 	        onTouchTap={this.handleClose}
-					style={styles.actionButton}
+					style={dialog.actionButton}
 	      />,
 	      <FlatButton
 	        label="Yes"
 	        onClick={this.handleRemoveUser}
-	        style={styles.actionButton}
+	        style={dialog.actionButton}
 	      />
 	  ];
 	  const lockActions = [
       <FlatButton
         label="Not sure. Maybe later."
         onTouchTap={this.handleCloseLock}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />,
       <FlatButton
         label="Yes"
         onClick={this.handleAccountSuspension}
-				style={styles.actionButton}
+				style={dialog.actionButton}
       />
 	  ];
 		const color = this.disabledUser() ? red500 : lightBlack ;
@@ -178,25 +163,25 @@ export default class UserList extends React.Component {
 					      <LockIcon color={color} />
 					    </IconButton>
 					    {(this.state.user.actions.indexOf('login') > -1)?(<Dialog
-										bodyStyle={styles.dialog}
+										bodyStyle={dialog.confirmBox}
 					          actions={lockActions}
-										actionsContainerStyle={styles.actionsContainer}
+										actionsContainerStyle={dialog.actionsContainer}
 					          modal={false}
 					          open={this.state.lockConfirm}
 					          onRequestClose={this.handleCloseLock}
 					        >
-					          Are you sure, you want to suspend the selected user account?
+					          Are you sure? You want to suspend the selected user account?
 					        </Dialog>
 					      ):(
 					      	<Dialog
-										bodyStyle={styles.dialog}
+										bodyStyle={dialog.confirmBox}
 					          actions={lockActions}
-										actionsContainerStyle={styles.actionsContainer}
+										actionsContainerStyle={dialog.actionsContainer}
 					          modal={false}
 					          open={this.state.lockConfirm}
 					          onRequestClose={this.handleCloseLock}
 					        >
-					          Are you sure, you want to unsuspend the selected user account?
+					          Are you sure? You want to unsuspend the selected user account?
 					        </Dialog>
 					      )}
 							<IconButton tooltip="Edit User" onClick={this.handleEditUser} disabled={disabled}>
@@ -206,14 +191,14 @@ export default class UserList extends React.Component {
 					      <DeleteIcon color={lightBlack} />
 					    </IconButton>
 					    <Dialog
-								bodyStyle={styles.dialog}
+								bodyStyle={dialog.confirmBox}
 			          actions={deleteActions}
-								actionsContainerStyle={styles.actionsContainer}
+								actionsContainerStyle={dialog.actionsContainer}
 			          modal={false}
 			          open={this.state.deleteConfirm}
 			          onRequestClose={this.handleClose}
 			        >
-			          Are you sure, you want to delete the selected user?
+			          Are you sure? You want to delete the selected user?
 			        </Dialog>
 						</CardActions>
 						{
