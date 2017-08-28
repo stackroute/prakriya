@@ -1,8 +1,10 @@
 import React from 'react';
 import SelectField from 'material-ui/SelectField';
+import RaisedButton from 'material-ui/RaisedButton';
 import MenuItem from 'material-ui/MenuItem';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
 import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import CandidateCard from './CandidateCard.jsx';
@@ -43,6 +45,7 @@ export default class Candidates extends React.Component {
 		super(props)
 
 		this.state = {
+			searchQuery: '',
 			snackbarOpen: false,
 			snackbarMessage: '',
 			candidates: [],
@@ -64,6 +67,7 @@ export default class Candidates extends React.Component {
 			}
 		}
 
+		this.handleQueryChange = this.handleQueryChange.bind(this);
 		this.getCandidates = this.getCandidates.bind(this);
 		this.getSkills = this.getSkills.bind(this);
 		this.getWaves = this.getWaves.bind(this);
@@ -99,6 +103,12 @@ export default class Candidates extends React.Component {
         th.setState({role: res.body})
       }
     })
+  }
+
+  handleQueryChange(event) {
+  	this.setState({
+  		searchQuery: event.target.value
+  	})
   }
 
 	getBillability() {
@@ -281,19 +291,35 @@ export default class Candidates extends React.Component {
 	}
 
 	// fetching filtered candidates from db
+	// getFilteredCandidates() {
+	// 	let th = this;
+	// 	Request
+	// 		.post('/dashboard/filteredcandidates')
+	// 		.set({'Authorization': localStorage.getItem('token')})
+	// 		.send({'filterQuery': this.state.appliedFilters})
+	// 		.end(function(err, res) {
+	// 			if(err)
+	// 	    	console.log(err);
+	// 	    else {
+	// 				th.setState({
+	// 					filteredCandidates: res.body
+	// 				});
+	// 	    }
+	// 		})
+	// }
+
+	// Filter with intelligence search
 	getFilteredCandidates() {
 		let th = this;
 		Request
 			.post('/dashboard/filteredcandidates')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send({'filterQuery': this.state.appliedFilters})
+			.send({'filterQuery': this.state.searchQuery})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-					th.setState({
-						filteredCandidates: res.body
-					});
+					console.log('Got the cadets');
 		    }
 			})
 	}
@@ -361,6 +387,16 @@ export default class Candidates extends React.Component {
 				<AddCandidate addCandidate={this.addCandidate}/>
 				<div>
 					<h1 style={app.heading}>Candidate Management</h1>
+					<TextField
+			      hintText="Describe your search..."
+			      floatingLabelText="Search Cadets"
+			      onChange={this.handleQueryChange}
+			    />
+			    <RaisedButton 
+			    	label="Search" 
+			    	primary={true}
+			    	onClick={this.getFilteredCandidates}
+			    />
 					<Grid>
 						<Row>
 							<Col md={3}>

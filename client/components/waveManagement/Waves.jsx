@@ -166,7 +166,7 @@ export default class Waves extends React.Component {
 			      open: true,
 						message: 'Wave Updated Successfully'
 			    });
-		    	}
+		    }
 			})
 	}
 

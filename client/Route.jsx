@@ -30,17 +30,43 @@ import ProductProfile from './components/productProfile/index.jsx';
 
 injectTapEventPlugin();
 
-const muiTheme = getMuiTheme(lightBaseTheme);
-muiTheme.baseTheme.palette.primary1Color = '#202D3E';
-muiTheme.appBar.color = '#202D3E';
-muiTheme.floatingActionButton.color = '#202D3E';
-muiTheme.textField.focusColor = '#202D3E';
-muiTheme.flatButton.primaryTextColor = '#202D3E';
-muiTheme.slider.selectionColor = '#202D3E';
-muiTheme.slider.rippleColor = '#202D3E';
-muiTheme.datePicker.selectColor = '#202D3E';
-muiTheme.radioButton.checkedColor = '#202D3E';
-muiTheme.toggle.thumbOnColor = '#202D3E';
+const muiTheme = getMuiTheme(lightBaseTheme, {
+	appBar: {
+		color: '#202D3E'
+	},
+	palette: {
+		primary1Color: '#202D3E'
+	},
+	datePicker: {
+		color: '#202D3E'
+	},
+	flatButton: {
+		primaryTextColor: '#202D3E'
+	},
+	floatingActionButton: {
+		color: '#202D3E'
+	},
+	inkBar: {
+		backgroundColor: '#202D3E'
+	},
+	radioButton: {
+		checkedColor: '#202D3E'
+	},
+	raisedButton: {
+		primaryColor: '#202D3E',
+		primaryTextColor: '#DDDDDD'
+	},
+	slider: {
+		rippleColor: '#202D3E',
+		selectionColor: '#202D3E'
+	},
+	textField: {
+		focusColor: '#202D3E'
+	},
+	toggle: {
+		thumbOnColor: '#202D3E'
+	}
+});
 
 console.log('muiTheme', muiTheme);
 

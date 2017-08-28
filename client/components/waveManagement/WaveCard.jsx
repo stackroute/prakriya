@@ -71,7 +71,6 @@ export default class WaveCard extends React.Component {
       disableSave: true,
       noCadets: false,
       removecadets: false
-
     }
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
@@ -96,9 +95,20 @@ export default class WaveCard extends React.Component {
     this.handleremovecadets = this.handleremovecadets.bind(this);
     this.handleGoHChange = this.handleGoHChange.bind(this);
   }
+  componentWillMount() {
+    this.setState({
+      wave: this.props.wave
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      wave: nextProps.wave
+    })
+  }
 
   handleEditWave() {
-    this.setState({openDialog: true, wave: this.props.wave})
+    this.setState({openDialog: true})
     this.getCourses();
   }
 
@@ -148,14 +158,14 @@ export default class WaveCard extends React.Component {
       wave = this.state.wave;
       wave.Course = this.state.selectedCourse;
     }
-    this.props.handleUpdate(wave, this.props.wave.CourseName);
-    this.closeUpdateDialog();
+    this.props.handleUpdate(wave, this.state.wave.CourseName);
+    this.closeUpdateDialog('update');
   }
 
   updateCadets(cadets) {
     let th = this;
-    let wave = this.props.wave.WaveID;
-    let course = this.props.wave.CourseName;
+    let wave = this.state.wave.WaveID;
+    let course = this.state.wave.CourseName;
     Request.post('/dashboard/updatewavecadets').set({'Authorization': localStorage.getItem('token')}).send({cadets: cadets, waveID: wave, course: course}).end(function(err, res) {
       if (err)
         console.log(err);
@@ -166,7 +176,7 @@ export default class WaveCard extends React.Component {
   }
 
   handleDeleteWave() {
-    this.props.handleDelete(this.props.wave);
+    this.props.handleDelete(this.state.wave);
     this.closeDeleteDialog();
   }
 
@@ -186,9 +196,11 @@ export default class WaveCard extends React.Component {
     this.setState({showDeleteDialog: false})
   }
 
-  closeUpdateDialog() {
-    let wave = this.props.wave;
-    this.setState({openDialog: false, addCadet: false, wave: wave})
+  closeUpdateDialog(type) {
+    this.setState({openDialog: false, addCadet: false})
+    if(type != 'update') {
+      this.props.getWaves();
+    }
   }
 
   handleOpen() {
@@ -243,13 +255,12 @@ export default class WaveCard extends React.Component {
     this.setState({
       removecadets: true
     })
-
   }
 
   handleremovecadets() {
     let th = this;
-    let wave = this.props.wave.WaveID;
-    let course = this.props.wave.CourseName;
+    let wave = this.state.wave.WaveID;
+    let course = this.state.wave.CourseName;
     Request.post('/dashboard/removeCadetFromWave').set({'Authorization': localStorage.getItem('token')}).send({cadets: this.state.cadetsToRemove, waveID: wave, course: course}).end(function(err, res) {
       console.log(res)
       if (err)
@@ -262,14 +273,14 @@ export default class WaveCard extends React.Component {
   }
 
   render() {
-    let startdate = new Date(parseInt(this.props.wave.StartDate));
+    let startdate = new Date(parseInt(this.state.wave.StartDate));
     startdate = startdate.getFullYear() + '/' + (startdate.getMonth() + 1) + '/' + startdate.getDate();
-    let enddate = new Date(parseInt(this.props.wave.EndDate));
+    let enddate = new Date(parseInt(this.state.wave.EndDate));
     enddate = enddate.getFullYear() + '/' + (enddate.getMonth() + 1) + '/' + enddate.getDate();
     let th = this
     let title = 'CADETS'
-    if (th.props.wave.Cadets !== undefined) {
-      title = ('CADETS - (' + th.props.wave.Cadets + ')')
+    if (th.state.wave.Cadets !== undefined) {
+      title = ('CADETS - (' + th.state.wave.Cadets + ')')
     }
     const deleteDialogActions = [ < FlatButton label = "Cancel" primary = {
         true
@@ -322,10 +333,10 @@ export default class WaveCard extends React.Component {
           marginBottom: '20px',
           background: bgColor
         }}>
-          <CardHeader title={< span style = {{fontSize:'20px', position: 'absolute',top: '32%'}} > <b>{this.props.wave.WaveNumber}</b> < /span>} avatar={< Avatar backgroundColor = {
+          <CardHeader title={< span style = {{fontSize:'20px', position: 'absolute',top: '32%'}} > <b>{this.state.wave.WaveNumber}</b> < /span>} avatar={< Avatar backgroundColor = {
             bgIcon
           } > {
-            this.props.wave.WaveID.charAt(0).toUpperCase()
+            this.state.wave.WaveID.charAt(0).toUpperCase()
           } < /Avatar>}/>
           <CardText style={styles.text}>
             <IconButton tooltip="Location">
@@ -334,41 +345,40 @@ export default class WaveCard extends React.Component {
             <span style={{
               position: 'relative',
               top: '-5px'
-            }}>{this.props.wave.Location}</span><br/>
+            }}>{this.state.wave.Location}</span><br/>
             <IconButton tooltip="Date">
               <DateIcon/>
             </IconButton>
             <span style={{
               position: 'relative',
               top: '-5px'
-            }}>{this.formatDate(this.props.wave.StartDate)}
-              - {this.formatDate(this.props.wave.EndDate)}</span><br/>
+            }}>{this.formatDate(this.state.wave.StartDate)}
+              - {this.formatDate(this.state.wave.EndDate)}</span><br/>
             <IconButton tooltip="Course">
               <CourseIcon/>
             </IconButton>
             <span style={{
               position: 'relative',
               top: '-5px'
-            }}>{this.props.wave.Course}</span><br/>
+            }}>{this.state.wave.Course}</span><br/>
             {
-              ( this.props.wave.GoH !== '' && this.props.wave.GoH !== undefined ) && <div>
+              ( this.state.wave.GoH !== '' && this.state.wave.GoH !== undefined ) && <div>
                 <IconButton tooltip="Guest of Honour">
                   <GoHIcon/>
                 </IconButton>
                 <span style={{
                   position: 'relative',
                   top: '-5px'
-                }}>{this.props.wave.GoH}</span><br/>
+                }}>{this.state.wave.GoH}</span><br/>
               </div>
             }
             <IconButton tooltip="Members" onClick={this.handleOpen}>
               <GroupIcon/>
             </IconButton>
-            {this.props.wave.Cadets != undefined && <b style={{
+            {this.state.wave.Cadets != undefined && <b style={{
               position: 'relative',
               top: '-5px'
-            }}>({this.props.wave.Cadets})</b>}
-
+            }}>({this.state.wave.Cadets})</b>}
 
             <IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{
               float: 'right'
@@ -382,7 +392,7 @@ export default class WaveCard extends React.Component {
             </IconButton>
           </CardText>
         </Card>
-        {this.state.cadetFetch && th.getCadets(this.props.wave.Cadets)}
+        {this.state.cadetFetch && th.getCadets(this.state.wave.Cadets)}
         <Dialog style={styles.dialog} title={title} open={this.state.dialog} autoScrollBodyContent={true} onRequestClose={this.handleClose} actionsContainerStyle={dialog.actionsContainer} bodyStyle={dialog.body} titleStyle={dialog.title}>
 
           <Grid style={styles.grid}>
@@ -479,9 +489,10 @@ export default class WaveCard extends React.Component {
           </div>
           <div style={dialog.box100}>
             <TextField
-            floatingLabelText="Guest of Honour"
-            value={th.state.wave.GoH} fullWidth={true}
-            onChange={th.handleGoHChange}
+              floatingLabelText="Guest of Honour"
+              value={th.state.wave.GoH} 
+              fullWidth={true}
+              onChange={th.handleGoHChange}
             />
           </div>
         </Dialog>

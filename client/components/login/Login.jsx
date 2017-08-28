@@ -111,12 +111,14 @@ export default class Login extends React.Component {
 						<img src="./assets/images/login_head.png"/>
 					</CardMedia>
 					<CardText>
-					 <form className="commentForm" onSubmit={this.onCommentSubmit}>
-						<TextField
-						 	floatingLabelText="Username"
-						 	onChange={this.onChangeUsername}
-							style={{width: '100%'}}
-							errorText={this.state.usernameErrorText}/> <br />
+					 	<form className="commentForm" onSubmit={this.onCommentSubmit}>
+							<TextField
+							 	floatingLabelText="Username"
+							 	onChange={this.onChangeUsername}
+								style={{width: '100%'}}
+								errorText={this.state.usernameErrorText}
+							/> 
+							<br />
 							<div style={{position: 'relative', display: 'inline-block', width: '100%'}}>
 								{
 									this.state.passwordType == 'password' ?
@@ -125,14 +127,14 @@ export default class Login extends React.Component {
 										right: 0, top: 35,
 										width: 20, height: 20,
 										zIndex: 1, cursor: 'pointer',
-										color: 'rgba(255, 255, 255, 0.87)'
+										color: '#202D3E'
 									}} onTouchTap={this.toggleShowPassword}/> :
 									<VisibilityOffIcon style={{
 										position: 'absolute',
 										right: 0, top: 35,
 										width: 20, height: 20,
 										zIndex: 1, cursor: 'pointer',
-										color: 'rgba(255, 255, 255, 0.87)'
+										color: '#202D3E'
 									}} onTouchTap={this.toggleShowPassword}/>
 								}
 								<TextField
@@ -152,7 +154,7 @@ export default class Login extends React.Component {
 								LOGIN
 							</RaisedButton>
 							<br /><br />
-							</form>
+						</form>
 						<div style={{color: 'red', fontWeight: 'bold', textAlign: 'center'}}>{this.state.errMsg}</div>
 					</CardText>
 				</Card>

@@ -262,103 +262,109 @@ let getNewCadets = function(successCB, errorCB) {
 }
 
 // Get the filtered cadets
+// let getFilteredCadets = function(filterQuery, successCB, errorCB) {
+
+//   logger.debug('Filter Query', filterQuery)
+//   let session = driver.session();
+//   let addFilter = false;
+//   let condition = 'WHERE ';
+
+//   if (filterQuery.EmployeeID != '') {
+//     addFilter = true;
+//     condition += `n.EmployeeID = '${filterQuery.EmployeeID}' AND `
+//   }
+//   if (filterQuery.EmployeeName != '') {
+//     addFilter = true;
+//     condition += `n.EmployeeName = '${filterQuery.EmployeeName}' AND `
+//   }
+//   if (filterQuery.EmailID != '') {
+//     addFilter = true;
+//     condition += `n.EmailID = '${filterQuery.EmailID}' AND `
+//   }
+//   if (filterQuery.DigiThonScore != '') {
+//     addFilter = true;
+//     condition += `n.DigiThonScore > '${filterQuery.DigiThonScore}' AND `
+//   }
+//   if (filterQuery.Wave != '') {
+//     addFilter = true;
+//     let wave = filterQuery.Wave.split('(')[0].trim();
+//     let course = filterQuery.Wave.split('(')[1].split(')')[0];
+//     condition += `w.WaveID = '${wave}' AND w.CourseName = '${course}' AND `
+//   }
+//   if(filterQuery.Billability.length > 0) {
+//     addFilter = true;
+//     let bill_arr = '';
+//     filterQuery.Billability.map(function (bill) {
+//       bill_arr += "'" + bill + "', ";
+//     })
+//     bill_arr = bill_arr.substring(0, bill_arr.length-2);
+//     condition += `n.Billability IN [${bill_arr}] AND`
+//   }
+
+//   if (addFilter) {
+//     condition = condition.substr(0, condition.length - 4);
+//   } else {
+//     condition = '';
+//   }
+
+//   let skills = '';
+//   let skill_arr = '';
+//   if(filterQuery.Skills.length > 0) {
+//     filterQuery.Skills.map(function(skill) {
+//       skill_arr += "'" + skill + "', ";
+//     })
+//     skill_arr = skill_arr.substring(0, skill_arr.length-2);
+//     skills = `WITH n as n
+//       MATCH (n)-[: ${graphConsts.REL_KNOWS}]->(s: ${graphConsts.NODE_SKILL})
+//       WHERE s.Name IN [${skill_arr}]`
+//   }
+
+//   let query = `MATCH(n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->
+//     (w:${graphConsts.NODE_WAVE})
+//       ${condition}
+//       ${skills}
+//       optional match (n)-[ver:worked_on]->(p:${graphConsts.NODE_PRODUCT})-[:has]->(v:${graphConsts.NODE_VERSION}{name:ver.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
+//       with p as product, n as candidate, w as wave, v as version, s as skill
+//     RETURN {
+//       candidate: candidate,
+//       wave: wave,
+//       product: version,
+//       skill: COLLECT(DISTINCT skill.Name)
+//     }`;
+
+//   logger.debug('Query for the search', query);
+
+//   session.run(query).then(function(resultObj, err) {
+//     session.close();
+//     if (resultObj) {
+//       let cadets = [];
+//       console.log(resultObj.records[0]._fields[0])
+//       resultObj.records.map(function(record, key) {
+//         cadets.push(record._fields[0].candidate.properties);
+//         cadets[key].Wave = record._fields[0].wave.properties.WaveID + ' (' + record._fields[0].wave.properties.CourseName + ')';
+//         if(record._fields[0].product !== null && record._fields[0].product !== undefined) {
+//           cadets[key].ProjectName = record._fields[0].product.properties.name;
+//           cadets[key].ProjectDescription = record._fields[0].product.properties.description;
+//           cadets[key].ProjectSkills = record._fields[0].skill;
+//         }
+//         else {
+//           cadets[key].ProjectName = '';
+//           cadets[key].ProjectDescription = '';
+//           cadets[key].ProjectSkills = '';
+//         }
+//       })
+//       successCB(cadets);
+//     } else {
+//       errorCB(err);
+//     }
+//   });
+// }
+
+// Get the filtered cadets(free flow)
 let getFilteredCadets = function(filterQuery, successCB, errorCB) {
-
-  logger.debug('Filter Query', filterQuery)
-  let session = driver.session();
-  let addFilter = false;
-  let condition = 'WHERE ';
-
-  if (filterQuery.EmployeeID != '') {
-    addFilter = true;
-    condition += `n.EmployeeID = '${filterQuery.EmployeeID}' AND `
-  }
-  if (filterQuery.EmployeeName != '') {
-    addFilter = true;
-    condition += `n.EmployeeName = '${filterQuery.EmployeeName}' AND `
-  }
-  if (filterQuery.EmailID != '') {
-    addFilter = true;
-    condition += `n.EmailID = '${filterQuery.EmailID}' AND `
-  }
-  if (filterQuery.DigiThonScore != '') {
-    addFilter = true;
-    condition += `n.DigiThonScore > '${filterQuery.DigiThonScore}' AND `
-  }
-  if (filterQuery.Wave != '') {
-    addFilter = true;
-    let wave = filterQuery.Wave.split('(')[0].trim();
-    let course = filterQuery.Wave.split('(')[1].split(')')[0];
-    condition += `w.WaveID = '${wave}' AND w.CourseName = '${course}' AND `
-  }
-  if(filterQuery.Billability.length > 0) {
-    addFilter = true;
-    let bill_arr = '';
-    filterQuery.Billability.map(function (bill) {
-      bill_arr += "'" + bill + "', ";
-    })
-    bill_arr = bill_arr.substring(0, bill_arr.length-2);
-    condition += `n.Billability IN [${bill_arr}] AND`
-  }
-
-  if (addFilter) {
-    condition = condition.substr(0, condition.length - 4);
-  } else {
-    condition = '';
-  }
-
-  let skills = '';
-  let skill_arr = '';
-  if(filterQuery.Skills.length > 0) {
-    filterQuery.Skills.map(function(skill) {
-      skill_arr += "'" + skill + "', ";
-    })
-    skill_arr = skill_arr.substring(0, skill_arr.length-2);
-    skills = `WITH n as n
-      MATCH (n)-[: ${graphConsts.REL_KNOWS}]->(s: ${graphConsts.NODE_SKILL})
-      WHERE s.Name IN [${skill_arr}]`
-  }
-
-  let query = `MATCH(n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->
-    (w:${graphConsts.NODE_WAVE})
-      ${condition}
-      ${skills}
-      optional match (n)-[ver:worked_on]->(p:${graphConsts.NODE_PRODUCT})-[:has]->(v:${graphConsts.NODE_VERSION}{name:ver.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
-      with p as product, n as candidate, w as wave, v as version, s as skill
-    RETURN {
-      candidate: candidate,
-      wave: wave,
-      product: version,
-      skill: COLLECT(DISTINCT skill.Name)
-    }`;
-
-  logger.debug('Query for the search', query);
-
-  session.run(query).then(function(resultObj, err) {
-    session.close();
-    if (resultObj) {
-      let cadets = [];
-      console.log(resultObj.records[0]._fields[0])
-      resultObj.records.map(function(record, key) {
-        cadets.push(record._fields[0].candidate.properties);
-        cadets[key].Wave = record._fields[0].wave.properties.WaveID + ' (' + record._fields[0].wave.properties.CourseName + ')';
-        if(record._fields[0].product !== null && record._fields[0].product !== undefined) {
-          cadets[key].ProjectName = record._fields[0].product.properties.name;
-          cadets[key].ProjectDescription = record._fields[0].product.properties.description;
-          cadets[key].ProjectSkills = record._fields[0].skill;
-        }
-        else {
-          cadets[key].ProjectName = '';
-          cadets[key].ProjectDescription = '';
-          cadets[key].ProjectSkills = '';
-        }
-      })
-      successCB(cadets);
-    } else {
-      errorCB(err);
-    }
-  });
+  logger.debug('Filter query',filterQuery);
 }
+
 
 /**********************************************
 ************ Candidate Management *************
