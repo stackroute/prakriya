@@ -16,7 +16,6 @@ export default class SRAdmin extends React.Component {
 			        <SRAdminGraph />
 							<WaveDetails /> <br />
 							<GetFeedback />
-
 			</div>
 		)
 	}

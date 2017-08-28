@@ -34,10 +34,11 @@ const muiTheme = getMuiTheme(lightBaseTheme, {
 	appBar: {
 		color: '#202D3E'
 	},
-	baseTheme: {
-		palette: {
-			primary1Color: '#202D3E'
-		}
+	palette: {
+		primary1Color: '#202D3E'
+	},
+	datePicker: {
+		color: '#202D3E'
 	},
 	flatButton: {
 		primaryTextColor: '#202D3E'
@@ -61,6 +62,9 @@ const muiTheme = getMuiTheme(lightBaseTheme, {
 	},
 	textField: {
 		focusColor: '#202D3E'
+	},
+	toggle: {
+		thumbOnColor: '#202D3E'
 	}
 });
 console.log('muiTheme', muiTheme);

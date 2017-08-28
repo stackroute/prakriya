@@ -7,7 +7,6 @@ import WaveProgress from './WaveProgress.jsx';
 import Toggle from 'material-ui/Toggle';
 import Paper from 'material-ui/Paper';
 
-
 const styles = {
   container: {
     padding: 20,
@@ -18,7 +17,6 @@ const styles = {
   }
 }
 
-
 export default class SRAdminGraph extends React.Component {
   constructor(props) {
     super(props);
@@ -26,7 +24,7 @@ export default class SRAdminGraph extends React.Component {
       Tvalue: [],
       activeWaves: [],
       waves: [],
-			toggle: 'block',
+			toggle: 'none',
 			toggleLabel: 'Show Details'
     }
     this.handleTChange = this.handleTChange.bind(this);
@@ -41,15 +39,15 @@ export default class SRAdminGraph extends React.Component {
   }
 
 	toggleGraph() {
-		if(this.state.toggle === 'block') {
+		if(this.state.toggle === 'none') {
 			this.setState({
-				toggle: 'none',
+				toggle: 'block',
 				toggleLabel: 'Hide Details'
 			})
 		}
 		else {
 			this.setState({
-				toggle: 'block',
+				toggle: 'none',
 				toggleLabel: 'Show Details'
 			})
 		}
@@ -144,7 +142,8 @@ export default class SRAdminGraph extends React.Component {
     return (
       <div>
 				<Paper style = {styles.container}>
-					<h3> Wave progress Graph</h3><Toggle
+					<h3> Wave progress Graph</h3>
+          <Toggle
 						onToggle={this.toggleGraph}
 						title={this.state.toggleLabel}
 						defaultToggled={false}

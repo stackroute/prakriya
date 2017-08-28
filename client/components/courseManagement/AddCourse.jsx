@@ -188,7 +188,7 @@ export default class AddCourse extends React.Component {
           showDialog: false,
           courseColumns: true
         });
-        // this.resetFields()
+        this.resetFields()
       }
     } else if (action == 'EDIT') {
       if (this.validationSuccess()) {
