@@ -54,7 +54,8 @@ export default class EvaluationForms extends React.Component {
 			improvement: '',
 			suggestions: '',
 			open: false,
-			disableSave: true,
+			buttonDisabled: false,
+			verify: false,
 			oldEvaluation: false
 		}
 		this.getCadets = this.getCadets.bind(this);
@@ -75,13 +76,19 @@ export default class EvaluationForms extends React.Component {
 		this.getCadets();
 	}
 
+	getInitialState() {
+		return {invalidData: true}
+	}
+
 	componentWillUpdate(nextProps, nextState) {
-		nextState.disableSave = !(
+		nextState.invalidData = !(
 			nextState.wave.trim() != '' &&
 			nextState.cadetName.trim() != '' &&
 			nextState.doneWell.trim() != '' &&
-			nextState.improvement.trim() != ''
+			nextState.improvement.trim() != '' &&
+			nextState.suggestions.trim() != ''
 		)
+		console.log(nextState.invalidData,"nextState.buttonDisabled")
 	};
 
 	getCadets() {
@@ -154,6 +161,8 @@ export default class EvaluationForms extends React.Component {
 				if(res.body.length > 0)
 				{
 					th.setState({
+						buttonDisabled: true,
+						invalidData: true,
 						cadetID: res.body[0].cadetID,
 						cadetName: res.body[0].cadetName,
 						attitude: res.body[0].attitude,
@@ -168,8 +177,8 @@ export default class EvaluationForms extends React.Component {
 						doneWell: res.body[0].doneWell,
 						improvement: res.body[0].improvement,
 						suggestions: res.body[0].suggestions,
-						oldEvaluation: true,
-						disableSave: true
+						oldEvaluation: true
+
 					})
 				}
 				else {
@@ -234,6 +243,20 @@ export default class EvaluationForms extends React.Component {
 	};
 
 	handleSubmit() {
+		let th = this
+		// console.log(th.state.attitude)
+		// console.log(th.state.punctuality)
+		// console.log(th.state.programming)
+		// console.log(th.state.codequality)
+		// console.log(th.state.testability)
+		// console.log(th.state.engineeringculture)
+		// console.log(th.state.communication)
+		// console.log(th.state.overall)
+		// console.log(th.state.doneWell)
+		// console.log(th.state.improvement)
+		// console.log(th.state.suggestions)
+		if (!(th.state.attitude == 0 ||th.state.punctuality == 0 ||th.state.programming.indexOf(0) != -1 ||th.state.codequality.indexOf(0) != -1 ||th.state.testability.indexOf(0) != -1 ||th.state.engineeringculture.indexOf(0) != -1 ||th.state.communication.indexOf(0) != -1 ||th.state.overall == '' ||th.state.doneWell == '' ||th.state.improvement == '' ||th.state.suggestions == '' )){
+			console.log("insd if loop")
 		let evaluationObj = {}
 		evaluationObj.cadetID = this.state.cadetID;
 		evaluationObj.cadetName = this.state.cadetName;
@@ -251,6 +274,13 @@ export default class EvaluationForms extends React.Component {
 		evaluationObj.suggestions = this.state.suggestions;
 		console.log('Evaluation Obj', evaluationObj);
 		this.saveEvaluation(evaluationObj);
+		}
+		else{
+			console.log("am gonna set verify true")
+			this.setState({
+						verify: true
+			})
+	}
 	};
 
   // saving evaluation results in mongodb
@@ -297,6 +327,8 @@ export default class EvaluationForms extends React.Component {
 	};
 
 	render() {
+		console.log(this.state.invalidData,"render invalidData")
+		console.log(this.state.buttonDisabled,"render buttonDisabled")
 		let th = this;
 		return(
 			<div>
@@ -365,6 +397,10 @@ export default class EvaluationForms extends React.Component {
 									value={this.state.attitude}
 									onChange={(newVal) => th.handleChange(newVal, 'attitude')}
 								/>
+								{
+									th.state.verify && th.state.attitude == 0
+									&& <span style={{color: '#DD0000'}}>Please provide a rating</span>
+								}
 							</Col>
 						</Row>
 
@@ -380,6 +416,10 @@ export default class EvaluationForms extends React.Component {
 									value={this.state.punctuality}
 									onChange={(newVal) => th.handleChange(newVal, 'punctuality')}
 								/>
+								{
+									th.state.verify && th.state.punctuality == 0
+									&& <span style={{color: '#DD0000'}}>Please provide a rating</span>
+								}
 							</Col>
 						</Row>
 						{
@@ -407,6 +447,10 @@ export default class EvaluationForms extends React.Component {
 																onChange={(newVal) => th.handleChange(newVal, item.type.replace(' ', ''), index)}
 															/>
 														</Col>
+														{
+															th.state.verify && th.state[item.type.replace(' ', '')][index] == 0
+															&& <span style={{color: '#DD0000'}}>Please provide a rating</span>
+														}
 													</Row>
 												)
 											})
@@ -434,6 +478,10 @@ export default class EvaluationForms extends React.Component {
 									})
 								}
 							</SelectField>
+							{
+								th.state.verify && th.state.overall == 0
+								&& <span style={{color: '#DD0000'}}>Please provide a overall rating</span>
+							}
 							</Col>
 						</Row>
 
@@ -449,6 +497,10 @@ export default class EvaluationForms extends React.Component {
 						      onChange={this.handleDoneWellChange}
 									disabled= {this.state.oldEvaluation}
 						    />
+								{
+									th.state.verify && th.state.doneWell == ''
+									&& <span style={{color: '#DD0000'}}>Please fill the field</span>
+								}
 							</Col>
 						</Row>
 
@@ -464,6 +516,10 @@ export default class EvaluationForms extends React.Component {
 						      onChange={this.handleAreasOfImprovementChange}
 									disabled= {this.state.oldEvaluation}
 						    />
+								{
+									th.state.verify && th.state.improvement == ''
+									&& <span style={{color: '#DD0000'}}>Please fill the field</span>
+								}
 						  </Col>
 						</Row>
 						<Row>
@@ -479,6 +535,10 @@ export default class EvaluationForms extends React.Component {
 									disabled= {this.state.oldEvaluation}
 								/>
 							</Col>
+							{
+								th.state.verify && th.state.suggestions == ''
+								&& <span style={{color: '#DD0000'}}>Please fill the field</span>
+							}
 						</Row>
 
 						<Row>
@@ -487,7 +547,7 @@ export default class EvaluationForms extends React.Component {
 									label="Submit"
 									primary={true}
 									onClick={this.handleSubmit}
-									disabled={this.state.disableSave || this.state.oldEvaluation}
+									disabled={this.state.buttonDisabled || this.state.invalidData}
 									style={{width: '100%'}}
 								/>
 								<Snackbar
