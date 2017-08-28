@@ -174,6 +174,7 @@ export default class AddCourse extends React.Component {
   }
 
   handleOpen() {
+    this.resetFields();
     this.setState({showDialog: true});
   }
 
