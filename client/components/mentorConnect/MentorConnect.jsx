@@ -19,17 +19,20 @@ const styles = {
 		paddingTop: 10,
 	},
 	paper1: {
-		padding: 10
+		padding: 10,
+		backgroundColor: '#C6D8D3'
 	},
 	paper2: {
 		padding: 10,
 		paddingBottom: 1,
-		marginBottom: 20
+		marginBottom: 20,
+		backgroundColor: '#C6D8D3'
 	},
 	sliderVal: {
 		textAlign: 'left',
 		marginTop: -20,
-		marginBottom: 40
+		marginBottom: 40,
+		color: ''
 	}
 }
 
@@ -121,7 +124,6 @@ export default class MentorConnect extends React.Component {
 		    	console.log(err);
 		    else {
 		    	th.getCadets();
-		    	console.log('After slider selected')
 		    }
 			});
 	}
@@ -180,6 +182,8 @@ export default class MentorConnect extends React.Component {
 		return(
 			<div>
 				<h1 style={app.heading}>Mentor Connect</h1>
+				{
+				this.state.cadets.length != 0 ?
 				<Grid>
 					<Row style={{textAlign: 'center'}}>
 						<Col md={5}>
@@ -187,7 +191,6 @@ export default class MentorConnect extends React.Component {
 								<AutoComplete
 				          hintText="Search Candidate"
 					  			filter={AutoComplete.fuzzyFilter}
-				          style={styles.heading}
 				          dataSource={cadetsName}
 				          onNewRequest={this.handleFilter}
 				        />
@@ -229,10 +232,10 @@ export default class MentorConnect extends React.Component {
 						<Col md={2}>
 							Cadet Name
 						</Col>
-						<Col md={4} style={styles.heading}>
+						<Col md={4}>
 							Remarks
 						</Col>
-						<Col md={3} style={styles.heading}>
+						<Col md={3}>
 							Selected
 						</Col>
 					</Row>
@@ -243,18 +246,16 @@ export default class MentorConnect extends React.Component {
 									cadet.EmployeeName.startsWith(th.state.filterCadet) &&
 									<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
 								)
-							}
-							else
+							} else
 								return (
 									<CadetItem cadet={cadet} key={i} handleRemarksUpdate={th.saveRemarks}/>
 								)
 						})
 					}
-					{
-						this.state.cadets.length == 0 &&
-						<h3 style={styles.heading}>No cadets available for Mentor Connect</h3>
-					}
-				</Grid>
+
+				</Grid> :
+				<h3 style={{textAlign: 'center'}}>NO CADETS AVAILABLE FOR MENTOR CONNECT</h3>
+				}
 				<Snackbar
           open={this.state.open}
           message={this.state.message}

@@ -32,9 +32,9 @@ export default class CandidateCard extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.query({filename: username})
 			.end(function(err, res) {
-				if(err)
-		    	console.log('Image not found for ', emailID);
-		    else {
+				if(err) {
+					console.log('Image not found for ', emailID);
+				} else {
 		    	if(res.text) {
 			    	th.setState({
 			    		imageURL: res.text

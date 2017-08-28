@@ -1,49 +1,17 @@
 import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import app from '../../styles/app.json';
-import select from '../../styles/select.json';
 import dialog from '../../styles/dialog.json';
 import Paper from 'material-ui/Paper';
 import Chip from 'material-ui/Chip';
 import AutoComplete from 'material-ui/AutoComplete';
 import Snackbar from 'material-ui/Snackbar';
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 
 const styles = {
-  dialog: {
-    backgroundColor: '#DDDBF1',
-    borderBottom: '10px solid teal',
-    borderRight: '10px solid teal',
-    borderLeft: '10px solid teal'
-  },
-  deleteDialog: {
-    backgroundColor: '#DDDBF1',
-    border: '10px solid teal'
-  },
-  dialogTitle: {
-    fontWeight: 'bold',
-    backgroundColor: 'teal',
-    color: '#DDDBF1',
-    textAlign: 'center'
-  },
-  actionsContainer: {
-    backgroundColor: 'teal',
-    borderTop: '0px',
-    marginTop: '0px'
-  },
-  actionButton: {
-    backgroundColor: '#DDDBF1',
-    width: '50%',
-    color: 'teal',
-    border: '1px solid teal',
-    height: '100%'
-  },
-  link: {
-      wordWrap: 'break-word'
-  },
   paper: {
     margin: '5px',
     padding: '5px',
@@ -185,8 +153,7 @@ export default class CourseCard extends React.Component {
     return false
   }
 
-  onChangeType(e, key, value) {
-    console.log('mode e: ', e)
+  onChangeType(e, value) {
     this.setState({type: value})
   }
 
@@ -232,16 +199,13 @@ export default class CourseCard extends React.Component {
       schedule.Skills = th.state.Skills;
       schedule.Day = th.state.Day;
       course.Schedule.push(schedule);
-      console.log(schedule);
       this.props.handleUpdate(course,'schedule');
       this.props.handleClose();
     }
   }
 
-  handleUpdateSkill(Skill) {
-		this.setState({
-			Skill: Skill
-		})
+  handleUpdateSkill(skill) {
+		this.setState({Skill: skill})
 	}
 
 	handleAddSkill() {
@@ -251,8 +215,13 @@ export default class CourseCard extends React.Component {
     let duplicateFound = skills.some(function(p) {
       return p.toLowerCase() == skill.toLowerCase()
     });
+    let matchFound = th.props.skills.some(function(s) {
+      return s.toLowerCase() == skill.toLowerCase()
+    });
     if(duplicateFound) {
       th.openSnackbar('Duplicate Skill! Try adding a new skill.');
+    } else if (!matchFound){
+      th.openSnackbar('Skill not found! Please add it to the superset.');
     } else {
       skills.push(skill)
       th.setState({
@@ -277,13 +246,13 @@ export default class CourseCard extends React.Component {
   	let actions = [
         <FlatButton
           label="Cancel"
-          style={styles.actionButton}
+          style={dialog.actionButton}
           onTouchTap={(e) => this.handleClose(e, 'CLOSE')}
         />,
         <FlatButton
           label={label}
           onClick={(e) => this.handleClose(e, 'ADD')}
-          style={styles.actionButton}
+          style={dialog.actionButton}
         />
       ]
       let duration = ''
@@ -319,19 +288,34 @@ export default class CourseCard extends React.Component {
       }
       return (
         <div>
-        <Dialog bodyStyle={styles.dialog}
+        <Dialog bodyStyle={dialog.body}
           title={title}
-          titleStyle={styles.dialogTitle}
+          titleStyle={dialog.title}
           modal={false}
           open={this.props.openDialog}
           autoScrollBodyContent={true}
           onRequestClose={this.handleClose}
-          actionsContainerStyle={styles.actionsContainer}
+          actionsContainerStyle={dialog.actionsContainer}
           actions={actions}>
-          <SelectField style={{width: '100%'}} hintText="Category" floatingLabelText='Category' value={this.state.type} onChange={this.onChangeType} menuItemStyle={select.menu} listStyle={select.list} selectedMenuItemStyle={select.selectedMenu} maxHeight={600}>
-            <MenuItem key='1' value='Assignment' primaryText='Assignment'/>
-            <MenuItem key='2' value='Schedule' primaryText='Schedule'/>
-          </SelectField>
+          <div>
+            <div  style={dialog.box100}>
+              <p>Category</p>
+              <RadioButtonGroup name='Category'
+                defaultSelected={this.state.type} valueSelected={this.state.type}
+                onChange={this.onChangeType}>
+                <RadioButton
+                  value='Assignment'
+                  label='Assignment'
+                  style={{display: 'inline-block', width: '150px'}}
+                />
+                <RadioButton
+                  value='Schedule'
+                  label='Schedule'
+                  style={{display: 'inline-block', width: '150px'}}
+                />
+              </RadioButtonGroup>
+            </div>
+          </div>
           <div>
             <div style={dialog.box100}>
               <TextField style={{

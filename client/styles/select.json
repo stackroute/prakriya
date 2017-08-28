@@ -1,13 +1,15 @@
 module.exports = {
   list: {
-    'backgroundColor': '#202D3E',
-    'borderLeft': '5px solid #202D3E',
-    'borderRight': '5px solid #202D3E'
+    'backgroundColor': '#C6D8D3',
+    'borderLeft': '5px solid #C6D8D3',
+    'borderRight': '5px solid #C6D8D3',
+    'paddingTop': '5px',
+    'paddingBottom': '5px'
   },
   'menu': {
-    'borderTop': '1px solid #202D3E',
-    'borderBottom': '1px solid #202D3E',
-    'backgroundColor': '#C6D8D3'
+    'borderTop': '1px solid #C6D8D3',
+    'borderBottom': '1px solid #C6D8D3',
+    'backgroundColor': '#F0F8FF'
   },
   'selectedMenu':{
     'color': 'black',

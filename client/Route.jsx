@@ -67,6 +67,7 @@ const muiTheme = getMuiTheme(lightBaseTheme, {
 		thumbOnColor: '#202D3E'
 	}
 });
+
 console.log('muiTheme', muiTheme);
 
 var user;

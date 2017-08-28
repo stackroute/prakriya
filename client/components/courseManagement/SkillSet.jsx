@@ -65,18 +65,20 @@ export default class SkillSet extends React.Component {
     this.setState({skill: e.target.value, skillsErrorText: ''});
   }
 
-  onSkillAddition() {
-    let th = this;
-    if (this.state.skill.trim().length != 0) {
-      let skill = this.state.skill;
-      let skills = this.props.skills;
-      let duplicateFound = skills.some(function(s) {
-        return s.toLowerCase() == skill.toLowerCase()
-      });
-      if(duplicateFound) {
-        th.openSnackbar('Duplicate Skill! Try adding a new skill.');
-      } else {
-        th.addNewSkill(skill);
+  onSkillAddition(e) {
+    if(e.key === 'Enter') {
+      if (this.state.skill.trim().length != 0) {
+        let th = this;
+        let skill = this.state.skill;
+        let skills = this.props.skills;
+        let duplicateFound = skills.some(function(s) {
+          return s.toLowerCase() == skill.toLowerCase()
+        });
+        if(duplicateFound) {
+          th.openSnackbar('Duplicate Skill! Try adding a new skill.');
+        } else {
+          th.addNewSkill(skill);
+        }
       }
     }
   }
@@ -120,18 +122,15 @@ export default class SkillSet extends React.Component {
             onRequestClose={this.onClose}>
             <div>
               <div style={dialog.box100}>
-                <TextField hintText="Skill Name" floatingLabelText="Skill Name" value={this.state.skill} onChange={this.onSkillChange}/>
-                <IconButton tooltip="Add Skill" onClick={this.onSkillAddition}>
-                  <AddIcon/>
-                </IconButton>
+                <TextField hintText="Skill Name" floatingLabelText="Skill Name" value={this.state.skill} onChange={this.onSkillChange} onKeyPress={this.onSkillAddition}/>
                 <Paper style={styles.paper} zDepth={1}>
                   <div style={styles.wrapper}>
                     {
                       this.props.skills.map(function(skill, index) {
                         return (
-                          <Chip 
-                            style={styles.chip} 
-                            key={index} 
+                          <Chip
+                            style={styles.chip}
+                            key={index}
                             onRequestDelete={(e) => th.deleteSkill(skill)}
                           >
                             <span>{skill}</span>

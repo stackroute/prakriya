@@ -21,7 +21,7 @@ export default class SRAdminGraph extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      Tvalue: [],
+      Tvalue: '',
       activeWaves: [],
       waves: [],
 			toggle: 'none',
@@ -35,14 +35,17 @@ export default class SRAdminGraph extends React.Component {
     this.getWaves();
   }
   handleTChange(event, key, values) {
+    if(values){
     this.setState({Tvalue: values})
+  }
   }
 
 	toggleGraph() {
 		if(this.state.toggle === 'none') {
 			this.setState({
 				toggle: 'block',
-				toggleLabel: 'Hide Details'
+				toggleLabel: 'Hide Details',
+        Tvalue: ''
 			})
 		}
 		else {
@@ -60,9 +63,7 @@ export default class SRAdminGraph extends React.Component {
         console.log(err)
       else {
         let activeWaves = []
-        console.log(res.body, "getwaves")
         res.body.map(function(wave, key) {
-          console.log(wave, "wave")
           let sdate = new Date(parseInt(wave.StartDate, 10));
           let edate = new Date(parseInt(wave.EndDate, 10));
           console.log(sdate, "sadate")
@@ -71,17 +72,13 @@ export default class SRAdminGraph extends React.Component {
           }
         )
         th.setState({activeWaves: activeWaves, waves: res.body})
-        console.log(th.state.activeWaves, "activewavesState")
-        console.log(th.state.waves, "wavesin state")
       }
     })
   }
   render() {
 
     let sampledata = []
-    console.log(this.state.activeWaves, "this.state.activeWaves")
     this.state.activeWaves.map(function(activewave, i) {
-      console.log(activewave, "activewave")
       let myobj = {}
       myobj.waveid = activewave.CourseName + '(' + activewave.WaveID + ')';
       let sdate = new Date(parseInt(activewave.StartDate, 10));
@@ -96,21 +93,14 @@ export default class SRAdminGraph extends React.Component {
       myobj.total = total1;
       myobj.duration = activewave.Duration;
       sampledata.push(myobj);
-
-      console.log(myobj.waveid, myobj.value)
     })
-
-    console.log(sampledata, "myobj");
-
     let Titems = [];
     for (let i = 0; i < sampledata.length; i++) {
       Titems.push(sampledata[i].waveid)
     }
-    console.log(Titems, "titems")
 
     let th = this;
     var Tdatavalue = []
-    console.log(this.state.Tvalue, "Tvalue")
     if (this.state.Tvalue != null) {
       for (var i = 0; i < sampledata.length; i++) {
         if (sampledata[i].waveid === this.state.Tvalue) {
@@ -120,25 +110,19 @@ export default class SRAdminGraph extends React.Component {
       }
 
     }
-    console.log(Tdatavalue, "Tdatavalue")
     let displayvalue = []
     let myobj = {}
     let myobj1 = {}
     Tdatavalue.map(function(val, i) {
-
       myobj.label = "Days completed";
       myobj.value = val.value;
       myobj.color = "#008DD5";
       myobj1.label = "Days yet to go";
       myobj1.value = val.total - val.value;
       myobj1.color = "#EE4266";
-      console.log(myobj, "maaobj")
-      console.log(myobj1, "wdbwejhf")
       displayvalue.push(myobj);
       displayvalue.push(myobj1);
     })
-
-    console.log(displayvalue, "displayvalue")
     return (
       <div>
 				<Paper style = {styles.container}>
@@ -149,7 +133,7 @@ export default class SRAdminGraph extends React.Component {
 						defaultToggled={false}
 						style={{marginLeft: '90%', marginTop: '-10%'}}
 					/>
-          <div style = {{display : this.state.toggle}}>
+          {this.state.toggle === 'none' && <div>
             <SelectField value={this.state.Tvalue} onChange={this.handleTChange} floatingLabelText="Wave Training Status">
               {sampledata.map(function(item, key) {
                 return <MenuItem key={key} value={item.waveid} primaryText={item.waveid}/>
@@ -160,6 +144,7 @@ export default class SRAdminGraph extends React.Component {
               enabled: true
             }} datum={displayvalue} x="label" y="value" height={500} width={500}/>
 					</div>
+        }
 					</Paper>
       </div>
     )

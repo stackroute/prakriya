@@ -119,7 +119,8 @@ export default class ProfileView extends React.Component {
 			Skills: this.props.cadet.Skills,
   		picPreview: this.state.defaultProfilePic,
 			Billability: Billability[0],
-			Date: date
+			Date: date,
+			wave: this.props.wave
   	})
 	}
 	componentWillUpdate(nextProps, nextState) {
@@ -344,8 +345,8 @@ export default class ProfileView extends React.Component {
 							<p style={styles.details}>
 								<strong>Wave:</strong> {this.state.cadet.Wave}<br/>
 								<strong>Mode:</strong> {this.state.wave.Mode}<br/>
-								<strong>Start Date:</strong> {this.formatDate(this.state.wave.StartDate)}<br/>
-								<strong>End Date:</strong> {this.formatDate(this.state.wave.EndDate)}
+								<strong>Start Date:</strong> {this.formatDate(new Date(parseInt(this.state.wave.StartDate, 10)))}<br/>
+								<strong>End Date:</strong> {this.formatDate(new Date(parseInt(this.state.wave.EndDate, 10)))}
 							</p>
 
 							{
@@ -365,8 +366,8 @@ export default class ProfileView extends React.Component {
 									cadetSkill[i] = []
 								}
 								{
-									this.state.Skills !== undefined &&
-									this.state.Skills.map(function(skill, key) {
+									this.props.cadet.Skills !== undefined &&
+									this.props.cadet.Skills.map(function(skill, key) {
 										if(key % 3 === 0) {
 											i = i + 1
 											cadetSkill[i] = []

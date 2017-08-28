@@ -48,33 +48,31 @@ export default class Projects extends React.Component {
 			.get('/dashboard/projects')
 			.set({'Authorization': localStorage.getItem('token')})
 			.end(function(err, res) {
-				if(err)
-		    	console.log(err,"err");
-		    else {
-					console.log('fetched all projects from db -- ', res.body);
+				if(err) {
+			    console.log(err);
+				} else {
 					let projects = res.body.map(function(record) {
 							return record._fields[0];
 					});
 		    	th.setState({
 		    		projects: projects
 		    	})
-					console.log('projects in sate: ', projects)
 		    }
 			})
 	}
 
 	addProject(project) {
-		console.log("addproj n projects", project)
 		let th = this;
 		Request
 			.post('/dashboard/addproject')
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(project)
 			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
+				if(err) {
+					console.log(err);
+				} else {
 		    	let projects = th.state.projects;
+					project.version[0].addedBy = th.props.user.role;
 		    	projects.push(project);
 		    	th.setState({
 		    		projects: projects
@@ -84,7 +82,6 @@ export default class Projects extends React.Component {
 	}
 
 	addVersion(version) {
-		console.log("addproj n version", version)
 		version.version.addedOn = new Date();
 		let th = this;
 		Request
@@ -92,10 +89,9 @@ export default class Projects extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(version)
 			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	console.log('version addition successfull')
+				if(err) {
+					console.log(err);
+				} else {
 		    	th.getProjects();
 		    }
 			})
@@ -108,12 +104,11 @@ export default class Projects extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.send(projObj)
 			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	console.log('Successfully updated a project')
+				if(err) {
+					console.log(err);
+				} else {
 		    	th.getProjects();
-		    	}
+		    }
 			})
 	}
 
@@ -125,12 +120,11 @@ export default class Projects extends React.Component {
 			.set({'Authorization': localStorage.getItem('token')})
 			.send({project:project,type:type})
 			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	console.log('Successfully deleted a project')
+				if(err) {
+					console.log(err);
+				} else {
 		    	th.getProjects();
-		    	}
+		    }
 			})
 	}
 
@@ -168,7 +162,7 @@ export default class Projects extends React.Component {
 						}
 						</Masonry>
 					</Row></Grid> :
-					<h4 style={{textAlign: 'center', width: '100%'}}>NO PROJECTS TO DISPLAY</h4>
+					<h4 style={{textAlign: 'center', width: '100%'}}>NO PRODUCTS TO DISPLAY</h4>
 				}
 			</div>
 		)

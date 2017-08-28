@@ -319,7 +319,7 @@ router.post('/updateproject', auth.accessedBy(['PROJECTS']), function (req, res)
   try {
     let version = req.body;
     version.addedBy = req.user.name;
-    version.updated = true;
+    version.updated = false;
     dashboardNeo4jController.
     updateVersion(
       version,

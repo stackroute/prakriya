@@ -121,9 +121,9 @@ export default class Header extends React.Component {
   		.set({'Authorization': localStorage.getItem('token')})
       .query({filename: username})
   		.end(function(err, res) {
-  			if(err)
-  	    	console.log(err);
-  	    else {
+  			if(err) {
+    	    	console.log('Profile pic not found.');
+        } else {
   	    	if(res.text) {
   		    	th.setState({
   		    		imageURL: res.text
@@ -145,7 +145,6 @@ export default class Header extends React.Component {
       .get(`/dashboard/notifications?username=${username}`)
       .set({'Authorization': localStorage.getItem('token')})
       .end(function(err, res){
-        console.log('Notifications recieved from server: ', res.body.notifications)
         th.setState({
           notifications: res.body.notifications
         })

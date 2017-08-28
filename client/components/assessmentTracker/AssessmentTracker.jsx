@@ -192,31 +192,42 @@ export default class AssessmentTracker extends React.Component {
     return (
       <div>
         <h1 style={app.heading}>Assessment Tracker</h1>
-        <Grid>
+        {th.state.waves.length === 0 &&
+          <h3  style={{textAlign:'center'}}> NO WAVES </h3>
+        }
+        {th.state.waves.length > 0 &&
+        <div><Grid>
           <Row>
             <Col md={6}>
               <Paper style={{
                 boxSizing: 'border-box',
-                padding: '5px'
+                padding: '5px',
+                backgroundColor: '#C6D8D3'
               }}>
                 <SelectField onChange={th.onWaveChange} floatingLabelText="Select Wave" value={th.state.wave}>
-                  {th.state.waves.map(function(val, key) {
-                    return <MenuItem key={key} value={val + ' (' + th.state.Course[key] + ')'} primaryText={val + ' (' + th.state.Course[key] + ')'}/>
-                  })
-}
+                  {
+                    th.state.waves.map(function(val, key) {
+                      return <MenuItem key={key} value={val + ' (' + th.state.Course[key] + ')'} primaryText={val + ' (' + th.state.Course[key] + ')'}/>
+                    })
+                  }
                 </SelectField>
+                {
+                  th.state.Assignments.length > 0 &&
                 <SelectField onChange={th.onAssessmentChange} floatingLabelText="Select Assessment" value={th.state.assessment}>
-                  {th.state.select && th.state.Assignments.map(function(val, key) {
-                    return <MenuItem key={key} value={val.Name} primaryText={val.Name}/>
-                  })
-}
+                  {
+                    th.state.select && th.state.Assignments.map(function(val, key) {
+                      return <MenuItem key={key} value={val.Name} primaryText={val.Name}/>
+                    })
+                  }
                 </SelectField>
+                }
               </Paper>
             </Col>
           </Row>
         </Grid>
         <br/>
-        <Table width='100%'>
+        {
+          th.state.assessment !== '' && <Table width='100%'>
           <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
             <TableHeaderColumn style={{
               width: '70px'
@@ -276,6 +287,13 @@ export default class AssessmentTracker extends React.Component {
 }
           </TableBody>
         </Table>
+      }
+      {
+        th.state.Assignments.length === 0 &&
+        <h3 style={{textAlign:'center'}}> NO ASSIGNMENTS </h3>
+      }
+    </div>
+        }
       </div>
     )
   }

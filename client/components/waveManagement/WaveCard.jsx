@@ -343,37 +343,41 @@ export default class WaveCard extends React.Component {
               <LocationIcon/>
             </IconButton>
             <span style={{
-              position: 'absolute',
-              top: '28%'
+              position: 'relative',
+              top: '-5px'
             }}>{this.state.wave.Location}</span><br/>
             <IconButton tooltip="Date">
               <DateIcon/>
             </IconButton>
             <span style={{
-              position: 'absolute',
-              top: '42%'
+              position: 'relative',
+              top: '-5px'
             }}>{this.formatDate(this.state.wave.StartDate)}
               - {this.formatDate(this.state.wave.EndDate)}</span><br/>
             <IconButton tooltip="Course">
               <CourseIcon/>
             </IconButton>
             <span style={{
-              position: 'absolute',
-              top: '55%'
+              position: 'relative',
+              top: '-5px'
             }}>{this.state.wave.Course}</span><br/>
-            <IconButton tooltip="Guest of Honour">
-              <GoHIcon/>
-            </IconButton>
-            <span style={{
-              position: 'absolute',
-              top: '67%'
-            }}>{this.state.wave.GoH}</span><br/>
+            {
+              ( this.state.wave.GoH !== '' && this.state.wave.GoH !== undefined ) && <div>
+                <IconButton tooltip="Guest of Honour">
+                  <GoHIcon/>
+                </IconButton>
+                <span style={{
+                  position: 'relative',
+                  top: '-5px'
+                }}>{this.state.wave.GoH}</span><br/>
+              </div>
+            }
             <IconButton tooltip="Members" onClick={this.handleOpen}>
               <GroupIcon/>
             </IconButton>
             {this.state.wave.Cadets != undefined && <b style={{
-              position: 'absolute',
-              top: '80%'
+              position: 'relative',
+              top: '-5px'
             }}>({this.state.wave.Cadets})</b>}
 
             <IconButton tooltip="Delete Wave" onClick={this.openDeleteDialog} style={{

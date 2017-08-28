@@ -53,6 +53,7 @@ module.exports = {
   },
   'confirmBox': {
     /*'backgroundColor': '#202D3E',*/
-    'border': '10px solid #C6D8D3'
+    'border': '10px solid #C6D8D3',
+    textAlign: 'center'
   }
 }
