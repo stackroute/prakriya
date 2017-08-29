@@ -395,7 +395,6 @@ let getSkills = function(successCB, errorCB) {
 
 // adding a course
 let addCourse = function(CourseObj, successCB, errorCB) {
-  logger.info(CourseObj);
   let query = `MERGE (c:${graphConsts.NODE_COURSE}{ID:'${CourseObj.ID}',Name:'${CourseObj.Name}',
   Mode:'${CourseObj.Mode}',Duration:${CourseObj.Duration},History:'${CourseObj.History}',
   Removed:${CourseObj.Removed},FeedbackFields: ${JSON.stringify(CourseObj.FeedbackFields)}}) WITH c AS course

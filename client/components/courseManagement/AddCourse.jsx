@@ -185,7 +185,6 @@ export default class AddCourse extends React.Component {
           showDialog: false,
           courseColumns: true
         });
-        this.resetFields()
       }
     } else if (action == 'EDIT') {
       if (this.validationSuccess()) {
@@ -265,6 +264,7 @@ export default class AddCourse extends React.Component {
     this.setState({
       courseColumns: false
     });
+    this.resetFields();
   }
 
   validationSuccess() {
