@@ -70,7 +70,9 @@ export default class WaveCard extends React.Component {
       cadetsToRemove: [],
       disableSave: true,
       noCadets: false,
-      removecadets: false
+      removecadets: false,
+      displayText: false,
+      ButtonDisplay: false
     }
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
@@ -94,17 +96,15 @@ export default class WaveCard extends React.Component {
     this.handleRemoveCadetsChange = this.handleRemoveCadetsChange.bind(this);
     this.handleremovecadets = this.handleremovecadets.bind(this);
     this.handleGoHChange = this.handleGoHChange.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+    this.handleCancelButton = this.handleCancelButton.bind(this);
   }
   componentWillMount() {
-    this.setState({
-      wave: this.props.wave
-    })
+    this.setState({wave: this.props.wave})
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      wave: nextProps.wave
-    })
+    this.setState({wave: nextProps.wave})
   }
 
   handleEditWave() {
@@ -131,7 +131,7 @@ export default class WaveCard extends React.Component {
       else {
         let cadets = res.body;
         if (cadets.length == 0) {
-          th.setState({noCadets: true, newCadets: []})
+          th.setState({noCadets: true, newCadets: [], displayText: true, ButtonDisplay: true})
         } else {
           th.setState({newCadets: cadets, noCadets: false})
         }
@@ -198,7 +198,7 @@ export default class WaveCard extends React.Component {
 
   closeUpdateDialog(type) {
     this.setState({openDialog: false, addCadet: false})
-    if(type != 'update') {
+    if (type != 'update') {
       this.props.getWaves();
     }
   }
@@ -209,17 +209,22 @@ export default class WaveCard extends React.Component {
 
   getCadets(cadets) {
     let th = this;
-    Request.post('/dashboard/cadetsofwave').set({'Authorization': localStorage.getItem('token')}).send({waveid: this.props.wave.WaveID, course:this.props.wave.CourseName}).end(function(err, res) {
+    Request.post('/dashboard/cadetsofwave').set({'Authorization': localStorage.getItem('token')}).send({waveid: this.props.wave.WaveID, course: this.props.wave.CourseName}).end(function(err, res) {
       if (err)
         console.log(err);
       else {
-        th.setState({cadets: res.body, cadetFetch: false, dialog: true})
+        let acadets = res.body;
+        if (acadets.length == 0) {
+          th.setState({cadets: [], cadetFetch: true, dialog: true})
+        } else {
+          th.setState({cadets: acadets, cadetFetch: false, dialog: true})
+        }
       }
     })
   }
 
   handleClose() {
-    this.setState({dialog: false, noCadets: false, addCadet: false,removecadets: false})
+    this.setState({dialog: false, noCadets: false, addCadet: false, removecadets: false})
   }
 
   handleLocationChange(event) {
@@ -242,18 +247,31 @@ export default class WaveCard extends React.Component {
     let wave = this.state.wave;
     wave.GoH = event.target.value;
     this.setState({wave: wave})
-	}
+  }
   handleCourseChange(event, key, val) {
     this.setState({selectedCourse: val})
   }
 
   openAddDialog() {
-    this.setState({addCadet: true})
+    this.setState({addCadet: true, removecadets: false})
     this.getNewCadets();
   }
   removecadetwave() {
+    this.setState({removecadets: true, addCadet: false})
+  }
+  handleCancel() {
+    this.setState({addCadet: false, removecadets: false, cadetsToRemove: [], selectedCadets: [], disableSave: true})
+  }
+  handleCancelButton() {
     this.setState({
-      removecadets: true
+      addCadet: false,
+      removecadets: false,
+      cadetsToRemove: [],
+      selectedCadets: [],
+      disableSave: true,
+      displayText: false,
+      ButtonDisplay: false
+
     })
   }
 
@@ -360,18 +378,16 @@ export default class WaveCard extends React.Component {
             <span style={{
               position: 'relative',
               top: '-5px'
-            }}>{this.state.wave.Course}</span><br/>
-            {
-              ( this.state.wave.GoH !== '' && this.state.wave.GoH !== undefined ) && <div>
-                <IconButton tooltip="Guest of Honour">
-                  <GoHIcon/>
-                </IconButton>
-                <span style={{
-                  position: 'relative',
-                  top: '-5px'
-                }}>{this.state.wave.GoH}</span><br/>
-              </div>
-            }
+            }}>{this.state.wave.Course}</span><br/> {(this.state.wave.GoH !== '' && this.state.wave.GoH !== undefined) && <div>
+              <IconButton tooltip="Guest of Honour">
+                <GoHIcon/>
+              </IconButton>
+              <span style={{
+                position: 'relative',
+                top: '-5px'
+              }}>{this.state.wave.GoH}</span><br/>
+            </div>
+}
             <IconButton tooltip="Members" onClick={this.handleOpen}>
               <GroupIcon/>
             </IconButton>
@@ -419,25 +435,48 @@ export default class WaveCard extends React.Component {
           }} onClick={this.removecadetwave}>
             <RemoveIcon/>
           </IconButton>
-          {this.state.addCadet && (!this.state.noCadets) && <div>
-            <SelectField multiple={true} hintText="Select Cadets" floatingLabelText='Add Cadets' value={this.state.selectedCadets} onChange={this.handleCadetsChange} menuItemStyle={{
-              borderTop: '1px solid teal',
-              borderBottom: '1px solid teal',
-              backgroundColor: '#DDDBF1'
-            }} listStyle={select.list} style={{
-              width: '100%'
-            }} selectedMenuItemStyle={select.selectedMenu}>
-              {th.state.newCadets.map(function(cadet, i) {
-                return (cadet.Selected != undefined && (cadet.Selected == 'Yes' || cadet.Selected == 'DS') && <MenuItem key={i} insetChildren={true} checked={th.state.selectedCadets && th.state.selectedCadets.includes(cadet.EmployeeID)} value={cadet.EmployeeID} primaryText={`${cadet.EmployeeName} (${cadet.EmployeeID})`}/>)
-              })
+          {this.state.noCadets && this.state.displayText && <h3 style={{
+            textAlign: 'center'
+          }}>No cadets Available for Adding!</h3>}
+          {this.state.noCadets && this.state.ButtonDisplay && <RaisedButton label="Cancel" disabled={false} primary={true} onClick={this.handleCancelButton}/>
 }
-            </SelectField>
+          {this.state.addCadet && (!this.state.noCadets) &&< div > <SelectField multiple={true} hintText="Select Cadets" floatingLabelText='Add Cadets' value={this.state.selectedCadets} onChange={this.handleCadetsChange} menuItemStyle={{
+            borderTop: '1px solid teal',
+            borderBottom: '1px solid teal',
+            backgroundColor: '#DDDBF1'
+          }} listStyle={select.list} style={{
+            width: '100%'
+          }} selectedMenuItemStyle={select.selectedMenu}>
+            {th.state.newCadets.map(function(cadet, i) {
+              return (cadet.Selected != undefined && (cadet.Selected == 'Yes' || cadet.Selected == 'DS') && <MenuItem key={i} insetChildren={true} checked={th.state.selectedCadets && th.state.selectedCadets.includes(cadet.EmployeeID)} value={cadet.EmployeeID} primaryText={`${cadet.EmployeeName} (${cadet.EmployeeID})`}/>)
+            })
+}
+          </SelectField> < RaisedButton label = "Save Changes" disabled = {
+            this.state.disableSave
+          }
+          primary = {
+            true
+          }
+          onClick = {
+            this.handleUpdateWave
+          } /> & nbsp;
+          &nbsp;
+          <RaisedButton label = "Cancel" disabled = {
+            false
+          }
+          primary = {
+            true
+          }
+          onClick = {
+            this.handleCancel
+          } /> </div>
+}
 
-            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleUpdateWave}/> {this.state.noCadets && <h3 style={{textAlign:'center'}}>No Cadets available</h3>
+          {this.state.cadetFetch && (!this.state.addCadet) && <h3 style={{
+            textAlign: 'center'
+          }}>No Cadets Available</h3>
 }
-          </div>
-}
-          {this.state.removecadets  && <div>
+          {this.state.removecadets && (this.state.cadets.length > 0) && <div>
             <SelectField multiple={true} hintText="Select Cadets" floatingLabelText=' Remove Cadets' value={this.state.cadetsToRemove} onChange={this.handleRemoveCadetsChange} menuItemStyle={{
               borderTop: '1px solid teal',
               borderBottom: '1px solid teal',
@@ -450,7 +489,12 @@ export default class WaveCard extends React.Component {
               })
 }
             </SelectField>
-            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleremovecadets}/> {this.state.cadets.length === 0 && <h3 style={{textAlign:'center'}} >No Cadets available</h3>}
+            <RaisedButton label="Save Changes" disabled={this.state.disableSave} primary={true} onClick={this.handleremovecadets}/> {this.state.cadets.length === 0 && <h3 style={{
+              textAlign: 'center'
+            }}>No Cadets available</h3>}
+            &nbsp; &nbsp;
+            <RaisedButton label="Cancel" disabled={false} primary={true} onClick={this.handleCancel}/>
+
           </div>
 }
 
@@ -488,12 +532,7 @@ export default class WaveCard extends React.Component {
             </SelectField>
           </div>
           <div style={dialog.box100}>
-            <TextField
-              floatingLabelText="Guest of Honour"
-              value={th.state.wave.GoH} 
-              fullWidth={true}
-              onChange={th.handleGoHChange}
-            />
+            <TextField floatingLabelText="Guest of Honour" value={th.state.wave.GoH} fullWidth={true} onChange={th.handleGoHChange}/>
           </div>
         </Dialog>
       </div>
