@@ -93,7 +93,8 @@ export default class AddWave extends React.Component {
 		if(check) {
 			this.setState({
 				openSnackbar: true,
-				snackbarMsg: 'No courses available for this mode'
+				snackbarMsg: 'No courses available for this mode',
+				disableAll: true
 			})
 		}
 		this.setState({
@@ -226,6 +227,7 @@ export default class AddWave extends React.Component {
 
 	render() {
 		let th = this;
+		console.log(disableAll);
 		const dialogActions = [
       <FlatButton
         label="Cancel"
