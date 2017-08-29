@@ -532,7 +532,12 @@ export default class WaveCard extends React.Component {
             </SelectField>
           </div>
           <div style={dialog.box100}>
-            <TextField floatingLabelText="Guest of Honour" value={th.state.wave.GoH} fullWidth={true} onChange={th.handleGoHChange}/>
+             <TextField
+              floatingLabelText="Guest of Honour"
+              value={th.state.wave.GoH}
+              fullWidth={true}
+              onChange={th.handleGoHChange}
+            />
           </div>
         </Dialog>
       </div>

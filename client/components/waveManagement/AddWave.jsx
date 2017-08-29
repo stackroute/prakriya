@@ -35,6 +35,7 @@ export default class AddWave extends React.Component {
 			selectedCadets: [],
 			disableCourse: true,
 			disableAll: true,
+			disableLocation: true
 
 		}
 		this.handleOpen = this.handleOpen.bind(this)
@@ -85,6 +86,17 @@ export default class AddWave extends React.Component {
 
 	handleModeChange(event, key, val) {
 		let check = true;
+		if(val == 'Online') {
+			this.setState({
+				Location: 'NA',
+				disableLocation: true
+			});
+		} else {
+			this.setState({
+				disableLocation: false
+			});
+		}
+
 		this.state.courses.map(function(course) {
 			if(val == course.Mode) {
 				check = false;
@@ -93,13 +105,15 @@ export default class AddWave extends React.Component {
 		if(check) {
 			this.setState({
 				openSnackbar: true,
-				snackbarMsg: 'No courses available for this mode'
+				snackbarMsg: 'No courses available for this mode',
+				disableAll: true
 			})
 		}
 		this.setState({
 			Mode: val,
 			disableCourse: check,
-			ModeErrorText: ''
+			ModeErrorText: '',
+			disableAll: true
 		})
 	}
 
@@ -187,6 +201,9 @@ export default class AddWave extends React.Component {
 			EndDate: null,
 			GoH: '',
 			selectedCadets: [],
+			disableAll: true,
+			disableCourse: true,
+			disableLocation: true
 		})
 	}
 
@@ -299,11 +316,13 @@ export default class AddWave extends React.Component {
 					<div style={dialog.box50}>
 				    <SelectField
 				      hintText="Provide the base location"
-				      floatingLabelText="Location"
+				      floatingLabelText={
+								this.state.Mode != 'Online' ? "Location" : "Location: Can't mark for an online wave."
+							}
 				      value={this.state.Location}
 				      onChange={this.handleLocationChange}
 				      fullWidth={true}
-				      disabled={this.state.disableAll}
+				      disabled={this.state.disableAll || this.state.disableLocation}
 				    >
 				    	{
 				    		CONFIG.LOCATIONS.map(function (loc, i) {
@@ -337,7 +356,9 @@ export default class AddWave extends React.Component {
 			    <SelectField
 		        multiple={true}
 		        hintText="Select Cadets"
-						floatingLabelText='Cadets'
+						floatingLabelText={
+							(this.state.cadets.length === 0 ? "Cadets: No cadets available." : "Cadets")
+						}
 		        value={this.state.selectedCadets}
 		        onChange={this.handleCadetsChange}
 						menuItemStyle={select.menu}
@@ -345,7 +366,9 @@ export default class AddWave extends React.Component {
 						style={{width: '100%'}}
 						selectedMenuItemStyle={select.selectedMenu}
 						maxHeight={600}
-						disabled={this.state.disableAll}
+						disabled={
+							(this.state.disableAll ? true : (this.state.cadets.length === 0))
+						}
 		      >
 		        {
 		        	this.state.cadets.map(function(cadet, i) {
