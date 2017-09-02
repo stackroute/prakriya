@@ -409,7 +409,7 @@ export default class WaveCard extends React.Component {
           </CardText>
         </Card>
         {this.state.cadetFetch && th.getCadets(this.state.wave.Cadets)}
-        <Dialog style={styles.dialog} title={title} open={this.state.dialog} autoScrollBodyContent={true} onRequestClose={this.handleClose} actionsContainerStyle={dialog.actionsContainer} bodyStyle={dialog.body} titleStyle={dialog.title}>
+        <Dialog title={title} open={this.state.dialog} autoScrollBodyContent={true} onRequestClose={this.handleClose} actionsContainerStyle={dialog.actionsContainer} bodyStyle={dialog.body} titleStyle={dialog.title}>
 
           <Grid style={styles.grid}>
             <Row>
@@ -459,7 +459,7 @@ export default class WaveCard extends React.Component {
           }
           onClick = {
             this.handleUpdateWave
-          } /> & nbsp;
+          } /> &nbsp;
           &nbsp;
           <RaisedButton label = "Cancel" disabled = {
             false
@@ -477,11 +477,8 @@ export default class WaveCard extends React.Component {
           }}>No Cadets Available</h3>
 }
           {this.state.removecadets && (this.state.cadets.length > 0) && <div>
-            <SelectField multiple={true} hintText="Select Cadets" floatingLabelText=' Remove Cadets' value={this.state.cadetsToRemove} onChange={this.handleRemoveCadetsChange} menuItemStyle={{
-              borderTop: '1px solid teal',
-              borderBottom: '1px solid teal',
-              backgroundColor: '#DDDBF1'
-            }} listStyle={select.list} style={{
+            <SelectField multiple={true} hintText="Select Cadets" floatingLabelText=' Remove Cadets' value={this.state.cadetsToRemove} onChange={this.handleRemoveCadetsChange}
+            menuItemStyle={select.menu} listStyle={select.list} style={{
               width: '100%'
             }} selectedMenuItemStyle={select.selectedMenu}>
               {this.state.cadets.map(function(cadet, i) {

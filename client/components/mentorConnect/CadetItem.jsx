@@ -76,12 +76,16 @@ export default class CadetItem extends React.Component {
 		else
 			color = '#ffd1d1'
 		return(
-			<div style={styles.container}>
-				<Row style={{display: 'flex', alignItems: 'center', backgroundColor: color}} >
-					<Col md={1} mdOffset={1}>
+				<Row style={{
+					display: 'flex',
+					alignItems: 'center',
+					backgroundColor: color,
+					border: '1px solid #F0F8FF'
+				}} >
+					<Col md={2} style={{textAlign: 'center'}}>
 						{this.state.cadet.DigiThonScore}
 					</Col>
-					<Col md={2}>
+					<Col md={2} style={{textAlign: 'center'}}>
 						<span
 							style={{cursor: 'pointer'}}
 							onClick={this.handleShowDetail}
@@ -91,17 +95,19 @@ export default class CadetItem extends React.Component {
 					</Col>
 					<Col md={4}>
 						<TextField
-				      floatingLabelText="Provide Remarks"
+				      hintText="Provide Remarks"
 				      multiLine={true}
-				      rows={2}
-				      rowsMax={3}
+							underlineShow={false}
+				      rows={1}
+							rowsMax={5}
 				      fullWidth={true}
+							inputStyle={{textAlign: 'justify'}}
 				      value={this.state.cadet.Remarks}
 				      onChange={this.handleRemarksChange}
 				      onBlur={this.handleRemarksUpdate}
 				    />
 					</Col>
-					<Col md={3}>
+					<Col md={3} style={{textAlign: 'center'}}>
 						<RadioButtonGroup
 							name="selected"
 							onChange={this.handleSelectedChange}
@@ -137,7 +143,6 @@ export default class CadetItem extends React.Component {
 						}
 					</Col>
 				</Row>
-			</div>
 		)
 	}
 }

@@ -5,10 +5,11 @@ import {Link} from 'react-router';
 
 const styles = {
 	profilePic: {
-		height: 100,
-		width: 100,
-		border: '5px solid teal',
-		borderRadius: 75
+		height: 90,
+		width: 90,
+		border: '2px solid #202D3E',
+		borderRadius: 75,
+		textAlign: 'center'
 	}
 }
 export default class CandidateCard extends React.Component {
@@ -46,18 +47,17 @@ export default class CandidateCard extends React.Component {
 
 	render() {
 		return(
-			<span><br/>
-			<Link
-				to={'/candidate/' + this.props.cadet.EmployeeID}
-				target="_blank"
-				style={{textDecoration: 'none', color: '#333'}}
-			>
-			<img style={styles.profilePic} src={this.state.imageURL} />
-				<h3>{this.props.cadet.EmployeeName}</h3>
+			<center><span>
+				<br/>
+				<img style={styles.profilePic} src={this.state.imageURL} />
+				<Link
+					to={'/candidate/' + this.props.cadet.EmployeeID}
+					target="_blank"
+					style={{color: '#333'}}
+				>
+					<h4>{this.props.cadet.EmployeeName}</h4>
 				</Link>
-				</span>
-
-
-			)
+			</span></center>
+		);
 	}
 }
