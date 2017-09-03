@@ -186,7 +186,7 @@ export default class MentorConnect extends React.Component {
 				this.state.cadets.length != 0 ?
 				<Grid>
 					<Row style={{textAlign: 'center'}}>
-						<Col md={5}>
+						<Col md={6}>
 							<Paper style={styles.paper1}>
 								<AutoComplete
 				          hintText="Search Candidate"
@@ -221,7 +221,7 @@ export default class MentorConnect extends React.Component {
 				        </div>
 				      </Paper>
 		        </Col>
-		        <Col md={5}>
+		        <Col md={6}>
 		        	<FileDrop handleBulkUpdateRemarks={this.updateBulkRemarks}/>
 		        </Col>
 					</Row>
