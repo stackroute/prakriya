@@ -117,7 +117,7 @@ export default class Login extends React.Component {
 							 	onChange={this.onChangeUsername}
 								style={{width: '100%'}}
 								errorText={this.state.usernameErrorText}
-							/> 
+							/>
 							<br />
 							<div style={{position: 'relative', display: 'inline-block', width: '100%'}}>
 								{

@@ -1939,7 +1939,7 @@ let getBillabilityStats = function(successCB, errorCB) {
   let query = `
     UNWIND (['Billable', 'Non-Billable (Internal)', 'Non-Billable (Customer)', 'Support', 'Free'])AS BL
     OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-    WHERE candidate.Billability=~(BL + '.*')
+    WHERE TRIM(SPLIT(candidate.Billability, 'since')[0])=(BL)
     WITH CASE WHEN LENGTH(BL) > 0 THEN {label: BL, value: COLLECT(candidate)} END AS obj
     RETURN COLLECT(obj)
     `;

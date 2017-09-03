@@ -10,7 +10,7 @@ const styles = {
 	body: {
 		fontFamily: 'sans-serif',
 		height: '100%',
-		marginTop: 63,
+		marginTop: 50,
 		paddingTop: 20,
 		backgroundColor: '#F0F8FF'
 	}
