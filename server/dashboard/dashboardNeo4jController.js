@@ -1337,7 +1337,7 @@ let getWaveCadetsWoProject = function(waveID, course, successCB, errorCB) {
   let query = 
     `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
     WHERE c.WaveID = '${waveID}' AND c.CourseName = '${course}'
-    MATCH(n)-[${graphConsts.REL_WORKEDON}]->(:${graphConsts.NODE_PRODUCT})
+    AND NOT (n)-[:${graphConsts.REL_WORKEDON}]->(:${graphConsts.NODE_PRODUCT})
     RETURN n`;
   let session = driver.session();
   session.run(query).then(function(resultObj) {
