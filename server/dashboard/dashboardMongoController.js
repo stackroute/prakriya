@@ -133,8 +133,8 @@ let getActiveWaves = function (successCB, errorCB) {
 		{$project: {_id: 0, WaveID: 1}},
 		function (err, result) {
 			if (err) {
-					logger.error('Date Error: ', err);
-					errorCB(err);
+				logger.error('Date Error: ', err);
+				errorCB(err);
 			}
 			// change successCB for an empty result array -- !to_be_done
 			successCB(result.map(function (obj) {
