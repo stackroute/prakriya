@@ -733,6 +733,44 @@ router.get('/getevaluation', auth.accessedBy(['EVAL_FORMS']), function(req, res)
   }
 })
 
+router.post('/saveProjectLogo', function (req, res) {
+  let form = new formidable.IncomingForm();
+  form.parse(req, function (err, fields, files) {
+    fs.readFile(files.file.path, 'binary', (readFileError, data) => {
+      try {
+        let buffer = new Buffer(data, 'binary');
+        let project = JSON.parse(fields.project);
+        let img = {};
+        let dir = './public/profilePics/';
+        img.data = buffer;
+        img.contentType = files.file.type;
+        project.ProfilePic = img;
+        if (!fs.existsSync('./public/')) {
+          logger.debug('Public Directory not present');
+          mkdirp.sync('./public/');
+          mkdirp(dir);
+        } else if(!fs.existsSync(dir)) {
+          logger.debug('ProfilePics Directory not present');
+          mkdirp(dir);
+        }
+        let imagePath = dir + (project.projectname) + '.jpeg';
+        logger.debug('Image Path', imagePath);
+        fs.writeFile(imagePath, data, 'binary', function (writeFileError) {
+            if(writeFileError) {
+              throw writeFileError;
+            }
+        });
+        res.send(data);
+      } catch(err1) {
+        logger.error(err1);
+        res.status(500).json({
+          error: 'Internal error occurred, please report...!'
+        });
+      }
+    });
+  });
+});
+
 router.post('/saveimage', function (req, res) {
   let form = new formidable.IncomingForm();
   form.parse(req, function (err, fields, files) {
