@@ -271,8 +271,8 @@ export default class ProjectCard extends React.Component {
             }
             <Grid style = {{marginLeft: '10px'}}>
             {
-                  cadetSkill.map(function (skills) {
-                    return <Row>{skills}</Row>
+                  cadetSkill.map(function (skills, index) {
+                    return <Row key={index}>{skills}</Row>
                   })
             }
           </Grid>

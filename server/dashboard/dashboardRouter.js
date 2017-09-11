@@ -1395,6 +1395,23 @@ router.post('/cadetsofwave', auth.accessedBy(['PROJECTS', 'WAVES']), function (r
   }
 });
 
+// Get all cadets of a particular wave without projects
+router.post('/wavecadetswoprojects', auth.accessedBy(['PROJECTS']), function (req, res) {
+  try{
+    dashboardNeo4jController.getWaveCadetsWoProject(req.body.waveid, req.body.course, function (cadets) {
+      res.status(201).json(cadets);
+    }, function (err) {
+      logger.error('Get Cadets of Wave Error: ', err);
+      res.status(500).json({error: 'Cannot get all waves from db...!'});
+    });
+  } catch(err) {
+    logger.error('Get Cadets of Wave Exception: ', err);
+    res.status(500).json({
+      error: 'Internal error occurred, please report...!'
+    });
+  }
+});
+
 // delete a wave
 router.post('/deletewave', auth.accessedBy(['WAVES']), function (req, res) {
   try {

@@ -199,6 +199,7 @@ export default class ProjectDialog extends React.Component {
 	    let course = waveID.split('(')[1].split(')')[0];
 	    Request
 				.post('/dashboard/cadetsofwave')
+				// .post('/dashboard/wavecadetswoprojects')
 				.set({'Authorization': localStorage.getItem('token')})
 				.send({waveid: wave, course: course})
 				.end(function(err, res){

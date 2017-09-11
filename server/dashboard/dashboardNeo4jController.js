@@ -1329,6 +1329,31 @@ let getCadetsOfWave = function(waveID, course, successCB, errorCB) {
     }
   });
 };
+
+// Get cadets of wave without projects
+let getWaveCadetsWoProject = function(waveID, course, successCB, errorCB) {
+  let query = 
+    `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
+    WHERE c.WaveID = '${waveID}' AND c.CourseName = '${course}'
+    MATCH(n)-[${graphConsts.REL_WORKEDON}]->(:${graphConsts.NODE_PRODUCT})
+    RETURN n`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      let candidateName = []
+      resultObj.records.map(function(res) {
+        logger.debug(res._fields[0])
+        candidateName.push(res._fields[0].properties)
+      })
+      logger.debug(candidateName, "candidateName");
+      successCB(candidateName);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
+
 //getCadetsOfActivewaves
 let ActivewaveCadets = function(activewaveId,course, successCB, errorCB){
   let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
@@ -2017,6 +2042,7 @@ module.exports = {
       getWave,
       deleteWave,
       getCadetsOfWave,
+      getWaveCadetsWoProject,
       updateWaveCadets,
       getWaveIDs,
       addProduct,
