@@ -246,7 +246,7 @@ export default class Candidates extends React.Component {
 		let valueArr = [];
 		this.state.candidates.map(function(candidate, index) {
 			if(candidate[key]) {
-				if(key = 'Skills') {
+				if(key == 'Skills') {
 					valueArr.push(...candidate[key]);
 				} else {
 					valueArr.push(candidate[key].toString());

@@ -48,6 +48,7 @@ export default class EvaluationForms extends React.Component {
 			testability: [],
 			engineeringculture: [],
 			skills: [],
+			credits: [],
 			communication: [],
 			overall: '',
 			doneWell: '',
@@ -87,8 +88,7 @@ export default class EvaluationForms extends React.Component {
 			nextState.doneWell.trim() != '' &&
 			nextState.improvement.trim() != '' &&
 			nextState.suggestions.trim() != ''
-		)
-		console.log(nextState.invalidData,"nextState.buttonDisabled")
+		);
 	};
 
 	getCadets() {
@@ -115,7 +115,6 @@ export default class EvaluationForms extends React.Component {
 
 	getEvaluationFields(candidateID) {
 		let th = this;
-		console.log('should get evaluation fields for ', candidateID);
 		Request
 			.get('/dashboard/evaluationfields')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -125,14 +124,14 @@ export default class EvaluationForms extends React.Component {
 					console.log('Error in fetching evaluation fields: ', err)
 				else {
 					// configuring the candidate specific evaluation skills
-					console.log('data recieved: ', res.body)
-          EVALUATION[4].options = res.body;
+          EVALUATION[4].options = res.body.skills;
           let skills = [];
-          res.body.map(function() {
+          res.body.skills.map(function() {
             skills.push(0)
           });
           th.setState({
-            skills: skills
+            skills: skills,
+						credits: res.body.credits
           });
 				}
 			});
@@ -157,7 +156,6 @@ export default class EvaluationForms extends React.Component {
       if (err)
         console.log(err);
       else {
-				console.log('Feedback saved successfully', res.body);
 				if(res.body.length > 0)
 				{
 					th.setState({
@@ -178,10 +176,8 @@ export default class EvaluationForms extends React.Component {
 						improvement: res.body[0].improvement,
 						suggestions: res.body[0].suggestions,
 						oldEvaluation: true
-
-					})
-				}
-				else {
+					});
+				} else {
 					th.getEvaluationFields(newVal[1]);
 					th.setState({
 						cadetName: newVal[0],
@@ -198,7 +194,7 @@ export default class EvaluationForms extends React.Component {
 						improvement: '',
 						suggestions: '',
 						oldEvaluation: false
-					})
+					});
 				}
 			}
 		})
@@ -209,18 +205,16 @@ export default class EvaluationForms extends React.Component {
 			this.setState({
 				attitude: val
 			})
-		}
-		else if(type == 'punctuality') {
+		} else if(type == 'punctuality') {
 			this.setState({
 				punctuality: val
-			})
-		}
-		else {
+			});
+		}  else {
 			let temp = this.state[type];
 			temp[key] = val;
 			this.setState({
 				[type]: temp
-			})
+			});
 		}
 	};
 
@@ -231,56 +225,36 @@ export default class EvaluationForms extends React.Component {
 	};
 
 	handleAreasOfImprovementChange(event) {
-		this.setState({
-			improvement: event.target.value
-		})
+		this.setState({improvement: event.target.value});
 	};
 
 	handleSuggestionsChange(event) {
-		this.setState({
-			suggestions: event.target.value
-		})
+		this.setState({suggestions: event.target.value});
 	};
 
 	handleSubmit() {
 		let th = this
-		// console.log(th.state.attitude)
-		// console.log(th.state.punctuality)
-		// console.log(th.state.programming)
-		// console.log(th.state.codequality)
-		// console.log(th.state.testability)
-		// console.log(th.state.engineeringculture)
-		// console.log(th.state.communication)
-		// console.log(th.state.overall)
-		// console.log(th.state.doneWell)
-		// console.log(th.state.improvement)
-		// console.log(th.state.suggestions)
 		if (!(th.state.attitude == 0 ||th.state.punctuality == 0 ||th.state.programming.indexOf(0) != -1 ||th.state.codequality.indexOf(0) != -1 ||th.state.testability.indexOf(0) != -1 ||th.state.engineeringculture.indexOf(0) != -1 ||th.state.communication.indexOf(0) != -1 ||th.state.overall == '' ||th.state.doneWell == '' ||th.state.improvement == '' ||th.state.suggestions == '' )){
-			console.log("insd if loop")
-		let evaluationObj = {}
-		evaluationObj.cadetID = this.state.cadetID;
-		evaluationObj.cadetName = this.state.cadetName;
-		evaluationObj.attitude = this.state.attitude;
-		evaluationObj.punctuality = this.state.punctuality;
-		evaluationObj.programming = this.state.programming;
-		evaluationObj.codequality = this.state.codequality;
-		evaluationObj.testability = this.state.testability;
-		evaluationObj.engineeringculture = this.state.engineeringculture;
-		evaluationObj.skills = this.state.skills;
-		evaluationObj.communication = this.state.communication;
-		evaluationObj.overall = this.state.overall;
-		evaluationObj.doneWell = this.state.doneWell;
-		evaluationObj.improvement = this.state.improvement;
-		evaluationObj.suggestions = this.state.suggestions;
-		console.log('Evaluation Obj', evaluationObj);
-		this.saveEvaluation(evaluationObj);
+			let evaluationObj = {}
+			evaluationObj.cadetID = this.state.cadetID;
+			evaluationObj.cadetName = this.state.cadetName;
+			evaluationObj.attitude = this.state.attitude;
+			evaluationObj.punctuality = this.state.punctuality;
+			evaluationObj.programming = this.state.programming;
+			evaluationObj.codequality = this.state.codequality;
+			evaluationObj.testability = this.state.testability;
+			evaluationObj.engineeringculture = this.state.engineeringculture;
+			evaluationObj.skills = this.state.skills;
+			evaluationObj.communication = this.state.communication;
+			evaluationObj.overall = this.state.overall;
+			evaluationObj.doneWell = this.state.doneWell;
+			evaluationObj.improvement = this.state.improvement;
+			evaluationObj.suggestions = this.state.suggestions;
+			this.saveEvaluation(evaluationObj);
 		}
 		else{
-			console.log("am gonna set verify true")
-			this.setState({
-						verify: true
-			})
-	}
+			this.setState({verify: true});
+		}
 	};
 
   // saving evaluation results in mongodb
@@ -294,7 +268,6 @@ export default class EvaluationForms extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Cadet evaluation form saved successfully', res.body);
 					th.saveRatingsInNeo4j();
 		    }
 		  });
@@ -310,6 +283,7 @@ export default class EvaluationForms extends React.Component {
 		obj.waveID = this.state.wave;
 		obj.skills = skillNames;
 		obj.ratings = skillRatings;
+		obj.credits = this.state.credits;
 		Request
 			.post('/dashboard/updaterating')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -318,17 +292,12 @@ export default class EvaluationForms extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-		    	console.log('Rating updated successfully', res.body);
-					th.setState({
-						open: true
-					});
+					th.setState({open: true});
 		    }
 		  });
 	};
 
 	render() {
-		console.log(this.state.invalidData,"render invalidData")
-		console.log(this.state.buttonDisabled,"render buttonDisabled")
 		let th = this;
 		return(
 			<div>
@@ -406,7 +375,7 @@ export default class EvaluationForms extends React.Component {
 
 						<Row>
 							<Col md={6} mdOffset={2} style={styles.single}>
-								Punctuality and attendance
+								Punctuality and Attendance
 							</Col>
 							<Col md={2}>
 								<StarRating

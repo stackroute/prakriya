@@ -137,24 +137,6 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
     errorCB(err);
   })
 }
-// fetching all the cadets
-// let getCadets = function(successCB, errorCB) {
-//   let session = driver.session();
-//   let query = `MATCH (c: ${graphConsts.NODE_CANDIDATE}),(w: ${graphConsts.NODE_WAVE})
-//     MATCH (c)-[:${graphConsts.REL_BELONGS_TO}]->(w)
-//     RETURN c`;
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     let cadets = [];
-//     for (let i = 0; i < resultObj.records.length; i++) {
-//       let result = resultObj.records[i];
-//       cadets.push(result._fields[0].properties);
-//     }
-//     successCB(cadets);
-//   }).catch(function(err) {
-//     errorCB(err);
-//   })
-// }
 
 // fetching all the cadets with wave and project details
 let getAllCadets = function(successCB, errorCB) {
@@ -167,7 +149,7 @@ let getAllCadets = function(successCB, errorCB) {
     -[w:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})
     -[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:w.version})
     WITH candidate AS candidate, wave AS wave, v AS version
-    OPTIONAL MATCH (candidate)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
+    MATCH (w)-[:${graphConsts.REL_HAS}]-(course:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
     WITH candidate AS candidate, wave AS wave, version AS version, COLLECT(s.Name) AS skillset
     return {
       candidate:candidate,
@@ -199,41 +181,15 @@ let getAllCadets = function(successCB, errorCB) {
   })
 }
 
-
-// fetching candidate logged in
-// let getCadet = function(email, successCB, errorCB) {
-//   let session = driver.session();
-//   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return n`;
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     console.log('done');
-//     successCB(resultObj.records[0]._fields[0].properties);
-//   }).catch(function(err) {
-//     errorCB(err);
-//   })
-// }
-
 // fetching candidate's Skill
 let getCadetSkills = function(email, successCB, errorCB) {
   let session = driver.session();
   let query = `
   MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${email}'})
-  WITH candidate AS candidate
-  OPTIONAL MATCH (candidate)
-  -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
-  WITH v.version AS versionname, candidate AS candidate
-  OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: versionname})
-  -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-  WITH COLLECT(skill.Name) as skills1, candidate AS candidate
-  MATCH (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
-  -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
-  WITH skills1 AS skills1, course AS course
-  MATCH (course) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-  WITH COLLECT(skill.Name) AS skills2, skills1
-  WITH skills1 + skills2 AS skills
-  UNWIND skills AS skill
-  WITH COLLECT (DISTINCT skill) AS skillset
-  RETURN skillset
+    -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
+    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
+    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    RETURN COLLECT(skill.Name)
   `;
   session.run(query).then(function(resultObj) {
     session.close();
@@ -264,43 +220,43 @@ let getNewCadets = function(successCB, errorCB) {
 }
 
 // Get the filtered cadets
-let getFilteredCadets = function(filterQuery, successCB, errorCB) {
+let getFilteredCadets = function(searchParams, successCB, errorCB) {
 
-  logger.debug('Filter Query', filterQuery)
+  logger.debug('Search Params: ', searchParams);
   let session = driver.session();
   let addFilter = false;
   let condition = 'WHERE ';
 
-  if (filterQuery.EmployeeID != '') {
+  if (searchParams.EmployeeID != '') {
     addFilter = true;
-    condition += `n.EmployeeID = '${filterQuery.EmployeeID}' AND `
+    condition += `c.EmployeeID = '${searchParams.EmployeeID}' AND `
   }
-  if (filterQuery.EmployeeName != '') {
+  if (searchParams.EmployeeName != '') {
     addFilter = true;
-    condition += `n.EmployeeName = '${filterQuery.EmployeeName}' AND `
+    condition += `c.EmployeeName = '${searchParams.EmployeeName}' AND `
   }
-  if (filterQuery.EmailID != '') {
+  if (searchParams.EmailID != '') {
     addFilter = true;
-    condition += `n.EmailID = '${filterQuery.EmailID}' AND `
+    condition += `c.EmailID = '${searchParams.EmailID}' AND `
   }
-  if (filterQuery.DigiThonScore != '') {
+  if (searchParams.DigiThonScore != '') {
     addFilter = true;
-    condition += `n.DigiThonScore > '${filterQuery.DigiThonScore}' AND `
+    condition += `c.DigiThonScore > '${searchParams.DigiThonScore}' AND `
   }
-  if (filterQuery.Wave != '') {
+  if (searchParams.Wave != '') {
     addFilter = true;
-    let wave = filterQuery.Wave.split('(')[0].trim();
-    let course = filterQuery.Wave.split('(')[1].split(')')[0];
+    let wave = searchParams.Wave.split('(')[0].trim();
+    let course = searchParams.Wave.split('(')[1].split(')')[0];
     condition += `w.WaveID = '${wave}' AND w.CourseName = '${course}' AND `
   }
-  if(filterQuery.Billability.length > 0) {
+  if(searchParams.Billability.length > 0) {
     addFilter = true;
     let bill_arr = '';
-    filterQuery.Billability.map(function (bill) {
+    searchParams.Billability.map(function (bill) {
       bill_arr += "'" + bill + "', ";
     })
     bill_arr = bill_arr.substring(0, bill_arr.length-2);
-    condition += `n.Billability IN [${bill_arr}] AND`
+    condition += `c.Billability IN [${bill_arr}] AND`
   }
 
   if (addFilter) {
@@ -311,62 +267,59 @@ let getFilteredCadets = function(filterQuery, successCB, errorCB) {
 
   let skills = '';
   let skill_arr = '';
-  if(filterQuery.Skills.length > 0) {
-    filterQuery.Skills.map(function(skill) {
+  if(searchParams.Skills.length > 0) {
+    searchParams.Skills.map(function(skill) {
       skill_arr += "'" + skill + "', ";
     })
     skill_arr = skill_arr.substring(0, skill_arr.length-2);
-    skills = `WITH n as n, w as w
-      MATCH (n)-[: ${graphConsts.REL_KNOWS}]->(s: ${graphConsts.NODE_SKILL})
-      WHERE s.Name IN [${skill_arr}]`
+    skills = `
+      MATCH (c)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
+      WHERE s.Name IN [${skill_arr}] WITH c AS c, w AS w`
   }
 
-  let query = `MATCH(n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->
-    (w:${graphConsts.NODE_WAVE})
-      ${condition}
-      ${skills}
-      optional match (n)-[ver:worked_on]->(p:${graphConsts.NODE_PRODUCT})-[:has]->(v:${graphConsts.NODE_VERSION}{name:ver.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
-      with p as product, n as candidate, w as wave, v as version, s as skill
+  let query = `
+    MATCH(c:${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]-> (w:${graphConsts.NODE_WAVE})
+    ${condition} WITH c AS c, w AS w
+    ${skills}
+    OPTIONAL MATCH (c)-[ver:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})-[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:ver.version})
+    WITH c AS c, w AS w, v AS v
+    OPTIONAL MATCH (c)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
+    WITH c AS candidate, w AS wave, v AS version, COLLECT(s.Name) AS skillset
     RETURN {
       candidate: candidate,
       wave: wave,
       product: version,
-      skill: COLLECT(DISTINCT skill.Name)
+      skill: skillset
     }`;
 
-  logger.debug('Query for the search', query);
+  logger.debug('Search Query: ', query);
 
   session.run(query).then(function(resultObj, err) {
     session.close();
     if (resultObj) {
       let cadets = [];
-      console.log(resultObj.records[0]._fields[0])
-      resultObj.records.map(function(record, key) {
-        cadets.push(record._fields[0].candidate.properties);
-        cadets[key].Wave = record._fields[0].wave.properties.WaveID + ' (' + record._fields[0].wave.properties.CourseName + ')';
-        if(record._fields[0].product !== null && record._fields[0].product !== undefined) {
-          cadets[key].ProjectName = record._fields[0].product.properties.name;
-          cadets[key].ProjectDescription = record._fields[0].product.properties.description;
-          cadets[key].ProjectSkills = record._fields[0].skill;
-        }
-        else {
-          cadets[key].ProjectName = '';
-          cadets[key].ProjectDescription = '';
-          cadets[key].ProjectSkills = '';
-        }
-      })
+      // logger.debug('Search Result : ', resultObj.records[0]._fields[0])
+      if(resultObj.records.length > 0) {
+        resultObj.records.map(function(record, key) {
+          cadets.push(record._fields[0].candidate.properties);
+          cadets[key].Wave = record._fields[0].wave.properties.WaveID + ' (' + record._fields[0].wave.properties.CourseName + ')';
+          if(record._fields[0].product !== null && record._fields[0].product !== undefined) {
+            cadets[key].ProjectName = record._fields[0].product.properties.name;
+            cadets[key].ProjectDescription = record._fields[0].product.properties.description;
+            cadets[key].ProjectSkills = record._fields[0].skill;
+          } else {
+            cadets[key].ProjectName = '';
+            cadets[key].ProjectDescription = '';
+            cadets[key].ProjectSkills = '';
+          }
+        });
+      }
       successCB(cadets);
     } else {
       errorCB(err);
     }
   });
 }
-
-// Get the filtered cadets(free flow)
-// let getFilteredCadets = function(filterQuery, successCB, errorCB) {
-//   logger.debug('Filter query',filterQuery);
-// }
-
 
 /**********************************************
 ************ Candidate Management *************
@@ -726,7 +679,6 @@ let addProduct = function(productObj, successCB, errorCB) {
      UNWIND ${JSON.stringify(version.skills)} AS skillname
      MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
      MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
-     MERGE (skill) <-[:${graphConsts.REL_KNOWS} {totalCredits: 0, totalRating: 0}]- (employee)
      WITH product AS product
      UNWIND ${JSON.stringify(version.members)} AS employeeName
      MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
@@ -759,9 +711,9 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   version.addedBy = versionObj.addedBy;
   version.addedOn = versionObj.addedOn;
   version.updated = versionObj.updated;
-  version.gitURL = productObj.version[0].gitURL;
-  version.videoURL = productObj.version[0].videoURL;
-  version.presentationURL = productObj.version[0].presentationURL;
+  version.gitURL = versionObj.gitURL;
+  version.videoURL = versionObj.videoURL;
+  version.presentationURL = versionObj.presentationURL;
 
   let session = driver.session();
 
@@ -792,7 +744,6 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
        UNWIND ${JSON.stringify(version.skills)} AS skillname
        MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
        MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
-       MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
        WITH product AS product
        UNWIND ${JSON.stringify(version.members)} AS employeeName
        MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
@@ -826,11 +777,6 @@ let updateVersion = function(version, successCB, errorCB) {
           -[skillsRelation:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
           DELETE skillsRelation
           WITH COLLECT(skill.Name) AS skills, version AS version
-          UNWIND (skills) AS skillName
-          OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-          -[skillsRelation:${graphConsts.REL_KNOWS}]-> (:${graphConsts.NODE_SKILL} {Name: skillName})
-          DELETE skillsRelation
-          WITH version AS version
           OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
           -[productRelation:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
           DELETE productRelation
@@ -854,7 +800,6 @@ let updateVersion = function(version, successCB, errorCB) {
           UNWIND ${JSON.stringify(version.skills)} AS skillname
           MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
           MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeID: employeeID})
-          MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
           WITH product AS product
           UNWIND ${JSON.stringify(employeeIDs)} AS employeeID
           MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeID: employeeID})
@@ -893,17 +838,7 @@ let deleteProduct = function(productName, successCB, errorCB) {
        MATCH (candidate:${graphConsts.NODE_CANDIDATE})
        -[workedonRelation:${graphConsts.REL_WORKEDON} {version: versionName}]->
        (product:${graphConsts.NODE_PRODUCT})
-       WITH COLLECT(workedonRelation) AS workedonRelations, product AS product,
-       COLLECT(candidate) AS candidates, skills AS skills
-       UNWIND (candidates) AS candidate
-       UNWIND (skills) AS skill
-       MATCH (candidate)
-       -[knowsRelation:${graphConsts.REL_KNOWS}]-> (skill)
-       DELETE knowsRelation
-       WITH workedonRelations AS workedonRelations, product AS product
-       UNWIND (workedonRelations) AS workedonRelation
-       DELETE workedonRelation
-       WITH product AS product
+       WITH COLLECT(workedonRelation) AS workedonRelations, product AS product
        DETACH DELETE product
        `;
 
@@ -936,13 +871,6 @@ let deleteVersion = function(versionName, successCB, errorCB) {
        -[workedonRelation:${graphConsts.REL_WORKEDON} {version: versionName}]->
        (product:${graphConsts.NODE_PRODUCT})
        WITH COLLECT(workedonRelation) AS workedonRelations,
-       COLLECT(candidate) AS candidates, skills AS skills
-       UNWIND (candidates) AS candidate
-       UNWIND (skills) AS skill
-       MATCH (candidate)
-       -[knowsRelation:${graphConsts.REL_KNOWS}]-> (skill)
-       DELETE knowsRelation
-       WITH workedonRelations AS workedonRelations
        UNWIND (workedonRelations) AS workedonRelation
        DELETE workedonRelation
        `;
@@ -1334,7 +1262,7 @@ let getCadetsOfWave = function(waveID, course, successCB, errorCB) {
 
 // Get cadets of wave without projects
 let getWaveCadetsWoProject = function(waveID, course, successCB, errorCB) {
-  let query = 
+  let query =
     `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
     WHERE c.WaveID = '${waveID}' AND c.CourseName = '${course}'
     AND NOT (n)-[:${graphConsts.REL_WORKEDON}]->(:${graphConsts.NODE_PRODUCT})
@@ -1631,7 +1559,6 @@ let getCadetsAndWave = function(successCB, errorCB) {
     for (let i = 0; i < resultObj.records.length; i++) {
       let result = resultObj.records[i];
       cadets.push(result._fields[0].candidate.properties);
-      console.log(cadets);
       cadets[i].Wave = result._fields[0].wave.properties.WaveID + ' (' + result._fields[0].wave.properties.CourseName + ')';
     }
     successCB(cadets);
@@ -1822,9 +1749,7 @@ let updateSession = function(wave, waveID, course, successCB, errorCB) {
 }
 
 let deleteSession = function (waveObj, waveID, course, successCB, errorCB) {
-  let query = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${waveObj.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE})
-              WHERE w.WaveID = '${waveID}' AND w.CourseName = '${course}'
-              DELETE r`;
+  let query = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${waveObj.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}) WHERE w.WaveID = '${waveID}' AND w.CourseName = '${course}' DELETE r`;
   let session = driver.session();
   session.run(query).then(function(resultObj, err) {
 
@@ -1845,28 +1770,19 @@ let deleteSession = function (waveObj, waveID, course, successCB, errorCB) {
 let getEvaluationSkills = function(candidateID, successCB, errorCB) {
   let query = `
     MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${candidateID}'})
-    WITH candidate AS candidate
-    OPTIONAL MATCH (candidate)
-    -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
-    WITH v.version AS versionname, candidate AS candidate
-    OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: versionname})
-    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    WITH COLLECT(skill.Name) as skills1, candidate AS candidate
-    MATCH (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
+    -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
     -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
-    WITH skills1 AS skills1, course AS course
-    MATCH (course) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    WITH COLLECT(skill.Name) AS skills2, skills1
-    WITH skills1 + skills2 AS skills
-    UNWIND skills AS skill
-    WITH COLLECT (DISTINCT skill) AS skillset
-    RETURN skillset
+    -[i:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    RETURN {
+        skills: COLLECT(skill.Name),
+        credits: COLLECT(toFloat(i.credit))
+    }
     `;
   let session = driver.session();
+  logger.debug('Get Evaluation Skills: ', query);
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
-      logger.debug(resultObj);
       successCB(resultObj.records[0]._fields[0]);
     } else {
       errorCB('getEvaluationSkills: Error');
@@ -1875,23 +1791,33 @@ let getEvaluationSkills = function(candidateID, successCB, errorCB) {
 };
 
 // update rating
-let updateRating = function(emailID, waveID, skillnames, ratings, successCB, errorCB) {
+let updateRating = function(emailID, waveID, skills, ratings, credits, successCB, errorCB) {
   let query = `
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${emailID}'})
-    WITH candidate AS candidate
-    MATCH (wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
-    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
-    WITH course AS course, candidate AS candidate,
-    ${JSON.stringify(skillnames)} AS skillnames,
+    MATCH (c:${graphConsts.NODE_CANDIDATE} {EmailID: '${emailID}'})
+    WITH c AS c,
+    ${JSON.stringify(skills)} AS skills,
     ${JSON.stringify(ratings)} AS ratings,
-    RANGE (0, ${skillnames.length}) AS indices
+    ${JSON.stringify(credits)} AS credits,
+    RANGE(0, ${skills.length}) AS indices
     UNWIND indices AS index
-    MATCH (course) -[i:${graphConsts.REL_INCLUDES}]->
-    (:${graphConsts.NODE_SKILL} {Name: skillnames[index]})
-    <-[k:${graphConsts.REL_KNOWS}]-(candidate)
-    SET k.totalRating=k.totalRating+(ratings[index]*i.credit),k.totalCredits=k.totalCredits+i.credit
-    RETURN candidate
+    MATCH (s:${graphConsts.NODE_SKILL} {Name: skills[index]})
+    MERGE (c) -[:${graphConsts.REL_KNOWS}]-> (s)
+    WITH c AS c, COLLECT(s) AS s,
+    skills AS skills, indices AS indices,
+    ratings AS ratings, credits AS credits
+    UNWIND indices AS index
+    OPTIONAL MATCH (c) -[k:${graphConsts.REL_KNOWS}]->
+    (:${graphConsts.NODE_SKILL} {Name: skills[index]})
+    SET k.totalRating =
+    CASE WHEN k.totalRating IS NULL THEN (ratings[index] * credits[index])
+    ELSE (k.totalRating + (ratings[index] * credits[index])) END,
+    k.totalCredits =
+    CASE WHEN k.totalCredits IS NULL THEN credits[index]
+    ELSE (k.totalCredits + credits[index]) END
+    WITH c AS c
+    RETURN c
     `;
+  logger.debug('Rating Updation Query: ', query);
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
@@ -2028,8 +1954,6 @@ module.exports = {
       updateCadet,
       updateCadets,
       deleteCadet,
-      // getCadets,
-      // getCadet,
       getAllCadets,
       getCadetSkills,
       getNewCadets,

@@ -1666,6 +1666,7 @@ router.post('/updaterating', auth.accessedBy(['EVAL_FORMS']), function(req, res)
       req.body.waveID,
       req.body.skills,
       req.body.ratings,
+      req.body.credits,
       function (candidate) {
       res.status(201).json(candidate);
     }, function (err) {
