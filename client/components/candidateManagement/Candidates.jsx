@@ -20,8 +20,6 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 
 const styles = {
 	header: {
-		// backgroundColor: '#eeeeee',
-		// border: '2px solid silver',
 		width: '100%',
 		marginLeft: '0px',
 		marginRight: '0px',
@@ -34,7 +32,6 @@ const styles = {
 		color: '#202D3E'
 	},
 	filters: {
-		// border: '2px solid silver',
 		width: ' 100%',
 		padding: '3px'
 	}
@@ -69,7 +66,6 @@ export default class Candidates extends React.Component {
 
 		this.handleQueryChange = this.handleQueryChange.bind(this);
 		this.getCandidates = this.getCandidates.bind(this);
-		this.getSkills = this.getSkills.bind(this);
 		this.getWaves = this.getWaves.bind(this);
 		this.getBillability = this.getBillability.bind(this);
 		this.deleteCandidate = this.deleteCandidate.bind(this);
@@ -89,7 +85,6 @@ export default class Candidates extends React.Component {
 	componentWillMount() {
 		this.getRole();
 		this.getCandidates();
-		this.getSkills();
 		this.getWaves();
 		this.getBillability();
 	}
@@ -176,25 +171,6 @@ export default class Candidates extends React.Component {
 		  })
 	}
 
-	getSkills() {
-		let th = this;
-		Request
-			.get('/dashboard/skills')
-			.set({'Authorization': localStorage.getItem('token')})
-			.end(function(err, res) {
-				if(err)
-		    	console.log(err);
-		    else {
-		    	let skills = res.body.map(function (skill) {
-		    		return skill.Name;
-		    	})
-					th.setState({
-						skills: skills
-					})
-		    }
-		  })
-	}
-
 	getWaves() {
 		let th = this;
 		Request
@@ -263,7 +239,11 @@ export default class Candidates extends React.Component {
 		let valueArr = [];
 		this.state.candidates.map(function(candidate, index) {
 			if(candidate[key]) {
-				valueArr.push(candidate[key].toString());
+				if(key = 'Skills') {
+					valueArr.push(...candidate[key]);
+				} else {
+					valueArr.push(candidate[key].toString());
+				}
 			}
 			else {
 				valueArr.push(candidate[key]);
@@ -301,6 +281,7 @@ export default class Candidates extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
+					console.log('filtered result: ', res.body);
 					th.setState({
 						filteredCandidates: res.body
 					});
@@ -393,8 +374,8 @@ export default class Candidates extends React.Component {
 				      floatingLabelText="Search Cadets"
 				      onChange={this.handleQueryChange}
 				    />
-				    <RaisedButton 
-				    	label="Search" 
+				    <RaisedButton
+				    	label="Search"
 				    	primary={true}
 				    	onClick={this.getFilteredCandidates}
 				    />
@@ -492,7 +473,7 @@ export default class Candidates extends React.Component {
 								<FilterItem
 									title={'Skills'}
 									type={'AutoComplete'}
-									onGetAccordianValues={()=>th.state.skills}
+									onGetAccordianValues={()=>th.getAccordianValues('Skills')}
 									onAddFilter={(filterValue)=>th.addFilter('Skills', filterValue)}
 									onOpenSnackbar={th.openSnackbar}
 								/>
