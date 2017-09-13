@@ -58,7 +58,7 @@ export default class FilterItem extends React.Component {
 
   getAccordianValues() {
     let values = this.props.onGetAccordianValues();
-    console.log('Accordian values', values)
+    // console.log('accordian values', values)
     this.setState({
       values: values
     });
