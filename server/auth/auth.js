@@ -13,8 +13,7 @@ let params = {
 
 module.exports = function () {
   passport.use(new JwtStrategy(params, function (jwtPayload, done) {
-    logger.debug('payload for authentication!!!');
-    logger.debug(jwtPayload);
+    logger.debug('payload for authentication: ', jwtPayload);
     userModel.findOne({username: jwtPayload.user}, function (err, user) {
       if (err) {
         return done(err, false);

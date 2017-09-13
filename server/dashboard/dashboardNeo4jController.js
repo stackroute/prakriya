@@ -137,24 +137,6 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
     errorCB(err);
   })
 }
-// fetching all the cadets
-// let getCadets = function(successCB, errorCB) {
-//   let session = driver.session();
-//   let query = `MATCH (c: ${graphConsts.NODE_CANDIDATE}),(w: ${graphConsts.NODE_WAVE})
-//     MATCH (c)-[:${graphConsts.REL_BELONGS_TO}]->(w)
-//     RETURN c`;
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     let cadets = [];
-//     for (let i = 0; i < resultObj.records.length; i++) {
-//       let result = resultObj.records[i];
-//       cadets.push(result._fields[0].properties);
-//     }
-//     successCB(cadets);
-//   }).catch(function(err) {
-//     errorCB(err);
-//   })
-// }
 
 // fetching all the cadets with wave and project details
 let getAllCadets = function(successCB, errorCB) {
@@ -199,20 +181,6 @@ let getAllCadets = function(successCB, errorCB) {
   })
 }
 
-
-// fetching candidate logged in
-// let getCadet = function(email, successCB, errorCB) {
-//   let session = driver.session();
-//   let query = `MATCH (n: ${graphConsts.NODE_CANDIDATE}{EmailID:'${email}'})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE}) return n`;
-//   session.run(query).then(function(resultObj) {
-//     session.close();
-//     console.log('done');
-//     successCB(resultObj.records[0]._fields[0].properties);
-//   }).catch(function(err) {
-//     errorCB(err);
-//   })
-// }
-
 // fetching candidate's Skill
 let getCadetSkills = function(email, successCB, errorCB) {
   let session = driver.session();
@@ -252,43 +220,43 @@ let getNewCadets = function(successCB, errorCB) {
 }
 
 // Get the filtered cadets
-let getFilteredCadets = function(filterQuery, successCB, errorCB) {
+let getFilteredCadets = function(searchParams, successCB, errorCB) {
 
-  logger.debug('Filter Query', filterQuery)
+  logger.debug('Search Params: ', searchParams);
   let session = driver.session();
   let addFilter = false;
   let condition = 'WHERE ';
 
-  if (filterQuery.EmployeeID != '') {
+  if (searchParams.EmployeeID != '') {
     addFilter = true;
-    condition += `n.EmployeeID = '${filterQuery.EmployeeID}' AND `
+    condition += `c.EmployeeID = '${searchParams.EmployeeID}' AND `
   }
-  if (filterQuery.EmployeeName != '') {
+  if (searchParams.EmployeeName != '') {
     addFilter = true;
-    condition += `n.EmployeeName = '${filterQuery.EmployeeName}' AND `
+    condition += `c.EmployeeName = '${searchParams.EmployeeName}' AND `
   }
-  if (filterQuery.EmailID != '') {
+  if (searchParams.EmailID != '') {
     addFilter = true;
-    condition += `n.EmailID = '${filterQuery.EmailID}' AND `
+    condition += `c.EmailID = '${searchParams.EmailID}' AND `
   }
-  if (filterQuery.DigiThonScore != '') {
+  if (searchParams.DigiThonScore != '') {
     addFilter = true;
-    condition += `n.DigiThonScore > '${filterQuery.DigiThonScore}' AND `
+    condition += `c.DigiThonScore > '${searchParams.DigiThonScore}' AND `
   }
-  if (filterQuery.Wave != '') {
+  if (searchParams.Wave != '') {
     addFilter = true;
-    let wave = filterQuery.Wave.split('(')[0].trim();
-    let course = filterQuery.Wave.split('(')[1].split(')')[0];
+    let wave = searchParams.Wave.split('(')[0].trim();
+    let course = searchParams.Wave.split('(')[1].split(')')[0];
     condition += `w.WaveID = '${wave}' AND w.CourseName = '${course}' AND `
   }
-  if(filterQuery.Billability.length > 0) {
+  if(searchParams.Billability.length > 0) {
     addFilter = true;
     let bill_arr = '';
-    filterQuery.Billability.map(function (bill) {
+    searchParams.Billability.map(function (bill) {
       bill_arr += "'" + bill + "', ";
     })
     bill_arr = bill_arr.substring(0, bill_arr.length-2);
-    condition += `n.Billability IN [${bill_arr}] AND`
+    condition += `c.Billability IN [${bill_arr}] AND`
   }
 
   if (addFilter) {
@@ -299,62 +267,59 @@ let getFilteredCadets = function(filterQuery, successCB, errorCB) {
 
   let skills = '';
   let skill_arr = '';
-  if(filterQuery.Skills.length > 0) {
-    filterQuery.Skills.map(function(skill) {
+  if(searchParams.Skills.length > 0) {
+    searchParams.Skills.map(function(skill) {
       skill_arr += "'" + skill + "', ";
     })
     skill_arr = skill_arr.substring(0, skill_arr.length-2);
-    skills = `WITH n as n, w as w
-      MATCH (n)-[: ${graphConsts.REL_KNOWS}]->(s: ${graphConsts.NODE_SKILL})
-      WHERE s.Name IN [${skill_arr}]`
+    skills = `
+      MATCH (c)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
+      WHERE s.Name IN [${skill_arr}] WITH c AS c, w AS w`
   }
 
-  let query = `MATCH(n: ${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->
-    (w:${graphConsts.NODE_WAVE})
-      ${condition}
-      ${skills}
-      optional match (n)-[ver:worked_on]->(p:${graphConsts.NODE_PRODUCT})-[:has]->(v:${graphConsts.NODE_VERSION}{name:ver.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
-      with p as product, n as candidate, w as wave, v as version, s as skill
+  let query = `
+    MATCH(c:${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]-> (w:${graphConsts.NODE_WAVE})
+    ${condition} WITH c AS c, w AS w
+    ${skills}
+    OPTIONAL MATCH (c)-[ver:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})-[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:ver.version})
+    WITH c AS c, w AS w, v AS v
+    OPTIONAL MATCH (c)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
+    WITH c AS candidate, w AS wave, v AS version, COLLECT(s.Name) AS skillset
     RETURN {
       candidate: candidate,
       wave: wave,
       product: version,
-      skill: COLLECT(DISTINCT skill.Name)
+      skill: skillset
     }`;
 
-  logger.debug('Query for the search', query);
+  logger.debug('Search Query: ', query);
 
   session.run(query).then(function(resultObj, err) {
     session.close();
     if (resultObj) {
       let cadets = [];
-      console.log(resultObj.records[0]._fields[0])
-      resultObj.records.map(function(record, key) {
-        cadets.push(record._fields[0].candidate.properties);
-        cadets[key].Wave = record._fields[0].wave.properties.WaveID + ' (' + record._fields[0].wave.properties.CourseName + ')';
-        if(record._fields[0].product !== null && record._fields[0].product !== undefined) {
-          cadets[key].ProjectName = record._fields[0].product.properties.name;
-          cadets[key].ProjectDescription = record._fields[0].product.properties.description;
-          cadets[key].ProjectSkills = record._fields[0].skill;
-        }
-        else {
-          cadets[key].ProjectName = '';
-          cadets[key].ProjectDescription = '';
-          cadets[key].ProjectSkills = '';
-        }
-      })
+      // logger.debug('Search Result : ', resultObj.records[0]._fields[0])
+      if(resultObj.records.length > 0) {
+        resultObj.records.map(function(record, key) {
+          cadets.push(record._fields[0].candidate.properties);
+          cadets[key].Wave = record._fields[0].wave.properties.WaveID + ' (' + record._fields[0].wave.properties.CourseName + ')';
+          if(record._fields[0].product !== null && record._fields[0].product !== undefined) {
+            cadets[key].ProjectName = record._fields[0].product.properties.name;
+            cadets[key].ProjectDescription = record._fields[0].product.properties.description;
+            cadets[key].ProjectSkills = record._fields[0].skill;
+          } else {
+            cadets[key].ProjectName = '';
+            cadets[key].ProjectDescription = '';
+            cadets[key].ProjectSkills = '';
+          }
+        });
+      }
       successCB(cadets);
     } else {
       errorCB(err);
     }
   });
 }
-
-// Get the filtered cadets(free flow)
-// let getFilteredCadets = function(filterQuery, successCB, errorCB) {
-//   logger.debug('Filter query',filterQuery);
-// }
-
 
 /**********************************************
 ************ Candidate Management *************
@@ -746,9 +711,9 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
   version.addedBy = versionObj.addedBy;
   version.addedOn = versionObj.addedOn;
   version.updated = versionObj.updated;
-  version.gitURL = productObj.version[0].gitURL;
-  version.videoURL = productObj.version[0].videoURL;
-  version.presentationURL = productObj.version[0].presentationURL;
+  version.gitURL = versionObj.gitURL;
+  version.videoURL = versionObj.videoURL;
+  version.presentationURL = versionObj.presentationURL;
 
   let session = driver.session();
 
@@ -1594,7 +1559,6 @@ let getCadetsAndWave = function(successCB, errorCB) {
     for (let i = 0; i < resultObj.records.length; i++) {
       let result = resultObj.records[i];
       cadets.push(result._fields[0].candidate.properties);
-      console.log(cadets);
       cadets[i].Wave = result._fields[0].wave.properties.WaveID + ' (' + result._fields[0].wave.properties.CourseName + ')';
     }
     successCB(cadets);
@@ -1842,7 +1806,7 @@ let updateRating = function(emailID, waveID, skillnames, ratings, successCB, err
   let query = `
     MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${emailID}'})
     WITH candidate AS candidate
-    MATCH (wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID}'})
+    MATCH (wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID.split(" ")[0]}'})
     -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
     WITH course AS course, candidate AS candidate,
     ${JSON.stringify(skillnames)} AS skillnames,
@@ -1855,6 +1819,7 @@ let updateRating = function(emailID, waveID, skillnames, ratings, successCB, err
     SET k.totalRating=k.totalRating+(ratings[index]*i.credit),k.totalCredits=k.totalCredits+i.credit
     RETURN candidate
     `;
+  logger.debug('Rating Updation Query: ', query);
   let session = driver.session();
   session.run(query).then(function(resultObj) {
     session.close();
@@ -1991,8 +1956,6 @@ module.exports = {
       updateCadet,
       updateCadets,
       deleteCadet,
-      // getCadets,
-      // getCadet,
       getAllCadets,
       getCadetSkills,
       getNewCadets,
