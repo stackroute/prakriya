@@ -99,6 +99,7 @@ let setupWebpack = function(app) {
 }
 
 let setupMongooseConnections = function() {
+  mongoose.Promise = require('bluebird');
   mongoose.connect(CONFIG.MONGO.mongoURL);
 
   mongoose.connection.on('connected', function () {

@@ -291,38 +291,38 @@ export default class Candidates extends React.Component {
 	}
 
 	// fetching filtered candidates from db
-	// getFilteredCandidates() {
-	// 	let th = this;
-	// 	Request
-	// 		.post('/dashboard/filteredcandidates')
-	// 		.set({'Authorization': localStorage.getItem('token')})
-	// 		.send({'filterQuery': this.state.appliedFilters})
-	// 		.end(function(err, res) {
-	// 			if(err)
-	// 	    	console.log(err);
-	// 	    else {
-	// 				th.setState({
-	// 					filteredCandidates: res.body
-	// 				});
-	// 	    }
-	// 		})
-	// }
-
-	// Filter with intelligence search
 	getFilteredCandidates() {
 		let th = this;
 		Request
 			.post('/dashboard/filteredcandidates')
 			.set({'Authorization': localStorage.getItem('token')})
-			.send({'filterQuery': this.state.searchQuery})
+			.send({'filterQuery': this.state.appliedFilters})
 			.end(function(err, res) {
 				if(err)
 		    	console.log(err);
 		    else {
-					console.log('Got the cadets');
+					th.setState({
+						filteredCandidates: res.body
+					});
 		    }
 			})
 	}
+
+	// Filter with intelligence search
+	// getFilteredCandidates() {
+	// 	let th = this;
+	// 	Request
+	// 		.post('/dashboard/filteredcandidates')
+	// 		.set({'Authorization': localStorage.getItem('token')})
+	// 		.send({'filterQuery': this.state.searchQuery})
+	// 		.end(function(err, res) {
+	// 			if(err)
+	// 	    	console.log(err);
+	// 	    else {
+	// 				console.log('Got the cadets');
+	// 	    }
+	// 		})
+	// }
 
 	updateSelectedList(status, cadet) {
 		let cadets = this.state.selectedCandidates;
@@ -387,16 +387,18 @@ export default class Candidates extends React.Component {
 				<AddCandidate addCandidate={this.addCandidate}/>
 				<div>
 					<h1 style={app.heading}>Candidate Management</h1>
-					<TextField
-			      hintText="Describe your search..."
-			      floatingLabelText="Search Cadets"
-			      onChange={this.handleQueryChange}
-			    />
-			    <RaisedButton 
-			    	label="Search" 
-			    	primary={true}
-			    	onClick={this.getFilteredCandidates}
-			    />
+					<div style={{display: 'none'}}>
+						<TextField
+				      hintText="Describe your search..."
+				      floatingLabelText="Search Cadets"
+				      onChange={this.handleQueryChange}
+				    />
+				    <RaisedButton 
+				    	label="Search" 
+				    	primary={true}
+				    	onClick={this.getFilteredCandidates}
+				    />
+			    </div>
 					<Grid>
 						<Row>
 							<Col md={3}>

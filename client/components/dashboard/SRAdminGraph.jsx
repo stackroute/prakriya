@@ -133,7 +133,7 @@ export default class SRAdminGraph extends React.Component {
 						defaultToggled={false}
 						style={{marginLeft: '90%', marginTop: '-10%'}}
 					/>
-          {this.state.toggle === 'none' && <div>
+          {this.state.toggle === 'block' && <div>
             <SelectField value={this.state.Tvalue} onChange={this.handleTChange} floatingLabelText="Wave Training Status">
               {sampledata.map(function(item, key) {
                 return <MenuItem key={key} value={item.waveid} primaryText={item.waveid}/>

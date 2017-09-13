@@ -324,8 +324,11 @@ export default class Waves extends React.Component {
 
 				}
 				{
-						this.state.courses.length === 0 &&
-						<h3 style={{marginLeft: '15%'}}>NO ACTIVE COURSE TO CREATE A WAVE! PLEASE CONTACT THE METOR TO CREATE NEW COURSE.</h3>
+					this.state.courses.length === 0 &&
+					<h3 style={{marginLeft: '15%'}}>
+						NO ACTIVE COURSE TO CREATE A WAVE! PLEASE CONTACT THE MENTOR 
+						TO CREATE NEW COURSE.
+					</h3>
 				}
 
 				<Snackbar

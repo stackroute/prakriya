@@ -12,14 +12,16 @@ import app from '../../styles/app.json';
 
 const styles = {
 	rowHeaders: {
-		height: 50,
+		height: 40,
 		fontWeight: 'bold',
 		color: '#eee',
 		background: '#555',
 		paddingTop: 10,
+		border: '1px solid #F0F8FF'
 	},
 	paper1: {
 		padding: 10,
+		textAlign: 'left',
 		backgroundColor: '#C6D8D3'
 	},
 	paper2: {
@@ -186,7 +188,7 @@ export default class MentorConnect extends React.Component {
 				this.state.cadets.length != 0 ?
 				<Grid>
 					<Row style={{textAlign: 'center'}}>
-						<Col md={5}>
+						<Col md={6}>
 							<Paper style={styles.paper1}>
 								<AutoComplete
 				          hintText="Search Candidate"
@@ -194,6 +196,7 @@ export default class MentorConnect extends React.Component {
 				          dataSource={cadetsName}
 				          onNewRequest={this.handleFilter}
 				        />
+								{' '}
 				        <FlatButton
 				        	label="Clear Filter"
 				        	primary={true}
@@ -210,7 +213,7 @@ export default class MentorConnect extends React.Component {
 				          onChange={this.handleSliderChange}
 				        />
 				        <div style={styles.sliderVal}>
-				        	<span>Digithon Score above {this.state.slider}</span>
+				        	<span>Digithon Score > {this.state.slider}</span>
 				        	<span style={{float: 'right'}}>
 				        		<FlatButton
 				        			label="Select Cadets"
@@ -221,22 +224,22 @@ export default class MentorConnect extends React.Component {
 				        </div>
 				      </Paper>
 		        </Col>
-		        <Col md={5}>
+		        <Col md={6}>
 		        	<FileDrop handleBulkUpdateRemarks={this.updateBulkRemarks}/>
 		        </Col>
 					</Row>
 					<Row style={styles.rowHeaders}>
-						<Col md={1} mdOffset={1}>
+						<Col md={2} style={{textAlign: 'center'}}>
 							Digithon Score
 						</Col>
-						<Col md={2}>
+						<Col md={2} style={{textAlign: 'center'}}>
 							Cadet Name
 						</Col>
-						<Col md={4}>
-							Remarks
+						<Col md={4} style={{textAlign: 'center'}}>
+							Cadet Remarks
 						</Col>
-						<Col md={3}>
-							Selected
+						<Col md={3} style={{textAlign: 'center'}}>
+							Cadet Selected
 						</Col>
 					</Row>
 					{
