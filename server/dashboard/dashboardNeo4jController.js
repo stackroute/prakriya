@@ -822,16 +822,16 @@ let updateVersion = function(version, successCB, errorCB) {
   });
 
   let query = `
-          MATCH (version:${graphConsts.NODE_VERSION} {name: '${version.name}'})
+          OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: '${version.name}'})
           -[skillsRelation:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
           DELETE skillsRelation
           WITH COLLECT(skill.Name) AS skills, version AS version
           UNWIND (skills) AS skillName
-          MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+          OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
           -[skillsRelation:${graphConsts.REL_KNOWS}]-> (:${graphConsts.NODE_SKILL} {Name: skillName})
           DELETE skillsRelation
           WITH version AS version
-          MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+          OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
           -[productRelation:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
           DELETE productRelation
           WITH version AS version
