@@ -787,16 +787,16 @@ let updateVersion = function(version, successCB, errorCB) {
   });
 
   let query = `
-          MATCH (version:${graphConsts.NODE_VERSION} {name: '${version.name}'})
+          OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: '${version.name}'})
           -[skillsRelation:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
           DELETE skillsRelation
           WITH COLLECT(skill.Name) AS skills, version AS version
           UNWIND (skills) AS skillName
-          MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+          OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
           -[skillsRelation:${graphConsts.REL_KNOWS}]-> (:${graphConsts.NODE_SKILL} {Name: skillName})
           DELETE skillsRelation
           WITH version AS version
-          MATCH (candidate:${graphConsts.NODE_CANDIDATE})
+          OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
           -[productRelation:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
           DELETE productRelation
           WITH version AS version
@@ -1296,6 +1296,31 @@ let getCadetsOfWave = function(waveID, course, successCB, errorCB) {
     }
   });
 };
+
+// Get cadets of wave without projects
+let getWaveCadetsWoProject = function(waveID, course, successCB, errorCB) {
+  let query = 
+    `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
+    WHERE c.WaveID = '${waveID}' AND c.CourseName = '${course}'
+    AND NOT (n)-[:${graphConsts.REL_WORKEDON}]->(:${graphConsts.NODE_PRODUCT})
+    RETURN n`;
+  let session = driver.session();
+  session.run(query).then(function(resultObj) {
+    session.close();
+    if (resultObj) {
+      let candidateName = []
+      resultObj.records.map(function(res) {
+        logger.debug(res._fields[0])
+        candidateName.push(res._fields[0].properties)
+      })
+      logger.debug(candidateName, "candidateName");
+      successCB(candidateName);
+    } else {
+      errorCB('Error');
+    }
+  });
+};
+
 //getCadetsOfActivewaves
 let ActivewaveCadets = function(activewaveId,course, successCB, errorCB){
   let query = `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
@@ -1982,6 +2007,7 @@ module.exports = {
       getWave,
       deleteWave,
       getCadetsOfWave,
+      getWaveCadetsWoProject,
       updateWaveCadets,
       getWaveIDs,
       addProduct,

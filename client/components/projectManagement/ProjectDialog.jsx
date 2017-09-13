@@ -189,48 +189,56 @@ export default class ProjectDialog extends React.Component {
 	}
 
 	getCandidates(waveID) {
-			let th = this;
-			let candidateSet = [];
-			let candidateNames = [];
-			let candidateIDs = [];
-			let candidateEmailID = [];
-			let candidates = [];
-			let wave = waveID.split('(')[0].trim();
-	    let course = waveID.split('(')[1].split(')')[0];
-	    Request
-				.post('/dashboard/cadetsofwave')
-				.set({'Authorization': localStorage.getItem('token')})
-				.send({waveid: wave, course: course})
-				.end(function(err, res){
-					res.body.map(function(candidate,index) {
-						let flag = false;
-						candidateSet.push(candidate)
-						if(th.props.dialogTitle == 'EDIT VERSION') {
-							th.props.project.version[th.props.version].members.filter(function (cadet) {
-								if(candidate.EmployeeName === cadet.EmployeeName) {
-									candidateNames.push({value: candidate.EmployeeName, checked: true})
-									candidates.push(cadet);
-									flag = true;
-								}
-							});
-							if(!flag) {
-								candidateNames.push({value: candidate.EmployeeName, checked: false})
+		console.log('Add version', this.props.showAddVersion);
+		let url = '';
+		if(this.props.showAddVersion) {
+			url = '/dashboard/cadetsofwave';
+		}
+		else {
+			url = '/dashboard/wavecadetswoprojects';
+		}
+		let th = this;
+		let candidateSet = [];
+		let candidateNames = [];
+		let candidateIDs = [];
+		let candidateEmailID = [];
+		let candidates = [];
+		let wave = waveID.split('(')[0].trim();
+    let course = waveID.split('(')[1].split(')')[0];
+    Request
+			.post(url)
+			.set({'Authorization': localStorage.getItem('token')})
+			.send({waveid: wave, course: course})
+			.end(function(err, res){
+				res.body.map(function(candidate,index) {
+					let flag = false;
+					candidateSet.push(candidate)
+					if(th.props.dialogTitle == 'EDIT VERSION') {
+						th.props.project.version[th.props.version].members.filter(function (cadet) {
+							if(candidate.EmployeeName === cadet.EmployeeName) {
+								candidateNames.push({value: candidate.EmployeeName, checked: true})
+								candidates.push(cadet);
+								flag = true;
 							}
+						});
+						if(!flag) {
+							candidateNames.push({value: candidate.EmployeeName, checked: false})
 						}
-						else {
-							candidateNames.push({value: candidate.EmployeeName, checked: false});
-						}
-						candidateIDs.push(candidate.EmployeeID)
-						candidateEmailID.push(candidate.EmailID)
-					});
-					th.setState({
-						candidateSet: candidateSet,
-						candidateNames: candidateNames,
-						candidateIDs: candidateIDs,
-						candidates: candidates,
-						candidateEmailID: candidateEmailID
-					});
-				})
+					}
+					else {
+						candidateNames.push({value: candidate.EmployeeName, checked: false});
+					}
+					candidateIDs.push(candidate.EmployeeID)
+					candidateEmailID.push(candidate.EmailID)
+				});
+				th.setState({
+					candidateSet: candidateSet,
+					candidateNames: candidateNames,
+					candidateIDs: candidateIDs,
+					candidates: candidates,
+					candidateEmailID: candidateEmailID
+				});
+			})
 	}
 
 	onToggleCandidate(event, isChecked) {

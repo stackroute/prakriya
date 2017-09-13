@@ -99,6 +99,7 @@ export default class Projects extends React.Component {
 
 	handleUpdate(projObj) {
 		let th = this;
+		console.log(projObj);
 		Request
 			.post('/dashboard/updateproject')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -130,6 +131,7 @@ export default class Projects extends React.Component {
 
 	render() {
 		let th = this;
+		console.log(th.state.projects);
 				return(
 			<div>
 				<h2 style={styles.heading}>Product Management</h2>
