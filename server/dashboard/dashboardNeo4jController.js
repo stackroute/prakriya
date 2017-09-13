@@ -159,19 +159,21 @@ let deleteCadet = function(cadetObj, successCB, errorCB) {
 // fetching all the cadets with wave and project details
 let getAllCadets = function(successCB, errorCB) {
   let session = driver.session();
-  let query =
-    `match (c:${graphConsts.NODE_CANDIDATE})-[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE})-[:${graphConsts.REL_HAS}]->(course:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_INCLUDES}]->(skill:${graphConsts.NODE_SKILL})
-    with c as candidate, w as wave, skill as courseSkill
-    optional match (candidate)-[w:worked_on]->(p:${graphConsts.NODE_PRODUCT})-[:has]->(v:${graphConsts.NODE_VERSION}{name:w.version})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
-    with p as product, candidate as candidate, wave as wave, v as version, COLLECT(s.Name) as skill,COLLECT(courseSkill.Name) as courseSkill
-    WITH skill + courseSkill AS skills,product as product, candidate as candidate, wave as wave, version as version
-    UNWIND skills AS skill
-    WITH COLLECT (DISTINCT skill) AS skillset, candidate as candidate, wave as wave, version as version
+  let query =`
+    MATCH (c:${graphConsts.NODE_CANDIDATE})
+    -[:${graphConsts.REL_BELONGS_TO}]->(w:${graphConsts.NODE_WAVE})
+    WITH c AS candidate, w AS wave
+    OPTIONAL MATCH (candidate)
+    -[w:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})
+    -[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:w.version})
+    WITH candidate AS candidate, wave AS wave, v AS version
+    OPTIONAL MATCH (candidate)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
+    WITH candidate AS candidate, wave AS wave, version AS version, COLLECT(s.Name) AS skillset
     return {
-    		candidate:candidate,
-    		product: version,
-            wave: wave,
-            skill: skillset
+      candidate:candidate,
+      product: version,
+      wave: wave,
+      skill: skillset
     }`;
   session.run(query).then(function(resultObj) {
     session.close();
@@ -314,7 +316,7 @@ let getFilteredCadets = function(filterQuery, successCB, errorCB) {
       skill_arr += "'" + skill + "', ";
     })
     skill_arr = skill_arr.substring(0, skill_arr.length-2);
-    skills = `WITH n as n
+    skills = `WITH n as n, w as w
       MATCH (n)-[: ${graphConsts.REL_KNOWS}]->(s: ${graphConsts.NODE_SKILL})
       WHERE s.Name IN [${skill_arr}]`
   }
