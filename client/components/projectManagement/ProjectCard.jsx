@@ -351,7 +351,7 @@ export default class ProjectCard extends React.Component {
           onRequestClose={th.handleEditLogo}
         >
           <UpdateProductLogo
-            productname={this.props.project.product}
+            productname={th.state.versionName[th.state.selectedVersionIndex]}
             handleClose={th.handleEditLogo}/>
         </Dialog>
       </div>

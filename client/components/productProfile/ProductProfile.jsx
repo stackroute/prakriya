@@ -192,19 +192,25 @@ export default class ProductProfile extends React.Component {
 							<div>
 								{
 									th.state.version.gitURL !== null &&
-									<h4>Git URL - <a href={th.state.version.gitURL} target="_blank"> {th.state.version.gitURL} </a></h4>
+									<h4>Git URL - {
+										th.state.version.gitURL !== '' ? <a href={th.state.version.gitURL} target="_blank"> {th.state.version.gitURL} </a> : <span>NA</span>
+									}</h4>
 								}
 							</div>
 							<div>
 								{
 									th.state.version.videoURL !== undefined &&
-									<h4>Video URL - <a href={th.state.version.videoURL} target="_blank"> {th.state.version.videoURL} </a></h4>
+									<h4>Video URL - {
+										th.state.version.videoURL !== '' ? <a href={th.state.version.videoURL} target="_blank"> {th.state.version.videoURL} </a> : <span>NA</span>
+									}</h4>
 								}
 							</div>
 							<div>
 								{
 									th.state.version.presentationURL !== undefined &&
-									<h4>Presentation URL - <a href={th.state.version.presentationURL} target="_blank"> {th.state.version.presentationURL} </a></h4>
+									<h4>Presentation URL - {
+										th.state.version.presentationURL !== '' ? <a href={th.state.version.presentationURL} target="_blank"> {th.state.version.presentationURL} </a> : <span>NA</span>
+									}</h4>
 								}
 							</div>
 						</div>
