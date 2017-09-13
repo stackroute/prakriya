@@ -13,6 +13,7 @@ import Moment from 'moment';
 import Dialog from 'material-ui/Dialog';
 import IconButton from 'material-ui/IconButton';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import CamIcon from 'material-ui/svg-icons/image/camera-alt';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import ProjectDialog from './ProjectDialog.jsx';
 import FlatButton from 'material-ui/FlatButton';
@@ -26,6 +27,7 @@ import MoreVertIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import dialog from '../../styles/dialog.json';
 import {Link} from 'react-router';
+import UpdateProductLogo from './UpdateProductLogo.jsx';
 
 const styles = {
   text: {
@@ -44,7 +46,11 @@ const styles = {
   },
   grid: {
     width: '100%'
-  }
+  },
+  customContent: {
+	  width: '400px',
+	  maxWidth: 'none'
+	}
 };
 
 export default class ProjectCard extends React.Component {
@@ -61,7 +67,8 @@ export default class ProjectCard extends React.Component {
       project: {},
       newVersionDialog: false,
       delete: '',
-      role: ''
+      role: '',
+      openEditLogo: false
     }
     this.formatDate = this.formatDate.bind(this);
     this.handleClose = this.handleClose.bind(this);
@@ -77,6 +84,7 @@ export default class ProjectCard extends React.Component {
     this.newVersion = this.newVersion.bind(this);
     this.handleDeleteChange = this.handleDeleteChange.bind(this);
     this.getRole = this.getRole.bind(this);
+    this.handleEditLogo = this.handleEditLogo.bind(this);
   }
 
   componentWillMount() {
@@ -186,6 +194,13 @@ export default class ProjectCard extends React.Component {
     })
   }
 
+  handleEditLogo() {
+    let th = this;
+    this.setState({
+      openEditLogo: !th.state.openEditLogo
+    })
+  }
+
   render() {
     let detail = '';
     if (this.state.project.version[this.state.selectedVersionIndex].updated === 'true') {
@@ -220,10 +235,8 @@ export default class ProjectCard extends React.Component {
 		let cadetSkill = []
 		let i = 0
 
-    console.log(this.state.role+'role');
     return (
       <div>
-
         <Card style={{
           width: '370px',
           marginRight: '20px',
@@ -288,6 +301,9 @@ export default class ProjectCard extends React.Component {
               <IconButton tooltip="Delete project" onClick={this.openDeleteDialog}>
                 <DeleteIcon/>
               </IconButton>
+              <IconButton tooltip="Add / Edit project Logo" onClick={this.handleEditLogo} style={{float:'right'}}>
+                <CamIcon/>
+              </IconButton>
           </span>
           }
         </Card>
@@ -328,6 +344,15 @@ export default class ProjectCard extends React.Component {
               label={<span>Current Version: <b>{th.state.versionName[th.state.selectedVersionIndex]}</b></span>}
             />
           </RadioButtonGroup></p>
+        </Dialog>
+        <Dialog
+          contentStyle={styles.customContent}
+          open={th.state.openEditLogo}
+          onRequestClose={th.handleEditLogo}
+        >
+          <UpdateProductLogo
+            productname={this.props.project.product}
+            handleClose={th.handleEditLogo}/>
         </Dialog>
       </div>
     )
