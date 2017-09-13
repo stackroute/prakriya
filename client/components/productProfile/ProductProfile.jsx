@@ -2,6 +2,7 @@ import React from 'react';
 import Request from 'superagent';
 import {Grid, Row, Col} from 'react-flexbox-grid';
 import {Link} from 'react-router';
+import Avatar from 'material-ui/Avatar';
 
 const styles = {
 	logo: {
@@ -37,14 +38,17 @@ export default class ProductProfile extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			version: null
+			version: null,
+			imageURL: ''
 		}
 
 		this.getProductVersion = this.getProductVersion.bind(this);
+    this.getProductLogo = this.getProductLogo.bind(this);
 	}
 
 	componentWillMount() {
 		this.getProductVersion();
+		this.getProductLogo(this.props.routeParams.name);
 	}
 
 	getProductVersion() {
@@ -62,6 +66,26 @@ export default class ProductProfile extends React.Component {
 		    }
 		  });
 	}
+
+  getProductLogo(projectname) {
+  	let th = this;
+  	Request
+  		.get(`/dashboard/getimage`)
+  		.set({'Authorization': localStorage.getItem('token')})
+      .query({filename: projectname})
+  		.end(function(err, res) {
+  			if(err) {
+    	    	console.log('Profile pic not found.');
+        } else {
+  	    	if(res.text) {
+  		    	th.setState({
+  		    		imageURL: res.text
+  		    	})
+  	    	}
+  	    }
+  		})
+  }
+
 
 	render() {
 		let th = this;
@@ -93,7 +117,13 @@ export default class ProductProfile extends React.Component {
 							<br/>
 						</div>
 						<div style={styles.hr}></div>
-						<div style={styles.logo}>{th.props.routeParams.name.toUpperCase().charAt(0)}</div>
+						{
+							th.state.imageURL !== '' ?  <Avatar src={th.state.imageURL} size={70} style={{textAlign: 'center', border: '1px solid #F0F8FF', margin:'auto', position: 'relative', top: '-25px', left: 'calc(50% - 35px)'}}/> : <div style={styles.logo}>
+							{
+								th.props.routeParams.name.toUpperCase().charAt(0)
+							}
+						</div>
+					}
 					</div>
 				}
 				{
