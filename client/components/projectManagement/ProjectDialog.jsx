@@ -623,8 +623,9 @@ export default class ProjectDialog extends React.Component {
       >
 				<div>
 				 <TextField
-			      floatingLabelText='Name *'
+			      floatingLabelText='Product Name *'
 						floatingLabelStyle={app.mandatoryField}
+						hintText= 'Eg: Android'
 						value={this.state.projectName}
 			      onChange={this.onNameChange}
 						errorText={this.state.projectNameErrorText}
@@ -634,8 +635,9 @@ export default class ProjectDialog extends React.Component {
 			    />
 					<br/>
 					<TextField
-					floatingLabelText='Version *'
+					floatingLabelText='Version Name *'
 					floatingLabelStyle={app.mandatoryField}
+					hintText = 'Eg: Lolipop, Marshmallow'
 					value={this.state.versionName}
 					onChange={this.onVersionChange}
 					errorText={this.state.projectVersionErrorText}
