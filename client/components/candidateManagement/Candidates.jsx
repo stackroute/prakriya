@@ -121,20 +121,27 @@ export default class Candidates extends React.Component {
 	addFilter(key, value) {
 		let appliedFilters = this.state.appliedFilters;
 
-		if(key == 'Skills') {
+		let save = false;
+
+		if(key == 'Skills' && appliedFilters[key].indexOf(value) < 0) {
 			appliedFilters[key].push(value);
+			save = true;
 		}
-		else if(key == 'Billability') {
+		else if(key == 'Billability' && appliedFilters[key].indexOf(value) < 0) {
 			appliedFilters[key].push(value);
+			save = true;
 		}
-		else {
+		else if(key != 'Skills' && key != 'Billability'){
 			appliedFilters[key] = value;
+			save = true;
 		}
-		this.setState({
-			filtersCount: this.state.filtersCount+1,
-			appliedFilters: appliedFilters
-		});
-		this.getFilteredCandidates()
+		if(save) {
+			this.setState({
+				filtersCount: this.state.filtersCount+1,
+				appliedFilters: appliedFilters
+			});
+			this.getFilteredCandidates()
+		}
 	}
 
 	removeFilter(key) {
