@@ -48,6 +48,7 @@ export default class EvaluationForms extends React.Component {
 			testability: [],
 			engineeringculture: [],
 			skills: [],
+			credits: [],
 			communication: [],
 			overall: '',
 			doneWell: '',
@@ -123,14 +124,14 @@ export default class EvaluationForms extends React.Component {
 					console.log('Error in fetching evaluation fields: ', err)
 				else {
 					// configuring the candidate specific evaluation skills
-					console.log('data recieved: ', res.body)
-          EVALUATION[4].options = res.body;
+          EVALUATION[4].options = res.body.skills;
           let skills = [];
-          res.body.map(function() {
+          res.body.skills.map(function() {
             skills.push(0)
           });
           th.setState({
-            skills: skills
+            skills: skills,
+						credits: res.body.credits
           });
 				}
 			});
@@ -204,18 +205,16 @@ export default class EvaluationForms extends React.Component {
 			this.setState({
 				attitude: val
 			})
-		}
-		else if(type == 'punctuality') {
+		} else if(type == 'punctuality') {
 			this.setState({
 				punctuality: val
-			})
-		}
-		else {
+			});
+		}  else {
 			let temp = this.state[type];
 			temp[key] = val;
 			this.setState({
 				[type]: temp
-			})
+			});
 		}
 	};
 
@@ -226,15 +225,11 @@ export default class EvaluationForms extends React.Component {
 	};
 
 	handleAreasOfImprovementChange(event) {
-		this.setState({
-			improvement: event.target.value
-		})
+		this.setState({improvement: event.target.value});
 	};
 
 	handleSuggestionsChange(event) {
-		this.setState({
-			suggestions: event.target.value
-		})
+		this.setState({suggestions: event.target.value});
 	};
 
 	handleSubmit() {
@@ -288,6 +283,7 @@ export default class EvaluationForms extends React.Component {
 		obj.waveID = this.state.wave;
 		obj.skills = skillNames;
 		obj.ratings = skillRatings;
+		obj.credits = this.state.credits;
 		Request
 			.post('/dashboard/updaterating')
 			.set({'Authorization': localStorage.getItem('token')})
@@ -379,7 +375,7 @@ export default class EvaluationForms extends React.Component {
 
 						<Row>
 							<Col md={6} mdOffset={2} style={styles.single}>
-								Punctuality and attendance
+								Punctuality and Attendance
 							</Col>
 							<Col md={2}>
 								<StarRating

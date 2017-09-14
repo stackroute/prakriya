@@ -1299,7 +1299,7 @@ let getCadetsOfWave = function(waveID, course, successCB, errorCB) {
 
 // Get cadets of wave without projects
 let getWaveCadetsWoProject = function(waveID, course, successCB, errorCB) {
-  let query = 
+  let query =
     `MATCH(n:${graphConsts.NODE_CANDIDATE})-[${graphConsts.REL_BELONGS_TO}]->(c:${graphConsts.NODE_WAVE})
     WHERE c.WaveID = '${waveID}' AND c.CourseName = '${course}'
     AND NOT (n)-[:${graphConsts.REL_WORKEDON}]->(:${graphConsts.NODE_PRODUCT})
@@ -1786,9 +1786,7 @@ let updateSession = function(wave, waveID, course, successCB, errorCB) {
 }
 
 let deleteSession = function (waveObj, waveID, course, successCB, errorCB) {
-  let query = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${waveObj.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE})
-              WHERE w.WaveID = '${waveID}' AND w.CourseName = '${course}'
-              DELETE r`;
+  let query = `MATCH (n:${graphConsts.NODE_SESSION}{Name:'${waveObj.Name}'})<-[r:${graphConsts.REL_INCLUDES}]-(w:${graphConsts.NODE_WAVE}) WHERE w.WaveID = '${waveID}' AND w.CourseName = '${course}' DELETE r`;
   let session = driver.session();
   session.run(query).then(function(resultObj, err) {
 
@@ -1809,28 +1807,19 @@ let deleteSession = function (waveObj, waveID, course, successCB, errorCB) {
 let getEvaluationSkills = function(candidateID, successCB, errorCB) {
   let query = `
     MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${candidateID}'})
-    WITH candidate AS candidate
-    OPTIONAL MATCH (candidate)
-    -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
-    WITH v.version AS versionname, candidate AS candidate
-    OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: versionname})
-    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    WITH COLLECT(skill.Name) as skills1, candidate AS candidate
-    MATCH (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
+    -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
     -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
-    WITH skills1 AS skills1, course AS course
-    MATCH (course) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-    WITH COLLECT(skill.Name) AS skills2, skills1
-    WITH skills1 + skills2 AS skills
-    UNWIND skills AS skill
-    WITH COLLECT (DISTINCT skill) AS skillset
-    RETURN skillset
+    -[i:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    RETURN {
+        skills: COLLECT(skill.Name),
+        credits: COLLECT(toFloat(i.credit))
+    }
     `;
   let session = driver.session();
+  logger.debug('Get Evaluation Skills: ', query);
   session.run(query).then(function(resultObj) {
     session.close();
     if (resultObj) {
-      logger.debug(resultObj);
       successCB(resultObj.records[0]._fields[0]);
     } else {
       errorCB('getEvaluationSkills: Error');
@@ -1839,22 +1828,31 @@ let getEvaluationSkills = function(candidateID, successCB, errorCB) {
 };
 
 // update rating
-let updateRating = function(emailID, waveID, skillnames, ratings, successCB, errorCB) {
+let updateRating = function(emailID, waveID, skills, ratings, credits, successCB, errorCB) {
   let query = `
-    MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${emailID}'})
-    WITH candidate AS candidate
-    MATCH (wave:${graphConsts.NODE_WAVE} {WaveID: '${waveID.split(" ")[0]}'})
-    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
-    WITH course AS course, candidate AS candidate,
-    ${JSON.stringify(skillnames)} AS skillnames,
+    MATCH (c:${graphConsts.NODE_CANDIDATE} {EmailID: '${emailID}'})
+    WITH c AS c,
+    ${JSON.stringify(skills)} AS skills,
     ${JSON.stringify(ratings)} AS ratings,
-    RANGE (0, ${skillnames.length}) AS indices
+    ${JSON.stringify(credits)} AS credits,
+    RANGE(0, ${skills.length}) AS indices
     UNWIND indices AS index
-    MATCH (course) -[i:${graphConsts.REL_INCLUDES}]->
-    (:${graphConsts.NODE_SKILL} {Name: skillnames[index]})
-    <-[k:${graphConsts.REL_KNOWS}]-(candidate)
-    SET k.totalRating=k.totalRating+(ratings[index]*i.credit),k.totalCredits=k.totalCredits+i.credit
-    RETURN candidate
+    MATCH (s:${graphConsts.NODE_SKILL} {Name: skills[index]})
+    MERGE (c) -[:${graphConsts.REL_KNOWS}]-> (s)
+    WITH c AS c, COLLECT(s) AS s,
+    skills AS skills, indices AS indices,
+    ratings AS ratings, credits AS credits
+    UNWIND indices AS index
+    OPTIONAL MATCH (c) -[k:${graphConsts.REL_KNOWS}]->
+    (:${graphConsts.NODE_SKILL} {Name: skills[index]})
+    SET k.totalRating =
+    CASE WHEN k.totalRating IS NULL THEN (ratings[index] * credits[index])
+    ELSE (k.totalRating + (ratings[index] * credits[index])) END,
+    k.totalCredits =
+    CASE WHEN k.totalCredits IS NULL THEN credits[index]
+    ELSE (k.totalCredits + credits[index]) END
+    WITH c AS c
+    RETURN c
     `;
   logger.debug('Rating Updation Query: ', query);
   let session = driver.session();
