@@ -149,7 +149,7 @@ let getAllCadets = function(successCB, errorCB) {
     -[w:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})
     -[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:w.version})
     WITH candidate AS candidate, wave AS wave, v AS version
-    OPTIONAL MATCH (candidate)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
+    MATCH (w)-[:${graphConsts.REL_HAS}]-(course:${graphConsts.NODE_COURSE})-[:${graphConsts.REL_INCLUDES}]->(s:${graphConsts.NODE_SKILL})
     WITH candidate AS candidate, wave AS wave, version AS version, COLLECT(s.Name) AS skillset
     return {
       candidate:candidate,
@@ -186,22 +186,10 @@ let getCadetSkills = function(email, successCB, errorCB) {
   let session = driver.session();
   let query = `
   MATCH (candidate:${graphConsts.NODE_CANDIDATE} {EmailID: '${email}'})
-  WITH candidate AS candidate
-  OPTIONAL MATCH (candidate)
-  -[v:${graphConsts.REL_WORKEDON}]-> (product:${graphConsts.NODE_PRODUCT})
-  WITH v.version AS versionname, candidate AS candidate
-  OPTIONAL MATCH (version:${graphConsts.NODE_VERSION} {name: versionname})
-  -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-  WITH COLLECT(skill.Name) as skills1, candidate AS candidate
-  MATCH (candidate) -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
-  -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
-  WITH skills1 AS skills1, course AS course
-  MATCH (course) -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
-  WITH COLLECT(skill.Name) AS skills2, skills1
-  WITH skills1 + skills2 AS skills
-  UNWIND skills AS skill
-  WITH COLLECT (DISTINCT skill) AS skillset
-  RETURN skillset
+    -[:${graphConsts.REL_BELONGS_TO}]-> (:${graphConsts.NODE_WAVE})
+    -[:${graphConsts.REL_HAS}]-> (course:${graphConsts.NODE_COURSE})
+    -[:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
+    RETURN COLLECT(skill.Name)
   `;
   session.run(query).then(function(resultObj) {
     session.close();
@@ -691,7 +679,6 @@ let addProduct = function(productObj, successCB, errorCB) {
      UNWIND ${JSON.stringify(version.skills)} AS skillname
      MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
      MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
-     MERGE (skill) <-[:${graphConsts.REL_KNOWS} {totalCredits: 0, totalRating: 0}]- (employee)
      WITH product AS product
      UNWIND ${JSON.stringify(version.members)} AS employeeName
      MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
@@ -757,7 +744,6 @@ let addVersion = function(name, versionObj, successCB, errorCB) {
        UNWIND ${JSON.stringify(version.skills)} AS skillname
        MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
        MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
-       MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
        WITH product AS product
        UNWIND ${JSON.stringify(version.members)} AS employeeName
        MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeName: employeeName})
@@ -791,11 +777,6 @@ let updateVersion = function(version, successCB, errorCB) {
           -[skillsRelation:${graphConsts.REL_INCLUDES}]-> (skill:${graphConsts.NODE_SKILL})
           DELETE skillsRelation
           WITH COLLECT(skill.Name) AS skills, version AS version
-          UNWIND (skills) AS skillName
-          OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
-          -[skillsRelation:${graphConsts.REL_KNOWS}]-> (:${graphConsts.NODE_SKILL} {Name: skillName})
-          DELETE skillsRelation
-          WITH version AS version
           OPTIONAL MATCH (candidate:${graphConsts.NODE_CANDIDATE})
           -[productRelation:${graphConsts.REL_WORKEDON} {version: version.name}]-> (:${graphConsts.NODE_PRODUCT})
           DELETE productRelation
@@ -819,7 +800,6 @@ let updateVersion = function(version, successCB, errorCB) {
           UNWIND ${JSON.stringify(version.skills)} AS skillname
           MERGE (skill:${graphConsts.NODE_SKILL} {Name: skillname})
           MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeID: employeeID})
-          MERGE (skill) <-[:${graphConsts.REL_KNOWS} {rating: 'nil'}]- (employee)
           WITH product AS product
           UNWIND ${JSON.stringify(employeeIDs)} AS employeeID
           MERGE (employee:${graphConsts.NODE_CANDIDATE} {EmployeeID: employeeID})
@@ -858,17 +838,7 @@ let deleteProduct = function(productName, successCB, errorCB) {
        MATCH (candidate:${graphConsts.NODE_CANDIDATE})
        -[workedonRelation:${graphConsts.REL_WORKEDON} {version: versionName}]->
        (product:${graphConsts.NODE_PRODUCT})
-       WITH COLLECT(workedonRelation) AS workedonRelations, product AS product,
-       COLLECT(candidate) AS candidates, skills AS skills
-       UNWIND (candidates) AS candidate
-       UNWIND (skills) AS skill
-       MATCH (candidate)
-       -[knowsRelation:${graphConsts.REL_KNOWS}]-> (skill)
-       DELETE knowsRelation
-       WITH workedonRelations AS workedonRelations, product AS product
-       UNWIND (workedonRelations) AS workedonRelation
-       DELETE workedonRelation
-       WITH product AS product
+       WITH COLLECT(workedonRelation) AS workedonRelations, product AS product
        DETACH DELETE product
        `;
 
@@ -901,13 +871,6 @@ let deleteVersion = function(versionName, successCB, errorCB) {
        -[workedonRelation:${graphConsts.REL_WORKEDON} {version: versionName}]->
        (product:${graphConsts.NODE_PRODUCT})
        WITH COLLECT(workedonRelation) AS workedonRelations,
-       COLLECT(candidate) AS candidates, skills AS skills
-       UNWIND (candidates) AS candidate
-       UNWIND (skills) AS skill
-       MATCH (candidate)
-       -[knowsRelation:${graphConsts.REL_KNOWS}]-> (skill)
-       DELETE knowsRelation
-       WITH workedonRelations AS workedonRelations
        UNWIND (workedonRelations) AS workedonRelation
        DELETE workedonRelation
        `;
