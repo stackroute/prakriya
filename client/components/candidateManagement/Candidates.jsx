@@ -430,10 +430,10 @@ export default class Candidates extends React.Component {
 												})
 												val = val.substring(0, val.length-2)
 											}
-
 											else {
 												val = th.state.appliedFilters[filter];
 											}
+											
 											if(val != '') {
 												return (
 													<Chip
