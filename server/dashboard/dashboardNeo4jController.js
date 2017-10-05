@@ -273,8 +273,9 @@ let getFilteredCadets = function(searchParams, successCB, errorCB) {
     })
     skill_arr = skill_arr.substring(0, skill_arr.length-2);
     skills = `
-      MATCH (c)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
-      WHERE s.Name IN [${skill_arr}] WITH c AS c, w AS w`
+      MATCH (c)-[k:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
+      WHERE s.Name IN [${skill_arr}] WITH c AS c, w AS w,
+      SUM(k.totalRating/k.totalCredits) AS rating`
   }
 
   let query = `
@@ -282,9 +283,11 @@ let getFilteredCadets = function(searchParams, successCB, errorCB) {
     ${condition} WITH c AS c, w AS w
     ${skills}
     OPTIONAL MATCH (c)-[ver:${graphConsts.REL_WORKEDON}]->(p:${graphConsts.NODE_PRODUCT})-[:${graphConsts.REL_HAS}]->(v:${graphConsts.NODE_VERSION}{name:ver.version})
-    WITH c AS c, w AS w, v AS v
+    WITH c AS c, w AS w, v AS v,
+    ${searchParams.Skills.length > 0 ? 'rating AS rating'  : '0 AS rating'}
     OPTIONAL MATCH (c)-[:${graphConsts.REL_KNOWS}]->(s:${graphConsts.NODE_SKILL})
-    WITH c AS candidate, w AS wave, v AS version, COLLECT(s.Name) AS skillset
+    WITH c AS candidate, w AS wave, v AS version, COLLECT(s.Name) AS skillset, rating AS rating
+    ORDER BY rating DESC
     RETURN {
       candidate: candidate,
       wave: wave,

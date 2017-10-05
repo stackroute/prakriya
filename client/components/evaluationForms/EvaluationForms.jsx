@@ -139,7 +139,22 @@ export default class EvaluationForms extends React.Component {
 
 	handleWaveChange(event, key, val) {
 		this.setState({
-			wave: val
+			wave: val,
+			cadetName: '',
+			cadetID: '',
+			programming: [0, 0, 0, 0, 0],
+			codequality: [0, 0, 0, 0],
+			testability: [0, 0, 0],
+			engineeringculture: [0, 0, 0, 0, 0],
+			communication: [0, 0, 0],
+			attitude: 0,
+			punctuality: 0,
+			overall: '',
+			doneWell: '',
+			improvement: '',
+			suggestions: '',
+			buttonDisabled: false,
+			oldEvaluation: false
 		})
 	};
 
@@ -193,6 +208,7 @@ export default class EvaluationForms extends React.Component {
 						doneWell: '',
 						improvement: '',
 						suggestions: '',
+						buttonDisabled: false,
 						oldEvaluation: false
 					});
 				}
@@ -292,7 +308,10 @@ export default class EvaluationForms extends React.Component {
 				if(err)
 		    	console.log(err);
 		    else {
-					th.setState({open: true});
+					th.setState({open: true,
+					buttonDisabled: true,
+					oldEvaluation: true
+				});
 		    }
 		  });
 	};
