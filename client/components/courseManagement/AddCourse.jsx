@@ -439,7 +439,7 @@ export default class AddCourse extends React.Component {
                    }
                   </div>
                 </Paper>
-                <p>The default creadit for each skill is 3. Please click on the skill to change it.<br/> Basic - 1, Intermediate - 2 and Advanced - 3</p>
+                <p>The default credit for each skill is 3. Please click on the skill to change it.<br/> Basic - 1, Intermediate - 2 and Advanced - 3</p>
               </div>
             </div>
           </Dialog>

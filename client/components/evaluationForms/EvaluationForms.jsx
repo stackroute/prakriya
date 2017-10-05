@@ -57,7 +57,8 @@ export default class EvaluationForms extends React.Component {
 			open: false,
 			buttonDisabled: false,
 			verify: false,
-			oldEvaluation: false
+			oldEvaluation: false,
+			role: ''
 		}
 		this.getCadets = this.getCadets.bind(this);
 		this.handleOverallRatingChange = this.handleOverallRatingChange.bind(this);
@@ -71,9 +72,11 @@ export default class EvaluationForms extends React.Component {
 		this.saveEvaluation = this.saveEvaluation.bind(this);
 		this.getEvaluationFields = this.getEvaluationFields.bind(this);
 		this.saveRatingsInNeo4j = this.saveRatingsInNeo4j.bind(this);
+		this.getRole = this.getRole.bind(this);
 	}
 
 	componentWillMount() {
+		this.getRole();
 		this.getCadets();
 	}
 
@@ -90,6 +93,17 @@ export default class EvaluationForms extends React.Component {
 			nextState.suggestions.trim() != ''
 		);
 	};
+
+	getRole() {
+		let th = this
+    Request.get('/dashboard/userrole').set({'Authorization': localStorage.getItem('token')}).end(function(err, res) {
+      if (err)
+        console.log(err);
+      else {
+        th.setState({role: res.body});
+      }
+    })
+	}
 
 	getCadets() {
 		let th = this;
@@ -318,6 +332,7 @@ export default class EvaluationForms extends React.Component {
 
 	render() {
 		let th = this;
+		console.log(th.state.role);
 		return(
 			<div>
 				<h1 style={styles.heading}>StackRoute - Cadet Evaluation</h1>
@@ -362,7 +377,7 @@ export default class EvaluationForms extends React.Component {
 					</Row>
 					<Row><Col md={10}>
 						{
-							th.state.oldEvaluation && <p style={{color: '#00BCD4', marginLeft: '50%'}}> You have already evaluated this cadet...</p>
+							th.state.oldEvaluation && th.state.role === 'mentor' && <p style={{color: '#00BCD4', marginLeft: '50%'}}> You have already evaluated this cadet...</p>
 						}
 					</Col></Row>
 					{
@@ -371,8 +386,9 @@ export default class EvaluationForms extends React.Component {
 							<Col md={8}  mdOffset={2} style={styles.single}>
 								<center>Please select a wave and a candidate to proceed.</center>
 							</Col>
-						</Row> :
-						<div>
+						</Row> : (
+							th.state.role !== 'mentor' && th.state.oldEvaluation === false ?
+						 <center> <b> Cadet not Evaludated </b> </center> : <div>
 						<Row>
 							<Col md={6} mdOffset={2} style={styles.single}>
 								Attitude – Interest, inclination and involvement
@@ -545,7 +561,7 @@ export default class EvaluationForms extends React.Component {
 	        			/>
 							</Col>
 						</Row>
-						</div>
+					</div>)
 					}
 				</Grid>
 			</div>
