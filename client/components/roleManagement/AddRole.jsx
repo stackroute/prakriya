@@ -18,13 +18,27 @@ const styles = {
 	}
 };
 
-let wiproadminControls = ['Candidates', 'Bulk Upload'];
+let wiproadminControls = [
+	'Candidates', 
+	'Bulk Upload'
+];
 let sradminControls = [
-	'Waves', 'Candidates', 'Mentor Connect', 'Attendance'
+	'Waves', 
+	'Candidates', 
+	'Mentor Connect', 
+	'Attendance', 
+	'Courses',
+	'Bulk Upload',
+	'Projects',
+	'Evaluation Forms'
 ];
 let mentorControls = [
-	'Projects', 'Courses', 'Assessment Tracker', 'Evaluation Forms',
-	'Mentor Connect', 'Program Flow'
+	'Projects', 
+	'Courses', 
+	'Assessment Tracker', 
+	'Evaluation Forms',
+	'Mentor Connect', 
+	'Program Flow'
 ];
 let candidateControls = ['My Profile', 'Attendace', 'Feedback'];
 

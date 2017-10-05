@@ -107,27 +107,30 @@ export default class FileDrop extends React.Component {
 							<Dropzone style={styles.dropzone} onDrop={this.handleDrop}>
 			          <div>Drop or Click to upload csv files using given template</div>
 			        </Dropzone>
-			        <SelectField
-			          value={this.state.email}
-			          onChange={this.handleEmailChange}
-			          floatingLabelText="Notify to..."
-			          fullWidth={true}
-			        >
-			          {
-			          	this.props.users.map((user, i) => {
-			          		return (
-			          			<MenuItem key={i} value={user.email} primaryText={user.email} />
-			          		)
-			          	})
-			          }
-			        </SelectField>
+			        {
+			        	this.props.user.role === 'wiproadmin' &&
+			        	<SelectField
+				          value={this.state.email}
+				          onChange={this.handleEmailChange}
+				          floatingLabelText="Notify to..."
+				          fullWidth={true}
+				        >
+				          {
+				          	this.props.users.map((user, i) => {
+				          		return (
+				          			<MenuItem key={i} value={user.email} primaryText={user.email} />
+				          		)
+				          	})
+				          }
+				        </SelectField>
+			        }
 			        <br/>
 					    <RaisedButton
 					      label="Upload"
 					      primary={true}
 					      icon={<UploadIcon />}
 					      onClick={this.uploadCadets}
-					      disabled={!(this.state.showSelFile && this.state.email)}
+					      disabled={!(this.state.showSelFile)}
 					    />
 					    {
 					    	this.state.showSelFile &&
